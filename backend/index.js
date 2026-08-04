@@ -37,8 +37,14 @@ const corsOptions = {
       'https://aloraradiance.com',
       'https://www.aloraradiance.com'
     ];
-    // Allow requests with no origin (e.g. mobile apps, Postman) or matched origins
-    if (!origin || allowedOrigins.includes(origin) || /\.netlify\.app$/.test(origin)) {
+    
+    // Allow requests with no origin, Netlify, Vercel preview domains, or matched origins
+    if (
+      !origin || 
+      allowedOrigins.includes(origin) || 
+      /\.netlify\.app$/.test(origin) ||
+      /\.vercel\.app$/.test(origin)  // 👈 Vercel URLs ke liye ye add kiya hai
+    ) {
       callback(null, true);
     } else {
       callback(new Error(`CORS blocked: ${origin}`));
@@ -46,6 +52,7 @@ const corsOptions = {
   },
   credentials: true
 };
+
 
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions)); // Express 5 ke liye preflight route compatible hai

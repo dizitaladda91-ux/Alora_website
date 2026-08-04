@@ -138,7 +138,7 @@ async function fetchSuggestions(query, suggestionsBox) {
         const productsList = data.products || [];
 
         if (productsList.length === 0) {
-            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>" ke liye</div>`;
+            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>"</div>`;
             suggestionsBox.classList.remove("hidden");
             return;
         }
@@ -153,7 +153,7 @@ async function fetchSuggestions(query, suggestionsBox) {
                 <div onclick="window.location.href='./product.html?id=${prod._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
                     <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>
+                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>S
                         <p class="text-[11px] text-[#A0522D] font-bold text-left">₹ ${finalPrice}</p>
                     </div>
                     <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
