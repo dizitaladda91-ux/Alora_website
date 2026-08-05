@@ -33,6 +33,7 @@ const corsOptions = {
       'http://127.0.0.1:5500',
       'http://localhost:5000',
       'http://127.0.0.1:5000',
+      'http://127.0.0.1:5501',
       'https://aloraproduct.netlify.app',
       'https://aloraradiance.com',
       'https://www.aloraradiance.com'
@@ -57,8 +58,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions)); // Express 5 ke liye preflight route compatible hai
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '20mb' }));
+app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cookieParser()); // Cookie Parser registration
 
 // ==========================================

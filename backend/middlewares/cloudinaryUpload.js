@@ -13,35 +13,35 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'ecommerce', // All images will go into this folder in Cloudinary
+    folder: 'ecommerce',
     allowedFormats: ['jpeg', 'png', 'jpg', 'webp'],
   },
 });
 
 const upload = multer({ 
-    storage: storage,
-    limits: {
-        fileSize: 1024 * 1024 * 5 // 5 MB Limit
-    }
+  storage: storage,
+  limits: {
+    fileSize: 1024 * 1024 * 5,          // 5 MB limit for file uploads
+    fieldSize: 1024 * 1024 * 20,        // 20 MB limit for text fields (fixes Quill content size issue)
+    fieldNameSize: 200                  // Optional: Max size for field name strings
+  }
 });
 
 export const deleteFromCloudinary = async (imageUrl) => {
-    try {
-        if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.includes('cloudinary.com')) return;
-        
-        // Extract public_id from URL
-        // Example: https://res.cloudinary.com/.../image/upload/v1234567890/ecommerce/abcde12345.png
-        const parts = imageUrl.split('/upload/');
-        if (parts.length === 2) {
-            let pathWithoutVersion = parts[1].replace(/^v\d+\//, ''); // Remove version part
-            const publicId = pathWithoutVersion.split('.')[0]; // Remove extension
-            
-            await cloudinary.uploader.destroy(publicId);
-            console.log(`Deleted image from Cloudinary: ${publicId}`);
-        }
-    } catch (err) {
-        console.error("Cloudinary Deletion Error:", err);
+  try {
+    if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.includes('cloudinary.com')) return;
+    
+    const parts = imageUrl.split('/upload/');
+    if (parts.length === 2) {
+      let pathWithoutVersion = parts[1].replace(/^v\d+\//, ''); 
+      const publicId = pathWithoutVersion.split('.')[0]; 
+      
+      await cloudinary.uploader.destroy(publicId);
+      console.log(`Deleted image from Cloudinary: ${publicId}`);
     }
+  } catch (err) {
+    console.error("Cloudinary Deletion Error:", err);
+  }
 };
 
 export default upload;
