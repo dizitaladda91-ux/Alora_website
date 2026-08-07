@@ -37,8 +37,9 @@
             <!-- Floating Overlay Search Bar (Fixed layout overlapping issue) -->
             <div id="search-container" class="hidden absolute top-full left-0 right-0 w-full bg-white p-3 shadow-md border-t border-gray-100 z-50 flex items-center justify-between gap-3 px-4 md:px-8">
                 <div class="relative w-full max-w-2xl mx-auto flex items-center">
-                    <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold">
+                    <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold" autocomplete="off">
                     <button id="search-close-btn" type="button" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
+                    <div id="search-suggestions" class="absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1"></div>
                 </div>
             </div>
 

@@ -2,29 +2,6 @@ import BASE_URL, { getImageUrl } from "./config.js";
 
 document.addEventListener("partialsLoaded", () => {
 
-    // ---------- Search box open/close ----------
-    const searchOpenBtn = document.getElementById('search-open-btn');
-    const searchCloseBtn = document.getElementById('search-close-btn');
-    const searchContainer = document.getElementById('search-container');
-    const searchInput = document.getElementById('search-input');
-
-    if (searchOpenBtn && searchContainer && searchInput) {
-        searchOpenBtn.addEventListener('click', () => {
-            searchContainer.classList.add('open');
-            searchInput.focus();
-        });
-    }
-    if (searchCloseBtn && searchContainer) {
-        searchCloseBtn.addEventListener('click', () => {
-            searchContainer.classList.remove('open');
-        });
-    }
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && searchContainer) {
-            searchContainer.classList.remove('open');
-        }
-    });
-
     // ---------- Mobile menu ----------
     const menuBtn = document.getElementById("menu-btn");
     const mobileMenu = document.getElementById("mobile-menu");
@@ -399,78 +376,39 @@ function updateQty(change, element) {
 
 window.addEventListener('load', updateHeaderCartCount);
 
-document.addEventListener("DOMContentLoaded", function () {
-    const searchOpenBtn = document.getElementById("search-open-btn");
-    const searchCloseBtn = document.getElementById("search-close-btn");
+document.addEventListener("partialsLoaded", function () {
     const searchContainer = document.getElementById("search-container");
     const searchInput = document.getElementById("search-input");
 
-    // 1. Search Bar Toggle Logic
-    if (searchOpenBtn && searchContainer) {
-        searchOpenBtn.addEventListener("click", () => {
-            searchContainer.classList.remove("search-hidden");
-            searchInput.focus();
-        });
-    }
-
-    if (searchCloseBtn && searchContainer) {
-        searchCloseBtn.addEventListener("click", () => {
-            searchContainer.classList.add("search-hidden");
-            searchInput.value = "";
-            // Agar user shop page par hai toh products reset ho jayein
-            if (window.location.pathname.includes("moreproduct.html")) {
-                filterProducts("");
-            }
-        });
-    }
-
-    // 2. Search Redirect & Filter Logic
-    if (searchInput) {
-        searchInput.addEventListener("keypress", function (e) {
-            if (e.key === "Enter") {
-                const query = searchInput.value.trim();
-                
-                // Agar user kisi dusre page par hai, toh text ke sath Shop page par bhejo
-                if (!window.location.pathname.includes("moreproduct.html")) {
-                    window.location.href = `./moreproduct.html?search=${encodeURIComponent(query)}`;
-                }
-            }
-        });
-
-        // Agar user pehle se shop page par hai toh type karte hi live filter ho
-        searchInput.addEventListener("input", function (e) {
-            if (window.location.pathname.includes("moreproduct.html")) {
-                filterProducts(e.target.value.toLowerCase().trim());
-            }
-        });
-    }
-
-    // 3. Agar URL me search query hai (jaise home page se redirect hoke aaya ho)
+    // Agar URL me search query hai (jaise home page se redirect hoke aaya ho)
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search');
-    if (searchQuery && window.location.pathname.includes("moreproduct.html")) {
-        searchContainer.classList.remove("search-hidden");
+    if (searchQuery && window.location.pathname.includes("moreproduct.html") && searchContainer && searchInput) {
+        searchContainer.classList.remove("hidden");
         searchInput.value = searchQuery;
-        // Thoda sa ruk kar filter chalayenge taaki products load ho chuke hon
-        setTimeout(() => filterProducts(searchQuery.toLowerCase()), 300);
-    }
-
-    // Product Filter Karne Ka Function
-    function filterProducts(query) {
-        const productCards = document.querySelectorAll(".product-card"); // Check karein aapki product card class kya hai
-        productCards.forEach(card => {
-            const productNameElement = card.querySelector(".product-name"); // Check karein product name ki class kya hai
-            if (productNameElement) {
-                const productNameText = productNameElement.textContent.toLowerCase();
-                if (productNameText.includes(query)) {
-                    card.style.display = "block"; 
-                } else {
-                    card.style.display = "none";
-                }
+        setTimeout(() => {
+            if (typeof filterProducts === "function") {
+                filterProducts(searchQuery.toLowerCase());
             }
-        });
+        }, 300);
     }
 });
+
+// Product Filter Karne Ka Function
+function filterProducts(query) {
+    const productCards = document.querySelectorAll(".product-card"); // Check karein aapki product card class kya hai
+    productCards.forEach(card => {
+        const productNameElement = card.querySelector(".product-name"); // Check karein product name ki class kya hai
+        if (productNameElement) {
+            const productNameText = productNameElement.textContent.toLowerCase();
+            if (productNameText.includes(query)) {
+                card.style.display = "block"; 
+            } else {
+                card.style.display = "none";
+            }
+        }
+    });
+}
 
 
 /* ============================================================
@@ -489,7 +427,8 @@ async function loadSliderProducts() {
 
         if (!response.ok) throw new Error(products.error || "Data fetch nahi ho paya");
 
-        const top5Products = products.slice(0, 5);
+        const productList = Array.isArray(products) ? products : (products.products || products.data || []);
+        const top5Products = productList.slice(0, 5);
 
         if (top5Products.length === 0) {
             wrapper.innerHTML = `<p class="text-ash px-6 py-4 font-medium text-center w-full">No active products found.</p>`;
@@ -509,7 +448,7 @@ async function loadSliderProducts() {
 
             let sizeButtonsHTML = '';
             let initialPrice = 0;
-            let initialComparePrice = 0;
+            let initialComparePrice = '';
 
             if (product.variants && product.variants.length > 0) {
                 initialPrice = product.variants[0].price;
@@ -531,6 +470,9 @@ async function loadSliderProducts() {
                         </button>
                     `;
                 }).join('');
+            } else {
+                initialPrice = product.price || 0;
+                initialComparePrice = product.comparePrice || product.mrp || '';
             }
 
             return `
@@ -642,9 +584,13 @@ function slideProducts(direction) {
     wrapper.style.transform = `translateX(-${currentScrollAmount}px)`;
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', loadSliderProducts);
+} else {
     loadSliderProducts();
-});
+}
+
+document.addEventListener('partialsLoaded', loadSliderProducts);
 
 
 // ---------- Auto Loop Multi-item Carousel Banner Engine ----------

@@ -379,7 +379,7 @@ async function fetchAndShowSuggestions(query) {
     const searchContainer = document.getElementById('search-container');
     if (!searchContainer) return;
 
-    let suggestionsBox = document.getElementById('search-suggestions-box');
+    let suggestionsBox = document.getElementById('search-suggestions-box') || document.getElementById('search-suggestions');
     if (!suggestionsBox) {
         suggestionsBox = document.createElement('div');
         suggestionsBox.id = 'search-suggestions-box';
@@ -413,14 +413,18 @@ async function fetchAndShowSuggestions(query) {
 
         suggestionsBox.innerHTML = matches.map(prod => {
             const imgSrc = getImageUrl(prod.imagepath, '');
-            const price = prod.price || (prod.variants && prod.variants[0] ? prod.variants[0].price : 'N/A');
+            const rawPrice = (prod.variants && prod.variants.length > 0 && prod.variants[0] && prod.variants[0].price != null)
+                ? prod.variants[0].price
+                : (prod.price ?? prod.discountprice ?? prod.productPrice ?? 'N/A');
+            const cleanedPrice = (rawPrice === 'N/A' || rawPrice == null) ? '' : String(rawPrice).replace(/[^\d.]/g, '').trim();
+            const displayPrice = cleanedPrice ? `₹ ${cleanedPrice}` : '';
 
             return `
                 <a href="./product.html?id=${prod._id || prod.id}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
                     <img src="${imgSrc}" alt="${prod.name}" class="w-10 h-10 object-contain rounded bg-white border p-1">
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-800 truncate group-hover:text-amber-700">${prod.name}</p>
-                        <p class="text-xs text-amber-800 font-semibold">₹${price}</p>
+                        ${displayPrice ? `<p class="text-xs text-amber-800 font-semibold" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}
                     </div>
                     <i class="fa-solid fa-chevron-right text-xs text-gray-300 group-hover:text-amber-700"></i>
                 </a>

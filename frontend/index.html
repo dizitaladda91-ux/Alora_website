@@ -104,31 +104,6 @@
   animation-play-state: paused;
 }
 
-
-/* Search container jo shuru me hide rahega */
-#search-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 60px;
-    background-color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    z-index: 999;
-    
-    /* Animation ke liye transitions */
-    transform: translateY(-100%);
-    transition: transform 0.3s ease-in-out;
-}
-
-/* Jab 'open' class add hogi to ye upar se niche aayega */
-#search-container.open {
-    transform: translateY(0);
-}
-
 /* Input field styling */
 #search-input {
     width: 60%;
@@ -185,6 +160,15 @@
         padding-right: 0.75rem;
     }
 }
+
+
+  /* Rupee icon layout and font override fix */
+  .fa-indian-rupee-sign {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    display: inline-block !important;
+  }
+
     </style>
 
 

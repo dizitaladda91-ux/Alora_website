@@ -1,5 +1,6 @@
 // js/navbar-interactions.js
 import BASE_URL, { getImageUrl } from './config.js';
+const RUPEE_SYMBOL = '\u20B9';
 
 // Global Event Delegation for Mobile Menu
 document.addEventListener('click', (e) => {
@@ -57,16 +58,18 @@ document.addEventListener("cartUpdated", () => {
 });
 
 // Search Feature Integration
+// Search Feature Integration
 function initSearchFeature() {
     const searchOpenBtn = document.getElementById('search-open-btn');
     const searchCloseBtn = document.getElementById('search-close-btn');
     const searchContainer = document.getElementById('search-container');
     const searchInput = document.getElementById('search-input');
+    const isMoreProductPage = window.location.pathname.includes('moreproduct.html');
 
     if (!searchContainer || !searchInput) return;
 
     let suggestionsBox = document.getElementById('search-suggestions');
-    if (!suggestionsBox && searchInput.parentElement) {
+    if (!suggestionsBox && searchInput.parentElement && !isMoreProductPage) {
         suggestionsBox = document.createElement('div');
         suggestionsBox.id = 'search-suggestions';
         searchInput.parentElement.appendChild(suggestionsBox);
@@ -90,6 +93,16 @@ function initSearchFeature() {
         searchInput.value = '';
     });
 
+    // Handle Enter key for redirecting to moreproduct page
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            const query = searchInput.value.trim();
+            if (query) {
+                window.location.href = `./moreproduct.html?search=${encodeURIComponent(query)}`;
+            }
+        }
+    });
+
     let debounceTimer;
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.trim();
@@ -102,29 +115,69 @@ function initSearchFeature() {
 
         debounceTimer = setTimeout(async () => {
             try {
-                const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
-                const data = await response.json();
+                let products = [];
 
-                if (data.success && data.products && data.products.length > 0 && suggestionsBox) {
-                    suggestionsBox.innerHTML = data.products.map(product => {
-                        const imageSrc = getImageUrl(product.imagepath, './static/placeholder.png');
+                // 1. Try Backend Search API
+                try {
+                    const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && Array.isArray(data.products)) {
+                            products = data.products;
+                        } else if (Array.isArray(data)) {
+                            products = data;
+                        }
+                    }
+                } catch (apiErr) {
+                    console.warn("Backend search endpoint failed, falling back to all products:", apiErr);
+                }
 
-                        const finalPrice = product.price || product.discountprice || product.productPrice || 'N/A';
+                // 2. Client-side fallback
+                if (products.length === 0) {
+                    try {
+                        const allRes = await fetch(`${BASE_URL}/api/product/all`);
+                        if (allRes.ok) {
+                            const allData = await allRes.json();
+                            if (Array.isArray(allData)) {
+                                const qLower = query.toLowerCase();
+                                products = allData.filter(p => {
+                                    const name = (p.name || p.title || '').toLowerCase();
+                                    const cat = (p.category || '').toLowerCase();
+                                    const desc = (p.description || '').toLowerCase();
+                                    return name.includes(qLower) || cat.includes(qLower) || desc.includes(qLower);
+                                });
+                            }
+                        }
+                    } catch (allErr) {
+                        console.error("Fallback product fetch error:", allErr);
+                    }
+                }
 
-                        return `
-                            <div onclick="window.location.href='product.html?id=${product._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
-                                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-xs font-semibold text-black truncate text-left">${product.name || product.title || ''}</p>
-                                    <p class="text-[11px] text-[#A0522D] font-bold text-left">₹ ${finalPrice}</p>
-                                </div>
-                                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
-                            </div>
-                        `;
-                    }).join('');
-                    suggestionsBox.classList.remove('hidden');
-                } else if (suggestionsBox) {
-                    suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>"</p>`;
+if (products.length > 0 && suggestionsBox) {
+    suggestionsBox.innerHTML = products.map(product => {
+        const imageSrc = getImageUrl(product.imagepath, './static/placeholder.png');
+        const rawPrice = (product.variants && product.variants.length > 0 && product.variants[0] && product.variants[0].price != null)
+            ? product.variants[0].price
+            : (product.price ?? product.discountprice ?? product.productPrice ?? 'N/A');
+        
+        const cleanedPrice = (rawPrice === 'N/A' || rawPrice == null) ? '' : String(rawPrice).replace(/[^\d.]/g, '').trim();
+        
+        const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
+
+        return `
+            <div onclick="window.location.href='./product.html?id=${product._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
+                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
+                <div class="flex-1 min-w-0">
+                    <p class="text-xs font-semibold text-black truncate text-left">${product.name || product.title || ''}</p>
+                    ${displayPrice ? `<p class="text-[11px] text-[#A0522D] font-bold text-left" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
+            </div>
+        `;
+    }).join('');
+    suggestionsBox.classList.remove('hidden');
+}else if (suggestionsBox) {
+                    suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">No products found for "<i>${query}</i>"</p>`;
                     suggestionsBox.classList.remove('hidden');
                 }
             } catch (error) {

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const searchContainer = document.getElementById('search-container');
     const searchInput = document.getElementById('search-input');
     const searchResults = document.getElementById('search-results');
+    const RUPEE_SYMBOL = '\u20B9';
 
     // 1. Toggle Search Bar
     if (searchOpenBtn && searchContainer) {
@@ -56,15 +57,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Render Results Dropdown
     function renderSuggestions(products) {
-        searchResults.innerHTML = products.map(product => `
-            <a href="./productdetail.html?id=${product._id}" class="flex items-center gap-3 p-2 hover:bg-gray-100 transition border-b border-gray-100 last:border-0">
-                <img src="${product.image || './static/logo2.png'}" alt="${product.name || product.title}" class="w-10 h-10 object-cover rounded">
-                <div>
-                    <h4 class="text-sm font-medium text-black">${product.name || product.title}</h4>
-                    <p class="text-xs text-gold font-semibold">$${product.price}</p>
-                </div>
-            </a>
-        `).join('');
+        searchResults.innerHTML = products.map(product => {
+            const rawPrice = (product.variants && product.variants.length > 0 && product.variants[0] && product.variants[0].price != null)
+                ? product.variants[0].price
+                : (product.price ?? product.discountprice ?? product.productPrice ?? 'N/A');
+            const cleanedPrice = (rawPrice === 'N/A' || rawPrice == null) ? '' : String(rawPrice).replace(/[^\d.]/g, '').trim();
+            const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
+
+            return `
+                <a href="./product.html?id=${product._id}" class="flex items-center gap-3 p-2 hover:bg-gray-100 transition border-b border-gray-100 last:border-0">
+                    <img src="${product.imagepath || product.image || './static/logo2.png'}" alt="${product.name || product.title}" class="w-10 h-10 object-cover rounded">
+                    <div>
+                        <h4 class="text-sm font-medium text-black">${product.name || product.title}</h4>
+                        ${displayPrice ? `<p class="text-xs text-gold font-serif font-semibold" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}
+                    </div>
+                </a>
+            `;
+        }).join('');
 
         searchResults.classList.remove('hidden');
     }

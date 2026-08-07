@@ -1,4 +1,5 @@
 import BASE_URL, { getImageUrl } from "./config.js";
+const RUPEE_SYMBOL = '\u20B9';
 
 // ==========================================
 // 1. GLOBAL CUSTOM SUCCESS MODAL
@@ -93,15 +94,18 @@ function initSearchFunctionality() {
         return;
     }
 
+    if (searchInput.dataset.appSearchInitialized === 'true') return;
+    searchInput.dataset.appSearchInitialized = 'true';
+
     let debounceTimer;
 
     searchOpenBtn.addEventListener("click", () => {
-        searchContainer.classList.remove("search-hidden");
+        searchContainer.classList.remove("hidden");
         searchInput.focus();
     });
 
     searchCloseBtn.addEventListener("click", () => {
-        searchContainer.classList.add("search-hidden");
+        searchContainer.classList.add("hidden");
         suggestionsBox.classList.add("hidden");
         searchInput.value = "";
     });
@@ -122,7 +126,7 @@ function initSearchFunctionality() {
     });
 
     document.addEventListener("click", (e) => {
-        if (!searchContainer.contains(e.target)) {
+        if (!searchContainer.contains(e.target) && !searchOpenBtn.contains(e.target)) {
             suggestionsBox.classList.add("hidden");
         }
     });
@@ -135,26 +139,28 @@ async function fetchSuggestions(query, suggestionsBox) {
         if (!response.ok) throw new Error("Search API response error");
         
         const data = await response.json();
-        const productsList = data.products || [];
+        const productsList = data.products || (Array.isArray(data) ? data : []);
 
         if (productsList.length === 0) {
-            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">No products found."<i>${query}</i>"</div>`;
+            suggestionsBox.innerHTML = `<div class="p-4 text-xs text-stone-500 text-center font-medium">No products found for "<i>${query}</i>"</div>`;
             suggestionsBox.classList.remove("hidden");
             return;
         }
 
         suggestionsBox.innerHTML = productsList.map(prod => {
             const imageSrc = getImageUrl(prod.imagepath, './static/placeholder.png');
-
-            // 🔥 Price validation fallback: Agar schema me key 'price' ki jagah kuch aur hai toh wo auto-pick ho jayega
-            const finalPrice = prod.price || prod.discountprice || prod.productPrice || 'N/A';
+            const rawPrice = (prod.variants && prod.variants.length > 0 && prod.variants[0] && prod.variants[0].price != null)
+                ? prod.variants[0].price
+                : (prod.price ?? prod.discountprice ?? prod.productPrice ?? 'N/A');
+            const cleanedPrice = (rawPrice === 'N/A' || rawPrice == null) ? '' : String(rawPrice).replace(/[^\d.]/g, '').trim();
+            const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
 
             return `
                 <div onclick="window.location.href='./product.html?id=${prod._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
                     <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
                     <div class="flex-1 min-w-0">
-                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>S
-                        <p class="text-[11px] text-[#A0522D] font-bold text-left">₹ ${finalPrice}</p>
+                        <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>
+                        ${displayPrice ? `<p class="text-[11px] text-[#A0522D] font-bold text-left" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}
                     </div>
                     <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
                 </div>
@@ -170,9 +176,19 @@ async function fetchSuggestions(query, suggestionsBox) {
 // ==========================================
 // 4. LISTENERS AND LIFECYCLE
 // ==========================================
-document.addEventListener("partialsLoaded", () => {
+function setupAppLifecycle() {
     renderNavbarState();
     initSearchFunctionality();
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", setupAppLifecycle);
+} else {
+    setupAppLifecycle();
+}
+
+document.addEventListener("partialsLoaded", () => {
+    setupAppLifecycle();
 });
 
 // partialsLoaded event ke baad hi renderNavbarState/initSearch chalega (see listener above)
