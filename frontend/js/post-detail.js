@@ -39,7 +39,25 @@ function renderArticle(blog) {
 
     document.getElementById('post-title').innerText = blog.title || '';
     document.getElementById('post-category').innerText = blog.category || 'General';
-    document.getElementById('post-body').innerHTML = blog.content || '';
+
+    let contentHtml = blog.content || '';
+
+    // Remove leading H1 in content if it duplicates the post title
+    if (contentHtml) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contentHtml;
+        const firstElem = tempDiv.firstElementChild;
+        if (firstElem && firstElem.tagName.toLowerCase() === 'h1') {
+            const h1Text = firstElem.innerText.trim().toLowerCase();
+            const titleText = (blog.title || '').trim().toLowerCase();
+            if (h1Text === titleText || h1Text.includes(titleText) || titleText.includes(h1Text)) {
+                firstElem.remove();
+                contentHtml = tempDiv.innerHTML;
+            }
+        }
+    }
+
+    document.getElementById('post-body').innerHTML = contentHtml;
 
     if (blog.createdAt) {
         document.getElementById('post-date').innerText = new Date(blog.createdAt).toLocaleDateString('en-US', {
