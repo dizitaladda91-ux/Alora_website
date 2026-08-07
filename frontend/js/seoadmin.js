@@ -90,7 +90,7 @@ blogForm.addEventListener('submit', async function(event) {
 
     // Form validation checks
     if (!title || !slug || quill.getText().trim().length === 0) {
-        alert("Bhai! Title, Slug aur Blog Content fill karna mandatory hai.");
+        alert("Bro! Title, Slug, and Blog Content are mandatory fields");
         return;
     }
 
@@ -99,7 +99,7 @@ blogForm.addEventListener('submit', async function(event) {
         try {
             JSON.parse(schema);
         } catch (e) {
-            alert("⚠️ Schema (JSON-LD) ka format sahi nahi hai! Please valid JSON enter karein.");
+            alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON.");
             return;
         }
     }
@@ -137,15 +137,15 @@ blogForm.addEventListener('submit', async function(event) {
         const data = await response.json();
 
         if (response.ok || data.success) {
-            alert("🎉 Gajab! Aapka blog successfully backend pe publish ho gaya.");
+            alert("🎉 Awesome! Your blog has been successfully published to the backend.");
             window.location.href = "./seoallpost.html";
         } else {
-            alert(`Error: ${data.message || 'Kuch galat hua post save karte waqt.'}`);
+            alert(`Error: ${data.message || 'Something went wrong while saving the post.'}`);
         }
 
     } catch (error) {
         console.error("API Integration Failure:", error);
-        alert("Server network disconnect ya backend crash hua hai. Dubara check karein!");
+        alert("Server network disconnected or the backend has crashed. Please check again!");
     } finally {
         // Resetting default button state
         submitBtn.innerText = "Publish Post";

@@ -176,7 +176,7 @@ window.selectSize = function(volume, price, comparePrice, buttonElement) {
 
 function handleCartButtonClick(btnElement) {
     if (!currentProductData || !currentSelectedVariant) {
-        alert("Product load hone ka intezar karein.");
+        alert("Please wait for the product to load.");
         return;
     }
 

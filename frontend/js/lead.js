@@ -103,7 +103,7 @@ window.handleLeadSubmit = async function(event) {
     const email = document.getElementById('leadEmail')?.value?.trim();
 
     if (!name || !email) {
-        alert("Kripya Name aur Email fill karein.");
+        alert("Fill Name aur Email .");
         return;
     }
 

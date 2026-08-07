@@ -98,16 +98,16 @@ function attachActionListeners() {
                     const resData = await response.json();
 
                     if (response.ok || resData.success) {
-                        alert("🗑️ Blog successfully delete ho gaya.");
+                        alert("🗑️ Blog successfully delete ");
                         fetchAllBlogs();
                     } else {
-                        alert(`Error: ${resData.message || 'Delete me dikkat aayi.'}`);
+                        alert(`Error: ${resData.message || 'Some error to Delete'}`);
                         btn.innerText = "Delete";
                         btn.disabled = false;
                     }
                 } catch (error) {
                     console.error("Delete failure:", error);
-                    alert("Server error! Delete fail hua.");
+                    alert("Server error! Delete fail .");
                     btn.innerText = "Delete";
                     btn.disabled = false;
                 }

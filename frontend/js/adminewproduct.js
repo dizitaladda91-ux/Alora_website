@@ -65,7 +65,7 @@ function removeVariantRow(button) {
             row.remove();
         }
     } else {
-        alert("Kam se kam ek variant hona zaroori hai!");
+        alert("At least one variant is required!");
     }
 }
 
@@ -137,11 +137,11 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
             }
 
         } else {
-            alert('Error: ' + (data.error || 'Product add nahi ho paya'));
+            alert('Error: ' + (data.error || 'Failed to add the product.'));
         }
     } catch (err) {
         console.error('Submission processing failure:', err);
-        alert('Server se connect nahi ho paya!');
+        alert('Server Failed to connect!');
     } finally {
         if (submitButton) {
             submitButton.disabled = false;

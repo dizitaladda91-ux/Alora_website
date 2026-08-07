@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const data = await response.json();
 
         if (!response.ok || !data.success) {
-            alert("Error: Post details fetch nahi ho pai.");
+            alert("Error: Failed to fetch post details.");
             return;
         }
 
@@ -83,7 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     } catch (error) {
         console.error("Fetch Data Error:", error);
-        alert("Server error: Blog detail load karne me dikkat aayi.");
+        alert("Server error: Failed to load blog details.");
     }
 });
 
@@ -109,7 +109,7 @@ updateForm.addEventListener('submit', async function(e) {
     const content = quill.root.innerHTML;
 
     if (!title || !slug || quill.getText().trim().length === 0) {
-        alert("Title, Slug aur Content required hain!");
+        alert("Title, Slug and Content required !");
         return;
     }
 
@@ -142,7 +142,7 @@ updateForm.addEventListener('submit', async function(e) {
         const resData = await response.json();
 
         if (response.ok || resData.success) {
-            alert("🎉 Post successfully update ho gaya!");
+            alert("🎉 Post successfully update !");
             window.location.href = "./seoallpost.html";
         } else {
             alert(`Error: ${resData.message || 'Update failed'}`);

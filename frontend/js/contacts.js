@@ -141,7 +141,7 @@ document.addEventListener("submit", async (e) => {
             }
         } catch (error) {
             console.error("Fetch Error:", error);
-            alert("Server connected nahi hai. Please try again later.");
+            alert("*The server is not connected. Please try again later.**");
         } finally {
             // Sahi timing par state aur button reset karna
             isSubmitting = false;

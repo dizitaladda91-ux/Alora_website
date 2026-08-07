@@ -39,7 +39,7 @@ button?.addEventListener("click", async (e) => {
 
     // 2. Form Validation
     if (!name || !phone || !address) {
-        alert("Kripya pehle apni Delivery Details (Name, Phone, Address) poori bharein!");
+        alert("Please fill in your Delivery Details (Name, Phone, Address) first!**");
         if (!name && nameInput) nameInput.focus();
         else if (!phone && phoneInput) phoneInput.focus();
         else if (!address && addressInput) addressInput.focus();
@@ -47,7 +47,7 @@ button?.addEventListener("click", async (e) => {
     }
 
     if (phone.length !== 10 || isNaN(phone)) {
-        alert("Kripya valid 10-digit mobile number dalein!");
+        alert(" valid 10-digit mobile number !");
         phoneInput.focus();
         return;
     }
@@ -55,14 +55,14 @@ button?.addEventListener("click", async (e) => {
     // 3. Cart Items Extraction
     const cartItems = getSafeCart();
     if (cartItems.length === 0) {
-        alert("Aapki cart khali hai! Kripya pehle product add karein.");
+        alert("Your cart is empty! Please add a product first.");
         return;
     }
 
     // 4. Total Amount Calculation
     const billTotalElement = document.getElementById("bill-total");
     if (!billTotalElement) {
-        alert("Bill Total Element nahi mila!");
+        alert("Bill Total Element not found!");
         return;
     }
 
@@ -70,7 +70,7 @@ button?.addEventListener("click", async (e) => {
     const payamount = parseFloat(rawAmount.replace(/[^0-9.]/g, ''));
 
     if (!payamount || payamount <= 0) {
-        alert("Amount invalid hai! Cart me koi item check karein.");
+        alert("The amount is invalid! Please check the items in your cart.");
         return;
     }
 

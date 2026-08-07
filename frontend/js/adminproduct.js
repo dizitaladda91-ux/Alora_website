@@ -176,15 +176,15 @@ async function deleteProduct(productId) {
         });
         const result = await response.json();
         if(response.ok){
-            alert("Product successfully delete ho gaya");
+            alert("Product successfully delete ");
             // ✅ State update crash se bachne ke liye safe execution loop execution
             loadAllProducts();
         }else{
-            alert("Error: "+ (result.message || "Delete nahi ho paya"));
+            alert("Error: "+ (result.message || "Failed to delete"));
         }
     } catch (error) {
         console.error("Delete error: ", error);
-        alert("Server se connect nahi ho paya");
+        alert("Could not connect to the server.");
     }
 }
 
