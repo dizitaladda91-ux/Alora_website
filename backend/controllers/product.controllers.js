@@ -135,3 +135,24 @@ export const getproductbyid = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
+// 6. SEARCH PRODUCTS
+export const searchProducts = async (req, res) => {
+    try {
+        const { q } = req.query;
+        if (!q || q.trim() === '') {
+            return res.status(200).json({ success: true, products: [] });
+        }
+        const regex = new RegExp(q.trim(), "i");
+        const products = await SimpleProduct.find({
+            $or: [
+                { name: regex },
+                { description: regex },
+                { category: regex }
+            ]
+        });
+        res.status(200).json({ success: true, products });
+    } catch (err) {
+        res.status(500).json({ success: false, error: err.message });
+    }
+};

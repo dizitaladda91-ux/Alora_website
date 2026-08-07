@@ -5,7 +5,8 @@ import {
     deleteproduct, 
     getproductbyid, 
     readproduct, 
-    updateproduct 
+    updateproduct,
+    searchProducts
 } from "../controllers/product.controllers.js";
 
 const router = express.Router();
@@ -14,6 +15,9 @@ const router = express.Router();
 
 // GET: Saare products
 router.get("/all", readproduct);
+
+// GET: Product Search by query (MUST be defined before /:id route)
+router.get("/search", searchProducts);
 
 // GET: Single product ID ke saath
 router.get("/:id", getproductbyid);
