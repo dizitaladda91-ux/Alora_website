@@ -22,10 +22,8 @@
     {
       "src": "/(.*)",
       "dest": "frontend/$1"
-    },
-    {
+    }
+  ],
   "cleanUrls": true,
   "trailingSlash": false
-}
-  ]
 }
