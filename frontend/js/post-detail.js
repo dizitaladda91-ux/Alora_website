@@ -1,13 +1,57 @@
 import BASE_URL from './config.js';
 
-async function fetchPostDetails() {
+// 1. Slug Extractor
+function getSlugFromURL() {
     const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
+    const querySlug = urlParams.get('slug');
+    if (querySlug) return querySlug;
+
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const lastSegment = pathSegments[pathSegments.length - 1];
+
+    if (lastSegment && !lastSegment.endsWith('.html') && lastSegment !== 'post' && lastSegment !== 'blogs') {
+        return lastSegment;
+    }
+
+    return null;
+}
+
+// 2. URL Formatter & Fix Navigation Paths
+function setupLocalCleanURL(slug) {
+    if (!slug) return;
+
+    // A. URL se ?slug= hata kar /post.html/slug banana
+    if (window.location.search.includes('slug=')) {
+        const cleanURL = `${window.location.pathname}/${slug}`;
+        window.history.replaceState({}, '', cleanURL);
+    }
+
+    // B. Navbar links ko fix karna taaki /post.html/ ke andar navigation na toote
+    setTimeout(() => {
+        const navLinks = document.querySelectorAll('nav a, #navbar-placeholder a');
+        navLinks.forEach(link => {
+            const href = link.getAttribute('href');
+            if (href && href.startsWith('./')) {
+                // Determine base path (/frontend/ or /)
+                const isFrontendPath = window.location.pathname.includes('/frontend/');
+                const basePath = isFrontendPath ? '/frontend/' : '/';
+                const cleanHref = href.replace('./', basePath);
+                link.setAttribute('href', cleanHref);
+            }
+        });
+    }, 100); // Small delay to wait for dynamic navbar load
+}
+
+async function fetchPostDetails() {
+    const slug = getSlugFromURL();
 
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
         return;
     }
+
+    // Clean URL apply + Navigation links fix
+    setupLocalCleanURL(slug);
 
     try {
         const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
@@ -17,12 +61,11 @@ async function fetchPostDetails() {
             throw new Error(result.message || 'Failed to fetch article');
         }
 
-        // Response handling (Extracting blog object)
         const blog = result.data || result.blog || result;
 
         if (blog) {
             renderArticle(blog);
-            injectSEO(blog); // 🟢 SEO Metadata Injector Call
+            injectSEO(blog);
         } else {
             showError("Article not found.");
         }
@@ -42,7 +85,6 @@ function renderArticle(blog) {
 
     let contentHtml = blog.content || '';
 
-    // Remove leading H1 in content if it duplicates the post title
     if (contentHtml) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = contentHtml;
@@ -80,34 +122,28 @@ function renderArticle(blog) {
 function injectSEO(blog) {
     const currentUrl = window.location.href;
 
-    // 1. Meta Title
     document.title = blog.metaTitle || blog.title || "Alora Radiance";
 
-    // 2. Meta Description
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
         metaDescEl.setAttribute('content', blog.metaDesc);
     }
 
-    // 3. Meta Keywords
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {
         keywordsEl.setAttribute('content', blog.keywords);
     }
 
-    // 4. Publisher
     const publisherEl = document.getElementById('dynamic-publisher');
     if (publisherEl && blog.publisher) {
         publisherEl.setAttribute('content', blog.publisher);
     }
 
-    // 5. Canonical Link Tag
     const canonicalEl = document.getElementById('dynamic-canonical');
     if (canonicalEl) {
         canonicalEl.setAttribute('href', currentUrl);
     }
 
-    // 6. Open Graph Tags
     document.getElementById('og-title')?.setAttribute('content', blog.metaTitle || blog.title || '');
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
@@ -117,7 +153,6 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // 7. Schema Injection
     const schemaEl = document.getElementById('dynamic-json-ld');
     if (schemaEl && blog.schema) {
         try {
@@ -128,6 +163,7 @@ function injectSEO(blog) {
         }
     }
 }
+
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
