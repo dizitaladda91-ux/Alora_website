@@ -17,29 +17,42 @@ function getSlugFromURL() {
 }
 
 // 2. URL Formatter & Fix Navigation Paths
+// 2. URL Formatter & Fix All Broken Images/Links
+// 2. URL Formatter & Fix All Broken Images/Links (Smart Path Handling)
 function setupLocalCleanURL(slug) {
     if (!slug) return;
 
-    // A. URL se ?slug= hata kar /post.html/slug banana
+    // A. URL Query Param ko rewrite karna
     if (window.location.search.includes('slug=')) {
         const cleanURL = `${window.location.pathname}/${slug}`;
         window.history.replaceState({}, '', cleanURL);
     }
 
-    // B. Navbar links ko fix karna taaki /post.html/ ke andar navigation na toote
+    // B. Smart Assets Path Resolver (Localhost + Vercel compatible)
+    const isFrontendPath = window.location.pathname.includes('/frontend/');
+    const baseFolder = isFrontendPath ? '/frontend/' : '/';
+
     setTimeout(() => {
+        // 1. Fix Logo & Static Images
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            const src = img.getAttribute('src');
+            if (src && (src.includes('static/') || src.startsWith('./static/'))) {
+                const imageName = src.split('static/').pop();
+                img.setAttribute('src', `${baseFolder}static/${imageName}`);
+            }
+        });
+
+        // 2. Fix Navigation Links
         const navLinks = document.querySelectorAll('nav a, #navbar-placeholder a');
         navLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (href && href.startsWith('./')) {
-                // Determine base path (/frontend/ or /)
-                const isFrontendPath = window.location.pathname.includes('/frontend/');
-                const basePath = isFrontendPath ? '/frontend/' : '/';
-                const cleanHref = href.replace('./', basePath);
+                const cleanHref = href.replace('./', baseFolder);
                 link.setAttribute('href', cleanHref);
             }
         });
-    }, 100); // Small delay to wait for dynamic navbar load
+    }, 150); // Navbar dynamic load hone ka wait karega
 }
 
 async function fetchPostDetails() {
