@@ -1,8 +1,25 @@
 import BASE_URL from './config.js';
 
-async function fetchPostDetails() {
+// Clean Slug Extractor
+function getSlugFromURL() {
+    // 1. URL Query Parameter check (Localhost: ?slug=saffron-benefits-for-skin)
     const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
+    const querySlug = urlParams.get('slug');
+    if (querySlug) return querySlug;
+
+    // 2. Dynamic Path Segment check (Vercel: /post/saffron-benefits-for-skin)
+    const pathSegments = window.location.pathname.split('/').filter(Boolean);
+    const lastSegment = pathSegments[pathSegments.length - 1];
+
+    if (lastSegment && !lastSegment.endsWith('.html') && lastSegment !== 'post') {
+        return lastSegment;
+    }
+
+    return null;
+}
+
+async function fetchPostDetails() {
+    const slug = getSlugFromURL();
 
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
@@ -17,15 +34,15 @@ async function fetchPostDetails() {
             throw new Error(result.message || 'Failed to fetch article');
         }
 
-        // Response handling (Extracting blog object)
         const blog = result.data || result.blog || result;
 
         if (blog) {
             renderArticle(blog);
-            injectSEO(blog); // 🟢 SEO Metadata Injector Call
+            injectSEO(blog);
         } else {
             showError("Article not found.");
         }
+
     } catch (err) {
         console.error("Error loading blog details:", err);
         showError("Failed to load article from server.");
@@ -42,7 +59,6 @@ function renderArticle(blog) {
 
     let contentHtml = blog.content || '';
 
-    // Remove leading H1 in content if it duplicates the post title
     if (contentHtml) {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = contentHtml;
@@ -80,34 +96,28 @@ function renderArticle(blog) {
 function injectSEO(blog) {
     const currentUrl = window.location.href;
 
-    // 1. Meta Title
     document.title = blog.metaTitle || blog.title || "Alora Radiance";
 
-    // 2. Meta Description
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
         metaDescEl.setAttribute('content', blog.metaDesc);
     }
 
-    // 3. Meta Keywords
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {
         keywordsEl.setAttribute('content', blog.keywords);
     }
 
-    // 4. Publisher
     const publisherEl = document.getElementById('dynamic-publisher');
     if (publisherEl && blog.publisher) {
         publisherEl.setAttribute('content', blog.publisher);
     }
 
-    // 5. Canonical Link Tag
     const canonicalEl = document.getElementById('dynamic-canonical');
     if (canonicalEl) {
         canonicalEl.setAttribute('href', currentUrl);
     }
 
-    // 6. Open Graph Tags
     document.getElementById('og-title')?.setAttribute('content', blog.metaTitle || blog.title || '');
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
@@ -117,7 +127,6 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // 7. Schema Injection
     const schemaEl = document.getElementById('dynamic-json-ld');
     if (schemaEl && blog.schema) {
         try {
@@ -128,6 +137,7 @@ function injectSEO(blog) {
         }
     }
 }
+
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
