@@ -18,7 +18,6 @@ function getSlugFromURL() {
 
 // 2. URL Formatter & Fix Navigation Paths
 // 2. URL Formatter & Fix All Broken Images/Links
-// 2. URL Formatter & Fix All Broken Images/Links (Smart Path Handling)
 function setupLocalCleanURL(slug) {
     if (!slug) return;
 
@@ -28,31 +27,31 @@ function setupLocalCleanURL(slug) {
         window.history.replaceState({}, '', cleanURL);
     }
 
-    // B. Smart Assets Path Resolver (Localhost + Vercel compatible)
-    const isFrontendPath = window.location.pathname.includes('/frontend/');
-    const baseFolder = isFrontendPath ? '/frontend/' : '/';
-
+    // B. Navbar Links & Logo Images path fix (Fix Broken Logo)
     setTimeout(() => {
-        // 1. Fix Logo & Static Images
+        // Fix Logo & Other Images
         const images = document.querySelectorAll('img');
         images.forEach(img => {
             const src = img.getAttribute('src');
-            if (src && (src.includes('static/') || src.startsWith('./static/'))) {
-                const imageName = src.split('static/').pop();
-                img.setAttribute('src', `${baseFolder}static/${imageName}`);
+            if (src && src.startsWith('./static/')) {
+                img.setAttribute('src', src.replace('./static/', '/static/'));
+            } else if (src && src.startsWith('static/')) {
+                img.setAttribute('src', '/' + src);
             }
         });
 
-        // 2. Fix Navigation Links
+        // Fix Navigation Links
         const navLinks = document.querySelectorAll('nav a, #navbar-placeholder a');
         navLinks.forEach(link => {
             const href = link.getAttribute('href');
             if (href && href.startsWith('./')) {
-                const cleanHref = href.replace('./', baseFolder);
+                const isFrontendPath = window.location.pathname.includes('/frontend/');
+                const basePath = isFrontendPath ? '/frontend/' : '/';
+                const cleanHref = href.replace('./', basePath);
                 link.setAttribute('href', cleanHref);
             }
         });
-    }, 150); // Navbar dynamic load hone ka wait karega
+    }, 100);
 }
 
 async function fetchPostDetails() {
