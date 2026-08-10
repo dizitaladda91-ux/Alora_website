@@ -10,26 +10,34 @@
       "use": "@vercel/static"
     }
   ],
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "destination": "/backend/index.js"
+      "src": "/api/(.*)",
+      "dest": "backend/index.js"
     },
     {
-      "source": "/uploads/(.*)",
-      "destination": "/backend/uploads/$1"
+      "src": "/uploads/(.*)",
+      "dest": "backend/uploads/$1"
     },
     {
-      "source": "/post/:slug*",
-      "destination": "/frontend/post.html"
+      "src": "/post/.*",
+      "dest": "frontend/post.html"
     },
     {
-      "source": "/blog/:slug*",
-      "destination": "/frontend/post.html"
+      "src": "/blog/.*",
+      "dest": "frontend/post.html"
     },
     {
-      "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "src": "/post",
+      "dest": "frontend/post.html"
+    },
+    {
+      "src": "/Blog",
+      "dest": "frontend/Blog.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "frontend/$1"
     }
   ],
   "cleanUrls": true,
