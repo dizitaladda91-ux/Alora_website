@@ -31,11 +31,23 @@
     },
     {
       "source": "/blog",
-      "destination": "/frontend/blog.html"
+      "destination": "/frontend/Blog.html"
     },
     {
       "source": "/Blog",
-      "destination": "/frontend/blog.html"
+      "destination": "/frontend/Blog.html"
+    },
+    {
+      "source": "/post",
+      "destination": "/frontend/post.html"
+    },
+    {
+      "source": "/",
+      "destination": "/frontend/index.html"
+    },
+    {
+      "source": "/:path*",
+      "destination": "/frontend/:path*"
     }
   ]
 }
