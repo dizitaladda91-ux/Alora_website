@@ -4,6 +4,10 @@
     {
       "src": "backend/index.js",
       "use": "@vercel/node"
+    },
+    {
+      "src": "frontend/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -13,34 +17,31 @@
     },
     {
       "src": "/uploads/(.*)",
-      "dest": "backend/index.js"
+      "dest": "backend/uploads/$1"
     },
     {
-      "handle": "filesystem"
+      "src": "/post",
+      "dest": "frontend/post.html"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "/frontend/js/$1"
+      "src": "/post/(.*)",
+      "dest": "frontend/post.html"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/frontend/static/$1"
+      "src": "/(.*\\.html)",
+      "dest": "frontend/$1"
     },
     {
-      "src": "/css/(.*)",
-      "dest": "/frontend/css/$1"
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|avif|webp|json|woff|woff2|ttf|map))",
+      "dest": "frontend/$1"
     },
     {
       "src": "/",
-      "dest": "/frontend/index.html"
-    },
-    {
-      "src": "/moreproduct",
-      "dest": "/frontend/moreproduct.html"
+      "dest": "frontend/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/frontend/$1"
+      "dest": "frontend/index.html"
     }
   ],
   "cleanUrls": true,
