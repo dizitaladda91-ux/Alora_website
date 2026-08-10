@@ -16,24 +16,11 @@
       "dest": "backend/index.js"
     },
     {
-      "src": "/js/(.*)",
-      "dest": "backend/index.js"
-    },
-    {
-      "src": "/static/(.*)",
-      "dest": "backend/index.js"
-    },
-    {
-      "src": "/post",
-      "dest": "backend/index.js"
-    },
-    {
-      "src": "/post/(.*)",
-      "dest": "backend/index.js"
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "backend/index.js"
+      "dest": "/$1"
     }
   ],
   "cleanUrls": true,

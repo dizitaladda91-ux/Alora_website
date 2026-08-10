@@ -153,7 +153,7 @@
     <script type="module" src="./js/moreproduct.js"></script>
 
     <script>
-        fetch('./lead.html')
+        fetch('/lead.html')
             .then(response => response.text())
             .then(htmlContent => {
                 document.getElementById('lead-modal-container').innerHTML = htmlContent;
