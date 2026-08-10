@@ -17,11 +17,19 @@
     },
     {
       "src": "/uploads/(.*)",
-      "dest": "backend/uploads/$1"
+      "dest": "/uploads/$1"
+    },
+    {
+      "src": "/post",
+      "dest": "/post.html"
+    },
+    {
+      "src": "/post/(.*)",
+      "dest": "/post.html"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/$1"
+      "dest": "/$1"
     }
   ],
   "cleanUrls": true,
