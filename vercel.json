@@ -38,6 +38,10 @@
       "destination": "/frontend/Blog.html"
     },
     {
+      "source": "/post",
+      "destination": "/frontend/post.html"
+    },
+    {
       "source": "/:path*",
       "destination": "/frontend/:path*"
     }
