@@ -6,7 +6,15 @@
       "use": "@vercel/node"
     },
     {
-      "src": "frontend/**",
+      "src": "frontend/**/*.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/js/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "frontend/static/**",
       "use": "@vercel/static"
     }
   ],
@@ -28,11 +36,8 @@
       "dest": "/post.html"
     },
     {
-      "handle": "filesystem"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/index.html"
+      "dest": "/$1"
     }
   ],
   "cleanUrls": true,
