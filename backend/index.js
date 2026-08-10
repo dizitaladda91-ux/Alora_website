@@ -88,6 +88,26 @@ app.get('/post', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));
 });
 
+// Auto-resolve direct page-names like /login, /lead, /privacy, /return-refund
+// into the corresponding frontend HTML without needing a static config match.
+app.get('/:viewName', (req, res, next) => {
+  const viewName = String(req.params.viewName || '').trim().toLowerCase();
+  if (!viewName || viewName.includes('.')) return next();
+
+  // Skip API and upload-like endpoints that have their own routers.
+  if (viewName === 'api' || viewName === 'uploads' || viewName === 'js' || viewName === 'static') {
+    return next();
+  }
+
+  const target = path.join(frontendRoot, `${viewName}.html`);
+  if (fs.existsSync(target)) {
+    return res.sendFile(target);
+  }
+
+  // If the requested page is a dynamic HTML asset, let the server fall through.
+  return next();
+});
+
 // ==========================================
 // VIEWS & API ROUTING
 // ==========================================
