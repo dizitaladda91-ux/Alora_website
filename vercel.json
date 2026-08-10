@@ -1,7 +1,5 @@
 {
   "version": 2,
-  "cleanUrls": true,
-  "trailingSlash": false,
   "builds": [
     {
       "src": "backend/index.js",
@@ -22,11 +20,15 @@
       "dest": "backend/uploads/$1"
     },
     {
-      "src": "/blog/(.*)",
+      "src": "/post/(.*)",
       "dest": "frontend/post.html"
     },
     {
-      "src": "/post/(.*)",
+      "src": "/post",
+      "dest": "frontend/post.html"
+    },
+    {
+      "src": "/blog/(.*)",
       "dest": "frontend/post.html"
     },
     {
@@ -38,12 +40,8 @@
       "dest": "frontend/Blog.html"
     },
     {
-      "src": "/",
-      "dest": "frontend/index.html"
-    },
-    {
       "src": "/(.*)",
-      "dest": "frontend/$1.html"
+      "dest": "frontend/$1"
     }
   ]
 }
