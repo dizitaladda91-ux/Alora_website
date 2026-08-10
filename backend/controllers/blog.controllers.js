@@ -2,24 +2,6 @@ import Blog from '../models/blog.models.js';
 import fs from 'fs';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
 
-function normalizeTitleText(value = '') {
-    return String(value).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-}
-
-function stripBodyH1Tags(content = '') {
-    if (!content) return content;
-
-    return String(content).replace(/<h1\b[^>]*>.*?<\/h1>/gis, '');
-}
-
-function sanitizeDuplicateTitleHeading(title = '', content = '') {
-    if (!title || !content) return content;
-
-    const normalizedContent = String(content);
-    const withoutH1 = stripBodyH1Tags(normalizedContent);
-    return withoutH1;
-}
-
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
     try {
@@ -45,12 +27,10 @@ export const createBlogPost = async (req, res) => {
             finalCover = req.file.path; // Cloudinary URL
         }
 
-        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
-
         const newBlog = new Blog({
             title,
             slug: formattedSlug,
-            content: sanitizedContent,
+            content,
             metaTitle,
             keywords,     
             category,
@@ -117,8 +97,7 @@ export const updateBlogPost = async (req, res) => {
         const { id } = req.params;
         const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl } = req.body;
 
-        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
-        let updateData = { title, content: sanitizedContent, metaTitle, keywords, category, metaDesc, schema, publisher };
+        let updateData = { title, content, metaTitle, keywords, category, metaDesc, schema, publisher };
 
         if (slug) {
             updateData.slug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');

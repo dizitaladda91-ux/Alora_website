@@ -1,21 +1,8 @@
 import BASE_URL from './config.js';
 
-function getSlugFromLocation() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const querySlug = urlParams.get('slug');
-    if (querySlug) return querySlug;
-
-    const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post');
-    if (postIndex >= 0 && pathParts[postIndex + 1]) {
-        return decodeURIComponent(pathParts[postIndex + 1]);
-    }
-
-    return '';
-}
-
 async function fetchPostDetails() {
-    const slug = getSlugFromLocation();
+    const urlParams = new URLSearchParams(window.location.search);
+    const slug = urlParams.get('slug');
 
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
@@ -23,7 +10,7 @@ async function fetchPostDetails() {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}`);
+        const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
         const result = await response.json();
 
         if (!response.ok) {
@@ -45,24 +32,6 @@ async function fetchPostDetails() {
     }
 }
 
-function normalizeTitleText(value = '') {
-    return String(value).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-}
-
-function sanitizePostBodyContent(contentHtml, blogTitle) {
-    if (!contentHtml) return contentHtml;
-
-    const tempDiv = document.createElement('div');
-    tempDiv.innerHTML = contentHtml;
-
-    const h1Nodes = tempDiv.querySelectorAll('h1');
-    h1Nodes.forEach((headingNode) => {
-        headingNode.remove();
-    });
-
-    return tempDiv.innerHTML;
-}
-
 // 🟢 Article Details DOM Rendering
 function renderArticle(blog) {
     document.getElementById('post-loader')?.classList.add('hidden');
@@ -72,7 +41,21 @@ function renderArticle(blog) {
     document.getElementById('post-category').innerText = blog.category || 'General';
 
     let contentHtml = blog.content || '';
-    contentHtml = sanitizePostBodyContent(contentHtml, blog.title || '');
+
+    // Remove leading H1 in content if it duplicates the post title
+    if (contentHtml) {
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = contentHtml;
+        const firstElem = tempDiv.firstElementChild;
+        if (firstElem && firstElem.tagName.toLowerCase() === 'h1') {
+            const h1Text = firstElem.innerText.trim().toLowerCase();
+            const titleText = (blog.title || '').trim().toLowerCase();
+            if (h1Text === titleText || h1Text.includes(titleText) || titleText.includes(h1Text)) {
+                firstElem.remove();
+                contentHtml = tempDiv.innerHTML;
+            }
+        }
+    }
 
     document.getElementById('post-body').innerHTML = contentHtml;
 
