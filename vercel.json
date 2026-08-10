@@ -6,15 +6,7 @@
       "use": "@vercel/node"
     },
     {
-      "src": "frontend/**/*.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/js/**",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "frontend/static/**",
+      "src": "frontend/**",
       "use": "@vercel/static"
     }
   ],
@@ -29,15 +21,27 @@
     },
     {
       "src": "/post",
-      "dest": "/post.html"
+      "dest": "frontend/post.html"
     },
     {
       "src": "/post/(.*)",
-      "dest": "/post.html"
+      "dest": "frontend/post.html"
+    },
+    {
+      "src": "/(.*\\.html)",
+      "dest": "frontend/$1"
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|avif|webp|json|woff|woff2|ttf|map))",
+      "dest": "frontend/$1"
+    },
+    {
+      "src": "/",
+      "dest": "frontend/index.html"
     },
     {
       "src": "/(.*)",
-      "dest": "/$1"
+      "dest": "frontend/index.html"
     }
   ],
   "cleanUrls": true,
