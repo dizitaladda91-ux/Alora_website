@@ -79,6 +79,15 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'index.html'));
 });
 
+// Serve post detail HTML at clean slug route: /post/:slug
+app.get('/post/:slug', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'post.html'));
+});
+
+app.get('/post', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'post.html'));
+});
+
 // ==========================================
 // VIEWS & API ROUTING
 // ==========================================
