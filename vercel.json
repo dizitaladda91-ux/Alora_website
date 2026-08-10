@@ -22,11 +22,11 @@
       "dest": "backend/uploads/$1"
     },
     {
-      "src": "/blog/(.+)",
+      "src": "/post/(.*)",
       "dest": "frontend/post.html"
     },
     {
-      "src": "/post/(.+)",
+      "src": "/blog/(.*)",
       "dest": "frontend/post.html"
     },
     {
