@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "builds": [
     {
       "src": "backend/index.js",
@@ -38,6 +40,24 @@
     {
       "src": "/Blog",
       "dest": "frontend/Blog.html"
+    },
+    {
+      "src": "/index",
+      "status": 301,
+      "headers": { "Location": "/" }
+    },
+    {
+      "src": "/(.*)\\.html",
+      "status": 301,
+      "headers": { "Location": "/$1" }
+    },
+    {
+      "src": "/",
+      "dest": "frontend/index.html"
+    },
+    {
+      "src": "/([^/]+)$",
+      "dest": "frontend/$1.html"
     },
     {
       "src": "/(.*)",
