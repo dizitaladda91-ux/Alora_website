@@ -53,9 +53,9 @@ async function renderBlogCards() {
 
                 const cardHTML = `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200/80 flex flex-col cursor-pointer transition transform hover:-translate-y-1 duration-300" onclick="goToPost('${post.slug}')">
-                        <div class="w-full aspect-[16/10] overflow-hidden bg-gray-100">
-                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover">
-                        </div>
+                                       <div class="w-full overflow-hidden bg-gray-100">
+    <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-auto object-cover">
+</div>
                         
                         <div class="p-5 flex flex-col flex-grow justify-between">
                             <div>
