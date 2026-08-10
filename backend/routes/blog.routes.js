@@ -22,8 +22,10 @@ router.get('/', getAllBlogs);
 router.get('/all', getAllBlogs);
 
 // 3. Get Single Blog by Slug or ID
-router.get('/:slug', getBlogBySlug);
+// Keep the specific route before /:slug; otherwise "post" is treated as a slug
+// and /api/blogs/post/<slug> never reaches the article handler.
 router.get('/post/:slug', getBlogBySlug);
+router.get('/:slug', getBlogBySlug);
 
 // 4. Update / Edit Blog
 router.put('/:id', upload.single('coverImage'), updateBlogPost);

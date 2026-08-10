@@ -99,10 +99,20 @@ app.use("/api/payments", paymentRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 
-// Database connection & Server Boot
-const Port = process.env.PORT || 5000;
-db().then(() => {
-  app.listen(Port, () => {
-      console.log(`Server is running on Port ${Port}`);
-  });
+// Connect once for both the local server and Vercel's serverless function.
+// Vercel invokes the exported Express app itself, so it must not call listen().
+const databaseReady = db().catch((error) => {
+  console.error('Database connection failed:', error);
+  throw error;
 });
+
+if (!process.env.VERCEL) {
+  const Port = process.env.PORT || 5000;
+  databaseReady.then(() => {
+    app.listen(Port, () => {
+      console.log(`Server is running on Port ${Port}`);
+    });
+  });
+}
+
+export default app;
