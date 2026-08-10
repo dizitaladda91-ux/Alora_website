@@ -1,21 +1,23 @@
 import BASE_URL from './config.js';
 
 function getSlugFromLocation() {
-    // 1. Query parameter check (/post?slug=my-blog)
     const urlParams = new URLSearchParams(window.location.search);
     const querySlug = urlParams.get('slug');
     if (querySlug) return querySlug;
 
-    // 2. Clean Path check (/post/my-blog OR /blog/my-blog)
+    // Route: /post/saffron-benefits-for-skin
     const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog');
     
+    if (postIndex >= 0 && pathParts[postIndex + 1]) {
+        return decodeURIComponent(pathParts[postIndex + 1]);
+    }
+
+    // Fallback: URL ka aakhiri segment lein
     if (pathParts.length > 0) {
-        // Last segment hi humara slug hoga (e.g., 'saffron-benefits-for-skin')
-        const lastSegment = pathParts[pathParts.length - 1];
-        
-        // Agar last segment file name na ho (jaise post.html ya blog.html)
-        if (!lastSegment.endsWith('.html') && lastSegment.toLowerCase() !== 'post' && lastSegment.toLowerCase() !== 'blog') {
-            return decodeURIComponent(lastSegment);
+        const lastPart = pathParts[pathParts.length - 1];
+        if (!lastPart.endsWith('.html')) {
+            return decodeURIComponent(lastPart);
         }
     }
 
@@ -24,6 +26,7 @@ function getSlugFromLocation() {
 
 async function fetchPostDetails() {
     const slug = getSlugFromLocation();
+    console.log("Extracted Slug:", slug); // Console log testing ke liye
 
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
@@ -31,11 +34,10 @@ async function fetchPostDetails() {
     }
 
     try {
-        // Dynamic API request based on BASE_URL
-        // Note: Agar Vercel Deployment par relative backend route hai to empty string fallback handle karein
-        const apiUrl = BASE_URL ? `${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}` : `/api/blogs/post/${encodeURIComponent(slug)}`;
-        
-        const response = await fetch(apiUrl);
+        const apiPath = BASE_URL ? `${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}` : `/api/blogs/post/${encodeURIComponent(slug)}`;
+        console.log("Fetching API URL:", apiPath);
+
+        const response = await fetch(apiPath);
         const result = await response.json();
 
         if (!response.ok) {
@@ -52,6 +54,24 @@ async function fetchPostDetails() {
         }
     } catch (err) {
         console.error("Error loading blog details:", err);
-        showError("Failed to load article from server.");
+        showError("Failed to load article: " + err.message);
     }
+}
+
+// Global functions & event listener
+function showError(msg) {
+    const loader = document.getElementById('post-loader');
+    if (loader) {
+        loader.innerHTML = `
+            <div class="text-clay text-center py-10">
+                <p class="font-bold text-red-600 text-lg">${msg}</p>
+            </div>
+        `;
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchPostDetails);
+} else {
+    fetchPostDetails();
 }
