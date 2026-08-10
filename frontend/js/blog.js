@@ -101,24 +101,7 @@ async function renderBlogCards() {
 }
 
 function goToPost(slug) {
-    const cleanSlug = String(slug || '').trim();
-    if (!cleanSlug) return;
-
-    const targetPath = `/post/${encodeURIComponent(cleanSlug)}`;
-
-    const host = window.location.hostname;
-    const isLocalLiveHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
-
-    let resolvedBase = BASE_URL;
-    if (!resolvedBase && isLocalLiveHost) {
-        resolvedBase = 'http://127.0.0.1:5000';
-    }
-
-    const targetUrl = resolvedBase
-        ? `${resolvedBase}${targetPath}`
-        : targetPath;
-
-    window.location.href = targetUrl;
+    window.location.href = `./post.html?slug=${slug}`;
 }
 
 window.goToPost = goToPost;
