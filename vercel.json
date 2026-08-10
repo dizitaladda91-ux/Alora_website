@@ -4,10 +4,6 @@
     {
       "src": "backend/index.js",
       "use": "@vercel/node"
-    },
-    {
-      "src": "frontend/**",
-      "use": "@vercel/static"
     }
   ],
   "routes": [
@@ -17,31 +13,27 @@
     },
     {
       "src": "/uploads/(.*)",
-      "dest": "backend/uploads/$1"
+      "dest": "backend/index.js"
+    },
+    {
+      "src": "/js/(.*)",
+      "dest": "backend/index.js"
+    },
+    {
+      "src": "/static/(.*)",
+      "dest": "backend/index.js"
     },
     {
       "src": "/post",
-      "dest": "frontend/post.html"
+      "dest": "backend/index.js"
     },
     {
       "src": "/post/(.*)",
-      "dest": "frontend/post.html"
-    },
-    {
-      "src": "/(.*\\.html)",
-      "dest": "frontend/$1"
-    },
-    {
-      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|avif|webp|json|woff|woff2|ttf|map))",
-      "dest": "frontend/$1"
-    },
-    {
-      "src": "/",
-      "dest": "frontend/index.html"
+      "dest": "backend/index.js"
     },
     {
       "src": "/(.*)",
-      "dest": "frontend/index.html"
+      "dest": "backend/index.js"
     }
   ],
   "cleanUrls": true,
