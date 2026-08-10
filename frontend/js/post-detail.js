@@ -1,8 +1,30 @@
 import BASE_URL from './config.js';
 
-async function fetchPostDetails() {
+function getSlugFromLocation() {
     const urlParams = new URLSearchParams(window.location.search);
-    const slug = urlParams.get('slug');
+    const querySlug = urlParams.get('slug');
+    if (querySlug) return querySlug;
+
+    // Path structure: /post/saffron-benefits-for-skin ya /blog/saffron-benefits-for-skin
+    const pathParts = window.location.pathname.split('/').filter(Boolean);
+    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog');
+    
+    if (postIndex >= 0 && pathParts[postIndex + 1]) {
+        return decodeURIComponent(pathParts[postIndex + 1]);
+    }
+
+    if (pathParts.length > 0) {
+        const lastPart = pathParts[pathParts.length - 1];
+        if (!lastPart.endsWith('.html')) {
+            return decodeURIComponent(lastPart);
+        }
+    }
+
+    return '';
+}
+
+async function fetchPostDetails() {
+    const slug = getSlugFromLocation();
 
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
@@ -10,26 +32,41 @@ async function fetchPostDetails() {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
+        const apiPath = BASE_URL ? `${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}` : `/api/blogs/post/${encodeURIComponent(slug)}`;
+
+        const response = await fetch(apiPath);
         const result = await response.json();
 
         if (!response.ok) {
             throw new Error(result.message || 'Failed to fetch article');
         }
 
-        // Response handling (Extracting blog object)
         const blog = result.data || result.blog || result;
 
         if (blog) {
             renderArticle(blog);
-            injectSEO(blog); // 🟢 SEO Metadata Injector Call
+            injectSEO(blog);
         } else {
             showError("Article not found.");
         }
     } catch (err) {
         console.error("Error loading blog details:", err);
-        showError("Failed to load article from server.");
+        showError("Failed to load article: " + err.message);
     }
+}
+
+function sanitizePostBodyContent(contentHtml, blogTitle) {
+    if (!contentHtml) return contentHtml;
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = contentHtml;
+
+    const h1Nodes = tempDiv.querySelectorAll('h1');
+    h1Nodes.forEach((headingNode) => {
+        headingNode.remove();
+    });
+
+    return tempDiv.innerHTML;
 }
 
 // 🟢 Article Details DOM Rendering
@@ -37,34 +74,27 @@ function renderArticle(blog) {
     document.getElementById('post-loader')?.classList.add('hidden');
     document.getElementById('blog-content-area')?.classList.remove('hidden');
 
-    document.getElementById('post-title').innerText = blog.title || '';
-    document.getElementById('post-category').innerText = blog.category || 'General';
+    const titleEl = document.getElementById('post-title');
+    if (titleEl) titleEl.innerText = blog.title || '';
+
+    const categoryEl = document.getElementById('post-category');
+    if (categoryEl) categoryEl.innerText = blog.category || 'General';
 
     let contentHtml = blog.content || '';
+    contentHtml = sanitizePostBodyContent(contentHtml, blog.title || '');
 
-    // Remove leading H1 in content if it duplicates the post title
-    if (contentHtml) {
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = contentHtml;
-        const firstElem = tempDiv.firstElementChild;
-        if (firstElem && firstElem.tagName.toLowerCase() === 'h1') {
-            const h1Text = firstElem.innerText.trim().toLowerCase();
-            const titleText = (blog.title || '').trim().toLowerCase();
-            if (h1Text === titleText || h1Text.includes(titleText) || titleText.includes(h1Text)) {
-                firstElem.remove();
-                contentHtml = tempDiv.innerHTML;
-            }
-        }
-    }
-
-    document.getElementById('post-body').innerHTML = contentHtml;
+    const bodyEl = document.getElementById('post-body');
+    if (bodyEl) bodyEl.innerHTML = contentHtml;
 
     if (blog.createdAt) {
-        document.getElementById('post-date').innerText = new Date(blog.createdAt).toLocaleDateString('en-US', {
-            month: 'short',
-            day: 'numeric',
-            year: 'numeric'
-        });
+        const dateEl = document.getElementById('post-date');
+        if (dateEl) {
+            dateEl.innerText = new Date(blog.createdAt).toLocaleDateString('en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        }
     }
 
     const coverImg = document.getElementById('post-cover');
@@ -80,34 +110,28 @@ function renderArticle(blog) {
 function injectSEO(blog) {
     const currentUrl = window.location.href;
 
-    // 1. Meta Title
     document.title = blog.metaTitle || blog.title || "Alora Radiance";
 
-    // 2. Meta Description
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
         metaDescEl.setAttribute('content', blog.metaDesc);
     }
 
-    // 3. Meta Keywords
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {
         keywordsEl.setAttribute('content', blog.keywords);
     }
 
-    // 4. Publisher
     const publisherEl = document.getElementById('dynamic-publisher');
     if (publisherEl && blog.publisher) {
         publisherEl.setAttribute('content', blog.publisher);
     }
 
-    // 5. Canonical Link Tag
     const canonicalEl = document.getElementById('dynamic-canonical');
     if (canonicalEl) {
         canonicalEl.setAttribute('href', currentUrl);
     }
 
-    // 6. Open Graph Tags
     document.getElementById('og-title')?.setAttribute('content', blog.metaTitle || blog.title || '');
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
@@ -117,7 +141,6 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // 7. Schema Injection
     const schemaEl = document.getElementById('dynamic-json-ld');
     if (schemaEl && blog.schema) {
         try {
@@ -128,16 +151,21 @@ function injectSEO(blog) {
         }
     }
 }
+
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
         loader.innerHTML = `
-            <div class="text-clay">
-                <i class="fa-solid fa-triangle-exclamation text-3xl mb-2"></i>
-                <p class="font-bold">${msg}</p>
+            <div class="text-clay text-center py-10">
+                <i class="fa-solid fa-triangle-exclamation text-3xl mb-2 text-red-500"></i>
+                <p class="font-bold text-red-600 text-lg">${msg}</p>
             </div>
         `;
     }
 }
 
-document.addEventListener('DOMContentLoaded', fetchPostDetails);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', fetchPostDetails);
+} else {
+    fetchPostDetails();
+}

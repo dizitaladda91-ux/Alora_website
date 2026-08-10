@@ -15,7 +15,7 @@ async function ensureLeadModalIsLoaded() {
     leadModalLoadInProgress = true;
 
     try {
-        const response = await fetch('./lead.html');
+        const response = await fetch('/lead.html');
         const html = await response.text();
         container.innerHTML = html;
         modal = document.getElementById('leadModal');

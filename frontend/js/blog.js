@@ -53,7 +53,7 @@ async function renderBlogCards() {
 
                 const cardHTML = `
                     <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200/80 flex flex-col cursor-pointer transition transform hover:-translate-y-1 duration-300" onclick="goToPost('${post.slug}')">
-                                     <div class="w-full overflow-hidden bg-gray-100">
+                                       <div class="w-full overflow-hidden bg-gray-100">
     <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-auto object-cover">
 </div>
                         
@@ -101,7 +101,24 @@ async function renderBlogCards() {
 }
 
 function goToPost(slug) {
-    window.location.href = `./post.html?slug=${slug}`;
+    const cleanSlug = String(slug || '').trim();
+    if (!cleanSlug) return;
+
+    const targetPath = `/post/${encodeURIComponent(cleanSlug)}`;
+
+    const host = window.location.hostname;
+    const isLocalLiveHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
+
+    let resolvedBase = BASE_URL;
+    if (!resolvedBase && isLocalLiveHost) {
+        resolvedBase = 'http://127.0.0.1:5000';
+    }
+
+    const targetUrl = resolvedBase
+        ? `${resolvedBase}${targetPath}`
+        : targetPath;
+
+    window.location.href = targetUrl;
 }
 
 window.goToPost = goToPost;

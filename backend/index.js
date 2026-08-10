@@ -80,6 +80,35 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'index.html'));
 });
 
+// Serve post detail HTML at clean slug route: /post/:slug
+app.get('/post/:slug', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'post.html'));
+});
+
+app.get('/post', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'post.html'));
+});
+
+// Auto-resolve direct page-names like /login, /lead, /privacy, /return-refund
+// into the corresponding frontend HTML without needing a static config match.
+app.get('/:viewName', (req, res, next) => {
+  const viewName = String(req.params.viewName || '').trim().toLowerCase();
+  if (!viewName || viewName.includes('.')) return next();
+
+  // Skip API and upload-like endpoints that have their own routers.
+  if (viewName === 'api' || viewName === 'uploads' || viewName === 'js' || viewName === 'static') {
+    return next();
+  }
+
+  const target = path.join(frontendRoot, `${viewName}.html`);
+  if (fs.existsSync(target)) {
+    return res.sendFile(target);
+  }
+
+  // If the requested page is a dynamic HTML asset, let the server fall through.
+  return next();
+});
+
 // ==========================================
 // VIEWS & API ROUTING
 // ==========================================
@@ -91,10 +120,20 @@ app.use("/api/payments", paymentRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 
-// Database connection & Server Boot
-const Port = process.env.PORT || 5000;
-db().then(() => {
-  app.listen(Port, () => {
-      console.log(`Server is running on Port ${Port}`);
-  });
+// Connect once for both the local server and Vercel's serverless function.
+// Vercel invokes the exported Express app itself, so it must not call listen().
+const databaseReady = db().catch((error) => {
+  console.error('Database connection failed:', error);
+  throw error;
 });
+
+if (!process.env.VERCEL) {
+  const Port = process.env.PORT || 5000;
+  databaseReady.then(() => {
+    app.listen(Port, () => {
+      console.log(`Server is running on Port ${Port}`);
+    });
+  });
+}
+
+export default app;

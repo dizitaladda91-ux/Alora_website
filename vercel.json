@@ -1,5 +1,7 @@
 {
   "version": 2,
+  "cleanUrls": true,
+  "trailingSlash": false,
   "builds": [
     {
       "src": "backend/index.js",
@@ -20,10 +22,27 @@
       "dest": "backend/uploads/$1"
     },
     {
+      "src": "/blog/(.*)",
+      "dest": "frontend/post"
+    },
+    {
+      "src": "/post/(.*)",
+      "dest": "frontend/post"
+    },
+    {
+      "src": "/blog",
+      "dest": "frontend/Blog"
+    },
+    {
+      "src": "/Blog",
+      "dest": "frontend/Blog"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
       "src": "/(.*)",
       "dest": "frontend/$1"
     }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }
