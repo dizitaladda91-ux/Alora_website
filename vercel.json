@@ -20,6 +20,10 @@
       "dest": "backend/uploads/$1"
     },
     {
+      "src": "/post/(.*)",
+      "dest": "frontend/post.html"
+    },
+    {
       "src": "/(.*)",
       "dest": "frontend/$1"
     }
