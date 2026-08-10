@@ -22,20 +22,20 @@
       "dest": "backend/uploads/$1"
     },
     {
-      "src": "/blog/(.+)",
-      "dest": "frontend/post.html"
+      "src": "/blog/(.*)",
+      "dest": "frontend/post"
     },
     {
-      "src": "/post/(.+)",
-      "dest": "frontend/post.html"
+      "src": "/post/(.*)",
+      "dest": "frontend/post"
     },
     {
       "src": "/blog",
-      "dest": "frontend/Blog.html"
+      "dest": "frontend/Blog"
     },
     {
       "src": "/Blog",
-      "dest": "frontend/Blog.html"
+      "dest": "frontend/Blog"
     },
     {
       "handle": "filesystem"
