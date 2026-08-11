@@ -109,8 +109,16 @@ function renderArticle(blog) {
 // 🟢 Dynamic SEO & Schema Injector Function
 function injectSEO(blog) {
     const currentUrl = window.location.href;
+    const finalTitle = blog.metaTitle || blog.title || "Alora Radiance";
 
-    document.title = blog.metaTitle || blog.title || "Alora Radiance";
+    // 1. Browser Tab Title Update
+    document.title = finalTitle;
+
+    // 2. DOM Title Element Update (Safe Side)
+    const titleEl = document.getElementById('dynamic-title');
+    if (titleEl) {
+        titleEl.textContent = finalTitle;
+    }
 
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
@@ -132,7 +140,7 @@ function injectSEO(blog) {
         canonicalEl.setAttribute('href', currentUrl);
     }
 
-    document.getElementById('og-title')?.setAttribute('content', blog.metaTitle || blog.title || '');
+    document.getElementById('og-title')?.setAttribute('content', finalTitle);
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
 
@@ -151,7 +159,6 @@ function injectSEO(blog) {
         }
     }
 }
-
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
