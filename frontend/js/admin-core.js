@@ -1,123 +1,108 @@
-import BASE_URL, { GOOGLE_SHEET_API_URL } from "./config.js";
+import BASE_URL from "./config.js";
 
-document.addEventListener("DOMContentLoaded", () => {
-    
-    // 1. ADMIN LOGOUT FUNCTIONALITY
-    const adminLogoutBtn = document.getElementById("adminLogoutBtn");
-    if (adminLogoutBtn) {
-        adminLogoutBtn.addEventListener("click", async () => {
-            try {
-                await fetch(`${BASE_URL}/api/auth/logout`, { 
-                    method: "POST", 
-                    credentials: "include" 
-                });
-                localStorage.clear();
-                window.location.href = "./login.html";
-            } catch (err) {
-                console.error("Admin Logout error:", err);
-                localStorage.clear();
-                window.location.href = "./login.html";
-            }
-        });
-    }
+const ORDER_STATUSES = ["paid", "processing", "packed", "shipped", "delivered", "cancelled"];
+let adminOrders = [];
 
-    // 2. FRONTEND ROUTE GUARD
-    const user = JSON.parse(localStorage.getItem("user"));
-    if (!user || user.role !== "admin") {
-        localStorage.clear();
-        window.location.href = "./login.html";
-    }
+const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 
-    // 3. FETCH ORDERS DIRECTLY FROM GOOGLE SHEET
-    fetchOrdersFromGoogleSheet();
-
-    // 4. MODAL CLOSE LOGIC
-    const modal = document.getElementById("invoiceModal");
-    document.getElementById("closeInvoiceBtn")?.addEventListener("click", () => modal?.classList.add("hidden"));
-    document.getElementById("closeInvoiceBtn2")?.addEventListener("click", () => modal?.classList.add("hidden"));
-});
-
-// Google Sheet Se Orders Fetch karne ka Function
-async function fetchOrdersFromGoogleSheet() {
+async function loadOrders() {
     const tableBody = document.getElementById("ordersTableBody");
     if (!tableBody) return;
+    tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
 
     try {
-        tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Google Sheet se orders load ho rahe hain...</td></tr>`;
+        const response = await fetch(`${BASE_URL}/api/orders?limit=100`, { credentials: "include" });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Could not load orders.");
+        adminOrders = result.data || [];
 
-        // Redirect: "follow" Google Apps Script ke 302 Redirect ko bypass karta hai
-        const response = await fetch(GOOGLE_SHEET_API_URL, {
-            method: "GET",
-            redirect: "follow",
-            headers: {
-                "Content-Type": "text/plain;charset=utf-8",
-            }
-        });
-
-        const orders = await response.json();
-
-        if (!orders || orders.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-gray-500">Sheet me koi order nahi mila.</td></tr>`;
+        if (!adminOrders.length) {
+            tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
             return;
         }
 
-        // Table Rows Rendering
-        tableBody.innerHTML = orders.map((order) => {
-            return `
-                <tr class="hover:bg-gray-50 border-b">
-                    <td class="p-4 font-mono font-medium text-xs">${order.order_id || 'N/A'}</td>
-                    <td class="p-4">
-                        <div class="font-bold text-gray-800">${order.name || 'Customer'}</div>
-                        <div class="text-xs text-gray-500">${order.phone || ''}</div>
-                    </td>
-                    <td class="p-4 font-bold text-gray-800">₹${order.amount || 0}</td>
-                    <td class="p-4">
-                        <span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold">PAID</span>
-                    </td>
-                    <td class="p-4">
-                        <button onclick='openInvoiceModal(${JSON.stringify(order).replace(/'/g, "&apos;")})' class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs flex items-center gap-1 transition-all">
-                            <i class="fa-solid fa-receipt"></i> Print Invoice
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).reverse().join("");
-
+        tableBody.innerHTML = adminOrders.map((order) => `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="p-4 font-mono text-xs">${escapeHtml(order.razorpayOrderId)}</td>
+                <td class="p-4"><div class="font-bold text-gray-800">${escapeHtml(order.customer?.name)}</div><div class="text-xs text-gray-500">${escapeHtml(order.customer?.phone)}</div></td>
+                <td class="p-4 font-bold">${formatMoney(order.totalAmount)}</td>
+                <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
+                <td class="p-4">${order.orderStatus === "refunded" ? `<span class="text-xs font-semibold text-purple-700 uppercase">refunded</span>` : `<select class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateOrderStatus('${order._id}', this.value)">${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.orderStatus ? "selected" : ""}>${status}</option>`).join("")}</select>`}</td>
+                <td class="p-4 flex gap-2"><button onclick="window.openInvoiceModal('${order._id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs"><i class="fa-solid fa-receipt"></i> Invoice</button>${order.paymentStatus === "paid" ? `<button onclick="window.refundOrder('${order._id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs">Refund</button>` : ""}</td>
+            </tr>`).join("");
     } catch (error) {
-        console.error("Error loading Google Sheet data:", error);
-        tableBody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-red-500 font-semibold">Data load nahi ho paya. Please config.js me Apps Script URL verify karein.</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
 }
 
-// Global scope me Invoice Popup View function
-window.openInvoiceModal = function(order) {
-    const setElementText = (id, text) => {
-        const el = document.getElementById(id);
-        if (el) el.innerText = text;
-    };
-
-    setElementText("invOrderId", `#${order.order_id || 'N/A'}`);
-    setElementText("invCustomer", order.name || 'N/A');
-    setElementText("invEmail", `Phone: ${order.phone || 'N/A'} | Addr: ${order.address || 'N/A'}`);
-    setElementText("invDate", `Date: ${order.date || ''}`);
-    setElementText("invTotalAmount", `₹${order.amount || 0}`);
-
-    // Cart items parsing
-    const itemsTable = document.getElementById("invItemsTable");
-    if (itemsTable) {
-        if (order.cart) {
-            const cartLines = order.cart.split('\n');
-            itemsTable.innerHTML = cartLines.map(line => `
-                <tr class="border-b text-xs">
-                    <td class="p-2" colspan="2">${line}</td>
-                    <td class="p-2 text-right text-gray-500">--</td>
-                </tr>
-            `).join("");
-        } else {
-            itemsTable.innerHTML = `<tr><td class="p-2 text-xs text-gray-500" colspan="3">No Items Detail Available</td></tr>`;
-        }
+window.updateOrderStatus = async (orderId, orderStatus) => {
+    try {
+        const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ orderStatus })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Status update failed.");
+        const index = adminOrders.findIndex((order) => order._id === orderId);
+        if (index >= 0) adminOrders[index] = result.data;
+    } catch (error) {
+        alert(error.message);
+        loadOrders();
     }
-
-    // Modal show karein
-    document.getElementById("invoiceModal")?.classList.remove("hidden");
 };
+
+window.refundOrder = async (orderId) => {
+    const reason = window.prompt("Refund reason (optional):", "Requested by admin");
+    if (reason === null) return;
+    if (!window.confirm("This will issue a real full refund through Razorpay and restore inventory. Continue?")) return;
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/orders/${orderId}/refund`, {
+            method: "POST",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ reason })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Refund failed.");
+        alert("Refund successful. Stock has been restored.");
+        loadOrders();
+    } catch (error) {
+        alert(error.message);
+    }
+};
+
+window.openInvoiceModal = async (orderId) => {
+    try {
+        const response = await fetch(`${BASE_URL}/api/orders/${orderId}`, { credentials: "include" });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Could not load order.");
+        const order = result.data;
+        document.getElementById("invOrderId").innerText = `#${order.razorpayOrderId}`;
+        document.getElementById("invCustomer").innerText = order.customer.name;
+        document.getElementById("invEmail").innerText = `Phone: ${order.customer.phone} | Address: ${order.customer.address}`;
+        document.getElementById("invDate").innerText = `Date: ${new Date(order.createdAt).toLocaleDateString("en-IN")}`;
+        document.getElementById("invStatus").innerText = `${order.paymentStatus.toUpperCase()} / ${order.orderStatus.toUpperCase()}`;
+        document.getElementById("invTotalAmount").innerText = formatMoney(order.totalAmount);
+        document.getElementById("invItemsTable").innerHTML = order.items.map((item) => `<tr class="border-b"><td class="p-2">${escapeHtml(item.name)} (${escapeHtml(item.variant)})</td><td class="p-2 text-center">${item.quantity}</td><td class="p-2 text-right">${formatMoney(item.lineTotal)}</td></tr>`).join("");
+        document.getElementById("invoiceModal")?.classList.remove("hidden");
+    } catch (error) {
+        alert(error.message);
+    }
+};
+
+document.addEventListener("DOMContentLoaded", async () => {
+    const logout = document.getElementById("adminLogoutBtn");
+    logout?.addEventListener("click", async () => {
+        await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
+        localStorage.removeItem("user");
+        window.location.href = "./login.html";
+    });
+
+    document.getElementById("closeInvoiceBtn")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
+    document.getElementById("closeInvoiceBtn2")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
+    loadOrders();
+});

@@ -11,6 +11,7 @@ import leadRoutes from "./routes/lead.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
 import blogRoutes from "./routes/blog.routes.js"; 
 import reviewRoutes from "./routes/review.routes.js";
+import orderRoutes from "./routes/order.routes.js";
 import dns from "dns";
 import fs from "fs";
 import path from "path";
@@ -63,6 +64,10 @@ app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cookieParser()); // Cookie Parser registration
 
+// Register auth and protected view routes before static files. Otherwise
+// express.static serves admin HTML directly and bypasses protectView.
+app.use('/', authRoutes);
+
 // ==========================================
 // STATIC FILES HANDLER (Fixes Blank Image Issue)
 // ==========================================
@@ -113,10 +118,10 @@ app.get('/:viewName', (req, res, next) => {
 // VIEWS & API ROUTING
 // ==========================================
 app.use('/api/product', productRouter);
-app.use('/', authRoutes); // Auth routes matching view pages directly
 app.use('/api/queries', queryRoutes);
 app.use('/api/lead', leadRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/orders", orderRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 

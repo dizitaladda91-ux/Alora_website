@@ -18,6 +18,10 @@
       "dest": "backend/index.js"
     },
     {
+      "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost)(\\.html)?",
+      "dest": "backend/index.js"
+    },
+    {
       "src": "/uploads/(.*)",
       "dest": "backend/uploads/$1"
     },

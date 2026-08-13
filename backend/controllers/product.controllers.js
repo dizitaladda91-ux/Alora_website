@@ -26,9 +26,9 @@ export const addnewproduct = async (req, res) => {
             variants 
         };
 
-        if (req.file) {
-            addproduct.imagepath = req.file.path; // Cloudinary URL
-        }
+        const mainImage = req.files?.imagepath?.[0];
+        if (mainImage) addproduct.imagepath = mainImage.path;
+        addproduct.galleryImages = (req.files?.galleryImages || []).map((file) => file.path);
 
         const newProduct = new SimpleProduct(addproduct);
         const savedProduct = await newProduct.save();
@@ -72,17 +72,25 @@ export const updateproduct = async (req, res) => {
         if (req.body.rating) updateProductData.rating = Number(req.body.rating);
         if (req.body.totalReviews) updateProductData.totalReviews = Number(req.body.totalReviews);
 
-        if (req.file) {
+        const mainImage = req.files?.imagepath?.[0];
+        const galleryImages = req.files?.galleryImages || [];
+        if (mainImage) {
             const oldProduct = await SimpleProduct.findById(id);
             if (oldProduct && oldProduct.imagepath) {
                 await deleteFromCloudinary(oldProduct.imagepath);
             }
-            updateProductData.imagepath = req.file.path; // Cloudinary URL
+            updateProductData.imagepath = mainImage.path;
         } else if (req.body.oldProfile) {
             updateProductData.imagepath = req.body.oldProfile;
         }
 
         delete updateProductData.oldProfile;
+
+        if (galleryImages.length > 0) {
+            const oldProduct = await SimpleProduct.findById(id);
+            await Promise.all((oldProduct?.galleryImages || []).map(deleteFromCloudinary));
+            updateProductData.galleryImages = galleryImages.map((file) => file.path);
+        }
 
         const updatedProduct = await SimpleProduct.findByIdAndUpdate(
             id,
@@ -113,6 +121,7 @@ export const deleteproduct = async (req, res) => {
         if (deleteProduct.imagepath) {
             await deleteFromCloudinary(deleteProduct.imagepath);
         }
+        await Promise.all((deleteProduct.galleryImages || []).map(deleteFromCloudinary));
 
         res.status(200).json({ message: "Product successfully deleted!" });
     } catch (err) {
@@ -155,4 +164,4 @@ export const searchProducts = async (req, res) => {
     } catch (err) {
         res.status(500).json({ success: false, error: err.message });
     }
-};
+};

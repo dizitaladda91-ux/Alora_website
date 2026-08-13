@@ -59,30 +59,13 @@ button?.addEventListener("click", async (e) => {
         return;
     }
 
-    // 4. Total Amount Calculation
-    const billTotalElement = document.getElementById("bill-total");
-    if (!billTotalElement) {
-        alert("Bill Total Element not found!");
-        return;
-    }
-
-    const rawAmount = billTotalElement.innerText;
-    const payamount = parseFloat(rawAmount.replace(/[^0-9.]/g, ''));
-
-    if (!payamount || payamount <= 0) {
-        alert("The amount is invalid! Please check the items in your cart.");
-        return;
-    }
-
     try {
-        // 5. Create Order API Call
+        // Server validates product IDs, variants, prices and stock from MongoDB.
         const response = await fetch(`${BASE_URL}/api/payments/create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                amount: payamount,
-                notes: { address, phone, name }
-            })
+            credentials: "include",
+            body: JSON.stringify({ cart: cartItems })
         });
 
         const orderData = await response.json();
@@ -109,16 +92,16 @@ button?.addEventListener("click", async (e) => {
                 console.log("Razorpay Response:", response);
 
                 try {
-                    // Verification & WhatsApp Notification API Call
+                    // The server uses its saved checkout snapshot; browser cart values are not trusted here.
                     const verifyResponse = await fetch(`${BASE_URL}/api/payments/verify-payment`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
+                        credentials: "include",
                         body: JSON.stringify({
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature,
-                            customer: { name, phone, address },
-                            cart: cartItems
+                            customer: { name, phone, address }
                         })
                     });
 

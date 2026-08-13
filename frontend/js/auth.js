@@ -35,21 +35,28 @@ export function showSuccessModal(title, message, callback) {
 // ==========================================
 // 2. ROUTE & GUARD LOGIC
 // ==========================================
-function runAuthGuard() {
+async function runAuthGuard() {
     const currentPath = window.location.pathname.toLowerCase();
-    const storedUser = localStorage.getItem("user");
-
     let user = null;
     let role = "";
 
-    if (storedUser) {
-        try {
-            user = JSON.parse(storedUser);
-            role = user.role ? String(user.role).toLowerCase().trim() : "";
-        } catch (e) {
-            console.error("Invalid user JSON in localStorage", e);
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
+        if (response.ok) {
+            const data = await response.json();
+            user = data.user || null;
+            role = user?.role ? String(user.role).toLowerCase().trim() : "";
+            if (user) localStorage.setItem("user", JSON.stringify(user));
+        } else {
+            localStorage.removeItem("user");
         }
+    } catch (error) {
+        console.warn("Could not check server session:", error);
     }
+
+    // Clear legacy browser tokens from older versions. The JWT now remains HttpOnly.
+    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
 
     const isPublicPage = currentPath.endsWith("login.html") || 
                          currentPath.endsWith("register.html") || 
@@ -57,7 +64,7 @@ function runAuthGuard() {
                          currentPath === "/" || 
                          currentPath.endsWith("/");
 
-    if (storedUser && user && isPublicPage && !currentPath.endsWith("index.html")) {
+    if (user && isPublicPage && !currentPath.endsWith("index.html")) {
         if (role.includes("seo")) {
             window.location.replace("./seoadmin.html");
             return;
@@ -74,9 +81,9 @@ function runAuthGuard() {
     if (isSeoPage) {
         const isSeoUser = role.includes("seo") || role.includes("admin");
 
-        if (!storedUser || !user || !isSeoUser) {
+        if (!user || !isSeoUser) {
             console.warn("Unauthorized access to SEO page. Redirecting...");
-            localStorage.clear();
+            localStorage.removeItem("user");
             window.location.replace("./login.html");
             return;
         }
@@ -102,9 +109,9 @@ function runAuthGuard() {
     const isAdminPage = adminPagesList.some(page => currentPath.includes(page));
 
     if (isAdminPage) {
-        if (!storedUser || !user || !role.includes("admin")) {
+        if (!user || !role.includes("admin")) {
             console.warn("Unauthorized access to Admin page. Redirecting...");
-            localStorage.clear();
+            localStorage.removeItem("user");
             window.location.replace("./login.html");
             return;
         }
@@ -129,7 +136,9 @@ async function handleLogout() {
     } catch (err) {
         console.error("Logout API error:", err);
     }
-    localStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
     window.location.replace("./login.html");
 }
 
@@ -239,12 +248,9 @@ function initLoginForm() {
                 };
 
                 localStorage.setItem("user", JSON.stringify(userObjToStore)); 
-                
-                const authToken = data.token || data.userToken;
-                if (authToken) {
-                    localStorage.setItem("token", authToken);
-                    localStorage.setItem("userToken", authToken);
-                }
+                // JWT stays in the HttpOnly cookie and must never be stored in localStorage.
+                localStorage.removeItem("token");
+                localStorage.removeItem("userToken");
 
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
                 
@@ -353,6 +359,7 @@ export function renderNavbarState() {
             authContainer.innerHTML = `
                 <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
                     <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
+                    ${user.role === 'user' ? '<a href="./myorders.html" class="text-[10px] font-bold uppercase text-[#A0522D] hover:underline">My Orders</a>' : ''}
                     <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                         Logout
                     </button>

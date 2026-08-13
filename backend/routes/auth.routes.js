@@ -1,6 +1,7 @@
 import express from "express";
-import { register, login, logout, forgotPassword, resetPassword } from '../controllers/auth.controllers.js';
+import { register, login, logout, forgotPassword, resetPassword, getSession } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
+import { requireAuth } from "../middlewares/auth.middleware.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -22,8 +23,13 @@ const protectView = (req, res, next) => {
     return res.redirect("/login.html");
   }
 
+  if (!process.env.JWT_SECRET) {
+    console.error("JWT_SECRET is missing. Refusing to serve a protected view.");
+    return res.status(500).send("Server authentication is not configured.");
+  }
+
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "fallback_secret");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     req.user = decoded; // Contains { id, role }
     next();
   } catch (error) {
@@ -49,6 +55,7 @@ const authorizeRoles = (...roles) => {
 router.post('/api/auth/register', register);
 router.post('/api/auth/login', login);
 router.post('/api/auth/logout', logout);
+router.get('/api/auth/session', requireAuth, getSession);
 
 // Forgot Password & Reset Password API Routes
 router.post('/api/auth/forgot-password', forgotPassword);
@@ -75,11 +82,19 @@ const adminPages = [
   'adminUserquery.html'
 ];
 
-adminPages.forEach((page) => {
-  router.get(`/${page}`, protectView, authorizeRoles('admin'), (req, res) => {
+const registerProtectedViews = (pages, roles) => {
+  pages.forEach((page) => {
+    const cleanPageName = page.replace(/\.html$/, '');
+    const sendProtectedPage = (req, res) => {
     res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
+    };
+
+    router.get(`/${page}`, protectView, authorizeRoles(...roles), sendProtectedPage);
+    router.get(`/${cleanPageName}`, protectView, authorizeRoles(...roles), sendProtectedPage);
   });
-});
+};
+
+registerProtectedViews(adminPages, ['admin']);
 
 // 2. SEO ADMIN PAGES LIST & PROTECTION LOOP
 const seoPages = [
@@ -88,10 +103,6 @@ const seoPages = [
   'seoallpost.html'
 ];
 
-seoPages.forEach((page) => {
-  router.get(`/${page}`, protectView, authorizeRoles('seoadmin', 'admin'), (req, res) => {
-    res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
-  });
-});
+registerProtectedViews(seoPages, ['seoadmin', 'admin']);
 
 export default router;

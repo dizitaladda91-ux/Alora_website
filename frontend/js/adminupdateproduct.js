@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl } from "./config.js";
+import BASE_URL, { getImageUrl, getAuthHeaders } from "./config.js";
 
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
@@ -148,8 +148,10 @@ if (form) {
 
         try {
             const response = await fetch(`${BASE_URL}/api/product/update/${productId}`, {
-                method: 'PUT',
-                body: formData
+            method: 'PUT',
+            headers: getAuthHeaders(),
+            credentials: 'include',
+            body: formData
             });
 
             const data = await response.json();

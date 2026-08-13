@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getAuthHeaders } from "./config.js";
 
 /**
  * 1. Reusable template helper for dynamic variant markup rows.
@@ -112,6 +112,8 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     try {
         const response = await fetch(`${BASE_URL}/api/product/add`, {
             method: 'POST',
+            headers: getAuthHeaders(),
+            credentials: 'include',
             body: formData 
         });
 

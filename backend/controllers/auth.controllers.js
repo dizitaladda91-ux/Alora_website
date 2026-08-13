@@ -3,9 +3,21 @@ import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 
+const authCookieOptions = {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL),
+  sameSite: "lax",
+  path: "/",
+  maxAge: 24 * 60 * 60 * 1000
+};
+
 // JWT Token Generator
 const generateToken = (id, role) => {
-  return jwt.sign({ id, role }, process.env.JWT_SECRET || "default_fallback_secret", { expiresIn: '1d' });
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT_SECRET is not configured");
+  }
+
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '1d' });
 };
 
 // Transporter Function (Dynamic Check)
@@ -103,17 +115,11 @@ export const login = async (req, res, next) => {
 
     const token = generateToken(userId, userRole);
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000 
-    });
+    res.cookie("token", token, authCookieOptions);
     
     res.status(200).json({ 
       success: true,
       message: 'Login successful!', 
-      token: token,
       user: userData 
     });
   } catch (error) {
@@ -126,8 +132,40 @@ export const login = async (req, res, next) => {
 // LOGOUT USER
 // ==========================================
 export const logout = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: authCookieOptions.secure,
+    sameSite: authCookieOptions.sameSite,
+    path: authCookieOptions.path
+  });
   res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+// Returns the currently authenticated user without exposing the JWT to browser JavaScript.
+export const getSession = async (req, res) => {
+  try {
+    const { id, role } = req.user;
+
+    if (id === "env-admin-id" || id === "env-seoadmin-id") {
+      return res.status(200).json({
+        success: true,
+        user: {
+          name: role === "admin" ? "SYSTEM ADMIN" : "SEO ADMIN",
+          role,
+          email: role === "admin" ? process.env.ADMIN_EMAIL : process.env.SEO_EMAIL
+        }
+      });
+    }
+
+    const user = await User.findById(id).select("name email phone role").lean();
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Session user no longer exists." });
+    }
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Could not load session." });
+  }
 };
 
 // ==========================================

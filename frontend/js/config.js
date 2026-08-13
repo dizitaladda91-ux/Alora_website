@@ -38,6 +38,11 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
     return `${base}${normalized.startsWith('/') ? normalized : '/' + normalized}`;
 }
 
+// Use this only for admin/SEO actions. Public catalogue, blog and contact APIs do not need it.
+export function getAuthHeaders(headers = {}) {
+    return headers;
+}
+
 export const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyyeLQYUdCrT8FxwDNLv-wVGF_YfC4aK4G4g4g2rRnWvtqeJeySVghAUFF1eN_atdnk/exec";
 
 export default BASE_URL;

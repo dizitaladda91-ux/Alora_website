@@ -1,5 +1,6 @@
 import express from 'express';
 import upload from '../middlewares/cloudinaryUpload.js';
+import { requireAuth, authorizeRoles } from "../middlewares/auth.middleware.js";
 import { 
     createBlogPost, 
     getAllBlogs, 
@@ -15,7 +16,7 @@ const router = express.Router();
 // ==========================================
 
 // 1. Create Blog
-router.post('/create', upload.single('coverImage'), createBlogPost);
+router.post('/create', requireAuth, authorizeRoles('admin', 'seoadmin'), upload.single('coverImage'), createBlogPost);
 
 // 2. Get All Blogs (Frontend requests /api/blogs OR /api/blogs/all)
 router.get('/', getAllBlogs);
@@ -28,11 +29,11 @@ router.get('/post/:slug', getBlogBySlug);
 router.get('/:slug', getBlogBySlug);
 
 // 4. Update / Edit Blog
-router.put('/:id', upload.single('coverImage'), updateBlogPost);
-router.put('/update/:id', upload.single('coverImage'), updateBlogPost);
+router.put('/:id', requireAuth, authorizeRoles('admin', 'seoadmin'), upload.single('coverImage'), updateBlogPost);
+router.put('/update/:id', requireAuth, authorizeRoles('admin', 'seoadmin'), upload.single('coverImage'), updateBlogPost);
 
 // 5. Delete Blog
-router.delete('/:id', deleteBlogPost);
-router.delete('/delete/:id', deleteBlogPost);
+router.delete('/:id', requireAuth, authorizeRoles('admin', 'seoadmin'), deleteBlogPost);
+router.delete('/delete/:id', requireAuth, authorizeRoles('admin', 'seoadmin'), deleteBlogPost);
 
 export default router;

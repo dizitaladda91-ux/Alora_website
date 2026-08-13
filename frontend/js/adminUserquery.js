@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getAuthHeaders } from "./config.js";
 
 
 
@@ -19,7 +19,7 @@ async function fetchQueries() {
         // Shuru me table body me loader ya "Loading..." dikhane ke liye
         tableBody.innerHTML = `<tr><td colspan="3" class="text-center py-6 text-gray-500 font-medium">Loading queries...</td></tr>`;
         
-        const response = await fetch(`${BASE_URL}/api/queries`);
+        const response = await fetch(`${BASE_URL}/api/queries`, { headers: getAuthHeaders(), credentials: 'include' });
         const result = await response.json();
 
         if (result.success) {

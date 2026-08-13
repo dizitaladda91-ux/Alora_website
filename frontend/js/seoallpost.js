@@ -1,4 +1,4 @@
-import BASE_URL from './config.js';
+import BASE_URL, { getAuthHeaders } from './config.js';
 
 const blogTableBody = document.getElementById('blog-table-body');
 
@@ -92,7 +92,9 @@ function attachActionListeners() {
                     btn.disabled = true;
 
                     const response = await fetch(`${BASE_URL}/api/blogs/delete/${blogId}`, {
-                        method: 'DELETE'
+                        method: 'DELETE',
+                        headers: getAuthHeaders(),
+                        credentials: 'include'
                     });
 
                     const resData = await response.json();

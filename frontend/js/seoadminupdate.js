@@ -1,4 +1,4 @@
-import BASE_URL from './config.js';
+import BASE_URL, { getAuthHeaders } from './config.js';
 
 // 1. Quill Editor Setup
 const quill = new Quill('#editor-container', {
@@ -136,6 +136,8 @@ updateForm.addEventListener('submit', async function(e) {
 
         const response = await fetch(`${BASE_URL}/api/blogs/update/${blogId}`, {
             method: 'PUT',
+            headers: getAuthHeaders(),
+            credentials: 'include',
             body: formData
         });
 

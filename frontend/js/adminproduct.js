@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl } from "./config.js";
+import BASE_URL, { getImageUrl, getAuthHeaders } from "./config.js";
 
 async function loadAllProducts(){
     const tbody = document.getElementById("productTableBody");
@@ -172,7 +172,9 @@ async function deleteProduct(productId) {
     }
     try {
         const response = await fetch(`${BASE_URL}/api/product/delete/${productId}`,{
-            method:"DELETE"
+            method:"DELETE",
+            headers: getAuthHeaders(),
+            credentials: 'include'
         });
         const result = await response.json();
         if(response.ok){

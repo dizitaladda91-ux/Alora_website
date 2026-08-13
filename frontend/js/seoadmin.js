@@ -1,4 +1,4 @@
-import BASE_URL from './config.js'; // Make sure config.js provides your API domain URL
+import BASE_URL, { getAuthHeaders } from './config.js'; // Make sure config.js provides your API domain URL
 
 // 1. Initialize Quill Editor
 const quill = new Quill('#editor-container', {
@@ -131,6 +131,8 @@ blogForm.addEventListener('submit', async function(event) {
         // Fetch command mapping to your backend server architecture
         const response = await fetch(`${BASE_URL}/api/blogs/create`, {
             method: 'POST',
+            headers: getAuthHeaders(),
+            credentials: 'include',
             body: formData 
         });
 

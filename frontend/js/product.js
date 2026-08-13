@@ -4,6 +4,17 @@ import BASE_URL, { getImageUrl } from "./config.js";
 let currentProductData = null;
 let currentSelectedVariant = null;
 
+function setPurchaseAvailability() {
+    const cartButton = document.getElementById('cart-toggle-btn');
+    const stock = Number(currentSelectedVariant?.stock || 0);
+    const available = Boolean(currentProductData?.isAvailable) && stock > 0;
+    if (!cartButton) return;
+    cartButton.disabled = !available;
+    cartButton.classList.toggle('opacity-50', !available);
+    cartButton.classList.toggle('cursor-not-allowed', !available);
+    cartButton.innerHTML = available ? '<i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart' : '<i class="fa-solid fa-ban text-xs"></i> Out of Stock';
+}
+
 // Unified Cart Storage Key
 const PRIMARY_CART_KEY = "glowRitualCartData";
 
@@ -85,6 +96,15 @@ async function loadProductDetails() {
             mainImg.alt = product.name || "Product Image";
         }
 
+        const thumbnailsContainer = document.getElementById('thumbnails-container');
+        if (thumbnailsContainer) {
+            const gallery = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
+            thumbnailsContainer.innerHTML = gallery.map((imagePath, index) => `
+                <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white" onclick="window.selectGalleryImage('${getImageUrl(imagePath, './static/placeholder.png')}')">
+                    <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" class="w-full h-full object-contain p-1">
+                </button>`).join('');
+        }
+
         const titleEl = document.getElementById('product-title');
         if (titleEl) titleEl.innerText = product.name || "No Title Available";
 
@@ -116,23 +136,25 @@ async function loadProductDetails() {
 
         if (product.variants && product.variants.length > 0) {
             // Default select first variant
-            currentSelectedVariant = product.variants[0];
+            currentSelectedVariant = product.variants.find((variant) => Number(variant.stock) > 0) || product.variants[0];
             if (priceEl) priceEl.innerText = `₹ ${currentSelectedVariant.price}`;
             if (mrpEl) mrpEl.innerText = currentSelectedVariant.comparePrice ? `₹ ${currentSelectedVariant.comparePrice}` : '';
 
             if (variantsContainer) {
-                variantsContainer.innerHTML = product.variants.map((v, index) => {
-                    const isActive = index === 0;
+                variantsContainer.innerHTML = product.variants.map((v) => {
+                    const inStock = product.isAvailable && Number(v.stock) > 0;
+                    const isActive = v.volume === currentSelectedVariant.volume;
                     const activeClasses = isActive 
                         ? 'border-2 border-ink bg-ink text-parchment font-semibold' 
                         : 'border border-[#DCD3BA] text-ash font-semibold hover:border-ink';
 
                     return `
                         <button 
-                            onclick="selectSize('${v.volume}', ${v.price}, ${v.comparePrice || 0}, this)" 
-                            class="size-btn text-sm px-4 py-2 rounded-full transition ${activeClasses}"
+                            onclick="selectSize('${v.volume}', ${v.price}, ${v.comparePrice || 0}, ${v.stock || 0}, this)"
+                            class="size-btn text-sm px-4 py-2 rounded-full transition ${inStock ? activeClasses : 'border border-gray-200 text-gray-400 line-through cursor-not-allowed'}"
+                            ${inStock ? '' : 'disabled'}
                         >
-                            ${v.volume}
+                            ${v.volume}${inStock ? '' : ' (Out)'}
                         </button>
                     `;
                 }).join('');
@@ -149,6 +171,8 @@ async function loadProductDetails() {
             if (variantsContainer) variantsContainer.innerHTML = `<p class="text-xs text-ash">No variants available</p>`;
         }
 
+        setPurchaseAvailability();
+
         // Product data successfully loaded -> triggers runtime reviews fetch
         fetchAndRenderReviews(productId);
 
@@ -158,15 +182,16 @@ async function loadProductDetails() {
 }
 
 // Global scope window access attachment for inline dynamic variant buttons
-window.selectSize = function(volume, price, comparePrice, buttonElement) {
+window.selectSize = function(volume, price, comparePrice, stock, buttonElement) {
     if (!buttonElement) return;
+    if (Number(stock) <= 0) return;
 
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.className = "size-btn text-sm px-4 py-2 rounded-full transition border border-[#DCD3BA] text-ash font-semibold hover:border-ink";
     });
     buttonElement.className = "size-btn text-sm px-4 py-2 rounded-full transition border-2 border-ink bg-ink text-parchment font-semibold";
 
-    currentSelectedVariant = { volume, price, comparePrice };
+    currentSelectedVariant = { volume, price, comparePrice, stock };
 
     const priceEl = document.getElementById('product-price');
     const mrpEl = document.getElementById('product-mrp');
@@ -182,6 +207,12 @@ function handleCartButtonClick(btnElement) {
 
     const qtyInput = document.getElementById('quantity');
     const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
+
+    if (!currentProductData.isAvailable || Number(currentSelectedVariant.stock) < quantity) {
+        alert('This selected variant is out of stock or has insufficient quantity.');
+        setPurchaseAvailability();
+        return;
+    }
 
     let cart = JSON.parse(localStorage.getItem(PRIMARY_CART_KEY)) || [];
 
@@ -235,6 +266,8 @@ function updateQty(change) {
     let currentQty = parseInt(qtyInput.value) || 1;
     currentQty += change;
     if (currentQty < 1) currentQty = 1;
+    const stock = Number(currentSelectedVariant?.stock || 0);
+    if (stock > 0 && currentQty > stock) currentQty = stock;
     qtyInput.value = currentQty;
 }
 
@@ -297,7 +330,12 @@ function initReviewsFeature() {
                 username: usernameInput.value.trim(),
                 rating: ratingValue,
                 comment: commentInput.value.trim()
-            };
+};
+
+window.selectGalleryImage = function(imageUrl) {
+    const mainImage = document.getElementById('main-product-image');
+    if (mainImage) mainImage.src = imageUrl;
+};
 
             try {
                 const token = getAuthToken();

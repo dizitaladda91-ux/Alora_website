@@ -1,10 +1,11 @@
 import express from "express";
 import { createOrder, verifyPayment, testConnection } from "../controllers/payment.controllers.js";
+import { optionalAuth } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
 // 1. Razorpay Order Creation Route
-router.post("/create-order", createOrder);
+router.post("/create-order", optionalAuth, createOrder);
 
 // 2. Razorpay Signature Verification & WhatsApp Notification Route
 router.post("/verify-payment", verifyPayment);
