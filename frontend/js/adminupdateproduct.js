@@ -80,6 +80,14 @@ async function fetchProductDetails() {
         document.querySelector('input[name="rating"]').value = product.rating || 4.5;
         document.querySelector('input[name="totalReviews"]').value = product.totalReviews || 0;
         document.querySelector('select[name="isAvailable"]').value = String(product.isAvailable);
+        document.querySelector('input[name="sku"]').value = product.sku || '';
+        document.querySelector('textarea[name="ingredients"]').value = product.ingredients || '';
+        document.querySelector('textarea[name="benefits"]').value = product.benefits || '';
+        document.querySelector('textarea[name="usageInstructions"]').value = product.usageInstructions || '';
+        document.querySelector('input[name="metaTitle"]').value = product.metaTitle || '';
+        document.querySelector('input[name="metaDescription"]').value = product.metaDescription || '';
+        document.querySelector('input[name="isBestseller"]').checked = Boolean(product.isBestseller);
+        document.querySelector('input[name="isFeatured"]').checked = Boolean(product.isFeatured);
 
         // Category select update
         if (product.category) {
@@ -124,6 +132,8 @@ if (form) {
     form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
+        formData.set('isBestseller', String(e.target.querySelector('input[name="isBestseller"]').checked));
+        formData.set('isFeatured', String(e.target.querySelector('input[name="isFeatured"]').checked));
 
         const variantRows = document.querySelectorAll('.variant-row');
         const variantsArray = [];

@@ -35,6 +35,14 @@ const SimpleProductSchema = new mongoose.Schema({
         required: [true, 'Product description zaroori hai'],
         trim: true
     },
+    sku: { type: String, trim: true, unique: true, sparse: true },
+    ingredients: { type: String, trim: true, default: '' },
+    benefits: { type: String, trim: true, default: '' },
+    usageInstructions: { type: String, trim: true, default: '' },
+    isBestseller: { type: Boolean, default: false },
+    isFeatured: { type: Boolean, default: false },
+    metaTitle: { type: String, trim: true, default: '' },
+    metaDescription: { type: String, trim: true, default: '' },
     category: {
         type: String,
         required: [true, 'Product category zaroori hai'],

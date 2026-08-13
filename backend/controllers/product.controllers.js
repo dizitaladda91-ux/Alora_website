@@ -5,7 +5,7 @@ import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 // 1. CREATE (Naya Product Add Karna)
 export const addnewproduct = async (req, res) => {
     try {
-        const { name, description, category, rating, totalReviews, isAvailable } = req.body;
+        const { name, description, category, rating, totalReviews, isAvailable, sku, ingredients, benefits, usageInstructions, metaTitle, metaDescription } = req.body;
         
         let variants = [];
         if (req.body.variants && req.body.variants !== "") {
@@ -23,6 +23,9 @@ export const addnewproduct = async (req, res) => {
             rating: rating ? Number(rating) : 4.5,
             totalReviews: totalReviews ? Number(totalReviews) : 0,
             isAvailable: isAvailable === 'true' || isAvailable === true, 
+            isBestseller: req.body.isBestseller === 'true' || req.body.isBestseller === true,
+            isFeatured: req.body.isFeatured === 'true' || req.body.isFeatured === true,
+            sku, ingredients, benefits, usageInstructions, metaTitle, metaDescription,
             variants 
         };
 
@@ -68,6 +71,12 @@ export const updateproduct = async (req, res) => {
 
         if (req.body.isAvailable !== undefined) {
             updateProductData.isAvailable = req.body.isAvailable === 'true' || req.body.isAvailable === true;
+        }
+        if (req.body.isBestseller !== undefined) {
+            updateProductData.isBestseller = req.body.isBestseller === 'true' || req.body.isBestseller === true;
+        }
+        if (req.body.isFeatured !== undefined) {
+            updateProductData.isFeatured = req.body.isFeatured === 'true' || req.body.isFeatured === true;
         }
         if (req.body.rating) updateProductData.rating = Number(req.body.rating);
         if (req.body.totalReviews) updateProductData.totalReviews = Number(req.body.totalReviews);
