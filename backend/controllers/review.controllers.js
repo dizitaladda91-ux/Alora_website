@@ -1,25 +1,20 @@
 import Review from '../models/review.models.js';
-import { sanitizePlainText } from "../services/contentSanitizer.service.js";
 
 // @desc    Create a new product review
 // @route   POST /api/reviews
 export const createReview = async (req, res) => {
     try {
         const { productId, username, rating, comment } = req.body;
-        const cleanUsername = sanitizePlainText(username, 80);
-        const cleanComment = sanitizePlainText(comment, 1000);
-        const cleanProductId = sanitizePlainText(productId || "alora-best-seller", 100);
-        const numericRating = Number(rating);
 
-        if (!cleanUsername || !cleanComment || !Number.isInteger(numericRating) || numericRating < 1 || numericRating > 5) {
-            return res.status(400).json({ success: false, message: 'Provide a name, review, and whole-star rating from 1 to 5.' });
+        if (!username || !rating || !comment) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
         }
 
         const newReview = await Review.create({
-            productId: cleanProductId,
-            username: cleanUsername,
-            rating: numericRating,
-            comment: cleanComment
+            productId: productId || "alora-best-seller",
+            username,
+            rating,
+            comment
         });
 
         res.status(201).json({ success: true, data: newReview });

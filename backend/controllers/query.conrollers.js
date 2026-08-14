@@ -1,17 +1,11 @@
 import { Query } from '../models/query.models.js';
-import { sanitizePlainText } from "../services/contentSanitizer.service.js";
 
 // 1. User ki query save karne ke liye
 export const createQuery = async (req, res) => {
     try {
-        const name = sanitizePlainText(req.body.name, 100);
-        const email = sanitizePlainText(req.body.email, 254).toLowerCase();
-        const message = sanitizePlainText(req.body.message, 2000);
+        const { name, email, message } = req.body;
         if (!name || !email || !message) {
             return res.status(400).json({ success: false, message: "All fields are required." });
-        }
-        if (!/^\S+@\S+\.\S+$/.test(email)) {
-            return res.status(400).json({ success: false, message: "Enter a valid email address." });
         }
 
         const newQuery = new Query({ name, email, message });

@@ -23,15 +23,6 @@ function clearAllCart() {
     }
 }
 
-function getStoredReferral() {
-    try {
-        if (typeof window.getAloraReferral === "function") return window.getAloraReferral();
-        return JSON.parse(localStorage.getItem("aloraReferral") || sessionStorage.getItem("aloraReferral") || "null");
-    } catch {
-        return null;
-    }
-}
-
 const button = document.getElementById("payNow");
 
 button?.addEventListener("click", async (e) => {
@@ -81,7 +72,7 @@ button?.addEventListener("click", async (e) => {
         // Server validates product IDs, variants, prices and stock from MongoDB.
         let referral = null;
         try {
-            const storedReferral = getStoredReferral();
+            const storedReferral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
             if (storedReferral) {
                 const code = storedReferral.referralCode || storedReferral.ref || storedReferral.code;
                 if (code) referral = { code, clickId: storedReferral.clickId || null };
