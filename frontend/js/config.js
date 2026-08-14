@@ -43,6 +43,39 @@ export function getAuthHeaders(headers = {}) {
     return headers;
 }
 
+export async function safeFetchJson(url, options = {}) {
+    const response = await fetch(url, options);
+    const contentType = response.headers.get("content-type") || "";
+
+    let data = null;
+    if (contentType.includes("application/json")) {
+        try {
+            data = await response.json();
+        } catch (e) {
+            data = null;
+        }
+    }
+
+    if (!response.ok) {
+        let errorMessage = `HTTP Error ${response.status}`;
+        if (data && (data.error || data.message)) {
+            errorMessage = data.error || data.message;
+        } else if (!contentType.includes("application/json")) {
+            try {
+                const text = await response.text();
+                if (text) errorMessage = text.trim();
+            } catch (e) {}
+        }
+        throw new Error(errorMessage);
+    }
+
+    if (data === null) {
+        throw new Error("Server returned non-JSON response");
+    }
+
+    return data;
+}
+
 export const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyyeLQYUdCrT8FxwDNLv-wVGF_YfC4aK4G4g4g2rRnWvtqeJeySVghAUFF1eN_atdnk/exec";
 
 export default BASE_URL;

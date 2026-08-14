@@ -1,13 +1,11 @@
-import BASE_URL, { getImageUrl, getAuthHeaders } from "./config.js";
+import BASE_URL, { getImageUrl, getAuthHeaders, safeFetchJson } from "./config.js";
 
 async function loadAllProducts(){
     const tbody = document.getElementById("productTableBody");
     if (!tbody) return; // Guard clause: Agar target table page par na ho toh execution block karein.
 
     try {
-        const response = await fetch(`${BASE_URL}/api/product/all`);
-        const products = await response.json();
-        if(!response.ok) throw new Error(products.error || "Data load nahi hua");
+        const products = await safeFetchJson(`${BASE_URL}/api/product/all`);
 
         if(products.length === 0){
             tbody.innerHTML = `

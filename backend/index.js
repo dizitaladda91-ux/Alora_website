@@ -164,6 +164,18 @@ app.use("/api/affiliates", affiliateRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 
+// Global error handler: Ensures all API errors respond with structured JSON
+app.use((err, req, res, next) => {
+  console.error("Express Error Handler:", err);
+  if (res.headersSent) {
+    return next(err);
+  }
+  res.status(err.status || 500).json({
+    success: false,
+    error: err.message || "A server error occurred"
+  });
+});
+
 // Connect once for both the local server and Vercel's serverless function.
 // Vercel invokes the exported Express app itself, so it must not call listen().
 if (!process.env.VERCEL) {

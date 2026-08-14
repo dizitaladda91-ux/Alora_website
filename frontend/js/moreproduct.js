@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl } from "./config.js";
+import BASE_URL, { getImageUrl, safeFetchJson } from "./config.js";
 
 // ===== Global State =====
 let PRODUCTS_DATABASE = [];
@@ -51,10 +51,7 @@ async function loadProductsFromBackend() {
     gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-clay mb-2"></i><br>Loading products...</p>`;
 
     try {
-        const response = await fetch(`${BASE_URL}/api/product/all`);
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error || "Failed to fetch products");
-
+        const data = await safeFetchJson(`${BASE_URL}/api/product/all`);
         PRODUCTS_DATABASE = normalizeAndAssignBestsellers(data);
         
         // ⚡ Update Quick Filter UI Buttons state if redirected from Index ⚡
@@ -394,10 +391,7 @@ async function fetchAndShowSuggestions(query) {
     }
 
     try {
-        const response = await fetch(`${BASE_URL}/api/product/all`);
-        const data = await response.json();
-
-        if (!response.ok) return;
+        const data = await safeFetchJson(`${BASE_URL}/api/product/all`);
 
         const matches = data.filter(item => {
             const name = (item.name || '').toLowerCase();
