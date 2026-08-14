@@ -105,4 +105,6 @@ const seoPages = [
 
 registerProtectedViews(seoPages, ['seoadmin', 'admin']);
 
+registerProtectedViews(['affiliate.html'], ['affiliate']);
+
 export default router;

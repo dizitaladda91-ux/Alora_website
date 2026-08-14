@@ -1,32 +1,43 @@
-const getAffiliateConfig = () => {
-  const baseUrl = String(process.env.AFFILIATE_API_URL || "").replace(/\/$/, "");
-  const apiKey = process.env.STOREFRONT_API_KEY;
-  return { baseUrl, apiKey, enabled: Boolean(baseUrl && apiKey) };
-};
-
-const affiliateFetch = async (path, options = {}) => {
-  const config = getAffiliateConfig();
-  if (!config.enabled) return null;
-  const response = await fetch(`${config.baseUrl}${path}`, {
-    ...options,
-    headers: { "X-Storefront-Api-Key": config.apiKey, ...(options.headers || {}) }
-  });
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "Affiliate service request failed.");
-  return data;
-};
+import { AffiliateConversion, AffiliateReferral } from "../models/affiliate.models.js";
 
 export const validateReferral = async ({ referralCode, customerEmail }) => {
   if (!referralCode || !customerEmail) return { valid: false, eligible: false, discountPercent: 0 };
-  const data = await affiliateFetch(`/referrals/coupon-status/${encodeURIComponent(referralCode)}?customerEmail=${encodeURIComponent(customerEmail)}`);
-  return data?.data || data || { valid: false, eligible: false, discountPercent: 0 };
+  const code = String(referralCode).trim().toUpperCase();
+  const email = String(customerEmail).trim().toLowerCase();
+  const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
+  if (!referral) return { valid: false, eligible: false, discountPercent: 0 };
+
+  // One referral discount per customer prevents repeated self-service coupon use.
+  const usedBefore = await AffiliateConversion.exists({ referralId: referral._id, customerEmail: email });
+  return {
+    valid: true,
+    eligible: !usedBefore,
+    discountPercent: usedBefore ? 0 : referral.discountPercent
+  };
 };
 
 export const createAffiliateConversion = async (payload) => {
-  if (!payload.referralCode || !payload.clickId) return null;
-  return affiliateFetch("/referrals/conversion", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload)
-  });
+  if (!payload.referralCode || !payload.orderId) return null;
+  const referral = await AffiliateReferral.findOne({ code: String(payload.referralCode).trim().toUpperCase(), active: true });
+  if (!referral) return null;
+
+  const commissionAmount = Number((Number(payload.eligibleAmount || payload.amount || 0) * referral.commissionPercent / 100).toFixed(2));
+  try {
+    const conversion = await AffiliateConversion.create({
+      referralId: referral._id,
+      affiliateId: referral.affiliateId,
+      orderId: String(payload.orderId),
+      customerEmail: String(payload.customerEmail).trim().toLowerCase(),
+      clickId: payload.clickId ? String(payload.clickId) : null,
+      orderAmount: Number(payload.amount || 0),
+      grossAmount: Number(payload.grossAmount || 0),
+      discountAmount: Number(payload.discountAmount || 0),
+      commissionAmount
+    });
+    await AffiliateReferral.updateOne({ _id: referral._id }, { $inc: { totalConversions: 1, totalCommission: commissionAmount } });
+    return conversion;
+  } catch (error) {
+    if (error?.code === 11000) return null;
+    throw error;
+  }
 };

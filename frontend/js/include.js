@@ -22,23 +22,24 @@ async function loadAllPartials() {
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
-function loadAffiliateStorefrontScript() {
-    window.addEventListener("alora:referral-ready", ({ detail }) => {
-        try {
-            sessionStorage.setItem("aloraReferral", JSON.stringify(detail));
-        } catch (error) {
-            console.warn("Referral session could not be saved.", error);
-        }
-    });
-
-    if (document.getElementById("alora-affiliate-storefront-script")) return;
-
-    const script = document.createElement("script");
-    script.id = "alora-affiliate-storefront-script";
-    script.src = "https://aloraaffilation.onrender.com/alora-storefront-discount.js";
-    script.defer = true;
-    document.head.appendChild(script);
+function trackReferralFromUrl() {
+    const referralCode = new URLSearchParams(window.location.search).get("ref");
+    if (!referralCode || !/^[a-z0-9_-]{5,64}$/i.test(referralCode)) return;
+    const normalizedCode = referralCode.toUpperCase();
+    let existing = null;
+    try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch { /* replace unreadable storage */ }
+    const clickId = existing?.referralCode === normalizedCode && existing?.clickId
+        ? existing.clickId
+        : (window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}${Math.random().toString(36).slice(2)}`);
+    const baseUrl = (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? `${location.protocol}//${location.hostname}:5000` : "";
+    fetch(`${baseUrl}/api/affiliates/track-click`, {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: normalizedCode, clickId, landingPage: `${location.pathname}${location.search}` })
+    }).then((response) => {
+        if (!response.ok) throw new Error("Referral code is invalid or inactive.");
+        sessionStorage.setItem("aloraReferral", JSON.stringify({ referralCode: normalizedCode, clickId }));
+    }).catch((error) => console.warn("Referral tracking skipped:", error.message));
 }
 
-loadAffiliateStorefrontScript();
+trackReferralFromUrl();
 document.addEventListener("DOMContentLoaded", loadAllPartials);

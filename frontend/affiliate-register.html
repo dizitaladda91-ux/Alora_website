@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Become an Affiliate | Alora Radiance</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#FCF8EF] text-[#2A2A24] flex items-center justify-center p-5">
+  <main class="w-full max-w-md bg-white rounded-3xl shadow-xl p-8 border border-[#E9DFC8]">
+    <a href="./index.html" class="text-sm text-[#A0522D]">← Back to Alora</a>
+    <h1 class="mt-5 text-3xl font-serif font-semibold">Become an affiliate</h1>
+    <p class="mt-2 text-sm text-stone-600">Share Alora products and earn commission on successful orders.</p>
+    <form id="affiliateRegisterForm" class="mt-6 space-y-4">
+      <input id="affiliateName" required placeholder="Full name" class="w-full border rounded-xl p-3">
+      <input id="affiliateEmail" required type="email" placeholder="Email address" class="w-full border rounded-xl p-3">
+      <input id="affiliatePhone" required inputmode="numeric" maxlength="10" placeholder="10-digit phone number" class="w-full border rounded-xl p-3">
+      <input id="affiliatePassword" required type="password" minlength="6" placeholder="Password (minimum 6 characters)" class="w-full border rounded-xl p-3">
+      <button class="w-full rounded-xl bg-[#2A2A24] text-white p-3 font-semibold">Create affiliate account</button>
+    </form>
+    <p id="affiliateRegisterMessage" class="mt-4 text-sm" aria-live="polite"></p>
+    <p class="mt-5 text-sm text-stone-600">Already registered? <a class="text-[#A0522D] font-semibold" href="./login.html">Sign in</a></p>
+  </main>
+  <script type="module" src="./js/affiliate.js"></script>
+</body>
+</html>

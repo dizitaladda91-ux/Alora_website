@@ -259,6 +259,8 @@ function initLoginForm() {
                     targetUrl = "./admin.html";
                 } else if (role === "seoadmin") {
                     targetUrl = "./seoadmin.html";
+                } else if (role === "affiliate") {
+                    targetUrl = "./affiliate.html";
                 }
 
                 showSuccessModal("Login Successful!", `Welcome back, ${displayName}!`, () => {

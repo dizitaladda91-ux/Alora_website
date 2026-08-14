@@ -12,6 +12,7 @@ import paymentRoutes from "./routes/payment.routes.js";
 import blogRoutes from "./routes/blog.routes.js"; 
 import reviewRoutes from "./routes/review.routes.js";
 import orderRoutes from "./routes/order.routes.js";
+import affiliateRoutes from "./routes/affiliate.routes.js";
 import dns from "dns";
 import fs from "fs";
 import path from "path";
@@ -65,6 +66,30 @@ app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
 app.use(cookieParser()); // Cookie Parser registration
+
+// A failed Atlas connection should not leave Mongoose requests buffering until
+// they time out. API clients receive a clear temporary-unavailable response,
+// while static pages can still be served.
+app.get('/api/health', async (req, res) => {
+  try {
+    await db();
+    return res.status(200).json({ success: true, database: 'connected' });
+  } catch {
+    return res.status(503).json({ success: false, database: 'unavailable' });
+  }
+});
+
+app.use('/api', async (req, res, next) => {
+  try {
+    await db();
+    return next();
+  } catch {
+    return res.status(503).json({
+      success: false,
+      message: 'Database is temporarily unavailable. Please try again shortly.'
+    });
+  }
+});
 
 // Register auth and protected view routes before static files. Otherwise
 // express.static serves admin HTML directly and bypasses protectView.
@@ -124,23 +149,23 @@ app.use('/api/queries', queryRoutes);
 app.use('/api/lead', leadRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/affiliates", affiliateRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 
 // Connect once for both the local server and Vercel's serverless function.
 // Vercel invokes the exported Express app itself, so it must not call listen().
-const databaseReady = db().catch((error) => {
-  console.error('Database connection failed:', error);
-  throw error;
-});
-
 if (!process.env.VERCEL) {
   const Port = process.env.PORT || 5000;
-  databaseReady.then(() => {
-    app.listen(Port, () => {
-      console.log(`Server is running on Port ${Port}`);
+  db()
+    .then(() => {
+      app.listen(Port, () => {
+        console.log(`Server is running on Port ${Port}`);
+      });
+    })
+    .catch(() => {
+      process.exitCode = 1;
     });
-  });
 }
 
 export default app;
