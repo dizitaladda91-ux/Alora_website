@@ -1,9 +1,11 @@
 import Lead from '../models/lead.models.js';
+import { sanitizePlainText } from "../services/contentSanitizer.service.js";
 
 // 1. New Lead Save Karna (Only Name & Email)
 export const createLead = async (req, res) => {
     try {
-        const { name, email } = req.body;
+        const name = sanitizePlainText(req.body.name, 100);
+        const email = sanitizePlainText(req.body.email, 254).toLowerCase();
 
         // Validation checking
         if (!name || !email) {

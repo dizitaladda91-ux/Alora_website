@@ -181,6 +181,7 @@ const sendOrderSideEffects = async (savedOrder) => {
                 grossAmount: savedOrder.subtotal,
                 discountAmount: savedOrder.affiliateDiscount,
                 eligibleAmount: savedOrder.totalAmount,
+                commissionPercent: savedOrder.referral.commissionPercent,
                 currency: savedOrder.currency
             });
             await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date() } });
@@ -264,6 +265,7 @@ export const createOrder = async (req, res) => {
         }
 
         let discountPercent = 0;
+        let commissionPercent = 0;
         let referralCode = null;
         let clickId = null;
         if (referral?.code) {
@@ -271,6 +273,7 @@ export const createOrder = async (req, res) => {
             const referralStatus = await validateReferral({ referralCode: String(referral.code), customerEmail });
             if (referralStatus.valid === true && referralStatus.eligible === true) {
                 discountPercent = Math.min(100, Math.max(0, Number(referralStatus.discountPercent) || 0));
+                commissionPercent = Math.min(100, Math.max(0, Number(referralStatus.commissionPercent) || 0));
                 referralCode = String(referral.code);
                 clickId = referral.clickId ? String(referral.clickId) : null;
             }
@@ -292,7 +295,7 @@ export const createOrder = async (req, res) => {
             items,
             subtotal,
             affiliateDiscount,
-            referral: { code: referralCode, clickId, discountPercent },
+            referral: { code: referralCode, clickId, discountPercent, commissionPercent },
             totalAmount,
             currency: order.currency || "INR"
         });

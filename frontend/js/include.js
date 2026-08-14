@@ -22,6 +22,44 @@ async function loadAllPartials() {
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
+const REFERRAL_STORAGE_KEY = "aloraReferral";
+const REFERRAL_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+function getStoredReferral() {
+    let referral = null;
+    try {
+        const raw = localStorage.getItem(REFERRAL_STORAGE_KEY) || sessionStorage.getItem(REFERRAL_STORAGE_KEY);
+        referral = raw ? JSON.parse(raw) : null;
+    } catch {
+        localStorage.removeItem(REFERRAL_STORAGE_KEY);
+        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
+        return null;
+    }
+
+    if (!referral?.referralCode) return null;
+    if (referral.expiresAt && Number(referral.expiresAt) < Date.now()) {
+        localStorage.removeItem(REFERRAL_STORAGE_KEY);
+        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
+        return null;
+    }
+
+    if (!referral.expiresAt) {
+        referral.expiresAt = Date.now() + REFERRAL_TTL_MS;
+        localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify(referral));
+        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
+    }
+    return referral;
+}
+
+function storeReferral(referral) {
+    const value = { ...referral, capturedAt: Date.now(), expiresAt: Date.now() + REFERRAL_TTL_MS };
+    localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify(value));
+    sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
+    return value;
+}
+
+window.getAloraReferral = getStoredReferral;
+
 function showReferralBanner(referral) {
     const code = String(referral?.referralCode || "").trim().toUpperCase();
     const discountPercent = Number(referral?.discountPercent || 0);
@@ -44,7 +82,7 @@ function showReferralBanner(referral) {
 
 function showStoredReferralBanner() {
     try {
-        showReferralBanner(JSON.parse(sessionStorage.getItem("aloraReferral") || "null"));
+        showReferralBanner(getStoredReferral());
     } catch {
         // Ignore malformed browser storage.
     }
@@ -54,8 +92,7 @@ function trackReferralFromUrl() {
     const referralCode = new URLSearchParams(window.location.search).get("ref");
     if (!referralCode || !/^[a-z0-9_-]{5,64}$/i.test(referralCode)) return;
     const normalizedCode = referralCode.toUpperCase();
-    let existing = null;
-    try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch { /* replace unreadable storage */ }
+    const existing = getStoredReferral();
     const clickId = existing?.referralCode === normalizedCode && existing?.clickId
         ? existing.clickId
         : (window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}${Math.random().toString(36).slice(2)}`);
@@ -66,8 +103,7 @@ function trackReferralFromUrl() {
     }).then(async (response) => {
         if (!response.ok) throw new Error("Referral code is invalid or inactive.");
         const data = await response.json();
-        const detail = { referralCode: normalizedCode, clickId, discountPercent: Number(data.discountPercent || 0) };
-        sessionStorage.setItem("aloraReferral", JSON.stringify(detail));
+        const detail = storeReferral({ referralCode: normalizedCode, clickId, discountPercent: Number(data.discountPercent || 0) });
         document.dispatchEvent(new CustomEvent("alora:referral-ready", { detail }));
         showReferralBanner(detail);
     }).catch((error) => console.warn("Referral tracking skipped:", error.message));

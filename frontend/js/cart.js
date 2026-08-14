@@ -11,9 +11,18 @@ const FOUNDER_DELIVERY_CHARGE = 5000;
 let activeCouponRate = 0;
 let activeCouponCode = "";
 
+function getStoredReferral() {
+    try {
+        if (typeof window.getAloraReferral === "function") return window.getAloraReferral();
+        return JSON.parse(localStorage.getItem("aloraReferral") || sessionStorage.getItem("aloraReferral") || "null");
+    } catch {
+        return null;
+    }
+}
+
 function applyStoredReferralDiscount() {
     try {
-        const referral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+        const referral = getStoredReferral();
         const discountPercent = Number(referral?.discountPercent || 0);
         const code = String(referral?.referralCode || "").trim().toUpperCase();
         if (!code || !Number.isFinite(discountPercent) || discountPercent <= 0) return;
@@ -364,6 +373,20 @@ function applyCoupon() {
     
     const typedCode = couponInput.value.trim().toUpperCase();
     couponMessage.classList.remove("hidden", "text-emerald-600", "text-red-600");
+
+    try {
+        const referral = getStoredReferral();
+        if (referral?.referralCode && Number(referral.discountPercent) > 0) {
+            applyStoredReferralDiscount();
+            couponMessage.textContent = `Referral ${referral.referralCode} is already applied. It will be verified securely at payment.`;
+            couponMessage.classList.remove("hidden", "text-red-600");
+            couponMessage.classList.add("text-emerald-600");
+            recalculateBill();
+            return;
+        }
+    } catch {
+        // Continue with the normal coupon UX if browser storage is unavailable.
+    }
 
     if (typedCode === "GLOW10") {
         activeCouponRate = 0.10;

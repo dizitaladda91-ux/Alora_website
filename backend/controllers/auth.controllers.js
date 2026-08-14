@@ -87,40 +87,23 @@ export const login = async (req, res, next) => {
       return res.status(400).json({ message: 'Email and password are required.' });
     }
 
-    let userData = null;
-    let userRole = "user";
-    let userId = "";
-
     const cleanEmail = email.toLowerCase().trim();
 
-    if (process.env.ADMIN_EMAIL && cleanEmail === process.env.ADMIN_EMAIL.toLowerCase() && password === process.env.ADMIN_PASSWORD) {
-      userId = "env-admin-id";
-      userRole = "admin";
-      userData = { name: "SYSTEM ADMIN", email: process.env.ADMIN_EMAIL, phone: "N/A", role: "admin" };
-    }
-    else if (process.env.SEO_EMAIL && cleanEmail === process.env.SEO_EMAIL.toLowerCase() && password === process.env.SEO_PASSWORD) {
-      userId = "env-seoadmin-id";
-      userRole = "seoadmin";
-      userData = { name: "SEO ADMIN", email: process.env.SEO_EMAIL, phone: "N/A", role: "seoadmin" };
-    }
-    else {
-      const user = await User.findOne({ email: cleanEmail });
-      if (!user || !(await user.comparePassword(password))) {
-        return res.status(401).json({ message: 'Invalid email or password.' });
-      }
-      userId = user._id;
-      userRole = user.role;
-      userData = { name: user.name, email: user.email, phone: user.phone, role: user.role };
+    // Every account, including admin and SEO staff, authenticates through the
+    // database so passwords are bcrypt-hashed and can be individually managed.
+    const user = await User.findOne({ email: cleanEmail });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: 'Invalid email or password.' });
     }
 
-    const token = generateToken(userId, userRole);
+    const token = generateToken(user._id, user.role);
 
     res.cookie("token", token, authCookieOptions);
     
     res.status(200).json({ 
       success: true,
       message: 'Login successful!', 
-      user: userData 
+      user: { name: user.name, email: user.email, phone: user.phone, role: user.role }
     });
   } catch (error) {
     console.error("LOGIN_ERROR:", error);
@@ -144,18 +127,7 @@ export const logout = (req, res) => {
 // Returns the currently authenticated user without exposing the JWT to browser JavaScript.
 export const getSession = async (req, res) => {
   try {
-    const { id, role } = req.user;
-
-    if (id === "env-admin-id" || id === "env-seoadmin-id") {
-      return res.status(200).json({
-        success: true,
-        user: {
-          name: role === "admin" ? "SYSTEM ADMIN" : "SEO ADMIN",
-          role,
-          email: role === "admin" ? process.env.ADMIN_EMAIL : process.env.SEO_EMAIL
-        }
-      });
-    }
+    const { id } = req.user;
 
     const user = await User.findById(id).select("name email phone role").lean();
     if (!user) {
