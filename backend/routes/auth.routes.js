@@ -2,6 +2,7 @@ import express from "express";
 import { register, login, logout, forgotPassword, resetPassword, getSession } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
 import { requireAuth } from "../middlewares/auth.middleware.js";
+import { loginLimiter, passwordResetLimiter, registrationLimiter } from "../middlewares/rateLimit.middleware.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -52,14 +53,14 @@ const authorizeRoles = (...roles) => {
 // ==========================================
 // PUBLIC API ROUTES
 // ==========================================
-router.post('/api/auth/register', register);
-router.post('/api/auth/login', login);
+router.post('/api/auth/register', registrationLimiter, register);
+router.post('/api/auth/login', loginLimiter, login);
 router.post('/api/auth/logout', logout);
 router.get('/api/auth/session', requireAuth, getSession);
 
 // Forgot Password & Reset Password API Routes
-router.post('/api/auth/forgot-password', forgotPassword);
-router.post('/api/auth/reset-password', resetPassword);
+router.post('/api/auth/forgot-password', passwordResetLimiter, forgotPassword);
+router.post('/api/auth/reset-password', passwordResetLimiter, resetPassword);
 
 // ==========================================
 // PUBLIC PAGES SERVING
