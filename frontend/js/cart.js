@@ -11,6 +11,28 @@ const FOUNDER_DELIVERY_CHARGE = 5000;
 let activeCouponRate = 0;
 let activeCouponCode = "";
 
+function applyStoredReferralDiscount() {
+    try {
+        const referral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+        const discountPercent = Number(referral?.discountPercent || 0);
+        const code = String(referral?.referralCode || "").trim().toUpperCase();
+        if (!code || !Number.isFinite(discountPercent) || discountPercent <= 0) return;
+
+        activeCouponRate = Math.min(50, discountPercent) / 100;
+        activeCouponCode = code;
+        const couponInput = document.getElementById("coupon-input");
+        const couponMessage = document.getElementById("coupon-message");
+        if (couponInput) couponInput.value = code;
+        if (couponMessage) {
+            couponMessage.textContent = `Referral ${code} applied: ${discountPercent}% off.`;
+            couponMessage.classList.remove("hidden", "text-red-600");
+            couponMessage.classList.add("text-emerald-600");
+        }
+    } catch (error) {
+        console.warn("Referral discount could not be displayed.", error);
+    }
+}
+
 /* =========================================================
    UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (FIXED ACCUMULATION LOOP)
    ========================================================= */
@@ -361,6 +383,7 @@ function applyCoupon() {
    INITIALIZATION BOOT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
+    applyStoredReferralDiscount();
     updateHeaderCartCount();
     renderCartPage(); 
 
@@ -370,6 +393,11 @@ document.addEventListener("DOMContentLoaded", () => {
             recalculateBill();
         });
     }
+});
+
+document.addEventListener("alora:referral-ready", () => {
+    applyStoredReferralDiscount();
+    recalculateBill();
 });
 
 // Expose hooks globally
