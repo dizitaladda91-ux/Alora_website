@@ -4,16 +4,21 @@ import dns from "node:dns";
 let connectionPromise = null;
 
 const configureDns = () => {
-    // MongoDB Atlas `mongodb+srv` URLs need an SRV DNS lookup. Apply this in
-    // the shared DB module (not only index.js) so CLI scripts use the same
-    // resolver configuration as the Express app.
-    const configuredServers = String(process.env.DNS_SERVERS || "1.1.1.1,8.8.8.8")
-        .split(",")
-        .map((server) => server.trim())
-        .filter(Boolean);
+    // Vercel serverless environments block outbound custom DNS ports (1.1.1.1).
+    // Use Vercel's default AWS DNS resolver in production serverless functions.
+    if (process.env.VERCEL) return;
 
-    if (configuredServers.length > 0) {
-        dns.setServers(configuredServers);
+    try {
+        const configuredServers = String(process.env.DNS_SERVERS || "1.1.1.1,8.8.8.8")
+            .split(",")
+            .map((server) => server.trim())
+            .filter(Boolean);
+
+        if (configuredServers.length > 0) {
+            dns.setServers(configuredServers);
+        }
+    } catch (e) {
+        console.warn("DNS server setup warning:", e.message);
     }
 };
 

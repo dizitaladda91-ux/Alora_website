@@ -94,10 +94,12 @@ app.use('/api', async (req, res, next) => {
   try {
     await db();
     return next();
-  } catch {
+  } catch (err) {
+    console.error("Database connection error:", err);
     return res.status(503).json({
       success: false,
-      message: 'Database is temporarily unavailable. Please try again shortly.'
+      message: 'Database is temporarily unavailable. Please try again shortly.',
+      error: err.message
     });
   }
 });
