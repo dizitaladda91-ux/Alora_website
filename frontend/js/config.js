@@ -48,29 +48,31 @@ export async function safeFetchJson(url, options = {}) {
     const contentType = response.headers.get("content-type") || "";
 
     let data = null;
+    let rawText = "";
+
     if (contentType.includes("application/json")) {
+        const clone = response.clone();
         try {
             data = await response.json();
         } catch (e) {
             data = null;
+            try {
+                rawText = await clone.text();
+            } catch (errClone) {}
         }
+    } else {
+        try {
+            rawText = await response.text();
+        } catch (e) {}
     }
 
     if (!response.ok) {
-        let errorMessage = `HTTP Error ${response.status}`;
-        if (data && (data.error || data.message)) {
-            errorMessage = data.error || data.message;
-        } else if (!contentType.includes("application/json")) {
-            try {
-                const text = await response.text();
-                if (text) errorMessage = text.trim();
-            } catch (e) {}
-        }
+        let errorMessage = data?.error || data?.message || rawText.trim() || `HTTP Error ${response.status}`;
         throw new Error(errorMessage);
     }
 
     if (data === null) {
-        throw new Error("Server returned non-JSON response");
+        throw new Error(rawText.trim() || "Server returned non-JSON response");
     }
 
     return data;
