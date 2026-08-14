@@ -31,17 +31,20 @@ button?.addEventListener("click", async (e) => {
     // 1. Delivery Details Fetching
     const nameInput = document.getElementById("custName");
     const phoneInput = document.getElementById("custPhone");
+    const emailInput = document.getElementById("custEmail");
     const addressInput = document.getElementById("custAddress");
 
     const name = nameInput?.value.trim();
     const phone = phoneInput?.value.trim();
+    const email = emailInput?.value.trim().toLowerCase();
     const address = addressInput?.value.trim();
 
     // 2. Form Validation
-    if (!name || !phone || !address) {
-        alert("Please fill in your Delivery Details (Name, Phone, Address) first!**");
+    if (!name || !phone || !email || !address) {
+        alert("Please fill in your delivery details (name, phone, email and address) first.");
         if (!name && nameInput) nameInput.focus();
         else if (!phone && phoneInput) phoneInput.focus();
+        else if (!email && emailInput) emailInput.focus();
         else if (!address && addressInput) addressInput.focus();
         return;
     }
@@ -49,6 +52,12 @@ button?.addEventListener("click", async (e) => {
     if (phone.length !== 10 || isNaN(phone)) {
         alert(" valid 10-digit mobile number !");
         phoneInput.focus();
+        return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+        alert("Please enter a valid email address.");
+        emailInput.focus();
         return;
     }
 
@@ -61,18 +70,37 @@ button?.addEventListener("click", async (e) => {
 
     try {
         // Server validates product IDs, variants, prices and stock from MongoDB.
+        let referral = null;
+        try {
+            const storedReferral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+            if (storedReferral) {
+                const code = storedReferral.referralCode || storedReferral.ref || storedReferral.code;
+                if (code) referral = { code, clickId: storedReferral.clickId || null };
+            }
+        } catch (error) {
+            console.warn("Referral data could not be read.", error);
+        }
+
         const response = await fetch(`${BASE_URL}/api/payments/create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             credentials: "include",
-            body: JSON.stringify({ cart: cartItems })
+            body: JSON.stringify({
+                cart: cartItems,
+                customer: { name, email, phone, address },
+                referral
+            })
         });
 
         const orderData = await response.json();
 
-        if (!orderData.order || !orderData.order.id) {
-            alert("Order ID generate nahi ho payi. Server logs check karein!");
+        if (!response.ok || !orderData.order || !orderData.order.id) {
+            alert(orderData.error || "Order could not be created. Please try again.");
             return;
+        }
+
+        if (Number(orderData.affiliateDiscount) > 0) {
+            alert(`Referral discount applied: ₹${Number(orderData.affiliateDiscount).toFixed(2)}`);
         }
 
         // 6. Razorpay Configuration Options
@@ -86,7 +114,8 @@ button?.addEventListener("click", async (e) => {
             "notes": {
                 "shipping_address": address,
                 "customer_phone": phone,
-                "customer_name": name
+                "customer_name": name,
+                "customer_email": email
             },
             "handler": async function (response) {
                 console.log("Razorpay Response:", response);
@@ -101,7 +130,7 @@ button?.addEventListener("click", async (e) => {
                             razorpay_order_id: response.razorpay_order_id,
                             razorpay_payment_id: response.razorpay_payment_id,
                             razorpay_signature: response.razorpay_signature,
-                            customer: { name, phone, address }
+                            customer: { name, email, phone, address }
                         })
                     });
 

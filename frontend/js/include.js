@@ -22,4 +22,23 @@ async function loadAllPartials() {
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
+function loadAffiliateStorefrontScript() {
+    window.addEventListener("alora:referral-ready", ({ detail }) => {
+        try {
+            sessionStorage.setItem("aloraReferral", JSON.stringify(detail));
+        } catch (error) {
+            console.warn("Referral session could not be saved.", error);
+        }
+    });
+
+    if (document.getElementById("alora-affiliate-storefront-script")) return;
+
+    const script = document.createElement("script");
+    script.id = "alora-affiliate-storefront-script";
+    script.src = "https://aloraaffilation.onrender.com/alora-storefront-discount.js";
+    script.defer = true;
+    document.head.appendChild(script);
+}
+
+loadAffiliateStorefrontScript();
 document.addEventListener("DOMContentLoaded", loadAllPartials);
