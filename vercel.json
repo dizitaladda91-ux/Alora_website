@@ -18,7 +18,7 @@
       "dest": "backend/index.js"
     },
     {
-      "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost)(\\.html)?",
+      "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },
     {

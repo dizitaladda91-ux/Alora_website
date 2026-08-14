@@ -170,7 +170,7 @@ const sendOrderSideEffects = async (savedOrder) => {
     sendMetaWhatsAppMessage(customer.phone, customerMessage);
     if (process.env.ADMIN_PHONE) sendMetaWhatsAppMessage(process.env.ADMIN_PHONE, adminMessage);
 
-    if (savedOrder.referral?.code && savedOrder.referral?.clickId) {
+    if (savedOrder.referral?.code) {
         try {
             await createAffiliateConversion({
                 referralCode: savedOrder.referral.code,
