@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl } from "./config.js";
+import BASE_URL, { getImageUrl, safeFetchJson } from "./config.js";
 
 document.addEventListener("partialsLoaded", () => {
 
@@ -422,12 +422,9 @@ async function loadSliderProducts() {
     if (!wrapper) return;
 
     try {
-        const response = await fetch(`${BASE_URL}/api/product/all`);
-        const products = await response.json();
+        const products = await safeFetchJson(`${BASE_URL}/api/product/all`);
 
-        if (!response.ok) throw new Error(products.error || "Data fetch nahi ho paya");
-
-        const productList = Array.isArray(products) ? products : (products.products || products.data || []);
+        const productList = Array.isArray(products) ? products : (products?.products || products?.data || []);
         const top5Products = productList.slice(0, 5);
 
         if (top5Products.length === 0) {
@@ -528,6 +525,9 @@ async function loadSliderProducts() {
 
     } catch (err) {
         console.error("Slider loading failed:", err);
+        if (wrapper) {
+            wrapper.innerHTML = `<p class="text-ash px-6 py-4 font-medium text-center w-full">Unable to load products at this time.</p>`;
+        }
     }
 }
 
