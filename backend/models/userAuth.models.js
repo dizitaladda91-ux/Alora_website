@@ -21,10 +21,15 @@ const userSchema = new mongoose.Schema({
     maxlength: [100, "Password 100 characters se bada nahi ho sakta!"],
   },
   phone: { 
-    type: String, 
+    type: String,
     required: [true, "Phone number zaroori hai!"],
     unique: true, 
     trim: true,
+  },
+  address: {
+    type: String,
+    trim: true,
+    default: ''
   },
   role: {
     type: String,

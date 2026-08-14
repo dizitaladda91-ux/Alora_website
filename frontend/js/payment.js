@@ -33,32 +33,18 @@ function getStoredReferral() {
 }
 
 const button = document.getElementById("payNow");
+let signedInCustomer = false;
 
-async function captureLeadAndAuthenticate({ name, email, phone, address, password }) {
-    // Save the delivery enquiry before payment so the admin can follow up even
-    // if the customer closes Razorpay or abandons checkout.
-    const leadResponse = await fetch(`${BASE_URL}/api/lead/newlead`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ name, email, phone, address, source: "checkout" })
-    });
-    const leadData = await leadResponse.json();
-    if (!leadResponse.ok) {
-        throw new Error(leadData.error || "Your delivery details could not be saved.");
-    }
-
+async function registerAndAuthenticate({ name, email, phone, address, password }) {
     const registerResponse = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ name, email, phone, password })
+        body: JSON.stringify({ name, email, phone, address, source: "checkout", password })
     });
     const registerData = await registerResponse.json();
 
-    // New accounts are created above. For an existing email, use the supplied
-    // password to sign in instead of permitting a guest checkout.
-    if (!registerResponse.ok && registerData.message !== "Email already registered.") {
+    if (!registerResponse.ok) {
         throw new Error(registerData.message || "Account could not be created.");
     }
 
@@ -72,7 +58,31 @@ async function captureLeadAndAuthenticate({ name, email, phone, address, passwor
     if (!loginResponse.ok) {
         throw new Error(loginData.message || "Account sign-in failed. Please check your password.");
     }
+
+    signedInCustomer = true;
 }
+
+async function restoreSignedInCustomer() {
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
+        if (!response.ok) return;
+
+        const { user } = await response.json();
+        if (!user || user.role !== "user") return;
+
+        document.getElementById("custName").value = user.name || "";
+        document.getElementById("custEmail").value = user.email || "";
+        document.getElementById("custPhone").value = user.phone || "";
+        document.getElementById("custAddress").value = user.address || "";
+        document.getElementById("checkout-account-fields")?.classList.add("hidden");
+        document.getElementById("checkout-signed-in-note")?.classList.remove("hidden");
+        signedInCustomer = true;
+    } catch (error) {
+        console.warn("Could not restore checkout account.", error);
+    }
+}
+
+restoreSignedInCustomer();
 
 button?.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -114,13 +124,13 @@ button?.addEventListener("click", async (e) => {
         return;
     }
 
-    if (password.length < 6) {
+    if (!signedInCustomer && password.length < 6) {
         alert("Please create a password with at least 6 characters.");
         passwordInput?.focus();
         return;
     }
 
-    if (password !== confirmPassword) {
+    if (!signedInCustomer && password !== confirmPassword) {
         alert("Password and confirm password must match.");
         confirmPasswordInput?.focus();
         return;
@@ -135,8 +145,10 @@ button?.addEventListener("click", async (e) => {
 
     try {
         button.disabled = true;
-        button.innerHTML = 'Creating account... <i class="fa-solid fa-spinner fa-spin text-xs"></i>';
-        await captureLeadAndAuthenticate({ name, email, phone, address, password });
+        if (!signedInCustomer) {
+            button.innerHTML = 'Creating account... <i class="fa-solid fa-spinner fa-spin text-xs"></i>';
+            await registerAndAuthenticate({ name, email, phone, address, password });
+        }
 
         // Server validates product IDs, variants, prices and stock from MongoDB.
         let referral = null;
