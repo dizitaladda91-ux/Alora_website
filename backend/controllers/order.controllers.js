@@ -1,6 +1,6 @@
 import Order from "../models/order.models.js";
 import SimpleProduct from "../models/product.models.js";
-import razorpay from "../config/razorpay.js";
+import getRazorpay from "../config/razorpay.js";
 
 const allowedStatuses = ["paid", "processing", "packed", "shipped", "delivered", "cancelled", "refunded"];
 
@@ -90,7 +90,7 @@ export const refundAdminOrder = async (req, res) => {
       return res.status(400).json({ success: false, message: "This order has no payment ID to refund." });
     }
 
-    const refund = await razorpay.payments.refund(claimedOrder.razorpayPaymentId, {
+    const refund = await getRazorpay().payments.refund(claimedOrder.razorpayPaymentId, {
       amount: Math.round(claimedOrder.totalAmount * 100),
       notes: { reason, orderId: String(claimedOrder._id) }
     });

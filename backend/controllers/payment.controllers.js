@@ -1,5 +1,5 @@
 import crypto from "crypto";
-import razorpay from "../config/razorpay.js";
+import getRazorpay from "../config/razorpay.js";
 import Order from "../models/order.models.js";
 import PaymentAttempt from "../models/paymentAttempt.models.js";
 import SimpleProduct from "../models/product.models.js";
@@ -210,7 +210,7 @@ const finalizeCapturedPayment = async ({ razorpayOrderId, razorpayPaymentId, cus
     if (!isValidCustomer(savedCustomer)) throw new Error("Valid customer details are unavailable for this payment.");
 
     // Razorpay remains the source of truth for the amount actually charged.
-    const razorpayOrder = await razorpay.orders.fetch(razorpayOrderId);
+    const razorpayOrder = await getRazorpay().orders.fetch(razorpayOrderId);
     const totalAmount = Number(razorpayOrder.amount || 0) / 100;
     if (!Number.isFinite(totalAmount) || totalAmount !== paymentAttempt.totalAmount) {
         throw new Error("Paid amount does not match the secure checkout total.");
@@ -282,7 +282,7 @@ export const createOrder = async (req, res) => {
         const affiliateDiscount = Number((subtotal * discountPercent / 100).toFixed(2));
         const totalAmount = Number((subtotal - affiliateDiscount).toFixed(2));
 
-        const order = await razorpay.orders.create({
+        const order = await getRazorpay().orders.create({
             amount: Math.round(totalAmount * 100),
             currency: "INR",
             receipt: `receipt_${Date.now()}`
