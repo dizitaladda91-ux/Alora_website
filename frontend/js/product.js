@@ -111,9 +111,19 @@ async function loadProductDetails() {
         const descEl = document.getElementById('product-desc');
         if (descEl) descEl.innerText = product.description || 'No description available.';
 
+        document.title = product.metaTitle || product.name || 'Alora Radiance';
+        const metaDescription = document.querySelector('meta[name="description"]');
+        if (metaDescription && product.metaDescription) metaDescription.setAttribute('content', product.metaDescription);
+
         // Details & Ingredients Tabs update
         const detailsEl = document.getElementById('product-details');
         if (detailsEl) detailsEl.innerText = product.details || product.description || "Details not available.";
+
+        const benefitsEl = document.getElementById('product-benefits');
+        if (benefitsEl) benefitsEl.innerText = product.benefits || 'Benefits information is not available.';
+
+        const usageEl = document.getElementById('product-usage');
+        if (usageEl) usageEl.innerText = product.usageInstructions || 'Usage instructions are not available.';
 
         const ingredientsEl = document.getElementById('product-ingredients');
         if (ingredientsEl) ingredientsEl.innerText = product.ingredients || "Ingredients info not specified.";
