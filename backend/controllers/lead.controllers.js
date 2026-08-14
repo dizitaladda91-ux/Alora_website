@@ -6,6 +6,9 @@ export const createLead = async (req, res) => {
     try {
         const name = sanitizePlainText(req.body.name, 100);
         const email = sanitizePlainText(req.body.email, 254).toLowerCase();
+        const phone = sanitizePlainText(req.body.phone, 20);
+        const address = sanitizePlainText(req.body.address, 500);
+        const source = sanitizePlainText(req.body.source, 50) || 'website';
 
         // Validation checking
         if (!name || !email) {
@@ -18,7 +21,9 @@ export const createLead = async (req, res) => {
             return res.status(400).json({ error: "Valid email address enter karein!" });
         }
 
-        const newLead = new Lead({ name, email });
+        // Checkout details are captured before payment, so abandoned checkouts
+        // are still visible to the sales team as leads.
+        const newLead = new Lead({ name, email, phone, address, source });
         await newLead.save();
 
         res.status(201).json({ success: true, message: "Lead successfully saved!" });
