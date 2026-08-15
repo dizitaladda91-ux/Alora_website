@@ -360,7 +360,7 @@ function autoFillCoupon(code) {
     applyCoupon();
 }
 
-function applyCoupon() {
+async function applyCoupon() {
     const couponInput = document.getElementById("coupon-input");
     const couponMessage = document.getElementById("coupon-message");
     if (!couponInput || !couponMessage) return;
@@ -368,24 +368,76 @@ function applyCoupon() {
     const typedCode = couponInput.value.trim().toUpperCase();
     couponMessage.classList.remove("hidden", "text-emerald-600", "text-red-600");
 
-    let refData = null;
-    try { refData = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch (e) {}
+    if (!typedCode) {
+        activeCouponRate = 0;
+        activeCouponCode = "";
+        couponMessage.innerText = "Please enter a coupon or referral code.";
+        couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        recalculateBill();
+        return;
+    }
 
     if (typedCode === "GLOW10") {
         activeCouponRate = 0.10;
         activeCouponCode = "GLOW10";
         couponMessage.innerText = "Coupon 'GLOW10' applied successfully! (10% Off)";
-        couponMessage.classList.add("text-emerald-600");
-    } else if (refData && refData.referralCode === typedCode) {
-        activeCouponRate = (Number(refData.discountPercent) || 10) / 100;
+        couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+        recalculateBill();
+        return;
+    }
+
+    let refData = null;
+    try { refData = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch (e) {}
+
+    if (refData && refData.referralCode === typedCode) {
+        const discountPercent = Number(refData.discountPercent) || 10;
+        activeCouponRate = discountPercent / 100;
         activeCouponCode = `Referral ${typedCode}`;
-        couponMessage.innerText = `Referral Code '${typedCode}' applied! (${Math.round(activeCouponRate * 100)}% Off)`;
-        couponMessage.classList.add("text-emerald-600");
-    } else {
+        couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+        couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+        recalculateBill();
+        return;
+    }
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = isLocal ? "http://localhost:5000" : "";
+    const clickId = window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}`;
+
+    try {
+        couponMessage.innerText = "Validating code...";
+        couponMessage.className = "text-xs font-semibold mt-2 text-ash block";
+
+        const res = await fetch(`${baseUrl}/api/affiliates/track-click`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: typedCode, clickId, landingPage: "/cart.html" })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            const discountPercent = Number(data.discountPercent) || 10;
+            activeCouponRate = discountPercent / 100;
+            activeCouponCode = `Referral ${typedCode}`;
+            sessionStorage.setItem("aloraReferral", JSON.stringify({
+                referralCode: typedCode,
+                clickId,
+                discountPercent
+            }));
+            couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+            if (typeof window.showReferralBanner === "function") {
+                window.showReferralBanner(typedCode, discountPercent);
+            }
+        } else {
+            activeCouponRate = 0;
+            activeCouponCode = "";
+            couponMessage.innerText = data.message || "Invalid coupon or referral code.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
+    } catch (err) {
         activeCouponRate = 0;
         activeCouponCode = "";
-        couponMessage.innerText = typedCode === "" ? "Please enter a code." : "Invalid coupon. Try 'GLOW10'.";
-        couponMessage.classList.add("text-red-600");
+        couponMessage.innerText = "Could not validate code. Try 'GLOW10'.";
+        couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
     }
     recalculateBill();
 }

@@ -36,9 +36,10 @@ function showReferralBanner(code, discountPercent) {
 }
 
 function trackReferralFromUrl() {
-    const referralCode = new URLSearchParams(window.location.search).get("ref");
-    if (!referralCode || !/^[a-z0-9_-]{5,64}$/i.test(referralCode)) {
-        // No ref parameter in current URL, check if previous referral is stored in session
+    const params = new URLSearchParams(window.location.search);
+    const rawCode = params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
+    if (!rawCode || !/^[a-z0-9_-]{5,64}$/i.test(rawCode)) {
+        // No ref/aff parameter in current URL, check if previous referral is stored in session
         try {
             const stored = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
             if (stored && stored.referralCode) {
@@ -47,7 +48,7 @@ function trackReferralFromUrl() {
         } catch (e) {}
         return;
     }
-    const normalizedCode = referralCode.toUpperCase();
+    const normalizedCode = rawCode.toUpperCase();
     let existing = null;
     try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch { /* replace unreadable storage */ }
     const clickId = existing?.referralCode === normalizedCode && existing?.clickId
@@ -77,5 +78,6 @@ function trackReferralFromUrl() {
     }).catch((error) => console.warn("Referral tracking skipped:", error.message));
 }
 
+window.showReferralBanner = showReferralBanner;
 trackReferralFromUrl();
 document.addEventListener("DOMContentLoaded", loadAllPartials);

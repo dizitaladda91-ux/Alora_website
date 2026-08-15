@@ -265,14 +265,19 @@ export const createOrder = async (req, res) => {
 
         let discountPercent = 0;
         let referralCode = null;
-        let clickId = null;
-        if (referral?.code) {
-            if (!customerEmail) throw new Error("Email is required to validate the referral discount.");
-            const referralStatus = await validateReferral({ referralCode: String(referral.code), customerEmail });
-            if (referralStatus.valid === true && referralStatus.eligible === true) {
-                discountPercent = Math.min(100, Math.max(0, Number(referralStatus.discountPercent) || 0));
-                referralCode = String(referral.code);
-                clickId = referral.clickId ? String(referral.clickId) : null;
+        let clickId = referral?.clickId ? String(referral.clickId) : null;
+        const candidateCode = String(req.body.couponCode || referral?.code || "").trim().toUpperCase();
+
+        if (candidateCode) {
+            if (candidateCode === "GLOW10") {
+                discountPercent = 10;
+                referralCode = "GLOW10";
+            } else {
+                const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
+                if (referralStatus.valid === true && referralStatus.eligible === true) {
+                    discountPercent = Math.min(100, Math.max(0, Number(referralStatus.discountPercent) || 0));
+                    referralCode = candidateCode;
+                }
             }
         }
 

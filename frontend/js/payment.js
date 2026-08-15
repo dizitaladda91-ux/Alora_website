@@ -141,16 +141,27 @@ button?.addEventListener("click", async (e) => {
             await registerAndAuthenticate({ name, email, phone, address, password });
         }
 
-        // Server validates product IDs, variants, prices and stock from MongoDB.
         let referral = null;
+        let couponCode = null;
         try {
             const storedReferral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
             if (storedReferral) {
                 const code = storedReferral.referralCode || storedReferral.ref || storedReferral.code;
-                if (code) referral = { code, clickId: storedReferral.clickId || null };
+                if (code) {
+                    referral = { code, clickId: storedReferral.clickId || null };
+                    couponCode = code;
+                }
             }
         } catch (error) {
             console.warn("Referral data could not be read.", error);
+        }
+
+        const inputCoupon = document.getElementById("coupon-input")?.value?.trim()?.toUpperCase();
+        if (inputCoupon) {
+            couponCode = inputCoupon;
+            if (!referral) {
+                referral = { code: inputCoupon, clickId: null };
+            }
         }
 
         const response = await fetch(`${BASE_URL}/api/payments/create-order`, {
@@ -160,7 +171,8 @@ button?.addEventListener("click", async (e) => {
             body: JSON.stringify({
                 cart: cartItems,
                 customer: { name, email, phone, address },
-                referral
+                referral,
+                couponCode
             })
         });
 
