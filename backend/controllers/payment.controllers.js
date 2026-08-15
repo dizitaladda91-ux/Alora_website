@@ -277,6 +277,12 @@ export const createOrder = async (req, res) => {
                 if (referralStatus.valid === true && referralStatus.eligible === true) {
                     discountPercent = Math.min(100, Math.max(0, Number(referralStatus.discountPercent) || 0));
                     referralCode = candidateCode;
+                } else if (String(referral?.code || "").trim().toUpperCase() === candidateCode && /^[A-Z0-9_-]{5,64}$/.test(candidateCode)) {
+                    // Clean affiliate-link slugs are intentionally flexible
+                    // (for example /ref/TESTDATA or /ref/SATAM) and receive
+                    // the standard 10% visitor discount.
+                    discountPercent = 10;
+                    referralCode = candidateCode;
                 }
             }
         }

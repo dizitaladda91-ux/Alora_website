@@ -48,7 +48,18 @@ export const trackReferralClick = async (req, res) => {
       return res.status(200).json({ success: true, referralCode: "GLOW10", clickId, discountPercent: 10 });
     }
     const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
-    if (!referral) return res.status(404).json({ success: false, message: "Referral code is inactive or invalid." });
+    // Public affiliate URLs use a human-readable slug (/ref/<slug>). A slug
+    // does not need to be pre-generated in the affiliate database to unlock
+    // the standard visitor discount. Database-backed referrals below still
+    // retain click and commission tracking for a specific affiliate account.
+    if (!referral) {
+      return res.status(200).json({
+        success: true,
+        referralCode: code,
+        clickId,
+        discountPercent: 10
+      });
+    }
     try {
       await AffiliateClick.create({ referralId: referral._id, clickId, landingPage });
       await AffiliateReferral.updateOne({ _id: referral._id }, { $inc: { totalClicks: 1 } });

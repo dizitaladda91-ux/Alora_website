@@ -18,6 +18,10 @@
       "dest": "/api/index.js"
     },
     {
+      "src": "/ref/([^/]+)/?",
+      "dest": "/frontend/index.html"
+    },
+    {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },

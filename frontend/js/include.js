@@ -39,7 +39,10 @@ function showReferralBanner(code, discountPercent) {
 
 function trackReferralFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    const rawCode = params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
+    // Support clean affiliate links such as /ref/TESTDATA as well as the
+    // existing query-string links (?ref=TESTDATA).
+    const pathMatch = window.location.pathname.match(/^\/ref\/([^/?#]+)\/?$/i);
+    const rawCode = pathMatch?.[1] || params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
     if (!rawCode || !/^[a-z0-9_-]{5,64}$/i.test(rawCode)) {
         // No ref/aff parameter in current URL, check if previous referral is stored in session
         try {
