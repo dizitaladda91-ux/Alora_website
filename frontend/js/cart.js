@@ -7,9 +7,66 @@ const LEGACY_CART_KEY = "glowRitualCartData";
 const FREE_SHIPPING_LIMIT = 499;
 const DELIVERY_FEE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000; 
+const APPLIED_COUPONS_KEY = "aloraAppliedCoupons";
+const MAX_STACKED_COUPONS = 3;
 
-let activeCouponRate = 0;
-let activeCouponCode = "";
+let appliedCoupons = [];
+
+try {
+    const storedCoupons = JSON.parse(sessionStorage.getItem(APPLIED_COUPONS_KEY) || "[]");
+    if (Array.isArray(storedCoupons)) {
+        appliedCoupons = storedCoupons.filter((coupon) => /^[A-Z0-9_-]{5,64}$/.test(String(coupon?.code || "")) && Number(coupon.rate) > 0);
+    }
+} catch (error) {
+    console.warn("Applied coupons could not be restored.", error);
+}
+
+function persistAppliedCoupons() {
+    sessionStorage.setItem(APPLIED_COUPONS_KEY, JSON.stringify(appliedCoupons));
+}
+
+function renderAppliedCoupons() {
+    const container = document.getElementById("applied-coupons");
+    if (!container) return;
+
+    container.innerHTML = appliedCoupons.map((coupon) => `
+        <span class="inline-flex items-center gap-1 rounded border border-sage/30 bg-sage-light px-2 py-1 text-xs font-semibold text-sage">
+            ${coupon.code} (${coupon.rate}% off)
+            <button type="button" onclick="removeAppliedCoupon('${coupon.code}')" class="ml-1 text-sage hover:text-red-600" aria-label="Remove ${coupon.code}">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </span>
+    `).join("");
+}
+
+function addAppliedCoupon(code, rate, source = "coupon") {
+    const normalizedCode = String(code || "").trim().toUpperCase();
+    if (!/^[A-Z0-9_-]{5,64}$/.test(normalizedCode)) return false;
+    if (appliedCoupons.some((coupon) => coupon.code === normalizedCode)) return false;
+    if (appliedCoupons.length >= MAX_STACKED_COUPONS) return false;
+
+    appliedCoupons.push({ code: normalizedCode, rate: Number(rate) || 0, source });
+    persistAppliedCoupons();
+    renderAppliedCoupons();
+    recalculateBill();
+    return true;
+}
+
+function removeAppliedCoupon(code) {
+    const normalizedCode = String(code || "").trim().toUpperCase();
+    appliedCoupons = appliedCoupons.filter((coupon) => coupon.code !== normalizedCode);
+    persistAppliedCoupons();
+
+    try {
+        const referral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+        if (referral?.referralCode === normalizedCode) sessionStorage.removeItem("aloraReferral");
+    } catch (error) {
+        console.warn("Referral data could not be updated.", error);
+    }
+
+    renderAppliedCoupons();
+    recalculateBill();
+}
 
 /* =========================================================
    UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (FIXED ACCUMULATION LOOP)
@@ -295,37 +352,13 @@ function recalculateBill() {
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
     billSubtotalEl.innerText = `₹${subtotal}`;
 
-    let discount = 0;
-    let referralRate = 0;
-    let referralCodeUsed = "";
-    try {
-        const refData = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
-        if (refData && refData.referralCode) {
-            referralRate = (Number(refData.discountPercent) || 10) / 100;
-            referralCodeUsed = refData.referralCode;
-        }
-    } catch (e) {}
+    const totalDiscountRate = Math.min(50, appliedCoupons.reduce((sum, coupon) => sum + (Number(coupon.rate) || 0), 0));
+    const discount = Math.round(subtotal * totalDiscountRate / 100);
 
-    if (activeCouponRate > 0) {
-        discount = Math.round(subtotal * activeCouponRate);
+    if (totalDiscountRate > 0 && subtotal > 0) {
         if (billDiscountEl) billDiscountEl.innerText = `${discount}`;
-        if (appliedCouponName) appliedCouponName.innerText = activeCouponCode;
+        if (appliedCouponName) appliedCouponName.innerText = appliedCoupons.map((coupon) => coupon.code).join(" + ");
         if (discountRow) discountRow.classList.remove("hidden");
-    } else if (referralRate > 0 && subtotal > 0) {
-        discount = Math.round(subtotal * referralRate);
-        if (billDiscountEl) billDiscountEl.innerText = `${discount}`;
-        if (appliedCouponName) appliedCouponName.innerText = `Referral ${referralCodeUsed} (${Math.round(referralRate * 100)}% OFF)`;
-        if (discountRow) discountRow.classList.remove("hidden");
-
-        const couponMessage = document.getElementById("coupon-message");
-        const couponInput = document.getElementById("coupon-input");
-        if (couponInput && !couponInput.value) {
-            couponInput.value = referralCodeUsed;
-        }
-        if (couponMessage && (!couponMessage.innerText || couponMessage.classList.contains("hidden"))) {
-            couponMessage.innerText = `Referral Code '${referralCodeUsed}' applied automatically! (${Math.round(referralRate * 100)}% OFF)`;
-            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-        }
     } else {
         if (discountRow) discountRow.classList.add("hidden");
     }
@@ -369,8 +402,6 @@ async function applyCoupon() {
     couponMessage.classList.remove("hidden", "text-emerald-600", "text-red-600");
 
     if (!typedCode) {
-        activeCouponRate = 0;
-        activeCouponCode = "";
         couponMessage.innerText = "Please enter a coupon or referral code.";
         couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         recalculateBill();
@@ -378,11 +409,14 @@ async function applyCoupon() {
     }
 
     if (typedCode === "GLOW10") {
-        activeCouponRate = 0.10;
-        activeCouponCode = "GLOW10";
-        couponMessage.innerText = "Coupon 'GLOW10' applied successfully! (10% Off)";
-        couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-        recalculateBill();
+        if (addAppliedCoupon(typedCode, 10)) {
+            couponMessage.innerText = "Coupon 'GLOW10' applied successfully! (10% Off)";
+            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+            couponInput.value = "";
+        } else {
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
         return;
     }
 
@@ -391,11 +425,14 @@ async function applyCoupon() {
 
     if (refData && refData.referralCode === typedCode) {
         const discountPercent = Number(refData.discountPercent) || 10;
-        activeCouponRate = discountPercent / 100;
-        activeCouponCode = `Referral ${typedCode}`;
-        couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
-        couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-        recalculateBill();
+        if (addAppliedCoupon(typedCode, discountPercent, "referral")) {
+            couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+            couponInput.value = "";
+        } else {
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
         return;
     }
 
@@ -415,27 +452,30 @@ async function applyCoupon() {
         const data = await res.json();
         if (res.ok && data.success) {
             const discountPercent = Number(data.discountPercent) || 10;
-            activeCouponRate = discountPercent / 100;
-            activeCouponCode = `Referral ${typedCode}`;
-            sessionStorage.setItem("aloraReferral", JSON.stringify({
-                referralCode: typedCode,
-                clickId,
-                discountPercent
-            }));
-            couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
-            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-            if (typeof window.showReferralBanner === "function") {
-                window.showReferralBanner(typedCode, discountPercent);
+            if (appliedCoupons.some((coupon) => coupon.source === "referral")) {
+                couponMessage.innerText = "Only one referral coupon can be combined with other coupons.";
+                couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+            } else if (addAppliedCoupon(typedCode, discountPercent, "referral")) {
+                sessionStorage.setItem("aloraReferral", JSON.stringify({
+                    referralCode: typedCode,
+                    clickId,
+                    discountPercent
+                }));
+                couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+                couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+                couponInput.value = "";
+                if (typeof window.showReferralBanner === "function") {
+                    window.showReferralBanner(typedCode, discountPercent);
+                }
+            } else {
+                couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+                couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
             }
         } else {
-            activeCouponRate = 0;
-            activeCouponCode = "";
             couponMessage.innerText = data.message || "Invalid coupon or referral code.";
             couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         }
     } catch (err) {
-        activeCouponRate = 0;
-        activeCouponCode = "";
         couponMessage.innerText = "Could not validate code. Try 'GLOW10'.";
         couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
     }
@@ -446,6 +486,15 @@ async function applyCoupon() {
    INITIALIZATION BOOT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
+    try {
+        const referral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+        if (referral?.referralCode && !appliedCoupons.some((coupon) => coupon.code === referral.referralCode)) {
+            addAppliedCoupon(referral.referralCode, Number(referral.discountPercent) || 10, "referral");
+        }
+    } catch (error) {
+        console.warn("Referral data could not be restored.", error);
+    }
+    renderAppliedCoupons();
     updateHeaderCartCount();
     renderCartPage(); 
 
@@ -466,5 +515,6 @@ window.changeCartQty = changeCartQty;
 window.removeFromCart = removeFromCart;
 window.autoFillCoupon = autoFillCoupon;
 window.applyCoupon = applyCoupon;
+window.removeAppliedCoupon = removeAppliedCoupon;
 window.updateHeaderCartCount = updateHeaderCartCount;
 window.recalculateBill = recalculateBill;

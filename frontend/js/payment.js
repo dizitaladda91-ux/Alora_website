@@ -158,7 +158,16 @@ button?.addEventListener("click", async (e) => {
 
         const inputCoupon = document.getElementById("coupon-input")?.value?.trim()?.toUpperCase();
         const founderHandDelivery = document.getElementById("founder-delivery")?.checked === true;
+        let couponCodes = [];
+        try {
+            couponCodes = JSON.parse(sessionStorage.getItem("aloraAppliedCoupons") || "[]")
+                .map((coupon) => coupon.code)
+                .filter(Boolean);
+        } catch (error) {
+            console.warn("Applied coupons could not be read.", error);
+        }
         if (inputCoupon) {
+            couponCodes.push(inputCoupon);
             couponCode = inputCoupon;
             if (!referral) {
                 referral = { code: inputCoupon, clickId: null };
@@ -174,6 +183,7 @@ button?.addEventListener("click", async (e) => {
                 customer: { name, email, phone, address },
                 referral,
                 couponCode,
+                couponCodes,
                 // This selects a service only. The backend owns all resulting charges.
                 deliveryOption: { founderHandDelivery }
             })

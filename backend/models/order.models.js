@@ -25,6 +25,7 @@ const orderSchema = new mongoose.Schema({
   affiliateDiscount: { type: Number, default: 0, min: 0 },
   deliveryCharge: { type: Number, default: 0, min: 0 },
   founderDeliveryCharge: { type: Number, default: 0, min: 0 },
+  appliedCoupons: { type: [String], default: [] },
   referral: {
     code: { type: String, default: null },
     clickId: { type: String, default: null },

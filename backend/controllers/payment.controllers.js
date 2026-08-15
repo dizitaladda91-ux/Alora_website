@@ -11,6 +11,8 @@ import { createAffiliateConversion, validateReferral } from "../services/affilia
 const FREE_SHIPPING_LIMIT = 499;
 const STANDARD_DELIVERY_CHARGE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000;
+const MAX_STACKED_COUPONS = 3;
+const MAX_COUPON_DISCOUNT_PERCENT = 50;
 
 const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
 
@@ -21,6 +23,25 @@ const calculateCheckoutTotals = ({ subtotal, discountPercent, founderHandDeliver
     const totalAmount = roundCurrency(Math.max(0, subtotal - affiliateDiscount + deliveryCharge + founderDeliveryCharge));
 
     return { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
+};
+
+const getRequestedCouponCodes = (body) => {
+    const rawCodes = [
+        ...(Array.isArray(body.couponCodes) ? body.couponCodes : []),
+        body.couponCode,
+        body.referral?.code
+    ];
+    const codes = [...new Set(rawCodes
+        .map((code) => String(code || "").trim().toUpperCase())
+        .filter(Boolean))];
+
+    if (codes.length > MAX_STACKED_COUPONS) {
+        throw new Error(`A maximum of ${MAX_STACKED_COUPONS} coupons can be applied to one order.`);
+    }
+    if (codes.some((code) => !/^[A-Z0-9_-]{5,64}$/.test(code))) {
+        throw new Error("One or more coupon codes are invalid.");
+    }
+    return codes;
 };
 
 const normalizeCheckoutItems = (cart) => {
@@ -244,6 +265,7 @@ const finalizeCapturedPayment = async ({ razorpayOrderId, razorpayPaymentId, cus
             affiliateDiscount: paymentAttempt.affiliateDiscount || 0,
             deliveryCharge: paymentAttempt.deliveryCharge || 0,
             founderDeliveryCharge: paymentAttempt.founderDeliveryCharge || 0,
+            appliedCoupons: paymentAttempt.appliedCoupons || [],
             referral: paymentAttempt.referral || {},
             totalAmount,
             currency: razorpayOrder.currency || "INR",
@@ -284,26 +306,36 @@ export const createOrder = async (req, res) => {
         let discountPercent = 0;
         let referralCode = null;
         let clickId = referral?.clickId ? String(referral.clickId) : null;
-        const candidateCode = String(req.body.couponCode || referral?.code || "").trim().toUpperCase();
+        const appliedCoupons = [];
+        const candidateCodes = getRequestedCouponCodes(req.body);
 
-        if (candidateCode) {
+        for (const candidateCode of candidateCodes) {
             if (candidateCode === "GLOW10") {
-                discountPercent = 10;
-                referralCode = "GLOW10";
-            } else {
-                const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
+                discountPercent += 10;
+                appliedCoupons.push(candidateCode);
+                continue;
+            }
+
+            // An order can attribute commission to one affiliate only. GLOW10 can
+            // still be combined with that referral coupon.
+            if (referralCode) continue;
+
+            const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
                 if (referralStatus.valid === true && referralStatus.eligible === true) {
-                    discountPercent = Math.min(100, Math.max(0, Number(referralStatus.discountPercent) || 0));
+                    discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
                     referralCode = candidateCode;
+                    appliedCoupons.push(candidateCode);
                 } else if (String(referral?.code || "").trim().toUpperCase() === candidateCode && /^[A-Z0-9_-]{5,64}$/.test(candidateCode)) {
                     // Clean affiliate-link slugs are intentionally flexible
                     // (for example /ref/TESTDATA or /ref/SATAM) and receive
                     // the standard 10% visitor discount.
-                    discountPercent = 10;
+                    discountPercent += 10;
                     referralCode = candidateCode;
+                    appliedCoupons.push(candidateCode);
                 }
-            }
         }
+
+        discountPercent = Math.min(MAX_COUPON_DISCOUNT_PERCENT, discountPercent);
 
         const founderHandDelivery = req.body.deliveryOption?.founderHandDelivery === true;
         const { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount } = calculateCheckoutTotals({
@@ -329,6 +361,7 @@ export const createOrder = async (req, res) => {
             affiliateDiscount,
             deliveryCharge,
             founderDeliveryCharge,
+            appliedCoupons,
             referral: { code: referralCode, clickId, discountPercent },
             totalAmount,
             currency: order.currency || "INR"
@@ -342,6 +375,7 @@ export const createOrder = async (req, res) => {
             affiliateDiscount,
             deliveryCharge,
             founderDeliveryCharge,
+            appliedCoupons,
             customerEmail
         });
     } catch (error) {
