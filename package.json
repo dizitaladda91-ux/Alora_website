@@ -1,19 +1,12 @@
 {
-  "name": "backend",
+  "name": "alora-website",
   "version": "1.0.0",
-  "main": "index.js",
   "type": "module",
+  "main": "backend/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node index.js",
-    "build": "echo \"No build step required for backend\"",
-    "postinstall": "npm run build",
-    "dev": "nodemon --ignore uploads/ index.js"
+    "start": "node backend/index.js",
+    "dev": "nodemon --ignore uploads/ backend/index.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "cloudinary": "^1.41.3",
@@ -21,7 +14,9 @@
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
     "google-auth-library": "^10.9.0",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "multer": "^2.2.0",

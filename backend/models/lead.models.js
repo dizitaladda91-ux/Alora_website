@@ -12,6 +12,21 @@ const leadSchema = new mongoose.Schema({
         trim: true,
         lowercase: true
     },
+    phone: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    address: {
+        type: String,
+        trim: true,
+        default: ''
+    },
+    source: {
+        type: String,
+        trim: true,
+        default: 'website'
+    },
     createdAt: {
         type: Date,
         default: Date.now

@@ -23,16 +23,57 @@ function clearAllCart() {
     }
 }
 
-function getStoredReferral() {
+const button = document.getElementById("payNow");
+let signedInCustomer = false;
+
+async function registerAndAuthenticate({ name, email, phone, address, password }) {
+    const registerResponse = await fetch(`${BASE_URL}/api/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ name, email, phone, address, source: "checkout", password })
+    });
+    const registerData = await registerResponse.json();
+
+    if (!registerResponse.ok) {
+        throw new Error(registerData.message || "Account could not be created.");
+    }
+
+    const loginResponse = await fetch(`${BASE_URL}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password })
+    });
+    const loginData = await loginResponse.json();
+    if (!loginResponse.ok) {
+        throw new Error(loginData.message || "Account sign-in failed. Please check your password.");
+    }
+
+    signedInCustomer = true;
+}
+
+async function restoreSignedInCustomer() {
     try {
-        if (typeof window.getAloraReferral === "function") return window.getAloraReferral();
-        return JSON.parse(localStorage.getItem("aloraReferral") || sessionStorage.getItem("aloraReferral") || "null");
-    } catch {
-        return null;
+        const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
+        if (!response.ok) return;
+
+        const { user } = await response.json();
+        if (!user || user.role !== "user") return;
+
+        document.getElementById("custName").value = user.name || "";
+        document.getElementById("custEmail").value = user.email || "";
+        document.getElementById("custPhone").value = user.phone || "";
+        document.getElementById("custAddress").value = user.address || "";
+        document.getElementById("checkout-account-fields")?.classList.add("hidden");
+        document.getElementById("checkout-signed-in-note")?.classList.remove("hidden");
+        signedInCustomer = true;
+    } catch (error) {
+        console.warn("Could not restore checkout account.", error);
     }
 }
 
-const button = document.getElementById("payNow");
+restoreSignedInCustomer();
 
 button?.addEventListener("click", async (e) => {
     e.preventDefault();
@@ -42,11 +83,15 @@ button?.addEventListener("click", async (e) => {
     const phoneInput = document.getElementById("custPhone");
     const emailInput = document.getElementById("custEmail");
     const addressInput = document.getElementById("custAddress");
+    const passwordInput = document.getElementById("custPassword");
+    const confirmPasswordInput = document.getElementById("custConfirmPassword");
 
     const name = nameInput?.value.trim();
     const phone = phoneInput?.value.trim();
     const email = emailInput?.value.trim().toLowerCase();
     const address = addressInput?.value.trim();
+    const password = passwordInput?.value || "";
+    const confirmPassword = confirmPasswordInput?.value || "";
 
     // 2. Form Validation
     if (!name || !phone || !email || !address) {
@@ -70,6 +115,18 @@ button?.addEventListener("click", async (e) => {
         return;
     }
 
+    if (!signedInCustomer && password.length < 6) {
+        alert("Please create a password with at least 6 characters.");
+        passwordInput?.focus();
+        return;
+    }
+
+    if (!signedInCustomer && password !== confirmPassword) {
+        alert("Password and confirm password must match.");
+        confirmPasswordInput?.focus();
+        return;
+    }
+
     // 3. Cart Items Extraction
     const cartItems = getSafeCart();
     if (cartItems.length === 0) {
@@ -78,10 +135,16 @@ button?.addEventListener("click", async (e) => {
     }
 
     try {
+        button.disabled = true;
+        if (!signedInCustomer) {
+            button.innerHTML = 'Creating account... <i class="fa-solid fa-spinner fa-spin text-xs"></i>';
+            await registerAndAuthenticate({ name, email, phone, address, password });
+        }
+
         // Server validates product IDs, variants, prices and stock from MongoDB.
         let referral = null;
         try {
-            const storedReferral = getStoredReferral();
+            const storedReferral = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
             if (storedReferral) {
                 const code = storedReferral.referralCode || storedReferral.ref || storedReferral.code;
                 if (code) referral = { code, clickId: storedReferral.clickId || null };
@@ -173,7 +236,10 @@ button?.addEventListener("click", async (e) => {
 
     } catch (error) {
         console.error("Error creating order:", error);
-        alert("Connection failed! Backend server offline lag raha hai.");
+        alert(error.message || "Connection failed! Backend server offline lag raha hai.");
+    } finally {
+        button.disabled = false;
+        button.innerHTML = 'Pay Now <i class="fa-solid fa-arrow-right text-xs"></i>';
     }
 });
 

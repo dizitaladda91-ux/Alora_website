@@ -1,5 +1,3 @@
-
-
 async function loadPartial(selector, url) {
     const el = document.querySelector(selector);
     if (!el) return; // us page par placeholder hi nahi hai to skip
@@ -22,96 +20,62 @@ async function loadAllPartials() {
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
-const REFERRAL_STORAGE_KEY = "aloraReferral";
-const REFERRAL_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-
-function getStoredReferral() {
-    let referral = null;
-    try {
-        const raw = localStorage.getItem(REFERRAL_STORAGE_KEY) || sessionStorage.getItem(REFERRAL_STORAGE_KEY);
-        referral = raw ? JSON.parse(raw) : null;
-    } catch {
-        localStorage.removeItem(REFERRAL_STORAGE_KEY);
-        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
-        return null;
+function showReferralBanner(code, discountPercent) {
+    if (!code) return;
+    let banner = document.getElementById("alora-referral-banner");
+    if (!banner) {
+        banner = document.createElement("div");
+        banner.id = "alora-referral-banner";
+        banner.className = "bg-[#8B4513] text-white text-xs py-2.5 px-4 text-center font-medium flex items-center justify-center gap-2 relative z-50 shadow-md border-b border-amber-900/40";
+        document.body.prepend(banner);
     }
-
-    if (!referral?.referralCode) return null;
-    if (referral.expiresAt && Number(referral.expiresAt) < Date.now()) {
-        localStorage.removeItem(REFERRAL_STORAGE_KEY);
-        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
-        return null;
-    }
-
-    if (!referral.expiresAt) {
-        referral.expiresAt = Date.now() + REFERRAL_TTL_MS;
-        localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify(referral));
-        sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
-    }
-    return referral;
-}
-
-function storeReferral(referral) {
-    const value = { ...referral, capturedAt: Date.now(), expiresAt: Date.now() + REFERRAL_TTL_MS };
-    localStorage.setItem(REFERRAL_STORAGE_KEY, JSON.stringify(value));
-    sessionStorage.removeItem(REFERRAL_STORAGE_KEY);
-    return value;
-}
-
-window.getAloraReferral = getStoredReferral;
-
-function showReferralBanner(referral) {
-    const code = String(referral?.referralCode || "").trim().toUpperCase();
-    const discountPercent = Number(referral?.discountPercent || 0);
-    if (!code || !Number.isFinite(discountPercent) || discountPercent <= 0 || document.getElementById("alora-referral-banner")) return;
-
-    const banner = document.createElement("div");
-    banner.id = "alora-referral-banner";
-    banner.className = "fixed left-1/2 top-4 z-[99999] w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-center text-sm font-semibold text-emerald-900 shadow-lg";
-    const text = document.createElement("span");
-    text.textContent = `Referral ${code} applied — ${discountPercent}% off at checkout.`;
-    const closeButton = document.createElement("button");
-    closeButton.type = "button";
-    closeButton.setAttribute("aria-label", "Close referral message");
-    closeButton.className = "ml-3 text-lg leading-none";
-    closeButton.textContent = "×";
-    closeButton.addEventListener("click", () => banner.remove());
-    banner.append(text, closeButton);
-    document.body.appendChild(banner);
-}
-
-function showStoredReferralBanner() {
-    try {
-        showReferralBanner(getStoredReferral());
-    } catch {
-        // Ignore malformed browser storage.
-    }
+    banner.innerHTML = `
+        <span>🎉 <strong>Special Offer Active!</strong> Referral Code <span class="font-mono bg-white/20 px-1.5 py-0.5 rounded font-bold">${code}</span> applied — <strong>${discountPercent}% OFF</strong> on your order!</span>
+        <button onclick="document.getElementById('alora-referral-banner').remove()" class="ml-2 text-white/80 hover:text-white text-sm focus:outline-none" title="Dismiss">&times;</button>
+    `;
 }
 
 function trackReferralFromUrl() {
     const referralCode = new URLSearchParams(window.location.search).get("ref");
-    if (!referralCode || !/^[a-z0-9_-]{5,64}$/i.test(referralCode)) return;
+    if (!referralCode || !/^[a-z0-9_-]{5,64}$/i.test(referralCode)) {
+        // No ref parameter in current URL, check if previous referral is stored in session
+        try {
+            const stored = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
+            if (stored && stored.referralCode) {
+                showReferralBanner(stored.referralCode, stored.discountPercent || 10);
+            }
+        } catch (e) {}
+        return;
+    }
     const normalizedCode = referralCode.toUpperCase();
-    const existing = getStoredReferral();
+    let existing = null;
+    try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch { /* replace unreadable storage */ }
     const clickId = existing?.referralCode === normalizedCode && existing?.clickId
         ? existing.clickId
         : (window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}${Math.random().toString(36).slice(2)}`);
-    const baseUrl = (location.hostname === "localhost" || location.hostname === "127.0.0.1") ? `${location.protocol}//${location.hostname}:5000` : "";
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = isLocal ? "http://localhost:5000" : "";
+
     fetch(`${baseUrl}/api/affiliates/track-click`, {
-        method: "POST", headers: { "Content-Type": "application/json" },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: normalizedCode, clickId, landingPage: `${location.pathname}${location.search}` })
     }).then(async (response) => {
         if (!response.ok) throw new Error("Referral code is invalid or inactive.");
         const data = await response.json();
-        const detail = storeReferral({ referralCode: normalizedCode, clickId, discountPercent: Number(data.discountPercent || 0) });
-        document.dispatchEvent(new CustomEvent("alora:referral-ready", { detail }));
-        showReferralBanner(detail);
+        const discountPercent = Number(data.discountPercent) || 10;
+        sessionStorage.setItem("aloraReferral", JSON.stringify({
+            referralCode: normalizedCode,
+            clickId,
+            discountPercent
+        }));
+        showReferralBanner(normalizedCode, discountPercent);
+        if (typeof window.recalculateBill === "function") {
+            window.recalculateBill();
+        }
     }).catch((error) => console.warn("Referral tracking skipped:", error.message));
 }
 
 trackReferralFromUrl();
-document.addEventListener("alora:referral-ready", (event) => showReferralBanner(event.detail));
-document.addEventListener("DOMContentLoaded", () => {
-    showStoredReferralBanner();
-    loadAllPartials();
-});
+document.addEventListener("DOMContentLoaded", loadAllPartials);

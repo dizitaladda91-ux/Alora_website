@@ -1,4 +1,5 @@
 import User from "../models/userAuth.models.js";
+import Lead from "../models/lead.models.js";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 import nodemailer from "nodemailer";
@@ -36,7 +37,7 @@ const getTransporter = () => {
 // ==========================================
 export const register = async (req, res, next) => {
   try {
-    const { name, email, password, phone } = req.body; 
+    const { name, email, password, phone, address, source } = req.body;
 
     // 1. Mandatory Input Validation (Avoids undefined crashes)
     if (!name || !email || !password || !phone) {
@@ -64,8 +65,26 @@ export const register = async (req, res, next) => {
       email: email.toLowerCase().trim(), 
       password, 
       phone: phone.trim(),
+      address: String(address || '').trim(),
       role: "user" 
     });
+
+    // A newly registered customer is a lead by definition. Using the account
+    // email as the key avoids creating a new lead every time they checkout.
+    await Lead.findOneAndUpdate(
+      { email: user.email },
+      {
+        $set: {
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+          address: user.address || '',
+          source: String(source || 'registration').trim()
+        },
+        $setOnInsert: { createdAt: new Date() }
+      },
+      { upsert: true, new: true, setDefaultsOnInsert: true }
+    );
 
     res.status(201).json({ 
       success: true,
@@ -103,7 +122,7 @@ export const login = async (req, res, next) => {
     res.status(200).json({ 
       success: true,
       message: 'Login successful!', 
-      user: { name: user.name, email: user.email, phone: user.phone, role: user.role }
+      user: { name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
     });
   } catch (error) {
     console.error("LOGIN_ERROR:", error);
@@ -129,7 +148,7 @@ export const getSession = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const user = await User.findById(id).select("name email phone role").lean();
+    const user = await User.findById(id).select("name email phone address role").lean();
     if (!user) {
       return res.status(401).json({ success: false, message: "Session user no longer exists." });
     }
