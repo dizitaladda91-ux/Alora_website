@@ -58,7 +58,9 @@ function trackReferralFromUrl() {
         : (window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}${Math.random().toString(36).slice(2)}`);
 
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-   const baseUrl = isLocal ? "http://localhost:5000" : "https://affiliation.aloraradiance.com";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) 
+        ? window.BASE_URL 
+        : (isLocal ? "http://localhost:5000" : "");
 
     fetch(`${baseUrl}/api/affiliates/track-click`, {
         method: "POST",
@@ -77,7 +79,19 @@ function trackReferralFromUrl() {
         if (typeof window.recalculateBill === "function") {
             window.recalculateBill();
         }
-    }).catch((error) => console.warn("Referral tracking skipped:", error.message));
+    }).catch((error) => {
+        console.warn("Referral tracking network notice:", error.message);
+        // Fallback: Store referral locally so discount still works seamlessly on frontend
+        sessionStorage.setItem("aloraReferral", JSON.stringify({
+            referralCode: normalizedCode,
+            clickId,
+            discountPercent: 10
+        }));
+        showReferralBanner(normalizedCode, 10);
+        if (typeof window.recalculateBill === "function") {
+            window.recalculateBill();
+        }
+    });
 }
 
 window.showReferralBanner = showReferralBanner;

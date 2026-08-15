@@ -400,7 +400,7 @@ async function applyCoupon() {
     }
 
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-    const baseUrl = isLocal ? "http://localhost:5000" : "";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
     const clickId = window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}`;
 
     try {
