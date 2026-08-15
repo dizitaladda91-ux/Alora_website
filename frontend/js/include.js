@@ -67,7 +67,14 @@ function trackReferralFromUrl() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code: normalizedCode, clickId, landingPage: `${location.pathname}${location.search}` })
     }).then(async (response) => {
-        if (!response.ok) throw new Error("Referral code is invalid or inactive.");
+        if (!response.ok) {
+            // Invalid or inactive code in DB -> clear any stored referral data
+            sessionStorage.removeItem("aloraReferral");
+            const existingBanner = document.getElementById("alora-referral-banner");
+            if (existingBanner) existingBanner.remove();
+            console.warn(`Referral code '${normalizedCode}' is invalid or inactive.`);
+            return;
+        }
         const data = await response.json();
         const discountPercent = Number(data.discountPercent) || 10;
         sessionStorage.setItem("aloraReferral", JSON.stringify({
@@ -81,16 +88,6 @@ function trackReferralFromUrl() {
         }
     }).catch((error) => {
         console.warn("Referral tracking network notice:", error.message);
-        // Fallback: Store referral locally so discount still works seamlessly on frontend
-        sessionStorage.setItem("aloraReferral", JSON.stringify({
-            referralCode: normalizedCode,
-            clickId,
-            discountPercent: 10
-        }));
-        showReferralBanner(normalizedCode, 10);
-        if (typeof window.recalculateBill === "function") {
-            window.recalculateBill();
-        }
     });
 }
 
