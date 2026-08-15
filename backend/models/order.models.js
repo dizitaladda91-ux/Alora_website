@@ -23,6 +23,8 @@ const orderSchema = new mongoose.Schema({
   items: { type: [orderItemSchema], required: true, validate: [items => items.length > 0, "An order needs at least one item."] },
   subtotal: { type: Number, required: true, min: 0 },
   affiliateDiscount: { type: Number, default: 0, min: 0 },
+  deliveryCharge: { type: Number, default: 0, min: 0 },
+  founderDeliveryCharge: { type: Number, default: 0, min: 0 },
   referral: {
     code: { type: String, default: null },
     clickId: { type: String, default: null },

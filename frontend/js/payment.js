@@ -157,6 +157,7 @@ button?.addEventListener("click", async (e) => {
         }
 
         const inputCoupon = document.getElementById("coupon-input")?.value?.trim()?.toUpperCase();
+        const founderHandDelivery = document.getElementById("founder-delivery")?.checked === true;
         if (inputCoupon) {
             couponCode = inputCoupon;
             if (!referral) {
@@ -172,7 +173,9 @@ button?.addEventListener("click", async (e) => {
                 cart: cartItems,
                 customer: { name, email, phone, address },
                 referral,
-                couponCode
+                couponCode,
+                // This selects a service only. The backend owns all resulting charges.
+                deliveryOption: { founderHandDelivery }
             })
         });
 

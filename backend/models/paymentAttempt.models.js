@@ -24,6 +24,8 @@ const paymentAttemptSchema = new mongoose.Schema({
   items: { type: [paymentAttemptItemSchema], required: true },
   subtotal: { type: Number, required: true, min: 0 },
   affiliateDiscount: { type: Number, default: 0, min: 0 },
+  deliveryCharge: { type: Number, default: 0, min: 0 },
+  founderDeliveryCharge: { type: Number, default: 0, min: 0 },
   referral: {
     code: { type: String, default: null },
     clickId: { type: String, default: null },

@@ -7,6 +7,22 @@ import User from "../models/userAuth.models.js";
 import WebhookEvent from "../models/webhookEvent.models.js";
 import { createAffiliateConversion, validateReferral } from "../services/affiliate.service.js";
 
+// Checkout prices must be calculated here, never from browser-rendered totals.
+const FREE_SHIPPING_LIMIT = 499;
+const STANDARD_DELIVERY_CHARGE = 40;
+const FOUNDER_DELIVERY_CHARGE = 5000;
+
+const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
+
+const calculateCheckoutTotals = ({ subtotal, discountPercent, founderHandDelivery }) => {
+    const affiliateDiscount = roundCurrency(subtotal * discountPercent / 100);
+    const deliveryCharge = subtotal >= FREE_SHIPPING_LIMIT ? 0 : STANDARD_DELIVERY_CHARGE;
+    const founderDeliveryCharge = founderHandDelivery ? FOUNDER_DELIVERY_CHARGE : 0;
+    const totalAmount = roundCurrency(Math.max(0, subtotal - affiliateDiscount + deliveryCharge + founderDeliveryCharge));
+
+    return { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
+};
+
 const normalizeCheckoutItems = (cart) => {
     if (!Array.isArray(cart)) return [];
 
@@ -226,6 +242,8 @@ const finalizeCapturedPayment = async ({ razorpayOrderId, razorpayPaymentId, cus
             items: paymentAttempt.items,
             subtotal: paymentAttempt.subtotal,
             affiliateDiscount: paymentAttempt.affiliateDiscount || 0,
+            deliveryCharge: paymentAttempt.deliveryCharge || 0,
+            founderDeliveryCharge: paymentAttempt.founderDeliveryCharge || 0,
             referral: paymentAttempt.referral || {},
             totalAmount,
             currency: razorpayOrder.currency || "INR",
@@ -287,8 +305,14 @@ export const createOrder = async (req, res) => {
             }
         }
 
-        const affiliateDiscount = Number((subtotal * discountPercent / 100).toFixed(2));
-        const totalAmount = Number((subtotal - affiliateDiscount).toFixed(2));
+        const founderHandDelivery = req.body.deliveryOption?.founderHandDelivery === true;
+        const { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount } = calculateCheckoutTotals({
+            subtotal,
+            discountPercent,
+            founderHandDelivery
+        });
+
+        if (totalAmount <= 0) throw new Error("The payable amount must be greater than zero.");
 
         const order = await getRazorpay().orders.create({
             amount: Math.round(totalAmount * 100),
@@ -303,12 +327,23 @@ export const createOrder = async (req, res) => {
             items,
             subtotal,
             affiliateDiscount,
+            deliveryCharge,
+            founderDeliveryCharge,
             referral: { code: referralCode, clickId, discountPercent },
             totalAmount,
             currency: order.currency || "INR"
         });
 
-        return res.status(200).json({ order, razorpay_key_id: process.env.RAZORPAY_KEY_ID, amount: totalAmount, affiliateDiscount, customerEmail });
+        return res.status(200).json({
+            order,
+            razorpay_key_id: process.env.RAZORPAY_KEY_ID,
+            amount: totalAmount,
+            subtotal,
+            affiliateDiscount,
+            deliveryCharge,
+            founderDeliveryCharge,
+            customerEmail
+        });
     } catch (error) {
         console.error("Create Razorpay order error:", error);
         return res.status(400).json({ error: error.message || "Could not validate your cart." });
