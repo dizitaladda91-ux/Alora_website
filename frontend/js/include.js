@@ -58,7 +58,7 @@ function trackReferralFromUrl() {
         : (window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}${Math.random().toString(36).slice(2)}`);
 
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-    const baseUrl = isLocal ? "http://localhost:5000" : "";
+   const baseUrl = isLocal ? "http://localhost:5000" : "https://affiliation.aloraradiance.com";
 
     fetch(`${baseUrl}/api/affiliates/track-click`, {
         method: "POST",
