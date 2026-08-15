@@ -44,35 +44,35 @@ export function getAuthHeaders(headers = {}) {
 }
 
 export async function safeFetchJson(url, options = {}) {
-    const response = await fetch(url, options);
+    let response;
+
+    try {
+        response = await fetch(url, options);
+    } catch {
+        throw new Error(`Network request failed for ${url}. Check the API deployment, CORS, and internet connection.`);
+    }
     const contentType = response.headers.get("content-type") || "";
 
     let data = null;
     let rawText = "";
 
-    if (contentType.includes("application/json")) {
-        const clone = response.clone();
-        try {
+    try {
+        if (contentType.includes("application/json")) {
             data = await response.json();
-        } catch (e) {
-            data = null;
-            try {
-                rawText = await clone.text();
-            } catch (errClone) {}
-        }
-    } else {
-        try {
+        } else {
             rawText = await response.text();
-        } catch (e) {}
+        }
+    } catch {
+        rawText = "The API returned an unreadable response.";
     }
 
     if (!response.ok) {
-        let errorMessage = data?.error || data?.message || rawText.trim() || `HTTP Error ${response.status}`;
+        const errorMessage = data?.error || data?.message || rawText.trim() || `API request failed (${response.status})`;
         throw new Error(errorMessage);
     }
 
     if (data === null) {
-        throw new Error(rawText.trim() || "Server returned non-JSON response");
+        throw new Error(rawText.trim() || "Server returned an empty JSON response.");
     }
 
     return data;
