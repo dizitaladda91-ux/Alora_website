@@ -7,12 +7,12 @@ export const validateReferral = async ({ referralCode, customerEmail }) => {
   const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
   if (!referral) return { valid: false, eligible: false, discountPercent: 0 };
 
-  // One referral discount per customer prevents repeated self-service coupon use.
-  const usedBefore = await AffiliateConversion.exists({ referralId: referral._id, customerEmail: email });
+  // One referral discount per customer email across all orders prevents repeated reuse.
+  const usedBefore = await AffiliateConversion.exists({ customerEmail: email });
   return {
     valid: true,
     eligible: !usedBefore,
-    discountPercent: usedBefore ? 0 : referral.discountPercent
+    discountPercent: usedBefore ? 0 : (referral.discountPercent ?? 10)
   };
 };
 

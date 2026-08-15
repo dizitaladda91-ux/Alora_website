@@ -12,10 +12,12 @@ async function loadPartial(selector, url) {
 }
 
 async function loadAllPartials() {
-    // Navbar aur footer dono parallel me load honge (fast)
+    const isFile = location.protocol === "file:";
+    const navUrl = isFile ? "./navbar.html" : "/navbar.html";
+    const footerUrl = isFile ? "./footer.html" : "/footer.html";
     await Promise.all([
-        loadPartial("#navbar-placeholder", "./navbar.html"),
-        loadPartial("#footer-placeholder", "./footer.html"),
+        loadPartial("#navbar-placeholder", navUrl),
+        loadPartial("#footer-placeholder", footerUrl),
     ]);
     document.dispatchEvent(new Event("partialsLoaded"));
 }
