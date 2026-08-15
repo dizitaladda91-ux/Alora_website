@@ -42,7 +42,6 @@ export function renderNavbarState() {
     const token = localStorage.getItem("token");
 
     if (!authActions) {
-        console.warn("Auth placeholder (#auth-actions) abhi DOM me nahi mila.");
         return;
     }
 
