@@ -52,7 +52,12 @@ export const trackReferralClick = async (req, res) => {
     } catch (error) {
       if (error?.code !== 11000) throw error;
     }
-    return res.status(200).json({ success: true, referralCode: referral.code, clickId });
+    return res.status(200).json({
+      success: true,
+      referralCode: referral.code,
+      clickId,
+      discountPercent: referral.discountPercent ?? 10
+    });
   } catch (error) {
     return res.status(500).json({ success: false, message: "Referral tracking failed." });
   }
