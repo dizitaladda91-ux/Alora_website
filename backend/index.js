@@ -3,7 +3,6 @@ dotenv.config();
 import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser"; // Cookie parse karne ke liye
-import helmet from "helmet";
 import db from "./config/db.js";
 import productRouter from "./routes/product.routes.js";
 import authRoutes from "./routes/auth.routes.js";
@@ -14,29 +13,19 @@ import blogRoutes from "./routes/blog.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";
+import dns from "dns";
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 
 import User from "./models/userAuth.models.js"; 
 
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-
-// Vercel and most production hosts run Express behind one reverse proxy.
-// This lets rate limiting use the real visitor IP without trusting arbitrary
-// client-supplied forwarding chains.
-app.set("trust proxy", 1);
-
-app.use(helmet({
-  // The storefront currently loads external CDNs and includes inline scripts.
-  // Enable a strict CSP after those assets/scripts are moved to nonce/hash-safe
-  // sources; the other browser protections are safe to enable immediately.
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
 
 // Middleware setup
 const corsOptions = {

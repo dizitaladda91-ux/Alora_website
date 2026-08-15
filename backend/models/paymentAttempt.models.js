@@ -27,8 +27,7 @@ const paymentAttemptSchema = new mongoose.Schema({
   referral: {
     code: { type: String, default: null },
     clickId: { type: String, default: null },
-    discountPercent: { type: Number, default: 0, min: 0, max: 100 },
-    commissionPercent: { type: Number, default: 0, min: 0, max: 100 }
+    discountPercent: { type: Number, default: 0, min: 0, max: 100 }
   },
   totalAmount: { type: Number, required: true, min: 0 },
   currency: { type: String, default: "INR" },

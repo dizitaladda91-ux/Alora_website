@@ -21,7 +21,6 @@ const configureDns = () => {
         console.warn("DNS server setup warning:", e.message);
     }
 };
-
 export const isDatabaseConnected = () => mongoose.connection.readyState === 1;
 
 const db = async () => {
