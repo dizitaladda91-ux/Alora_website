@@ -183,10 +183,10 @@ const sendOrderSideEffects = async (savedOrder) => {
                 eligibleAmount: savedOrder.totalAmount,
                 currency: savedOrder.currency
             });
-            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date() } });
+            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date(), "referral.externalSyncedAt": new Date(), "referral.lastSyncError": "" }, $inc: { "referral.syncAttempts": 1 } });
         } catch (error) {
-            // The payment and order are valid; retained referral data can be retried safely.
-            console.error("Affiliate conversion creation failed:", error.message);
+            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.lastSyncError": String(error.message || "Affiliate conversion sync failed.").slice(0, 1000) }, $inc: { "referral.syncAttempts": 1 } });
+            console.error("Affiliate conversion sync failed:", error.message);
         }
     }
 };
@@ -274,6 +274,21 @@ export const createOrder = async (req, res) => {
                 referralCode = String(referral.code);
                 clickId = referral.clickId ? String(referral.clickId) : null;
             }
+<<<<<<< HEAD
+=======
+
+            // An order can attribute commission to one affiliate only. GLOW10 can
+            // still be combined with that referral coupon.
+            if (referralCode) continue;
+
+            const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
+            const referralMatchesCandidate = String(referral?.code || "").trim().toUpperCase() === candidateCode;
+            if (referralStatus.valid === true && referralStatus.eligible === true && referralMatchesCandidate && clickId) {
+                    discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
+                    referralCode = candidateCode;
+                    appliedCoupons.push(candidateCode);
+                }
+>>>>>>> 4d739ff (inital chnages)
         }
 
         const affiliateDiscount = Number((subtotal * discountPercent / 100).toFixed(2));

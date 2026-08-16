@@ -371,6 +371,7 @@ function applyCoupon() {
     let refData = null;
     try { refData = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch (e) {}
 
+<<<<<<< HEAD
     if (typedCode === "GLOW10") {
         activeCouponRate = 0.10;
         activeCouponCode = "GLOW10";
@@ -386,6 +387,64 @@ function applyCoupon() {
         activeCouponCode = "";
         couponMessage.innerText = typedCode === "" ? "Please enter a code." : "Invalid coupon. Try 'GLOW10'.";
         couponMessage.classList.add("text-red-600");
+=======
+    if (refData && refData.referralCode === typedCode) {
+        const discountPercent = Number(refData.discountPercent) || 10;
+        if (addAppliedCoupon(typedCode, discountPercent, "referral")) {
+            couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+            couponInput.value = "";
+        } else {
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
+        return;
+    }
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
+
+    try {
+        couponMessage.innerText = "Validating code...";
+        couponMessage.className = "text-xs font-semibold mt-2 text-ash block";
+
+        const res = await fetch(`${baseUrl}/api/affiliates/track-click`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ code: typedCode, landingPage: "/cart.html" })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            const clickId = data.clickId || null;
+            const discountPercent = Number(data.discountPercent) || 0;
+            if (!clickId || discountPercent <= 0) throw new Error("Affiliate tracking response was incomplete.");
+            if (appliedCoupons.some((coupon) => coupon.source === "referral")) {
+                couponMessage.innerText = "Only one referral coupon can be combined with other coupons.";
+                couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+            } else if (addAppliedCoupon(typedCode, discountPercent, "referral")) {
+                sessionStorage.setItem("aloraReferral", JSON.stringify({
+                    referralCode: typedCode,
+                    clickId,
+                    discountPercent
+                }));
+                couponMessage.innerText = `Referral Code '${typedCode}' applied! (${discountPercent}% Off)`;
+                couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+                couponInput.value = "";
+                if (typeof window.showReferralBanner === "function") {
+                    window.showReferralBanner(typedCode, discountPercent);
+                }
+            } else {
+                couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+                couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+            }
+        } else {
+            couponMessage.innerText = data.message || "Invalid coupon or referral code.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
+    } catch (err) {
+        couponMessage.innerText = "Could not validate code. Try 'GLOW10'.";
+        couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+>>>>>>> 4d739ff (inital chnages)
     }
     recalculateBill();
 }

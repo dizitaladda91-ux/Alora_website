@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import User from "../models/userAuth.models.js";
 import { AffiliateClick, AffiliateConversion, AffiliateReferral } from "../models/affiliate.models.js";
+import { createAffiliateClick } from "../services/affiliate.service.js";
 
 const makeReferralCode = () => `ALORA${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
@@ -39,11 +40,10 @@ export const registerAffiliate = async (req, res) => {
 export const trackReferralClick = async (req, res) => {
   try {
     const code = String(req.body.code || "").trim().toUpperCase();
-    const clickId = String(req.body.clickId || "").trim();
-    const landingPage = String(req.body.landingPage || "/").trim();
-    if (!/^[A-Z0-9_-]{5,64}$/.test(code) || !/^[A-Za-z0-9_-]{8,120}$/.test(clickId)) {
+    if (!/^[A-Z0-9_-]{3,50}$/.test(code)) {
       return res.status(400).json({ success: false, message: "Invalid referral tracking data." });
     }
+<<<<<<< HEAD
     const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
     if (!referral) return res.status(404).json({ success: false, message: "Referral code is inactive or invalid." });
     try {
@@ -58,8 +58,15 @@ export const trackReferralClick = async (req, res) => {
       clickId,
       discountPercent: referral.discountPercent ?? 10
     });
+=======
+    if (code === "GLOW10") {
+      return res.status(200).json({ success: true, referralCode: "GLOW10", clickId: null, discountPercent: 10 });
+    }
+    const click = await createAffiliateClick({ referralCode: code });
+    return res.status(200).json({ success: true, ...click });
+>>>>>>> 4d739ff (inital chnages)
   } catch (error) {
-    return res.status(500).json({ success: false, message: "Referral tracking failed." });
+    return res.status(502).json({ success: false, message: error.message || "Referral tracking failed." });
   }
 };
 
