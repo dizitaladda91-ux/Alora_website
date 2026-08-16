@@ -30,7 +30,10 @@ const orderSchema = new mongoose.Schema({
     code: { type: String, default: null },
     clickId: { type: String, default: null },
     discountPercent: { type: Number, default: 0, min: 0, max: 100 },
-    conversionRecordedAt: { type: Date, default: null }
+    conversionRecordedAt: { type: Date, default: null },
+    externalSyncedAt: { type: Date, default: null },
+    syncAttempts: { type: Number, default: 0, min: 0 },
+    lastSyncError: { type: String, default: "", trim: true, maxlength: 1000 }
   },
   totalAmount: { type: Number, required: true, min: 0 },
   currency: { type: String, default: "INR", uppercase: true, trim: true },

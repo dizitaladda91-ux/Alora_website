@@ -1,43 +1,57 @@
-import { AffiliateConversion, AffiliateReferral } from "../models/affiliate.models.js";
+const getAffiliateApiBaseUrl = () => {
+  const url = String(process.env.AFFILIATE_API_URL || "").trim().replace(/\/+$/, "");
+  if (!url || !process.env.STOREFRONT_API_KEY) {
+    throw new Error("Affiliate integration is not configured. Set AFFILIATE_API_URL and STOREFRONT_API_KEY.");
+  }
+  return url;
+};
+
+const affiliateRequest = async (path, options = {}) => {
+  const response = await fetch(`${getAffiliateApiBaseUrl()}${path}`, {
+    ...options,
+    headers: {
+      "X-Storefront-Api-Key": process.env.STOREFRONT_API_KEY,
+      ...(options.body ? { "Content-Type": "application/json" } : {}),
+      ...(options.headers || {})
+    }
+  });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(body?.message || body?.error || `Affiliate API request failed (${response.status}).`);
+  return body?.data ?? body;
+};
 
 export const validateReferral = async ({ referralCode, customerEmail }) => {
   if (!referralCode || !customerEmail) return { valid: false, eligible: false, discountPercent: 0 };
   const code = String(referralCode).trim().toUpperCase();
   const email = String(customerEmail).trim().toLowerCase();
-  const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
-  if (!referral) return { valid: false, eligible: false, discountPercent: 0 };
+  const data = await affiliateRequest(`/referrals/coupon-status/${encodeURIComponent(code)}?customerEmail=${encodeURIComponent(email)}`);
+  return { valid: data.valid === true, eligible: data.eligible === true, discountPercent: Number(data.discountPercent || 0) };
+};
 
-  // One referral discount per customer email across all orders prevents repeated reuse.
-  const usedBefore = await AffiliateConversion.exists({ customerEmail: email });
-  return {
-    valid: true,
-    eligible: !usedBefore,
-    discountPercent: usedBefore ? 0 : (referral.discountPercent ?? 10)
-  };
+// Click IDs are issued by the affiliate platform and tied to a referral code.
+export const createAffiliateClick = async ({ referralCode }) => {
+  const code = String(referralCode || "").trim().toUpperCase();
+  if (!/^[A-Z0-9_-]{3,50}$/.test(code)) throw new Error("Invalid referral code.");
+  const data = await affiliateRequest(`/referrals/click/${encodeURIComponent(code)}`);
+  const clickId = data.clickId || data.id;
+  if (!clickId) throw new Error("Affiliate API did not return a click ID.");
+  return { referralCode: data.referralCode || code, clickId: String(clickId), discountPercent: Number(data.discountPercent || 0) };
 };
 
 export const createAffiliateConversion = async (payload) => {
-  if (!payload.referralCode || !payload.orderId) return null;
-  const referral = await AffiliateReferral.findOne({ code: String(payload.referralCode).trim().toUpperCase(), active: true });
-  if (!referral) return null;
-
-  const commissionAmount = Number((Number(payload.eligibleAmount || payload.amount || 0) * referral.commissionPercent / 100).toFixed(2));
-  try {
-    const conversion = await AffiliateConversion.create({
-      referralId: referral._id,
-      affiliateId: referral.affiliateId,
+  if (!payload.referralCode || !payload.clickId || !payload.orderId) return null;
+  return affiliateRequest("/referrals/conversion", {
+    method: "POST",
+    body: JSON.stringify({
+      referralCode: String(payload.referralCode).trim().toUpperCase(),
+      clickId: String(payload.clickId),
       orderId: String(payload.orderId),
       customerEmail: String(payload.customerEmail).trim().toLowerCase(),
-      clickId: payload.clickId ? String(payload.clickId) : null,
-      orderAmount: Number(payload.amount || 0),
       grossAmount: Number(payload.grossAmount || 0),
       discountAmount: Number(payload.discountAmount || 0),
-      commissionAmount
-    });
-    await AffiliateReferral.updateOne({ _id: referral._id }, { $inc: { totalConversions: 1, totalCommission: commissionAmount } });
-    return conversion;
-  } catch (error) {
-    if (error?.code === 11000) return null;
-    throw error;
-  }
+      eligibleAmount: Number(payload.eligibleAmount || payload.amount || 0),
+      amount: Number(payload.amount || 0),
+      currency: String(payload.currency || "INR").toUpperCase()
+    })
+  });
 };

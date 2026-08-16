@@ -438,7 +438,6 @@ async function applyCoupon() {
 
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
     const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
-    const clickId = window.crypto?.randomUUID?.().replace(/-/g, "") || `${Date.now()}`;
 
     try {
         couponMessage.innerText = "Validating code...";
@@ -447,11 +446,13 @@ async function applyCoupon() {
         const res = await fetch(`${baseUrl}/api/affiliates/track-click`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code: typedCode, clickId, landingPage: "/cart.html" })
+            body: JSON.stringify({ code: typedCode, landingPage: "/cart.html" })
         });
         const data = await res.json();
         if (res.ok && data.success) {
-            const discountPercent = Number(data.discountPercent) || 10;
+            const clickId = data.clickId || null;
+            const discountPercent = Number(data.discountPercent) || 0;
+            if (!clickId || discountPercent <= 0) throw new Error("Affiliate tracking response was incomplete.");
             if (appliedCoupons.some((coupon) => coupon.source === "referral")) {
                 couponMessage.innerText = "Only one referral coupon can be combined with other coupons.";
                 couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";

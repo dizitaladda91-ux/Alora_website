@@ -1,6 +1,7 @@
 import crypto from "crypto";
 import User from "../models/userAuth.models.js";
 import { AffiliateClick, AffiliateConversion, AffiliateReferral } from "../models/affiliate.models.js";
+import { createAffiliateClick } from "../services/affiliate.service.js";
 
 const makeReferralCode = () => `ALORA${crypto.randomBytes(4).toString("hex").toUpperCase()}`;
 
@@ -39,41 +40,16 @@ export const registerAffiliate = async (req, res) => {
 export const trackReferralClick = async (req, res) => {
   try {
     const code = String(req.body.code || "").trim().toUpperCase();
-    const clickId = String(req.body.clickId || "").trim();
-    const landingPage = String(req.body.landingPage || "/").trim();
-    if (!/^[A-Z0-9_-]{5,64}$/.test(code) || !/^[A-Za-z0-9_-]{8,120}$/.test(clickId)) {
+    if (!/^[A-Z0-9_-]{3,50}$/.test(code)) {
       return res.status(400).json({ success: false, message: "Invalid referral tracking data." });
     }
     if (code === "GLOW10") {
-      return res.status(200).json({ success: true, referralCode: "GLOW10", clickId, discountPercent: 10 });
+      return res.status(200).json({ success: true, referralCode: "GLOW10", clickId: null, discountPercent: 10 });
     }
-    const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
-    // Public affiliate URLs use a human-readable slug (/ref/<slug>). A slug
-    // does not need to be pre-generated in the affiliate database to unlock
-    // the standard visitor discount. Database-backed referrals below still
-    // retain click and commission tracking for a specific affiliate account.
-    if (!referral) {
-      return res.status(200).json({
-        success: true,
-        referralCode: code,
-        clickId,
-        discountPercent: 10
-      });
-    }
-    try {
-      await AffiliateClick.create({ referralId: referral._id, clickId, landingPage });
-      await AffiliateReferral.updateOne({ _id: referral._id }, { $inc: { totalClicks: 1 } });
-    } catch (error) {
-      if (error?.code !== 11000) throw error;
-    }
-    return res.status(200).json({
-      success: true,
-      referralCode: referral.code,
-      clickId,
-      discountPercent: referral.discountPercent ?? 10
-    });
+    const click = await createAffiliateClick({ referralCode: code });
+    return res.status(200).json({ success: true, ...click });
   } catch (error) {
-    return res.status(500).json({ success: false, message: "Referral tracking failed." });
+    return res.status(502).json({ success: false, message: error.message || "Referral tracking failed." });
   }
 };
 

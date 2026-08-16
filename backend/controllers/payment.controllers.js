@@ -220,10 +220,10 @@ const sendOrderSideEffects = async (savedOrder) => {
                 eligibleAmount: savedOrder.totalAmount,
                 currency: savedOrder.currency
             });
-            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date() } });
+            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date(), "referral.externalSyncedAt": new Date(), "referral.lastSyncError": "" }, $inc: { "referral.syncAttempts": 1 } });
         } catch (error) {
-            // The payment and order are valid; retained referral data can be retried safely.
-            console.error("Affiliate conversion creation failed:", error.message);
+            await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.lastSyncError": String(error.message || "Affiliate conversion sync failed.").slice(0, 1000) }, $inc: { "referral.syncAttempts": 1 } });
+            console.error("Affiliate conversion sync failed:", error.message);
         }
     }
 };
@@ -321,15 +321,9 @@ export const createOrder = async (req, res) => {
             if (referralCode) continue;
 
             const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
-                if (referralStatus.valid === true && referralStatus.eligible === true) {
+            const referralMatchesCandidate = String(referral?.code || "").trim().toUpperCase() === candidateCode;
+            if (referralStatus.valid === true && referralStatus.eligible === true && referralMatchesCandidate && clickId) {
                     discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
-                    referralCode = candidateCode;
-                    appliedCoupons.push(candidateCode);
-                } else if (String(referral?.code || "").trim().toUpperCase() === candidateCode && /^[A-Z0-9_-]{5,64}$/.test(candidateCode)) {
-                    // Clean affiliate-link slugs are intentionally flexible
-                    // (for example /ref/TESTDATA or /ref/SATAM) and receive
-                    // the standard 10% visitor discount.
-                    discountPercent += 10;
                     referralCode = candidateCode;
                     appliedCoupons.push(candidateCode);
                 }
