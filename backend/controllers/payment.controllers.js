@@ -1,4 +1,5 @@
 import crypto from "crypto";
+import nodemailer from "nodemailer";
 import getRazorpay from "../config/razorpay.js";
 import Order from "../models/order.models.js";
 import PaymentAttempt from "../models/paymentAttempt.models.js";
@@ -154,6 +155,53 @@ const isValidCustomer = (customer) => (
     && /^\d{10}$/.test(customer.phone)
 );
 
+const escapeHtml = (value) => String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+
+const sendOrderEmails = async ({ orderData, savedOrder, itemsList }) => {
+    const senderEmail = process.env.EMAIL_USER;
+    const senderPassword = process.env.EMAIL_PASS;
+    const adminEmail = process.env.ADMIN_EMAIL;
+    if (!senderEmail || !senderPassword) {
+        console.warn("Order email skipped: EMAIL_USER or EMAIL_PASS is not configured.");
+        return;
+    }
+
+    try {
+        const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: { user: senderEmail, pass: senderPassword }
+        });
+        const { customer } = savedOrder;
+        const safeItems = orderData.cart.map((item) => (
+            `<li>${escapeHtml(item.name)} (${escapeHtml(item.size)}) &times; ${item.qty} — INR ${item.price * item.qty}</li>`
+        )).join("");
+        const customerMail = {
+            from: `"ALORA PRODUCTS" <${senderEmail}>`,
+            to: customer.email,
+            subject: `Order confirmed — ${orderData.order_id}`,
+            text: `Hi ${customer.name},\n\nYour ALORA PRODUCTS order is confirmed.\n\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nDelivery address: ${customer.address}`,
+            html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>Order confirmed</h2><p>Hi ${escapeHtml(customer.name)},</p><p>Thank you for shopping with ALORA PRODUCTS. Your order has been confirmed.</p><p><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total paid:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Delivery address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p></div>`
+        };
+        const adminMail = adminEmail ? {
+            from: `"ALORA PRODUCTS" <${senderEmail}>`,
+            to: adminEmail,
+            subject: `New order received — ${orderData.order_id}`,
+            text: `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nEmail: ${customer.email}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}`,
+            html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>New order received</h2><p><strong>Customer:</strong> ${escapeHtml(customer.name)}<br><strong>Email:</strong> ${escapeHtml(customer.email)}<br><strong>Phone:</strong> ${escapeHtml(customer.phone)}<br><strong>Address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p></div>`
+        } : null;
+
+        await Promise.all([transporter.sendMail(customerMail), ...(adminMail ? [transporter.sendMail(adminMail)] : [])]);
+    } catch (error) {
+        // Email failure must never undo a successfully captured payment or saved order.
+        console.error("Order email notification failed:", error.message);
+    }
+};
+
 const sendMetaWhatsAppMessage = async (toPhone, messageText) => {
     try {
         const token = process.env.META_WHATSAPP_TOKEN;
@@ -206,6 +254,7 @@ const sendOrderSideEffects = async (savedOrder) => {
     const adminMessage = `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}`;
     sendMetaWhatsAppMessage(customer.phone, customerMessage);
     if (process.env.ADMIN_PHONE) sendMetaWhatsAppMessage(process.env.ADMIN_PHONE, adminMessage);
+    await sendOrderEmails({ orderData, savedOrder, itemsList });
 
     if (savedOrder.referral?.code) {
         try {
