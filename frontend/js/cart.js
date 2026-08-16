@@ -360,7 +360,7 @@ function autoFillCoupon(code) {
     applyCoupon();
 }
 
-function applyCoupon() {
+async function applyCoupon() {
     const couponInput = document.getElementById("coupon-input");
     const couponMessage = document.getElementById("coupon-message");
     if (!couponInput || !couponMessage) return;
@@ -371,23 +371,6 @@ function applyCoupon() {
     let refData = null;
     try { refData = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch (e) {}
 
-<<<<<<< HEAD
-    if (typedCode === "GLOW10") {
-        activeCouponRate = 0.10;
-        activeCouponCode = "GLOW10";
-        couponMessage.innerText = "Coupon 'GLOW10' applied successfully! (10% Off)";
-        couponMessage.classList.add("text-emerald-600");
-    } else if (refData && refData.referralCode === typedCode) {
-        activeCouponRate = (Number(refData.discountPercent) || 10) / 100;
-        activeCouponCode = `Referral ${typedCode}`;
-        couponMessage.innerText = `Referral Code '${typedCode}' applied! (${Math.round(activeCouponRate * 100)}% Off)`;
-        couponMessage.classList.add("text-emerald-600");
-    } else {
-        activeCouponRate = 0;
-        activeCouponCode = "";
-        couponMessage.innerText = typedCode === "" ? "Please enter a code." : "Invalid coupon. Try 'GLOW10'.";
-        couponMessage.classList.add("text-red-600");
-=======
     if (refData && refData.referralCode === typedCode) {
         const discountPercent = Number(refData.discountPercent) || 10;
         if (addAppliedCoupon(typedCode, discountPercent, "referral")) {
@@ -444,7 +427,6 @@ function applyCoupon() {
     } catch (err) {
         couponMessage.innerText = "Could not validate code. Try 'GLOW10'.";
         couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
->>>>>>> 4d739ff (inital chnages)
     }
     recalculateBill();
 }

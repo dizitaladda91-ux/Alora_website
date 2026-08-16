@@ -28,15 +28,6 @@ export const validateReferral = async ({ referralCode, customerEmail }) => {
   return { valid: data.valid === true, eligible: data.eligible === true, discountPercent: Number(data.discountPercent || 0) };
 };
 
-<<<<<<< HEAD
-  // One referral discount per customer prevents repeated self-service coupon use.
-  const usedBefore = await AffiliateConversion.exists({ referralId: referral._id, customerEmail: email });
-  return {
-    valid: true,
-    eligible: !usedBefore,
-    discountPercent: usedBefore ? 0 : referral.discountPercent
-  };
-=======
 // Click IDs are issued by the affiliate platform and tied to a referral code.
 export const createAffiliateClick = async ({ referralCode }) => {
   const code = String(referralCode || "").trim().toUpperCase();
@@ -45,7 +36,6 @@ export const createAffiliateClick = async ({ referralCode }) => {
   const clickId = data.clickId || data.id;
   if (!clickId) throw new Error("Affiliate API did not return a click ID.");
   return { referralCode: data.referralCode || code, clickId: String(clickId), discountPercent: Number(data.discountPercent || 0) };
->>>>>>> 4d739ff (inital chnages)
 };
 
 export const createAffiliateConversion = async (payload) => {

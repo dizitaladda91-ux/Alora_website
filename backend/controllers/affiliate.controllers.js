@@ -43,28 +43,11 @@ export const trackReferralClick = async (req, res) => {
     if (!/^[A-Z0-9_-]{3,50}$/.test(code)) {
       return res.status(400).json({ success: false, message: "Invalid referral tracking data." });
     }
-<<<<<<< HEAD
-    const referral = await AffiliateReferral.findOne({ code, active: true }).lean();
-    if (!referral) return res.status(404).json({ success: false, message: "Referral code is inactive or invalid." });
-    try {
-      await AffiliateClick.create({ referralId: referral._id, clickId, landingPage });
-      await AffiliateReferral.updateOne({ _id: referral._id }, { $inc: { totalClicks: 1 } });
-    } catch (error) {
-      if (error?.code !== 11000) throw error;
-    }
-    return res.status(200).json({
-      success: true,
-      referralCode: referral.code,
-      clickId,
-      discountPercent: referral.discountPercent ?? 10
-    });
-=======
     if (code === "GLOW10") {
       return res.status(200).json({ success: true, referralCode: "GLOW10", clickId: null, discountPercent: 10 });
     }
     const click = await createAffiliateClick({ referralCode: code });
     return res.status(200).json({ success: true, ...click });
->>>>>>> 4d739ff (inital chnages)
   } catch (error) {
     return res.status(502).json({ success: false, message: error.message || "Referral tracking failed." });
   }
