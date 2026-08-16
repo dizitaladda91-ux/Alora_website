@@ -36,6 +36,7 @@ const orderSchema = new mongoose.Schema({
     lastSyncError: { type: String, default: "", trim: true, maxlength: 1000 }
   },
   totalAmount: { type: Number, required: true, min: 0 },
+  expectedDeliveryDate: { type: Date, default: null },
   currency: { type: String, default: "INR", uppercase: true, trim: true },
   paymentStatus: { type: String, enum: ["paid", "failed", "refunded"], default: "paid" },
   refund: {

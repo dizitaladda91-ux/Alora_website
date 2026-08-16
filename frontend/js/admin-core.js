@@ -9,7 +9,7 @@ const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", 
 async function loadOrders() {
     const tableBody = document.getElementById("ordersTableBody");
     if (!tableBody) return;
-    tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
 
     try {
         const response = await fetch(`${BASE_URL}/api/orders?limit=100`, { credentials: "include" });
@@ -18,7 +18,7 @@ async function loadOrders() {
         adminOrders = result.data || [];
 
         if (!adminOrders.length) {
-            tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
             return;
         }
 
@@ -29,10 +29,11 @@ async function loadOrders() {
                 <td class="p-4 font-bold">${formatMoney(order.totalAmount)}</td>
                 <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
                 <td class="p-4">${order.orderStatus === "refunded" ? `<span class="text-xs font-semibold text-purple-700 uppercase">refunded</span>` : `<select class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateOrderStatus('${order._id}', this.value)">${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.orderStatus ? "selected" : ""}>${status}</option>`).join("")}</select>`}</td>
+                <td class="p-4"><input type="date" value="${order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().slice(0, 10) : ""}" class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateExpectedDelivery('${order._id}', this.value)"></td>
                 <td class="p-4 flex gap-2"><button onclick="window.openInvoiceModal('${order._id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs"><i class="fa-solid fa-receipt"></i> Invoice</button>${order.paymentStatus === "paid" ? `<button onclick="window.refundOrder('${order._id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs">Refund</button>` : ""}</td>
             </tr>`).join("");
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
 }
 
@@ -46,6 +47,25 @@ window.updateOrderStatus = async (orderId, orderStatus) => {
         });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || "Status update failed.");
+        const index = adminOrders.findIndex((order) => order._id === orderId);
+        if (index >= 0) adminOrders[index] = result.data;
+    } catch (error) {
+        alert(error.message);
+        loadOrders();
+    }
+};
+
+window.updateExpectedDelivery = async (orderId, expectedDeliveryDate) => {
+    if (!expectedDeliveryDate) return;
+    try {
+        const response = await fetch(`${BASE_URL}/api/orders/${orderId}/expected-delivery`, {
+            method: "PATCH",
+            credentials: "include",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ expectedDeliveryDate })
+        });
+        const result = await response.json();
+        if (!response.ok || !result.success) throw new Error(result.message || "Delivery date update failed.");
         const index = adminOrders.findIndex((order) => order._id === orderId);
         if (index >= 0) adminOrders[index] = result.data;
     } catch (error) {

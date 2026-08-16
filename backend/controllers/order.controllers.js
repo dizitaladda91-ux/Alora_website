@@ -69,6 +69,24 @@ export const updateAdminOrderStatus = async (req, res) => {
   }
 };
 
+export const updateExpectedDeliveryDate = async (req, res) => {
+  try {
+    const rawDate = String(req.body.expectedDeliveryDate || "").trim();
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(rawDate)) {
+      return res.status(400).json({ success: false, message: "Choose a valid delivery date." });
+    }
+    const expectedDeliveryDate = new Date(`${rawDate}T12:00:00.000Z`);
+    if (Number.isNaN(expectedDeliveryDate.getTime())) {
+      return res.status(400).json({ success: false, message: "Choose a valid delivery date." });
+    }
+    const order = await Order.findByIdAndUpdate(req.params.id, { expectedDeliveryDate }, { new: true, runValidators: true }).lean();
+    if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+    return res.status(200).json({ success: true, data: order, message: "Expected delivery date updated." });
+  } catch {
+    return res.status(400).json({ success: false, message: "Could not update expected delivery date." });
+  }
+};
+
 export const refundAdminOrder = async (req, res) => {
   let claimedOrder = null;
   try {
