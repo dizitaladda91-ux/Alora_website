@@ -120,7 +120,7 @@
 
                 <!-- 🚀 DELIVERY DETAILS FORM -->
                 <div class="bg-white p-5 rounded-2xl shadow-sm border border-[#ECE4CE]">
-                    <h3 class="text-xs font-bold text-ash uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                    <h3 id="checkout-details-title" class="text-xs font-bold text-ash uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
                         <i class="fa-solid fa-user-plus text-clay"></i> Create Account & Delivery Details
                     </h3>
                     <div class="space-y-3">
@@ -144,13 +144,11 @@
                             <p class="text-[11px] font-bold text-clay uppercase tracking-wide mb-2">Create your account to continue</p>
                             <label class="block text-[11px] font-semibold text-ash uppercase mb-1">Create Password</label>
                             <input type="password" id="custPassword" minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password" class="w-full px-3 py-2 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
-                        </div>
-                        <div>
                             <label class="block text-[11px] font-semibold text-ash uppercase mb-1">Confirm Password</label>
                             <input type="password" id="custConfirmPassword" minlength="6" placeholder="Re-enter password" autocomplete="new-password" class="w-full px-3 py-2 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
                             <p class="mt-1 text-[10px] text-ash">Already have an account? <a class="text-clay font-semibold underline" href="./login.html">Log in</a> first.</p>
                         </div>
-                        <p id="checkout-signed-in-note" class="hidden pt-2 text-xs font-semibold text-sage">You are signed in. Your account details have been filled in.</p>
+                        <p id="checkout-signed-in-note" class="hidden pt-2 text-xs font-semibold text-sage">You are signed in. Your saved mobile number, email and delivery address have been filled in.</p>
                     </div>
                 </div>
 

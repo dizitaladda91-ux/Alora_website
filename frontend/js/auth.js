@@ -198,7 +198,8 @@ function initRegisterForm() {
 
             if (response.ok) {
                 showSuccessModal("Registration Successful!", data.message || "Account successful created!", () => {
-                    window.location.href = "./login.html";
+                    // Register API creates the authenticated session automatically.
+                    window.location.href = "./index.html";
                 });
             } else {
                 showSuccessModal("Registration Failed", data.message || "Could not complete registration.", null);

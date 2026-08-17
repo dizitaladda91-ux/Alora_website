@@ -86,9 +86,15 @@ export const register = async (req, res, next) => {
       { upsert: true, new: true, setDefaultsOnInsert: true }
     );
 
-    res.status(201).json({ 
+    // Registration should leave the customer signed in immediately. This also
+    // makes checkout account creation a single step rather than register + login.
+    const token = generateToken(user._id, user.role);
+    res.cookie("token", token, authCookieOptions);
+
+    res.status(201).json({
       success: true,
-      message: 'Registration successful!' 
+      message: 'Registration successful!',
+      user: { name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
     });
   } catch (error) {
     console.error("REGISTER_ERROR:", error);

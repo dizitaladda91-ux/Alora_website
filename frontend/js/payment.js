@@ -39,17 +39,24 @@ async function registerAndAuthenticate({ name, email, phone, address, password }
         throw new Error(registerData.message || "Account could not be created.");
     }
 
-    const loginResponse = await fetch(`${BASE_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password })
-    });
-    const loginData = await loginResponse.json();
-    if (!loginResponse.ok) {
-        throw new Error(loginData.message || "Account sign-in failed. Please check your password.");
-    }
+    signedInCustomer = true;
+    return registerData.user;
+}
 
+function fillSignedInCustomer(user) {
+    document.getElementById("custName").value = user.name || "";
+    document.getElementById("custEmail").value = user.email || "";
+    document.getElementById("custPhone").value = user.phone || "";
+    document.getElementById("custAddress").value = user.address || "";
+
+    // Existing customers should checkout with their account details instead of
+    // being asked to create an account again.
+    ["custName", "custEmail", "custPhone", "custAddress"].forEach(id => {
+        document.getElementById(id)?.setAttribute("readonly", "readonly");
+    });
+    document.getElementById("checkout-details-title").innerHTML = '<i class="fa-solid fa-truck text-clay"></i> Delivery Details';
+    document.getElementById("checkout-account-fields")?.classList.add("hidden");
+    document.getElementById("checkout-signed-in-note")?.classList.remove("hidden");
     signedInCustomer = true;
 }
 
@@ -61,13 +68,7 @@ async function restoreSignedInCustomer() {
         const { user } = await response.json();
         if (!user || user.role !== "user") return;
 
-        document.getElementById("custName").value = user.name || "";
-        document.getElementById("custEmail").value = user.email || "";
-        document.getElementById("custPhone").value = user.phone || "";
-        document.getElementById("custAddress").value = user.address || "";
-        document.getElementById("checkout-account-fields")?.classList.add("hidden");
-        document.getElementById("checkout-signed-in-note")?.classList.remove("hidden");
-        signedInCustomer = true;
+        fillSignedInCustomer(user);
     } catch (error) {
         console.warn("Could not restore checkout account.", error);
     }
@@ -138,7 +139,10 @@ button?.addEventListener("click", async (e) => {
         button.disabled = true;
         if (!signedInCustomer) {
             button.innerHTML = 'Creating account... <i class="fa-solid fa-spinner fa-spin text-xs"></i>';
-            await registerAndAuthenticate({ name, email, phone, address, password });
+            const registeredUser = await registerAndAuthenticate({ name, email, phone, address, password });
+            // The API registration response already sets the HttpOnly login cookie.
+            // Reflect that state immediately, without requiring a page refresh.
+            fillSignedInCustomer(registeredUser || { name, email, phone, address });
         }
 
         let referral = null;
