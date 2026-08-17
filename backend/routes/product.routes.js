@@ -7,6 +7,7 @@ import {
     getproductbyid, 
     readproduct, 
     updateproduct,
+    updateProductForSeo,
     searchProducts
 } from "../controllers/product.controllers.js";
 
@@ -43,6 +44,9 @@ router.post("/add", requireAuth, authorizeRoles("admin"), (req, res, next) => {
 
 // PUT: Product update karne ke liye (Single Image Upload optional)
 router.put("/update/:id", requireAuth, authorizeRoles("admin"), productUploadFields, updateproduct);
+
+// SEO users may edit only image, description, rating and ML/volume measurements.
+router.put("/seo-update/:id", requireAuth, authorizeRoles("admin", "seoadmin"), upload.single('imagepath'), updateProductForSeo);
 
 // DELETE: Product aur uski image remove karne ke liye
 router.delete("/delete/:id", requireAuth, authorizeRoles("admin"), deleteproduct);

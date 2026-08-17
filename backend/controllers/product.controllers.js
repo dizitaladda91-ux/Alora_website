@@ -117,6 +117,47 @@ export const updateproduct = async (req, res) => {
     }
 };
 
+// SEO staff can only update content-facing product details.  Keep this separate
+// from the admin update handler so an edited browser request cannot change stock,
+// prices, availability, or any other product setting.
+export const updateProductForSeo = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await SimpleProduct.findById(id);
+
+        if (!product) {
+            return res.status(404).json({ message: "Product nahi mila" });
+        }
+
+        if (req.body.description !== undefined) product.description = req.body.description;
+        if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
+
+        // The SEO UI sends only the displayed ML/volume values. Prices and stock
+        // always remain the existing admin-managed values.
+        if (req.body.volumes) {
+            const volumes = JSON.parse(req.body.volumes);
+            if (!Array.isArray(volumes) || volumes.length !== product.variants.length) {
+                return res.status(400).json({ error: "Invalid product measurements" });
+            }
+            product.variants = product.variants.map((variant, index) => ({
+                ...variant.toObject(),
+                volume: String(volumes[index]).trim()
+            }));
+        }
+
+        const mainImage = req.file;
+        if (mainImage) {
+            if (product.imagepath) await deleteFromCloudinary(product.imagepath);
+            product.imagepath = mainImage.path;
+        }
+
+        await product.save();
+        res.status(200).json(product);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
 // 4. DELETE (Sirf Database se Product Hata Dena)
 export const deleteproduct = async (req, res) => {
     try {

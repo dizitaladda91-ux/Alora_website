@@ -76,7 +76,8 @@ async function runAuthGuard() {
 
     const isSeoPage = currentPath.includes("seoadmin") || 
                       currentPath.includes("seoallpost") || 
-                      currentPath.includes("seoadminupdate");
+                      currentPath.includes("seoadminupdate") ||
+                      currentPath.includes("seoproduct");
 
     if (isSeoPage) {
         const isSeoUser = role.includes("seo") || role.includes("admin");

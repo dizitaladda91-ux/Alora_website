@@ -100,7 +100,9 @@ registerProtectedViews(adminPages, ['admin']);
 const seoPages = [
   'seoadmin.html',
   'seoadminupdate.html',
-  'seoallpost.html'
+  'seoallpost.html',
+  'seoproduct.html',
+  'seoproductupdate.html'
 ];
 
 registerProtectedViews(seoPages, ['seoadmin', 'admin']);
