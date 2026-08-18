@@ -12,7 +12,6 @@ let pendingCatalogProductId = null;
 let pendingCatalogCartAction = null;
 
 // ===== Init =====
-// ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
     // 1. URL Query Parameters check karein (?filter=bestseller YA ?category=body)
     const urlParams = new URLSearchParams(window.location.search);
@@ -48,16 +47,14 @@ async function loadProductsFromBackend() {
     const gridContainer = document.getElementById('product-grid');
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-clay mb-2"></i><br>Loading products...</p>`;
-
     try {
         const data = await safeFetchJson(`${BASE_URL}/api/product/all`);
         PRODUCTS_DATABASE = normalizeAndAssignBestsellers(data);
         
-        // ⚡ Update Quick Filter UI Buttons state if redirected from Index ⚡
+        // Update Quick Filter UI Buttons state if redirected from Index
         updateQuickFilterUI();
 
-        // ⚡ Initial Filter Call (Respects URL query param) ⚡
+        // Initial Filter Call (Respects URL query param)
         filterProducts();
 
     } catch (err) {
@@ -104,11 +101,9 @@ function normalizeAndAssignBestsellers(rawProducts) {
         };
     });
 
-    // ⚡ FRONTEND BESTSELLER FALLBACK LOGIC ⚡
     const hasAnyBackendBestseller = normalized.some(p => p.isBestseller);
 
     if (!hasAnyBackendBestseller && normalized.length > 0) {
-        // Sort copy by rating (highest first)
         const sortedIndices = [...normalized]
             .map((p, idx) => ({ idx, rating: p.rating }))
             .sort((a, b) => b.rating - a.rating);
@@ -279,7 +274,6 @@ function filterProducts() {
 
         if (item.rating < ratingFloorFilter) return false;
 
-        // ⚡ BESTSELLER QUICK TAG FILTER ⚡
         if (activeQuickTag === 'bestseller' && !item.isBestseller) {
             return false;
         }
@@ -290,7 +284,6 @@ function filterProducts() {
         return true;
     });
 
-    // Sort Results
     const sortFilter = document.getElementById('sort-filter');
     if (sortFilter) {
         const sortSelection = sortFilter.value;
@@ -306,7 +299,6 @@ function filterProducts() {
     renderProductCatalog(results);
 }
 
-// Sync UI Active state for Quick Filters
 function updateQuickFilterUI() {
     const bestsellerBadge = document.getElementById('badge-bestseller');
     if (bestsellerBadge) {
@@ -343,11 +335,11 @@ function setRatingFilter(minStars) {
 function resetFilters() {
     document.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = false);
     const range = document.getElementById('price-range');
-    if (range) range.value = 1500;
+    if (range) range.value = 2500;
     const sort = document.getElementById('sort-filter');
     if (sort) sort.value = 'featured';
     
-    updatePriceLabel(1500);
+    updatePriceLabel(2500);
     ratingFloorFilter = 0;
     activeQuickTag = 'all';
     searchQuery = '';
@@ -532,7 +524,7 @@ document.addEventListener('cartUpdated', () => {
     try { syncCartCounterIcon(); } catch (e) { console.warn('cartUpdated handler failed', e); }
 });
 
-// ===== Mobile Menu Helper =====
+// ===== Mobile Menu & Mobile Filter Listener =====
 function setupMobileMenu() {
     document.addEventListener("click", (e) => {
         const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
@@ -540,9 +532,7 @@ function setupMobileMenu() {
         const mobileMenu = document.getElementById("mobile-menu");
         const mobileDrawer = document.getElementById("mobile-menu-drawer");
 
-        if (!mobileMenu) return;
-
-        if (menuBtn) {
+        if (menuBtn && mobileMenu) {
             e.preventDefault();
             mobileMenu.classList.remove("hidden", "pointer-events-none", "opacity-0");
             if (mobileDrawer) {
@@ -551,7 +541,7 @@ function setupMobileMenu() {
             return;
         }
 
-        if (closeBtn || e.target === mobileMenu) {
+        if ((closeBtn || e.target === mobileMenu) && mobileMenu) {
             e.preventDefault();
             if (mobileDrawer) {
                 mobileDrawer.classList.add("-translate-x-full");
@@ -561,6 +551,16 @@ function setupMobileMenu() {
                 mobileMenu.classList.add("hidden", "pointer-events-none");
             }, 300);
             return;
+        }
+
+        // Toggle Mobile Filter Sidebar
+        const toggleFilterBtn = e.target.closest("#toggle-filter-btn");
+        if (toggleFilterBtn) {
+            e.preventDefault();
+            const sidebar = document.getElementById("filter-sidebar");
+            if (sidebar) {
+                sidebar.classList.toggle("hidden");
+            }
         }
     });
 }

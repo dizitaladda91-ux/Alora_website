@@ -67,10 +67,19 @@
     </div>
 
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
-        <div class="flex flex-col lg:flex-row gap-8">
+        <!-- Mobile Filter Toggle Bar -->
+        <div class="lg:hidden flex items-center justify-between mb-4 bg-white border border-[#ECE4CE] p-3.5 rounded-2xl shadow-sm">
+            <span class="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
+                <i class="fa-solid fa-sliders text-clay"></i> Filter &amp; Sort
+            </span>
+            <button id="toggle-filter-btn" type="button" class="bg-clay text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm hover:bg-clay-dark transition">
+                <i class="fa-solid fa-filter text-xs"></i> <span>Filter Options</span>
+            </button>
+        </div>
 
+        <div class="flex flex-col lg:flex-row gap-8">
             <!-- Sidebar Filters -->
-            <aside class="w-full lg:w-64 flex-shrink-0 bg-white p-6 rounded-2xl border border-[#ECE4CE] shadow-sm h-fit">
+            <aside id="filter-sidebar" class="hidden lg:block w-full lg:w-64 flex-shrink-0 bg-white p-6 rounded-2xl border border-[#ECE4CE] shadow-sm h-fit order-2 lg:order-1">
                 <div class="flex items-center justify-between mb-6 border-b border-dashed border-[#E3D9BC] pb-4">
                     <h2 class="font-serif font-semibold text-ink tracking-wide text-base"><i class="fa-solid fa-sliders mr-2 text-clay text-sm"></i>Filters</h2>
                     <button onclick="resetFilters()" class="text-xs text-clay hover:text-clay-dark hover:underline font-semibold">Clear All</button>
@@ -92,9 +101,6 @@
                         <label class="flex items-center text-sm text-[#3d3b34] cursor-pointer hover:text-ink">
                             <input type="checkbox" name="category" value="face" onchange="filterProducts()" class="rounded border-[#DCD3BA] text-clay focus:ring-clay mr-2.5"> Face
                         </label>
-                        <!-- <label class="flex items-center text-sm text-[#3d3b34] cursor-pointer hover:text-ink">
-                            <input type="checkbox" name="category" value="cream" onchange="filterProducts()" class="rounded border-[#DCD3BA] text-clay focus:ring-clay mr-2.5"> Cream
-                        </label> -->
                         <label class="flex items-center text-sm text-[#3d3b34] cursor-pointer hover:text-ink">
                             <input type="checkbox" name="category" value="body" onchange="filterProducts()" class="rounded border-[#DCD3BA] text-clay focus:ring-clay mr-2.5"> Body
                         </label>
@@ -123,8 +129,8 @@
                 </div>
             </aside>
 
-            <!-- Product Grid Area -->
-            <section class="flex-1">
+            <!-- Product Grid Area (First on mobile via order-1) -->
+            <section class="flex-1 order-1 lg:order-2">
                 <div class="flex items-center justify-between mb-6 bg-white border border-[#ECE4CE] p-4 rounded-2xl shadow-sm">
                     <span id="results-count" class="text-sm font-medium text-ash">Showing all products</span>
                     <div class="flex gap-2 text-xs">
@@ -132,7 +138,30 @@
                     </div>
                 </div>
 
-                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+                <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+                    <!-- Instant Skeleton Loaders for Smooth Parallel Render -->
+                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between">
+                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
+                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
+                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
+                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    </div>
+                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between hidden sm:flex">
+                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
+                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
+                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
+                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    </div>
+                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between hidden md:flex">
+                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
+                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
+                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
+                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    </div>
+                </div>
 
                 <div id="no-products" class="hidden text-center py-20 bg-white border border-[#ECE4CE] rounded-2xl mt-4">
                     <i class="fa-solid fa-magnifying-glass text-4xl text-[#D9D2BC] mb-3"></i>
