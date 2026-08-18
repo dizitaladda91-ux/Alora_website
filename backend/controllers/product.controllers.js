@@ -148,12 +148,7 @@ export const updateproduct = async (req, res) => {
 export const updateProductForSeo = async (req, res) => {
     try {
         const { id } = req.params;
-        let product = await SimpleProduct.findOne({ slug: id });
-        if (!product && /^[a-f\d]{24}$/i.test(id)) product = await SimpleProduct.findById(id);
-        if (!product) {
-            const products = await SimpleProduct.find();
-            product = products.find((item) => toProductSlug(item.name) === id);
-        }
+        const product = await SimpleProduct.findById(id);
 
         if (!product) {
             return res.status(404).json({ message: "Product nahi mila" });
@@ -213,7 +208,16 @@ export const deleteproduct = async (req, res) => {
 export const getproductbyid = async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await SimpleProduct.findById(id);
+        // Product pages use the readable slug. ObjectId support is retained
+        // solely for old shared links that still contain ?id=.
+        let product = await SimpleProduct.findOne({ slug: id });
+        if (!product && /^[a-f\d]{24}$/i.test(id)) {
+            product = await SimpleProduct.findById(id);
+        }
+        if (!product) {
+            const products = await SimpleProduct.find();
+            product = products.find((item) => toProductSlug(item.name) === id);
+        }
 
         if (!product) {
             return res.status(404).json({ error: "Product nahi mila" });
