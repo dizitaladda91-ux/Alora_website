@@ -2,6 +2,25 @@ import SimpleProduct from "../models/product.models.js";
 import fs from "fs";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 
+const toProductSlug = (value = "") => String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const ensureProductSlug = async (product) => {
+    if (!product || product.slug) return product;
+    const baseSlug = toProductSlug(product.name) || "product";
+    let slug = baseSlug;
+    let suffix = 2;
+    while (await SimpleProduct.exists({ slug, _id: { $ne: product._id } })) {
+        slug = `${baseSlug}-${suffix++}`;
+    }
+    product.slug = slug;
+    await product.save();
+    return product;
+};
+
 // 1. CREATE (Naya Product Add Karna)
 export const addnewproduct = async (req, res) => {
     try {
@@ -18,6 +37,7 @@ export const addnewproduct = async (req, res) => {
 
         const addproduct = {
             name,
+            slug: toProductSlug(name),
             description,
             category, 
             rating: rating ? Number(rating) : 4.5,
@@ -49,6 +69,7 @@ export const addnewproduct = async (req, res) => {
 export const readproduct = async (req, res) => {
     try {
         const products = await SimpleProduct.find();
+        await Promise.all(products.map(ensureProductSlug));
         res.status(200).json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -60,6 +81,10 @@ export const updateproduct = async (req, res) => {
     try {
         const { id } = req.params;
         let updateProductData = { ...req.body };
+
+        if (updateProductData.name !== undefined) {
+            updateProductData.slug = toProductSlug(updateProductData.name);
+        }
 
         if (req.body.variants) {
             try {
@@ -123,7 +148,12 @@ export const updateproduct = async (req, res) => {
 export const updateProductForSeo = async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await SimpleProduct.findById(id);
+        let product = await SimpleProduct.findOne({ slug: id });
+        if (!product && /^[a-f\d]{24}$/i.test(id)) product = await SimpleProduct.findById(id);
+        if (!product) {
+            const products = await SimpleProduct.find();
+            product = products.find((item) => toProductSlug(item.name) === id);
+        }
 
         if (!product) {
             return res.status(404).json({ message: "Product nahi mila" });
@@ -188,6 +218,8 @@ export const getproductbyid = async (req, res) => {
         if (!product) {
             return res.status(404).json({ error: "Product nahi mila" });
         }
+
+        await ensureProductSlug(product);
 
         res.status(200).json(product);
     } catch (err) {

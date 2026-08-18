@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl } from "./config.js";
+import BASE_URL, { getImageUrl, getProductUrl } from "./config.js";
 
 // Global variables current selection store karne ke liye
 let currentProductData = null;
@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadProductDetails() {
     const urlParams = new URLSearchParams(window.location.search);
-    // Preferred URL: /product/<id>. Keep ?id=<id> working for existing links.
+    // Public URL is /product/<product-name>; old ?id= links stay compatible.
     const pathMatch = window.location.pathname.match(/^\/product\/([^/?#]+)\/?$/i);
     const productId = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('id');
 
@@ -89,6 +89,7 @@ async function loadProductDetails() {
 
         // Global state update
         currentProductData = product; 
+        if (!pathMatch) window.history.replaceState({}, "", getProductUrl(product));
         console.log("Fetched Product Data:", product);
 
         // --- UI Updates ---

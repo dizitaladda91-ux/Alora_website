@@ -1,3 +1,5 @@
+import { getProductUrl } from "./config.js";
+
 document.addEventListener('DOMContentLoaded', () => {
     const searchOpenBtn = document.getElementById('search-open-btn');
     const searchCloseBtn = document.getElementById('search-close-btn');
