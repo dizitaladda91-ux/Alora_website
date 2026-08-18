@@ -135,6 +135,30 @@ app.get('/about', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'aboutus.html'));
 });
 
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'PrivacyPolicy.html'));
+});
+
+app.get('/terms-and-conditions', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'termCondition.html'));
+});
+
+app.get('/corporate-governance', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'Corporate Governance.html'));
+});
+
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'KnowledegeFAQ.html'));
+});
+
+app.get('/return-refund', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'ReturnRefund.html'));
+});
+
+app.get('/certificates', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'certificates.html'));
+});
+
 // Serve post detail HTML at clean slug route: /post/:slug
 app.get('/post/:slug', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));

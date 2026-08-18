@@ -41,6 +41,30 @@
       "dest": "/frontend/aboutus"
     },
     {
+      "src": "/privacy-policy/?",
+      "dest": "/frontend/PrivacyPolicy"
+    },
+    {
+      "src": "/terms-and-conditions/?",
+      "dest": "/frontend/termCondition"
+    },
+    {
+      "src": "/corporate-governance/?",
+      "dest": "/frontend/Corporate Governance"
+    },
+    {
+      "src": "/faq/?",
+      "dest": "/frontend/KnowledegeFAQ"
+    },
+    {
+      "src": "/return-refund/?",
+      "dest": "/frontend/ReturnRefund"
+    },
+    {
+      "src": "/certificates/?",
+      "dest": "/frontend/certificates"
+    },
+    {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },
