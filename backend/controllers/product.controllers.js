@@ -2,6 +2,25 @@ import SimpleProduct from "../models/product.models.js";
 import fs from "fs";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 
+const toProductSlug = (value = "") => String(value)
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+
+const ensureProductSlug = async (product) => {
+    if (!product || product.slug) return product;
+    const baseSlug = toProductSlug(product.name) || "product";
+    let slug = baseSlug;
+    let suffix = 2;
+    while (await SimpleProduct.exists({ slug, _id: { $ne: product._id } })) {
+        slug = `${baseSlug}-${suffix++}`;
+    }
+    product.slug = slug;
+    await product.save();
+    return product;
+};
+
 // 1. CREATE (Naya Product Add Karna)
 export const addnewproduct = async (req, res) => {
     try {
@@ -18,6 +37,7 @@ export const addnewproduct = async (req, res) => {
 
         const addproduct = {
             name,
+            slug: toProductSlug(name),
             description,
             category, 
             rating: rating ? Number(rating) : 4.5,
@@ -49,6 +69,7 @@ export const addnewproduct = async (req, res) => {
 export const readproduct = async (req, res) => {
     try {
         const products = await SimpleProduct.find();
+        await Promise.all(products.map(ensureProductSlug));
         res.status(200).json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -60,6 +81,10 @@ export const updateproduct = async (req, res) => {
     try {
         const { id } = req.params;
         let updateProductData = { ...req.body };
+
+        if (updateProductData.name !== undefined) {
+            updateProductData.slug = toProductSlug(updateProductData.name);
+        }
 
         if (req.body.variants) {
             try {
@@ -117,9 +142,7 @@ export const updateproduct = async (req, res) => {
     }
 };
 
-// SEO staff can only update content-facing product details.  Keep this separate
-// from the admin update handler so an edited browser request cannot change stock,
-// prices, availability, or any other product setting.
+// SEO staff update handler
 export const updateProductForSeo = async (req, res) => {
     try {
         const { id } = req.params;
@@ -132,23 +155,26 @@ export const updateProductForSeo = async (req, res) => {
         if (req.body.description !== undefined) product.description = req.body.description;
         if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
 
-        // The SEO UI sends only the displayed ML/volume values. Prices and stock
-        // always remain the existing admin-managed values.
         if (req.body.volumes) {
             const volumes = JSON.parse(req.body.volumes);
-            if (!Array.isArray(volumes) || volumes.length !== product.variants.length) {
-                return res.status(400).json({ error: "Invalid product measurements" });
+            if (Array.isArray(volumes) && volumes.length === product.variants.length) {
+                product.variants = product.variants.map((variant, index) => ({
+                    ...variant.toObject(),
+                    volume: String(volumes[index]).trim()
+                }));
             }
-            product.variants = product.variants.map((variant, index) => ({
-                ...variant.toObject(),
-                volume: String(volumes[index]).trim()
-            }));
         }
 
-        const mainImage = req.file;
+        const mainImage = req.files?.imagepath?.[0] || req.file;
+        const galleryImages = req.files?.galleryImages || [];
         if (mainImage) {
             if (product.imagepath) await deleteFromCloudinary(product.imagepath);
             product.imagepath = mainImage.path;
+        }
+
+        if (galleryImages.length > 0) {
+            await Promise.all((product.galleryImages || []).map(deleteFromCloudinary));
+            product.galleryImages = galleryImages.map((file) => file.path);
         }
 
         await product.save();
@@ -183,11 +209,20 @@ export const deleteproduct = async (req, res) => {
 export const getproductbyid = async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await SimpleProduct.findById(id);
+        let product = await SimpleProduct.findOne({ slug: id });
+        if (!product && /^[a-f\d]{24}$/i.test(id)) {
+            product = await SimpleProduct.findById(id);
+        }
+        if (!product) {
+            const products = await SimpleProduct.find();
+            product = products.find((item) => toProductSlug(item.name) === id);
+        }
 
         if (!product) {
             return res.status(404).json({ error: "Product nahi mila" });
         }
+
+        await ensureProductSlug(product);
 
         res.status(200).json(product);
     } catch (err) {

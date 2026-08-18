@@ -35,7 +35,7 @@ async function loadMyOrders() {
     loader.remove();
     const orders = result.data || [];
     if (!orders.length) {
-      list.innerHTML = `<div class="bg-white rounded-2xl border border-[#ECE4CE] p-10 text-center"><i class="fa-solid fa-bag-shopping text-3xl text-[#A0522D]"></i><h2 class="font-semibold text-lg mt-4">No orders yet</h2><a href="./moreproduct.html" class="inline-block mt-4 bg-[#A0522D] text-white px-5 py-2.5 rounded-lg text-sm">Shop Products</a></div>`;
+      list.innerHTML = `<div class="bg-white rounded-2xl border border-[#ECE4CE] p-10 text-center"><i class="fa-solid fa-bag-shopping text-3xl text-[#A0522D]"></i><h2 class="font-semibold text-lg mt-4">No orders yet</h2><a href="/products" class="inline-block mt-4 bg-[#A0522D] text-white px-5 py-2.5 rounded-lg text-sm">Shop Products</a></div>`;
       return;
     }
     list.innerHTML = orders.map((order) => {

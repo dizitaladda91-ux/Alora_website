@@ -2,6 +2,13 @@
   "version": 2,
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/moreproduct.html",
+      "destination": "/products",
+      "permanent": true
+    }
+  ],
   "builds": [
     {
       "src": "api/index.js",
@@ -19,19 +26,43 @@
     },
     {
       "src": "/ref/([^/]+)/?",
-      "dest": "/frontend/index.html"
+      "dest": "/frontend/index"
     },
     {
       "src": "/products/?",
-      "dest": "/frontend/moreproduct.html"
+      "dest": "/frontend/moreproduct"
     },
     {
       "src": "/product/[^/]+/?",
-      "dest": "/frontend/product.html"
+      "dest": "/frontend/product"
     },
     {
       "src": "/about/?",
-      "dest": "/frontend/aboutus.html"
+      "dest": "/frontend/aboutus"
+    },
+    {
+      "src": "/privacy-policy/?",
+      "dest": "/frontend/PrivacyPolicy"
+    },
+    {
+      "src": "/terms-and-conditions/?",
+      "dest": "/frontend/termCondition"
+    },
+    {
+      "src": "/corporate-governance/?",
+      "dest": "/frontend/Corporate Governance"
+    },
+    {
+      "src": "/faq/?",
+      "dest": "/frontend/KnowledegeFAQ"
+    },
+    {
+      "src": "/return-refund/?",
+      "dest": "/frontend/ReturnRefund"
+    },
+    {
+      "src": "/certificates/?",
+      "dest": "/frontend/certificates"
     },
     {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",

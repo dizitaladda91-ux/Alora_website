@@ -249,14 +249,7 @@
             const cartBtn = document.getElementById('cart-toggle-btn');
 
             if (cartBtn) {
-                cartBtn.addEventListener('click', function(e) {
-                    // Check if first-time user
-                    if (!isLeadSubmitted()) {
-                        e.preventDefault();
-                        e.stopImmediatePropagation();
-                        openLeadModal();
-                    }
-                }, true); // Capture phase listener
+                // Product is added directly; customer details are collected at checkout.
             }
         });
 

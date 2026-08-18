@@ -1,5 +1,5 @@
 // js/navbar-interactions.js
-import BASE_URL, { getImageUrl } from './config.js';
+import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
 const RUPEE_SYMBOL = '\u20B9';
 
 // Global Event Delegation for Mobile Menu
@@ -64,7 +64,7 @@ function initSearchFeature() {
     const searchCloseBtn = document.getElementById('search-close-btn');
     const searchContainer = document.getElementById('search-container');
     const searchInput = document.getElementById('search-input');
-    const isMoreProductPage = window.location.pathname.includes('moreproduct.html');
+    const isMoreProductPage = window.location.pathname.includes('moreproduct.html') || window.location.pathname === '/products';
 
     if (!searchContainer || !searchInput) return;
 
@@ -98,7 +98,7 @@ function initSearchFeature() {
         if (e.key === 'Enter') {
             const query = searchInput.value.trim();
             if (query) {
-                window.location.href = `./moreproduct.html?search=${encodeURIComponent(query)}`;
+                window.location.href = `/products?search=${encodeURIComponent(query)}`;
             }
         }
     });
@@ -165,7 +165,7 @@ if (products.length > 0 && suggestionsBox) {
         const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
 
         return `
-            <div onclick="window.location.href='/product/${encodeURIComponent(product._id)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
+            <div onclick="window.location.href='${getProductUrl(product)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
                 <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
                 <div class="flex-1 min-w-0">
                     <p class="text-xs font-semibold text-black truncate text-left">${product.name || product.title || ''}</p>

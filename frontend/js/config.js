@@ -38,6 +38,15 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
     return `${base}${normalized.startsWith('/') ? normalized : '/' + normalized}`;
 }
 
+export function getProductUrl(product) {
+    const slug = String(product?.slug || product?.name || "product")
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "");
+    return `/product/${encodeURIComponent(slug || "product")}`;
+}
+
 // Use this only for admin/SEO actions. Public catalogue, blog and contact APIs do not need it.
 export function getAuthHeaders(headers = {}) {
     return headers;

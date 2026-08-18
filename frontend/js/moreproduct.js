@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl, safeFetchJson } from "./config.js";
+import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
 
 // ===== Global State =====
 let PRODUCTS_DATABASE = [];
@@ -11,7 +11,6 @@ let searchQuery = '';
 let pendingCatalogProductId = null;
 let pendingCatalogCartAction = null;
 
-// ===== Init =====
 // ===== Init =====
 document.addEventListener("DOMContentLoaded", () => {
     // 1. URL Query Parameters check karein (?filter=bestseller YA ?category=body)
@@ -48,17 +47,24 @@ async function loadProductsFromBackend() {
     const gridContainer = document.getElementById('product-grid');
     if (!gridContainer) return;
 
-    gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10"><i class="fa-solid fa-spinner fa-spin text-2xl text-clay mb-2"></i><br>Loading products...</p>`;
-
     try {
         const data = await safeFetchJson(`${BASE_URL}/api/product/all`);
         PRODUCTS_DATABASE = normalizeAndAssignBestsellers(data);
         
-        // ⚡ Update Quick Filter UI Buttons state if redirected from Index ⚡
+        // Update Quick Filter UI Buttons state if redirected from Index
         updateQuickFilterUI();
 
-        // ⚡ Initial Filter Call (Respects URL query param) ⚡
+        // Initial Filter Call (Respects URL query param)
         filterProducts();
+
+        // Smoothly reveal sidebar filter controls with YouTube-style fade-in
+        const filterSkeleton = document.getElementById('filter-skeleton');
+        const filterContent = document.getElementById('filter-content');
+        if (filterSkeleton && filterContent) {
+            filterSkeleton.classList.add('hidden');
+            filterContent.classList.remove('hidden');
+            filterContent.classList.add('animate-fade-in');
+        }
 
     } catch (err) {
         console.error("Product fetch failed:", err);
@@ -92,21 +98,22 @@ function normalizeAndAssignBestsellers(rawProducts) {
 
         return {
             id: product._id || product.id,
+            slug: product.slug,
+            productUrl: getProductUrl(product),
             name: product.name || 'Untitled Product',
             category: rawCategory, 
             isBestseller: backendIsBestseller,
             rating: product.rating || 4,
             baseImg: imageSrc,
+            galleryImages: (product.galleryImages || []).map(img => getImageUrl(img, '')).filter(Boolean),
             description: product.description || 'No description available', 
             sizes
         };
     });
 
-    // ⚡ FRONTEND BESTSELLER FALLBACK LOGIC ⚡
     const hasAnyBackendBestseller = normalized.some(p => p.isBestseller);
 
     if (!hasAnyBackendBestseller && normalized.length > 0) {
-        // Sort copy by rating (highest first)
         const sortedIndices = [...normalized]
             .map((p, idx) => ({ idx, rating: p.rating }))
             .sort((a, b) => b.rating - a.rating);
@@ -145,6 +152,9 @@ function renderProductCatalog(products) {
         const initialSize = product.sizes[0];
         const starsHTML = generateStarsHTML(product.rating);
 
+        const allImages = [product.baseImg, ...(product.galleryImages || [])].filter(Boolean);
+        const hasMultipleImages = allImages.length > 1;
+
         const sizeButtonsHTML = product.sizes.map((sz, idx) => {
             const isActive = idx === 0;
             const activeClasses = isActive 
@@ -162,17 +172,36 @@ function renderProductCatalog(products) {
             `;
         }).join('');
 
+        const imageAreaHTML = hasMultipleImages ? `
+            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative group/card-img" data-images="${encodeURIComponent(JSON.stringify(allImages))}" data-active-idx="0">
+                <a href="${product.productUrl}" class="block w-full h-full p-2 flex items-center justify-center">
+                    <img src="${allImages[0]}" alt="${product.name}" class="card-active-img max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
+                </a>
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.cycleCardImage(this, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] opacity-80 sm:opacity-0 group-hover/card-img:opacity-100 transition hover:bg-black/80 z-20 shadow">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.cycleCardImage(this, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] opacity-80 sm:opacity-0 group-hover/card-img:opacity-100 transition hover:bg-black/80 z-20 shadow">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 z-20 bg-black/20 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                    ${allImages.map((_, i) => `<span class="img-dot w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-clay' : 'bg-white/60'}"></span>`).join('')}
+                </div>
+            </div>
+        ` : `
+            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative">
+                <a href="${product.productUrl}" class="block w-full h-full p-2 flex items-center justify-center">
+                    <img src="${product.baseImg}" alt="${product.name}" class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
+                </a>
+            </div>
+        `;
+
         return `
-        <div data-product-id="${product.id}" class="relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
+        <div data-product-id="${product.id}" class="animate-fade-in relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
             <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 ${product.isBestseller ? 'bg-orange-600' : 'bg-black'} uppercase text-white rounded-full flex items-center justify-center shadow-md">
                 ${product.isBestseller ? 'Hot' : 'New'}
             </span>
           
-            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative">
-                <a href="/product/${encodeURIComponent(product.id)}" class="block w-full h-full p-2 flex items-center justify-center">
-                    <img src="${product.baseImg}" alt="${product.name}" class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
-                </a>
-            </div>
+            ${imageAreaHTML}
 
             <div class="px-4 flex-1 flex flex-col justify-center gap-1.5">
                 <h3 class="text-base font-robot font-medium text-ink text-center leading-snug capitalize line-clamp-1 product-name">${product.name}</h3>
@@ -277,7 +306,6 @@ function filterProducts() {
 
         if (item.rating < ratingFloorFilter) return false;
 
-        // ⚡ BESTSELLER QUICK TAG FILTER ⚡
         if (activeQuickTag === 'bestseller' && !item.isBestseller) {
             return false;
         }
@@ -288,7 +316,6 @@ function filterProducts() {
         return true;
     });
 
-    // Sort Results
     const sortFilter = document.getElementById('sort-filter');
     if (sortFilter) {
         const sortSelection = sortFilter.value;
@@ -304,7 +331,6 @@ function filterProducts() {
     renderProductCatalog(results);
 }
 
-// Sync UI Active state for Quick Filters
 function updateQuickFilterUI() {
     const bestsellerBadge = document.getElementById('badge-bestseller');
     if (bestsellerBadge) {
@@ -341,11 +367,11 @@ function setRatingFilter(minStars) {
 function resetFilters() {
     document.querySelectorAll('input[name="category"]').forEach(cb => cb.checked = false);
     const range = document.getElementById('price-range');
-    if (range) range.value = 1500;
+    if (range) range.value = 2500;
     const sort = document.getElementById('sort-filter');
     if (sort) sort.value = 'featured';
     
-    updatePriceLabel(1500);
+    updatePriceLabel(2500);
     ratingFloorFilter = 0;
     activeQuickTag = 'all';
     searchQuery = '';
@@ -414,7 +440,7 @@ async function fetchAndShowSuggestions(query) {
             const displayPrice = cleanedPrice ? `₹ ${cleanedPrice}` : '';
 
             return `
-                <a href="/product/${encodeURIComponent(prod._id || prod.id)}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
+                <a href="${getProductUrl(prod)}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
                     <img src="${imgSrc}" alt="${prod.name}" class="w-10 h-10 object-contain rounded bg-white border p-1">
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-800 truncate group-hover:text-amber-700">${prod.name}</p>
@@ -431,23 +457,9 @@ async function fetchAndShowSuggestions(query) {
     }
 }
 
-// ===== Cart Interceptor & Lead Flow =====
+// ===== Cart =====
 function handleCartButtonClick(productId, buttonElement) {
-    const isLeadFilled = localStorage.getItem('leadFilled');
-
-    if (isLeadFilled === 'true') {
-        commitProductToCart(productId, buttonElement);
-    } else {
-        pendingCatalogProductId = productId;
-        pendingCatalogCartAction = buttonElement;
-
-        if (typeof window.openLeadModal === 'function') {
-            window.openLeadModal(buttonElement);
-        } else {
-            const modal = document.getElementById('leadModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-    }
+    commitProductToCart(productId, buttonElement);
 }
 
 function commitProductToCart(productId, actionBtnElement) {
@@ -544,7 +556,7 @@ document.addEventListener('cartUpdated', () => {
     try { syncCartCounterIcon(); } catch (e) { console.warn('cartUpdated handler failed', e); }
 });
 
-// ===== Mobile Menu Helper =====
+// ===== Mobile Menu & Mobile Filter Listener =====
 function setupMobileMenu() {
     document.addEventListener("click", (e) => {
         const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
@@ -552,9 +564,7 @@ function setupMobileMenu() {
         const mobileMenu = document.getElementById("mobile-menu");
         const mobileDrawer = document.getElementById("mobile-menu-drawer");
 
-        if (!mobileMenu) return;
-
-        if (menuBtn) {
+        if (menuBtn && mobileMenu) {
             e.preventDefault();
             mobileMenu.classList.remove("hidden", "pointer-events-none", "opacity-0");
             if (mobileDrawer) {
@@ -563,7 +573,7 @@ function setupMobileMenu() {
             return;
         }
 
-        if (closeBtn || e.target === mobileMenu) {
+        if ((closeBtn || e.target === mobileMenu) && mobileMenu) {
             e.preventDefault();
             if (mobileDrawer) {
                 mobileDrawer.classList.add("-translate-x-full");
@@ -573,6 +583,16 @@ function setupMobileMenu() {
                 mobileMenu.classList.add("hidden", "pointer-events-none");
             }, 300);
             return;
+        }
+
+        // Toggle Mobile Filter Sidebar
+        const toggleFilterBtn = e.target.closest("#toggle-filter-btn");
+        if (toggleFilterBtn) {
+            e.preventDefault();
+            const sidebar = document.getElementById("filter-sidebar");
+            if (sidebar) {
+                sidebar.classList.toggle("hidden");
+            }
         }
     });
 }
@@ -601,6 +621,56 @@ document.addEventListener('click', (e) => {
         return;
     }
 });
+
+// ===== Product Card Image Slider Cycle & Mobile Touch Swipe =====
+window.cycleCardImage = function(btnElement, direction) {
+    const container = btnElement.closest('[data-images]');
+    if (!container) return;
+    try {
+        const rawImages = JSON.parse(decodeURIComponent(container.dataset.images || "[]"));
+        if (!rawImages.length) return;
+        let currentIdx = parseInt(container.dataset.activeIdx || "0");
+        currentIdx = (currentIdx + direction + rawImages.length) % rawImages.length;
+        container.dataset.activeIdx = String(currentIdx);
+
+        const imgEl = container.querySelector('.card-active-img');
+        if (imgEl) imgEl.src = rawImages[currentIdx];
+
+        const dots = container.querySelectorAll('.img-dot');
+        dots.forEach((dot, idx) => {
+            if (idx === currentIdx) {
+                dot.className = "img-dot w-1.5 h-1.5 rounded-full bg-clay";
+            } else {
+                dot.className = "img-dot w-1.5 h-1.5 rounded-full bg-white/60";
+            }
+        });
+    } catch (e) {
+        console.error("Image cycle error:", e);
+    }
+};
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+    const cardImgBox = e.target.closest('[data-images]');
+    if (cardImgBox) {
+        touchStartX = e.changedTouches[0].screenX;
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    const cardImgBox = e.target.closest('[data-images]');
+    if (cardImgBox) {
+        touchEndX = e.changedTouches[0].screenX;
+        const diffX = touchEndX - touchStartX;
+        if (Math.abs(diffX) > 35) {
+            const direction = diffX < 0 ? 1 : -1;
+            const nextBtn = cardImgBox.querySelector(direction === 1 ? 'button:nth-of-type(2)' : 'button:nth-of-type(1)');
+            if (nextBtn) window.cycleCardImage(nextBtn, direction);
+        }
+    }
+}, { passive: true });
 
 // ===== Expose Global Functions for Inline HTML Event Listeners =====
 window.changeCardSize = changeCardSize;

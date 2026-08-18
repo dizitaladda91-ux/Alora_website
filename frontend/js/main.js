@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl, safeFetchJson } from "./config.js";
+import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
 
 document.addEventListener("partialsLoaded", () => {
 
@@ -250,28 +250,6 @@ function toggleCartState(button) {
     const card = button.closest('.product-card');
     if (!card) return;
 
-    // --- NEW VALIDATION TRIGGER BEFORE CART SAVE ---
-    // Check karein kya user ne lead form bhara hai
-    const isLeadFilled = localStorage.getItem('leadFilled');
-    
-    if (!isLeadFilled || isLeadFilled !== 'true') {
-        console.log("Lead form not filled yet. Prompting user modal...");
-
-        if (typeof window.openLeadModal === 'function') {
-            window.openLeadModal(button);
-        } else {
-            const leadModalElement = document.getElementById('leadModal') || document.getElementById('lead-modal') || document.querySelector('#lead-modal-container > div');
-            if (leadModalElement) {
-                leadModalElement.classList.remove('hidden');
-                leadModalElement.style.display = 'flex';
-            } else {
-                console.warn("Lead modal element DOM me nahi mila.");
-            }
-        }
-        return;
-    }
-    // -------------------------------------------------
-
     // Get active size details from variant setup
     const activeSizeBtn = card.querySelector('.size-btn.bg-ink') || card.querySelector('.size-btn');
     const sizeText = activeSizeBtn ? activeSizeBtn.innerText.trim() : 'Standard';
@@ -383,7 +361,7 @@ document.addEventListener("partialsLoaded", function () {
     // Agar URL me search query hai (jaise home page se redirect hoke aaya ho)
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search');
-    if (searchQuery && window.location.pathname.includes("moreproduct.html") && searchContainer && searchInput) {
+    if (searchQuery && (window.location.pathname.includes("moreproduct.html") || window.location.pathname === "/products") && searchContainer && searchInput) {
         searchContainer.classList.remove("hidden");
         searchInput.value = searchQuery;
         setTimeout(() => {
@@ -480,7 +458,7 @@ async function loadSliderProducts() {
                 </span>
 
                 <div class="mx-4 mt-4 rounded-xl flex justify-center h-[180px] items-center overflow-hidden relative">
-                    <a href="/product/${encodeURIComponent(product._id)}" class="block w-full h-[180px]">
+                    <a href="${getProductUrl(product)}" class="block w-full h-[180px]">
                         <img src="${fullImgUrl}" alt="${product.name}" class="w-full h-full object-contain transition-transform duration-300 hover:scale-110">
                     </a>
                 </div>

@@ -30,6 +30,14 @@ const SimpleProductSchema = new mongoose.Schema({
         required: [true, 'Product name zaroori hai'],
         trim: true
     },
+    // Public storefront URLs use this readable value instead of exposing a MongoDB ID.
+    slug: {
+        type: String,
+        trim: true,
+        lowercase: true,
+        unique: true,
+        sparse: true
+    },
     description: {
         type: String,
         required: [true, 'Product description zaroori hai'],
