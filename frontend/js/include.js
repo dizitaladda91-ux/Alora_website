@@ -22,6 +22,71 @@ async function loadAllPartials() {
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
+/* =========================================================
+   GOOGLE TAG MANAGER (GTM) DYNAMIC INITIALIZER
+   ========================================================= */
+function loadGtmScript(gtmId) {
+    if (!gtmId || !/^GTM-[A-Z0-9]+$/i.test(gtmId.trim())) return;
+    const cleanId = gtmId.trim().toUpperCase();
+
+    if (window._gtmInitialized === cleanId) return;
+    window._gtmInitialized = cleanId;
+
+    // 1. Initialize dataLayer
+    window.dataLayer = window.dataLayer || [];
+    window.dataLayer.push({
+        'gtm.start': new Date().getTime(),
+        event: 'gtm.js'
+    });
+
+    // 2. Inject GTM Head Script
+    const headScript = document.createElement("script");
+    headScript.async = true;
+    headScript.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(cleanId)}`;
+    document.head.appendChild(headScript);
+
+    // 3. Inject GTM Noscript iframe in Body
+    const noscript = document.createElement("noscript");
+    const iframe = document.createElement("iframe");
+    iframe.src = `https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(cleanId)}`;
+    iframe.height = "0";
+    iframe.width = "0";
+    iframe.style.cssText = "display:none;visibility:hidden";
+    noscript.appendChild(iframe);
+
+    if (document.body) {
+        document.body.insertBefore(noscript, document.body.firstChild);
+    } else {
+        document.addEventListener("DOMContentLoaded", () => {
+            document.body.insertBefore(noscript, document.body.firstChild);
+        });
+    }
+}
+
+function initGoogleTagManager() {
+    if (window.GTM_ID) {
+        loadGtmScript(window.GTM_ID);
+        return;
+    }
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null)
+        ? window.BASE_URL
+        : (isLocal ? "http://localhost:5000" : "");
+
+    fetch(`${baseUrl}/api/config/gtm`)
+        .then((res) => res.ok ? res.json() : null)
+        .then((data) => {
+            if (data?.gtmId) {
+                loadGtmScript(data.gtmId);
+            }
+        })
+        .catch(() => {});
+}
+
+/* =========================================================
+   AFFILIATE REFERRAL BANNER & TRACKING
+   ========================================================= */
 function showReferralBanner(code, discountPercent) {
     if (!code) return;
     let banner = document.getElementById("alora-referral-banner");
@@ -39,12 +104,9 @@ function showReferralBanner(code, discountPercent) {
 
 function trackReferralFromUrl() {
     const params = new URLSearchParams(window.location.search);
-    // Support clean affiliate links such as /ref/TESTDATA as well as the
-    // existing query-string links (?ref=TESTDATA).
     const pathMatch = window.location.pathname.match(/^\/ref\/([^/?#]+)\/?$/i);
     const rawCode = pathMatch?.[1] || params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
     if (!rawCode || !/^[a-z0-9_-]{5,64}$/i.test(rawCode)) {
-        // No ref/aff parameter in current URL, check if previous referral is stored in session
         try {
             const stored = JSON.parse(sessionStorage.getItem("aloraReferral") || "null");
             if (stored && stored.referralCode) {
@@ -72,7 +134,6 @@ function trackReferralFromUrl() {
         body: JSON.stringify({ code: normalizedCode, landingPage: `${location.pathname}${location.search}` })
     }).then(async (response) => {
         if (!response.ok) {
-            // Invalid or inactive code in DB -> clear any stored referral data
             sessionStorage.removeItem("aloraReferral");
             const existingBanner = document.getElementById("alora-referral-banner");
             if (existingBanner) existingBanner.remove();
@@ -98,5 +159,7 @@ function trackReferralFromUrl() {
 }
 
 window.showReferralBanner = showReferralBanner;
+window.loadGtmScript = loadGtmScript;
+initGoogleTagManager();
 trackReferralFromUrl();
 document.addEventListener("DOMContentLoaded", loadAllPartials);

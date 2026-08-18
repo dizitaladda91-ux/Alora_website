@@ -169,7 +169,7 @@ function renderProductCatalog(products) {
             </span>
           
             <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative">
-                <a href="./product.html?id=${product.id}" class="block w-full h-full p-2 flex items-center justify-center">
+                <a href="/product/${encodeURIComponent(product.id)}" class="block w-full h-full p-2 flex items-center justify-center">
                     <img src="${product.baseImg}" alt="${product.name}" class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
                 </a>
             </div>
@@ -414,7 +414,7 @@ async function fetchAndShowSuggestions(query) {
             const displayPrice = cleanedPrice ? `₹ ${cleanedPrice}` : '';
 
             return `
-                <a href="./product.html?id=${prod._id || prod.id}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
+                <a href="/product/${encodeURIComponent(prod._id || prod.id)}" class="flex items-center gap-3 p-3 hover:bg-amber-50/50 transition border-b border-gray-100 last:border-none group">
                     <img src="${imgSrc}" alt="${prod.name}" class="w-10 h-10 object-contain rounded bg-white border p-1">
                     <div class="flex-1 min-w-0">
                         <p class="text-sm font-medium text-gray-800 truncate group-hover:text-amber-700">${prod.name}</p>

@@ -155,7 +155,7 @@ async function fetchSuggestions(query, suggestionsBox) {
             const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
 
             return `
-                <div onclick="window.location.href='./product.html?id=${prod._id}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
+                <div onclick="window.location.href='/product/${encodeURIComponent(prod._id)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
                     <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>

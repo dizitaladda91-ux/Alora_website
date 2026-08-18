@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, logout, forgotPassword, resetPassword, getSession } from '../controllers/auth.controllers.js';
+import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
 import { requireAuth } from "../middlewares/auth.middleware.js";
 import path from "path";
@@ -56,6 +56,7 @@ router.post('/api/auth/register', register);
 router.post('/api/auth/login', login);
 router.post('/api/auth/logout', logout);
 router.get('/api/auth/session', requireAuth, getSession);
+router.put('/api/auth/profile', requireAuth, updateProfile);
 
 // Forgot Password & Reset Password API Routes
 router.post('/api/auth/forgot-password', forgotPassword);

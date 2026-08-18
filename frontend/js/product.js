@@ -72,7 +72,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadProductDetails() {
     const urlParams = new URLSearchParams(window.location.search);
-    const productId = urlParams.get('id');
+    // Preferred URL: /product/<id>. Keep ?id=<id> working for existing links.
+    const pathMatch = window.location.pathname.match(/^\/product\/([^/?#]+)\/?$/i);
+    const productId = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('id');
 
     if (!productId) {
         console.error("Product ID URL mein nahi mili.");

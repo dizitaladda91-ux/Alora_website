@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
 
             return `
-                <a href="./product.html?id=${product._id}" class="flex items-center gap-3 p-2 hover:bg-gray-100 transition border-b border-gray-100 last:border-0">
+                <a href="/product/${encodeURIComponent(product._id)}" class="flex items-center gap-3 p-2 hover:bg-gray-100 transition border-b border-gray-100 last:border-0">
                     <img src="${product.imagepath || product.image || './static/logo2.png'}" alt="${product.name || product.title}" class="w-10 h-10 object-cover rounded">
                     <div>
                         <h4 class="text-sm font-medium text-black">${product.name || product.title}</h4>

@@ -25,6 +25,7 @@ function clearAllCart() {
 
 const button = document.getElementById("payNow");
 let signedInCustomer = false;
+let savedCustomer = null;
 
 async function registerAndAuthenticate({ name, email, phone, address, password }) {
     const registerResponse = await fetch(`${BASE_URL}/api/auth/register`, {
@@ -49,15 +50,43 @@ function fillSignedInCustomer(user) {
     document.getElementById("custPhone").value = user.phone || "";
     document.getElementById("custAddress").value = user.address || "";
 
-    // Existing customers should checkout with their account details instead of
-    // being asked to create an account again.
-    ["custName", "custEmail", "custPhone", "custAddress"].forEach(id => {
-        document.getElementById(id)?.setAttribute("readonly", "readonly");
-    });
+    savedCustomer = user;
+    const hasSavedAddress = Boolean(String(user.address || "").trim());
+
+    // A returning customer only needs to see their saved contact and delivery
+    // details—there is no need to create an account again or re-enter a name.
+    document.getElementById("checkout-name-field")?.classList.add("hidden");
+    document.getElementById("checkout-phone-field")?.classList.add("hidden");
+    document.getElementById("checkout-email-field")?.classList.add("hidden");
+    document.getElementById("checkout-address-field")?.classList.toggle("hidden", hasSavedAddress);
+    document.getElementById("custAddress")?.toggleAttribute("readonly", hasSavedAddress);
+    document.getElementById("saved-customer-phone").textContent = user.phone || "—";
+    document.getElementById("saved-customer-email").textContent = user.email || "—";
+    document.getElementById("saved-customer-address").textContent = user.address || "Add your delivery address below.";
+    document.getElementById("saved-customer-address-row")?.classList.toggle("hidden", !hasSavedAddress);
+    document.getElementById("saved-customer-summary")?.classList.remove("hidden");
     document.getElementById("checkout-details-title").innerHTML = '<i class="fa-solid fa-truck text-clay"></i> Delivery Details';
     document.getElementById("checkout-account-fields")?.classList.add("hidden");
-    document.getElementById("checkout-signed-in-note")?.classList.remove("hidden");
+    const signedInNote = document.getElementById("checkout-signed-in-note");
+    signedInNote?.classList.remove("hidden");
+    if (signedInNote) signedInNote.textContent = hasSavedAddress
+        ? "You are signed in. Your saved mobile number, email and delivery address are shown below."
+        : "You are signed in. Add your delivery address once to save it to your account.";
     signedInCustomer = true;
+}
+
+async function saveMissingDeliveryAddress(address) {
+    if (!signedInCustomer || String(savedCustomer?.address || "").trim()) return;
+
+    const response = await fetch(`${BASE_URL}/api/auth/profile`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ address })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || "Could not save the delivery address.");
+    savedCustomer = data.user;
 }
 
 async function restoreSignedInCustomer() {
@@ -144,6 +173,10 @@ button?.addEventListener("click", async (e) => {
             // Reflect that state immediately, without requiring a page refresh.
             fillSignedInCustomer(registeredUser || { name, email, phone, address });
         }
+
+        // Accounts made through the standalone register page may not yet have
+        // an address. Save it now so the next checkout is prefilled too.
+        await saveMissingDeliveryAddress(address);
 
         let referral = null;
         let couponCode = null;
