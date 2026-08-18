@@ -39,6 +39,23 @@
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        @keyframes youtubeShimmer {
+            0% { background-position: -200% 0; }
+            100% { background-position: 200% 0; }
+        }
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, #ede8dd 0%, #f7f4ed 50%, #ede8dd 100%);
+            background-size: 200% 100%;
+            animation: youtubeShimmer 1.6s infinite ease-in-out;
+        }
+        @keyframes cardFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
     </style>
     <script
   src="https://aloraaffilation.onrender.com/alora-storefront-discount.js"
@@ -139,27 +156,41 @@
                 </div>
 
                 <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-                    <!-- Instant Skeleton Loaders for Smooth Parallel Render -->
-                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between">
-                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
-                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
-                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
-                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    <!-- YouTube-Style Shimmer Skeleton Loader 1 -->
+                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden">
+                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
+                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
+                        <div class="flex justify-between items-center px-2 mb-3">
+                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
+                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
+                        </div>
+                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
+                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
                     </div>
-                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between hidden sm:flex">
-                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
-                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
-                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
-                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    <!-- YouTube-Style Shimmer Skeleton Loader 2 -->
+                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden hidden sm:flex">
+                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
+                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
+                        <div class="flex justify-between items-center px-2 mb-3">
+                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
+                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
+                        </div>
+                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
+                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
                     </div>
-                    <div class="animate-pulse bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between hidden md:flex">
-                        <div class="bg-gray-100 h-[170px] rounded-xl mb-4"></div>
-                        <div class="bg-gray-100 h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="bg-gray-100 h-3 rounded w-1/2 mx-auto mb-4"></div>
-                        <div class="bg-gray-100 h-8 rounded mb-2"></div>
-                        <div class="bg-gray-100 h-10 rounded mt-auto"></div>
+                    <!-- YouTube-Style Shimmer Skeleton Loader 3 -->
+                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden hidden md:flex">
+                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
+                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
+                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
+                        <div class="flex justify-between items-center px-2 mb-3">
+                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
+                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
+                        </div>
+                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
+                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
                     </div>
                 </div>
 
