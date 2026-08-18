@@ -79,6 +79,13 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
+app.get('/api/config/gtm', (req, res) => {
+  return res.status(200).json({
+    success: true,
+    gtmId: (process.env.GTM_ID || "").trim()
+  });
+});
+
 app.use('/api', async (req, res, next) => {
   try {
     await db();
@@ -112,6 +119,20 @@ app.use(express.static(frontendRoot));
 // Serve the frontend root page for GET /
 app.get('/', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'index.html'));
+});
+
+// Public storefront routes use readable URLs while product.html?id=... stays
+// available for older shared links.
+app.get('/products', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'moreproduct.html'));
+});
+
+app.get('/product/:id', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'product.html'));
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'aboutus.html'));
 });
 
 // Serve post detail HTML at clean slug route: /post/:slug

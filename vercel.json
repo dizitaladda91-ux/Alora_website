@@ -22,6 +22,18 @@
       "dest": "/frontend/index.html"
     },
     {
+      "src": "/products/?",
+      "dest": "/frontend/moreproduct.html"
+    },
+    {
+      "src": "/product/[^/]+/?",
+      "dest": "/frontend/product.html"
+    },
+    {
+      "src": "/about/?",
+      "dest": "/frontend/aboutus.html"
+    },
+    {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },

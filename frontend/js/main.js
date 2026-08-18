@@ -480,7 +480,7 @@ async function loadSliderProducts() {
                 </span>
 
                 <div class="mx-4 mt-4 rounded-xl flex justify-center h-[180px] items-center overflow-hidden relative">
-                    <a href="./product.html?id=${product._id}" class="block w-full h-[180px]">
+                    <a href="/product/${encodeURIComponent(product._id)}" class="block w-full h-[180px]">
                         <img src="${fullImgUrl}" alt="${product.name}" class="w-full h-full object-contain transition-transform duration-300 hover:scale-110">
                     </a>
                 </div>
