@@ -433,23 +433,9 @@ async function fetchAndShowSuggestions(query) {
     }
 }
 
-// ===== Cart Interceptor & Lead Flow =====
+// ===== Cart =====
 function handleCartButtonClick(productId, buttonElement) {
-    const isLeadFilled = localStorage.getItem('leadFilled');
-
-    if (isLeadFilled === 'true') {
-        commitProductToCart(productId, buttonElement);
-    } else {
-        pendingCatalogProductId = productId;
-        pendingCatalogCartAction = buttonElement;
-
-        if (typeof window.openLeadModal === 'function') {
-            window.openLeadModal(buttonElement);
-        } else {
-            const modal = document.getElementById('leadModal');
-            if (modal) modal.classList.remove('hidden');
-        }
-    }
+    commitProductToCart(productId, buttonElement);
 }
 
 function commitProductToCart(productId, actionBtnElement) {

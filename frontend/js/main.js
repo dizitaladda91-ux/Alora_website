@@ -250,28 +250,6 @@ function toggleCartState(button) {
     const card = button.closest('.product-card');
     if (!card) return;
 
-    // --- NEW VALIDATION TRIGGER BEFORE CART SAVE ---
-    // Check karein kya user ne lead form bhara hai
-    const isLeadFilled = localStorage.getItem('leadFilled');
-    
-    if (!isLeadFilled || isLeadFilled !== 'true') {
-        console.log("Lead form not filled yet. Prompting user modal...");
-
-        if (typeof window.openLeadModal === 'function') {
-            window.openLeadModal(button);
-        } else {
-            const leadModalElement = document.getElementById('leadModal') || document.getElementById('lead-modal') || document.querySelector('#lead-modal-container > div');
-            if (leadModalElement) {
-                leadModalElement.classList.remove('hidden');
-                leadModalElement.style.display = 'flex';
-            } else {
-                console.warn("Lead modal element DOM me nahi mila.");
-            }
-        }
-        return;
-    }
-    // -------------------------------------------------
-
     // Get active size details from variant setup
     const activeSizeBtn = card.querySelector('.size-btn.bg-ink') || card.querySelector('.size-btn');
     const sizeText = activeSizeBtn ? activeSizeBtn.innerText.trim() : 'Standard';
