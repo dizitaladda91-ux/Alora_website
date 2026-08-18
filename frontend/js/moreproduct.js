@@ -57,6 +57,15 @@ async function loadProductsFromBackend() {
         // Initial Filter Call (Respects URL query param)
         filterProducts();
 
+        // Smoothly reveal sidebar filter controls with YouTube-style fade-in
+        const filterSkeleton = document.getElementById('filter-skeleton');
+        const filterContent = document.getElementById('filter-content');
+        if (filterSkeleton && filterContent) {
+            filterSkeleton.classList.add('hidden');
+            filterContent.classList.remove('hidden');
+            filterContent.classList.add('animate-fade-in');
+        }
+
     } catch (err) {
         console.error("Product fetch failed:", err);
         gridContainer.innerHTML = `<p class="text-ash text-center col-span-full py-10">Could not load products. Please try again later.</p>`;
