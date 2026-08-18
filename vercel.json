@@ -26,19 +26,19 @@
     },
     {
       "src": "/ref/([^/]+)/?",
-      "dest": "/frontend/index.html"
+      "dest": "/frontend/index"
     },
     {
       "src": "/products/?",
-      "dest": "/frontend/moreproduct.html"
+      "dest": "/frontend/moreproduct"
     },
     {
       "src": "/product/[^/]+/?",
-      "dest": "/frontend/product.html"
+      "dest": "/frontend/product"
     },
     {
       "src": "/about/?",
-      "dest": "/frontend/aboutus.html"
+      "dest": "/frontend/aboutus"
     },
     {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
