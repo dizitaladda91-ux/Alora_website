@@ -46,7 +46,7 @@ router.post("/add", requireAuth, authorizeRoles("admin"), (req, res, next) => {
 router.put("/update/:id", requireAuth, authorizeRoles("admin"), productUploadFields, updateproduct);
 
 // SEO users may edit only image, description, rating and ML/volume measurements.
-router.put("/seo-update/:id", requireAuth, authorizeRoles("admin", "seoadmin"), upload.single('imagepath'), updateProductForSeo);
+router.put("/seo-update/:id", requireAuth, authorizeRoles("admin", "seoadmin"), productUploadFields, updateProductForSeo);
 
 // DELETE: Product aur uski image remove karne ke liye
 router.delete("/delete/:id", requireAuth, authorizeRoles("admin"), deleteproduct);

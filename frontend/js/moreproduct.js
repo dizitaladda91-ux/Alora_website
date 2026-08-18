@@ -105,6 +105,7 @@ function normalizeAndAssignBestsellers(rawProducts) {
             isBestseller: backendIsBestseller,
             rating: product.rating || 4,
             baseImg: imageSrc,
+            galleryImages: (product.galleryImages || []).map(img => getImageUrl(img, '')).filter(Boolean),
             description: product.description || 'No description available', 
             sizes
         };
@@ -151,6 +152,9 @@ function renderProductCatalog(products) {
         const initialSize = product.sizes[0];
         const starsHTML = generateStarsHTML(product.rating);
 
+        const allImages = [product.baseImg, ...(product.galleryImages || [])].filter(Boolean);
+        const hasMultipleImages = allImages.length > 1;
+
         const sizeButtonsHTML = product.sizes.map((sz, idx) => {
             const isActive = idx === 0;
             const activeClasses = isActive 
@@ -168,17 +172,36 @@ function renderProductCatalog(products) {
             `;
         }).join('');
 
+        const imageAreaHTML = hasMultipleImages ? `
+            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative group/card-img" data-images="${encodeURIComponent(JSON.stringify(allImages))}" data-active-idx="0">
+                <a href="${product.productUrl}" class="block w-full h-full p-2 flex items-center justify-center">
+                    <img src="${allImages[0]}" alt="${product.name}" class="card-active-img max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
+                </a>
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.cycleCardImage(this, -1)" class="absolute left-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] opacity-80 sm:opacity-0 group-hover/card-img:opacity-100 transition hover:bg-black/80 z-20 shadow">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); window.cycleCardImage(this, 1)" class="absolute right-1 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full bg-black/50 text-white flex items-center justify-center text-[10px] opacity-80 sm:opacity-0 group-hover/card-img:opacity-100 transition hover:bg-black/80 z-20 shadow">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <div class="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-1 z-20 bg-black/20 px-1.5 py-0.5 rounded-full backdrop-blur-sm">
+                    ${allImages.map((_, i) => `<span class="img-dot w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-clay' : 'bg-white/60'}"></span>`).join('')}
+                </div>
+            </div>
+        ` : `
+            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative">
+                <a href="${product.productUrl}" class="block w-full h-full p-2 flex items-center justify-center">
+                    <img src="${product.baseImg}" alt="${product.name}" class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
+                </a>
+            </div>
+        `;
+
         return `
         <div data-product-id="${product.id}" class="animate-fade-in relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
             <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 ${product.isBestseller ? 'bg-orange-600' : 'bg-black'} uppercase text-white rounded-full flex items-center justify-center shadow-md">
                 ${product.isBestseller ? 'Hot' : 'New'}
             </span>
           
-            <div class="mx-4 mt-4 rounded-xl flex justify-center h-[170px] items-center overflow-hidden relative">
-                <a href="${product.productUrl}" class="block w-full h-full p-2 flex items-center justify-center">
-                    <img src="${product.baseImg}" alt="${product.name}" class="max-h-full max-w-full object-contain transition-transform duration-300 hover:scale-110">
-                </a>
-            </div>
+            ${imageAreaHTML}
 
             <div class="px-4 flex-1 flex flex-col justify-center gap-1.5">
                 <h3 class="text-base font-robot font-medium text-ink text-center leading-snug capitalize line-clamp-1 product-name">${product.name}</h3>
@@ -598,6 +621,56 @@ document.addEventListener('click', (e) => {
         return;
     }
 });
+
+// ===== Product Card Image Slider Cycle & Mobile Touch Swipe =====
+window.cycleCardImage = function(btnElement, direction) {
+    const container = btnElement.closest('[data-images]');
+    if (!container) return;
+    try {
+        const rawImages = JSON.parse(decodeURIComponent(container.dataset.images || "[]"));
+        if (!rawImages.length) return;
+        let currentIdx = parseInt(container.dataset.activeIdx || "0");
+        currentIdx = (currentIdx + direction + rawImages.length) % rawImages.length;
+        container.dataset.activeIdx = String(currentIdx);
+
+        const imgEl = container.querySelector('.card-active-img');
+        if (imgEl) imgEl.src = rawImages[currentIdx];
+
+        const dots = container.querySelectorAll('.img-dot');
+        dots.forEach((dot, idx) => {
+            if (idx === currentIdx) {
+                dot.className = "img-dot w-1.5 h-1.5 rounded-full bg-clay";
+            } else {
+                dot.className = "img-dot w-1.5 h-1.5 rounded-full bg-white/60";
+            }
+        });
+    } catch (e) {
+        console.error("Image cycle error:", e);
+    }
+};
+
+let touchStartX = 0;
+let touchEndX = 0;
+
+document.addEventListener('touchstart', (e) => {
+    const cardImgBox = e.target.closest('[data-images]');
+    if (cardImgBox) {
+        touchStartX = e.changedTouches[0].screenX;
+    }
+}, { passive: true });
+
+document.addEventListener('touchend', (e) => {
+    const cardImgBox = e.target.closest('[data-images]');
+    if (cardImgBox) {
+        touchEndX = e.changedTouches[0].screenX;
+        const diffX = touchEndX - touchStartX;
+        if (Math.abs(diffX) > 35) {
+            const direction = diffX < 0 ? 1 : -1;
+            const nextBtn = cardImgBox.querySelector(direction === 1 ? 'button:nth-of-type(2)' : 'button:nth-of-type(1)');
+            if (nextBtn) window.cycleCardImage(nextBtn, direction);
+        }
+    }
+}, { passive: true });
 
 // ===== Expose Global Functions for Inline HTML Event Listeners =====
 window.changeCardSize = changeCardSize;

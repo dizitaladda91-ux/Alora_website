@@ -142,9 +142,7 @@ export const updateproduct = async (req, res) => {
     }
 };
 
-// SEO staff can only update content-facing product details.  Keep this separate
-// from the admin update handler so an edited browser request cannot change stock,
-// prices, availability, or any other product setting.
+// SEO staff update handler
 export const updateProductForSeo = async (req, res) => {
     try {
         const { id } = req.params;
@@ -157,23 +155,26 @@ export const updateProductForSeo = async (req, res) => {
         if (req.body.description !== undefined) product.description = req.body.description;
         if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
 
-        // The SEO UI sends only the displayed ML/volume values. Prices and stock
-        // always remain the existing admin-managed values.
         if (req.body.volumes) {
             const volumes = JSON.parse(req.body.volumes);
-            if (!Array.isArray(volumes) || volumes.length !== product.variants.length) {
-                return res.status(400).json({ error: "Invalid product measurements" });
+            if (Array.isArray(volumes) && volumes.length === product.variants.length) {
+                product.variants = product.variants.map((variant, index) => ({
+                    ...variant.toObject(),
+                    volume: String(volumes[index]).trim()
+                }));
             }
-            product.variants = product.variants.map((variant, index) => ({
-                ...variant.toObject(),
-                volume: String(volumes[index]).trim()
-            }));
         }
 
-        const mainImage = req.file;
+        const mainImage = req.files?.imagepath?.[0] || req.file;
+        const galleryImages = req.files?.galleryImages || [];
         if (mainImage) {
             if (product.imagepath) await deleteFromCloudinary(product.imagepath);
             product.imagepath = mainImage.path;
+        }
+
+        if (galleryImages.length > 0) {
+            await Promise.all((product.galleryImages || []).map(deleteFromCloudinary));
+            product.galleryImages = galleryImages.map((file) => file.path);
         }
 
         await product.save();
@@ -208,8 +209,6 @@ export const deleteproduct = async (req, res) => {
 export const getproductbyid = async (req, res) => {
     try {
         const { id } = req.params;
-        // Product pages use the readable slug. ObjectId support is retained
-        // solely for old shared links that still contain ?id=.
         let product = await SimpleProduct.findOne({ slug: id });
         if (!product && /^[a-f\d]{24}$/i.test(id)) {
             product = await SimpleProduct.findById(id);
