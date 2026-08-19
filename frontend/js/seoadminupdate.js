@@ -124,6 +124,12 @@ updateForm.addEventListener('submit', async function(e) {
     formData.append('schema', schemaInput.value.trim());
     formData.append('publisher', publisherInput.value.trim());
 
+    // Cover image size check (Max 3.5 MB for Vercel 4.5MB payload limit)
+    if (coverUpload.files[0] && coverUpload.files[0].size > 3.5 * 1024 * 1024) {
+        alert(`⚠️ Cover image file size is too large (${(coverUpload.files[0].size / (1024 * 1024)).toFixed(2)} MB). Maximum allowed size is 3.5 MB. Please select a smaller or compressed image.`);
+        return;
+    }
+
     if (coverUpload.files[0]) {
         formData.append('coverImage', coverUpload.files[0]);
     } else if (coverUrlInput.value.trim()) {
@@ -141,18 +147,29 @@ updateForm.addEventListener('submit', async function(e) {
             body: formData
         });
 
-        const resData = await response.json();
+        const responseText = await response.text();
+        let resData = {};
+        try {
+            resData = JSON.parse(responseText);
+        } catch (e) {
+            console.warn("Server response was not JSON:", responseText);
+        }
 
-        if (response.ok || resData.success) {
-            alert("🎉 Post successfully update !");
+        if (response.status === 413) {
+            alert("⚠️ Error 413: Cover image or blog content size is too large for the server. Please compress your image (under 3.5 MB) and try again.");
+            return;
+        }
+
+        if (response.ok && resData.success !== false) {
+            alert("🎉 Post successfully updated!");
             window.location.href = "./seoallpost.html";
         } else {
-            alert(`Error: ${resData.message || 'Update failed'}`);
+            alert(`Error: ${resData.message || resData.error || 'Update failed'}`);
         }
 
     } catch (error) {
         console.error("Update Error:", error);
-        alert("Server network error!");
+        alert("Server network error! Please check your image size and connection.");
     } finally {
         submitBtn.innerText = "Update Post";
         submitBtn.disabled = false;

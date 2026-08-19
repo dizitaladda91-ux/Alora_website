@@ -116,6 +116,12 @@ blogForm.addEventListener('submit', async function(event) {
     formData.append('schema', schema);
     formData.append('publisher', publisher);
 
+    // Cover image size check (Max 3.5 MB for Vercel 4.5MB payload limit)
+    if (coverFile && coverFile.size > 3.5 * 1024 * 1024) {
+        alert(`⚠️ Cover image file size is too large (${(coverFile.size / (1024 * 1024)).toFixed(2)} MB). Maximum allowed size is 3.5 MB. Please select a smaller or compressed image.`);
+        return;
+    }
+
     // Agar image select kari hai toh file bhejo, warna URL fallback karo
     if (coverFile) {
         formData.append('coverImage', coverFile);
@@ -136,18 +142,29 @@ blogForm.addEventListener('submit', async function(event) {
             body: formData 
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        let data = {};
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            console.warn("Server response was not JSON:", responseText);
+        }
 
-        if (response.ok || data.success) {
+        if (response.status === 413) {
+            alert("⚠️ Error 413: Cover image or blog content size is too large for the server. Please compress your image (under 3.5 MB) and try again.");
+            return;
+        }
+
+        if (response.ok && data.success !== false) {
             alert("🎉 Awesome! Your blog has been successfully published to the backend.");
             window.location.href = "./seoallpost.html";
         } else {
-            alert(`Error: ${data.message || 'Something went wrong while saving the post.'}`);
+            alert(`Error: ${data.message || data.error || 'Something went wrong while saving the post.'}`);
         }
 
     } catch (error) {
         console.error("API Integration Failure:", error);
-        alert("Server network disconnected or the backend has crashed. Please check again!");
+        alert("Server network disconnected or request failed. Please check your image size and network connection.");
     } finally {
         // Resetting default button state
         submitBtn.innerText = "Publish Post";

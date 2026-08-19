@@ -212,14 +212,27 @@ app.use("/api/affiliates", affiliateRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 
+app.get('/favicon.ico', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'static', 'favicon.ico'));
+});
+
 // Global error handler: Ensures all API errors respond with structured JSON
 app.use((err, req, res, next) => {
   console.error("Express Error Handler:", err);
   if (res.headersSent) {
     return next(err);
   }
+
+  if (err.code === 'LIMIT_FILE_SIZE' || err.code === 'LIMIT_FIELD_VALUE' || err.status === 413 || err.statusCode === 413) {
+    return res.status(400).json({
+      success: false,
+      message: 'Cover image or blog content size is too large. Please upload an image file under 3.5 MB.'
+    });
+  }
+
   res.status(err.status || 500).json({
     success: false,
+    message: err.message || "A server error occurred",
     error: err.message || "A server error occurred"
   });
 });
