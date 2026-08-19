@@ -17,22 +17,61 @@ const quill = new Quill('#editor-container', {
     theme: 'snow'
 });
 
+// Client-side Image Compressor Helper
+function compressImageFile(file, maxWidth = 1920, quality = 0.82) {
+    return new Promise((resolve) => {
+        if (!file || file.size <= 800 * 1024) {
+            return resolve(file);
+        }
+
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = (event) => {
+            const img = new Image();
+            img.src = event.target.result;
+            img.onload = () => {
+                let width = img.width;
+                let height = img.height;
+
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0, width, height);
+
+                canvas.toBlob((blob) => {
+                    if (!blob) return resolve(file);
+                    const compressedFile = new File([blob], file.name.replace(/\.[^/.]+$/, ".jpg"), {
+                        type: 'image/jpeg',
+                        lastModified: Date.now()
+                    });
+                    console.log(`Image compressed from ${(file.size / (1024 * 1024)).toFixed(2)} MB to ${(compressedFile.size / 1024).toFixed(0)} KB`);
+                    resolve(compressedFile);
+                }, 'image/jpeg', quality);
+            };
+            img.onerror = () => resolve(file);
+        };
+        reader.onerror = () => resolve(file);
+    });
+}
+
 // Custom Cloudinary Image Uploader for Quill Editor
 async function uploadImageFile(file) {
     if (!file) return;
-
-    if (file.size > 3.5 * 1024 * 1024) {
-        alert("⚠️ Image file is too large! Maximum allowed size for editor images is 3.5 MB.");
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('image', file);
 
     const range = quill.getSelection(true) || { index: quill.getLength() };
     quill.insertText(range.index, '⏳ Uploading image...', 'user');
 
     try {
+        const compressedFile = await compressImageFile(file);
+        const formData = new FormData();
+        formData.append('image', compressedFile);
+
         const response = await fetch(`${BASE_URL}/api/blogs/upload-image`, {
             method: 'POST',
             headers: getAuthHeaders(),
@@ -40,7 +79,12 @@ async function uploadImageFile(file) {
             body: formData
         });
 
-        const data = await response.json();
+        const responseText = await response.text();
+        let data = {};
+        if (responseText) {
+            try { data = JSON.parse(responseText); } catch (e) { data = { message: responseText.slice(0, 150) }; }
+        }
+
         quill.deleteText(range.index, '⏳ Uploading image...'.length);
 
         if (response.ok && data.success && (data.url || data.imageUrl)) {
@@ -170,41 +214,43 @@ blogForm.addEventListener('submit', async function(event) {
         }
     }
 
-    // Backend payload design using FormData
-    const formData = new FormData();
-    formData.append('title', title);
-    formData.append('slug', slug);
-    formData.append('content', content);
-    formData.append('metaTitle', metaTitle);
-    formData.append('keywords', keywords);
-    formData.append('category', category);
-    formData.append('metaDesc', metaDesc);
-    formData.append('schema', schema);
-    formData.append('publisher', publisher);
-
     // Check if Base64 images are pasted directly into Quill editor
     if (content.includes('data:image/') && content.length > 1024 * 1024) {
-        alert("⚠️ Warning: You have pasted large raw image(s) directly into the text editor. Pasted images increase post size beyond server limits.\n\nPlease upload images to Cloudinary / an image host or use the Image URL tool instead.");
+        alert("⚠️ Warning: You have pasted large raw image(s) directly into the text editor. Pasted images increase post size beyond server limits.\n\nPlease upload images using the Toolbar Image Button 🖼️.");
         return;
-    }
-
-    // Cover image size check (Max 3.5 MB for Vercel 4.5MB payload limit)
-    if (coverFile && coverFile.size > 3.5 * 1024 * 1024) {
-        alert(`⚠️ Cover image file size is too large (${(coverFile.size / (1024 * 1024)).toFixed(2)} MB). Maximum allowed size is 3.5 MB. Please select a smaller or compressed image.`);
-        return;
-    }
-
-    // Agar image select kari hai toh file bhejo, warna URL fallback karo
-    if (coverFile) {
-        formData.append('coverImage', coverFile);
-    } else if (coverUrl) {
-        formData.append('coverImageUrl', coverUrl);
     }
 
     try {
         // UI handling: Button processing state
         submitBtn.innerText = "Publishing...";
         submitBtn.disabled = true;
+
+        // Auto-compress cover image if present
+        let finalCoverFile = coverFile;
+        if (coverFile) {
+            submitBtn.innerText = "Optimizing Cover Image...";
+            finalCoverFile = await compressImageFile(coverFile);
+        }
+
+        // Backend payload design using FormData
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('slug', slug);
+        formData.append('content', content);
+        formData.append('metaTitle', metaTitle);
+        formData.append('keywords', keywords);
+        formData.append('category', category);
+        formData.append('metaDesc', metaDesc);
+        formData.append('schema', schema);
+        formData.append('publisher', publisher);
+
+        if (finalCoverFile) {
+            formData.append('coverImage', finalCoverFile);
+        } else if (coverUrl) {
+            formData.append('coverImageUrl', coverUrl);
+        }
+
+        submitBtn.innerText = "Publishing Post...";
 
         // Fetch command mapping to your backend server architecture
         const response = await fetch(`${BASE_URL}/api/blogs/create`, {
@@ -216,10 +262,12 @@ blogForm.addEventListener('submit', async function(event) {
 
         const responseText = await response.text();
         let data = {};
-        try {
-            data = JSON.parse(responseText);
-        } catch (e) {
-            console.warn("Server response was not JSON:", responseText);
+        if (responseText) {
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                data = { message: responseText.slice(0, 200) };
+            }
         }
 
         if (response.status === 401 || response.status === 403) {
@@ -229,7 +277,7 @@ blogForm.addEventListener('submit', async function(event) {
         }
 
         if (response.status === 413) {
-            alert("⚠️ Error 413: Cover image or blog content size is too large for the server. Please compress your image (under 3.5 MB) and try again.");
+            alert("⚠️ Error 413: Cover image or blog content size is too large for the server. Please select a smaller cover image and try again.");
             return;
         }
 
@@ -242,7 +290,7 @@ blogForm.addEventListener('submit', async function(event) {
 
     } catch (error) {
         console.error("API Integration Failure:", error);
-        alert(`⚠️ Upload / Network Notice: ${error.message || 'Connection interrupted'}.\n\nPlease ensure:\n1. Cover image size is under 3.5 MB.\n2. No raw heavy images are pasted directly in text editor.\n3. Admin session is logged in.`);
+        alert(`⚠️ Upload / Network Notice: ${error.message || 'Connection interrupted'}.\n\nPlease ensure:\n1. Cover image size is under 3.5 MB.\n2. Admin session is logged in.`);
     } finally {
         // Resetting default button state
         submitBtn.innerText = "Publish Post";

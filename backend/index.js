@@ -215,7 +215,11 @@ app.use('/api/reviews', reviewRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 
 app.get('/favicon.ico', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'static', 'favicon.ico'));
+  const target = path.join(frontendRoot, 'static', 'favicon.ico');
+  if (fs.existsSync(target)) {
+    return res.sendFile(target);
+  }
+  return res.status(204).end();
 });
 
 // Global error handler: Ensures all API errors respond with structured JSON
