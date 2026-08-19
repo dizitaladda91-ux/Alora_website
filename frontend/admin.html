@@ -71,8 +71,18 @@
 
                 <!-- ORDERS TABLE -->
                 <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 bg-gray-50 border-b border-gray-200">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
                         <h3 class="font-bold text-gray-700">Recent Payment Slips / Orders</h3>
+                        <select id="statusFilter" class="border rounded-md text-sm p-2 bg-white">
+                            <option value="">All Statuses</option>
+                            <option value="paid">Paid</option>
+                            <option value="processing">Processing</option>
+                            <option value="packed">Packed</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                            <option value="refunded">Refunded</option>
+                        </select>
                     </div>
                     <table class="w-full text-left border-collapse">
                         <thead>
@@ -83,6 +93,7 @@
                                 <th class="p-4">Payment Status</th>
                                 <th class="p-4">Order Status</th>
                                 <th class="p-4">Expected Delivery</th>
+                                <th class="p-4">Tracking</th>
                                 <th class="p-4">Action</th>
                             </tr>
                         </thead>

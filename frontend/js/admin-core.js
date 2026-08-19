@@ -2,6 +2,7 @@ import BASE_URL from "./config.js";
 
 const ORDER_STATUSES = ["paid", "processing", "packed", "shipped", "delivered", "cancelled"];
 let adminOrders = [];
+let activeStatusFilter = "";
 
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
@@ -9,16 +10,17 @@ const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", 
 async function loadOrders() {
     const tableBody = document.getElementById("ordersTableBody");
     if (!tableBody) return;
-    tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
+    tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
 
     try {
-        const response = await fetch(`${BASE_URL}/api/orders?limit=100`, { credentials: "include" });
+        const statusQuery = activeStatusFilter ? `&status=${encodeURIComponent(activeStatusFilter)}` : "";
+        const response = await fetch(`${BASE_URL}/api/orders?limit=100${statusQuery}`, { credentials: "include" });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || "Could not load orders.");
         adminOrders = result.data || [];
 
         if (!adminOrders.length) {
-            tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
             return;
         }
 
@@ -30,25 +32,66 @@ async function loadOrders() {
                 <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
                 <td class="p-4">${order.orderStatus === "refunded" ? `<span class="text-xs font-semibold text-purple-700 uppercase">refunded</span>` : `<select class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateOrderStatus('${order._id}', this.value)">${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.orderStatus ? "selected" : ""}>${status}</option>`).join("")}</select>`}</td>
                 <td class="p-4"><input type="date" value="${order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().slice(0, 10) : ""}" class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateExpectedDelivery('${order._id}', this.value)"></td>
+                <td class="p-4">
+                    <div class="flex flex-col gap-1 w-40">
+                        <input id="track-num-${order._id}" type="text" placeholder="Tracking No." value="${escapeHtml(order.trackingNumber || "")}" class="border rounded-md text-xs p-1.5 bg-white">
+                        <input id="track-link-${order._id}" type="text" placeholder="Courier link (https://...)" value="${escapeHtml(order.courierLink || "")}" class="border rounded-md text-xs p-1.5 bg-white">
+                        <button onclick="window.saveTracking('${order._id}')" class="bg-gray-700 hover:bg-gray-800 text-white text-xs py-1 rounded-md">Save</button>
+                    </div>
+                </td>
                 <td class="p-4 flex gap-2"><button onclick="window.openInvoiceModal('${order._id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs"><i class="fa-solid fa-receipt"></i> Invoice</button>${order.paymentStatus === "paid" ? `<button onclick="window.refundOrder('${order._id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs">Refund</button>` : ""}</td>
             </tr>`).join("");
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
+        tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
+}
+
+// Sends both orderStatus and, if present, tracking fields in one request so a
+// switch to "shipped" can carry the tracking number the backend requires.
+async function patchOrder(orderId, body) {
+    const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
+        method: "PATCH",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+    });
+    const result = await response.json();
+    if (!response.ok || !result.success) throw new Error(result.message || "Update failed.");
+    const index = adminOrders.findIndex((order) => order._id === orderId);
+    if (index >= 0) adminOrders[index] = result.data;
+    return result.data;
 }
 
 window.updateOrderStatus = async (orderId, orderStatus) => {
     try {
-        const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
-            method: "PATCH",
-            credentials: "include",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ orderStatus })
-        });
-        const result = await response.json();
-        if (!response.ok || !result.success) throw new Error(result.message || "Status update failed.");
-        const index = adminOrders.findIndex((order) => order._id === orderId);
-        if (index >= 0) adminOrders[index] = result.data;
+        const body = { orderStatus };
+
+        if (orderStatus === "shipped") {
+            const trackingInput = document.getElementById(`track-num-${orderId}`);
+            let trackingNumber = trackingInput?.value.trim() || "";
+            if (!trackingNumber) {
+                trackingNumber = window.prompt("Enter the tracking number for this shipment:", "")?.trim() || "";
+                if (!trackingNumber) throw new Error("A tracking number is required to mark an order as shipped.");
+            }
+            const courierLink = document.getElementById(`track-link-${orderId}`)?.value.trim() || "";
+            body.trackingNumber = trackingNumber;
+            if (courierLink) body.courierLink = courierLink;
+        }
+
+        await patchOrder(orderId, body);
+    } catch (error) {
+        alert(error.message);
+        loadOrders();
+    }
+};
+
+window.saveTracking = async (orderId) => {
+    try {
+        const trackingNumber = document.getElementById(`track-num-${orderId}`)?.value.trim() || "";
+        const courierLink = document.getElementById(`track-link-${orderId}`)?.value.trim() || "";
+        const order = adminOrders.find((entry) => entry._id === orderId);
+        await patchOrder(orderId, { orderStatus: order?.orderStatus, trackingNumber, courierLink });
+        alert("Tracking details saved.");
     } catch (error) {
         alert(error.message);
         loadOrders();
@@ -124,5 +167,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     document.getElementById("closeInvoiceBtn")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
     document.getElementById("closeInvoiceBtn2")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
+    document.getElementById("statusFilter")?.addEventListener("change", (event) => {
+        activeStatusFilter = event.target.value;
+        loadOrders();
+    });
     loadOrders();
 });

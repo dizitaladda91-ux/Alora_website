@@ -9,7 +9,26 @@ const restoreOrderStock = async (order) => {
 
   await Promise.all(order.items.map((item) => SimpleProduct.updateOne(
     { _id: item.productId, "variants.volume": item.variant },
-    { $inc: { "variants.$.stock": item.quantity } }
+    [
+      {
+        $set: {
+          variants: {
+            $map: {
+              input: "$variants",
+              as: "v",
+              in: {
+                $cond: [
+                  { $eq: ["$$v.volume", item.variant] },
+                  { $mergeObjects: ["$$v", { stock: { $add: ["$$v.stock", item.quantity] } }] },
+                  "$$v"
+                ]
+              }
+            }
+          },
+          isAvailable: true
+        }
+      }
+    ]
   )));
 };
 
@@ -61,7 +80,27 @@ export const updateAdminOrderStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid order status." });
     }
 
-    const order = await Order.findByIdAndUpdate(req.params.id, { orderStatus }, { new: true, runValidators: true }).lean();
+    const update = { orderStatus };
+
+    // Tracking fields are optional on every status update, but required in practice
+    // once an order moves to "shipped" — enforced here rather than at the schema
+    // level so earlier statuses (paid/processing/packed) can still save without them.
+    const trackingNumberProvided = Object.prototype.hasOwnProperty.call(req.body, "trackingNumber");
+    const courierLinkProvided = Object.prototype.hasOwnProperty.call(req.body, "courierLink");
+    const trackingNumber = trackingNumberProvided ? String(req.body.trackingNumber || "").trim().slice(0, 100) : undefined;
+    const courierLink = courierLinkProvided ? String(req.body.courierLink || "").trim().slice(0, 500) : undefined;
+
+    if (courierLink && !/^https?:\/\//i.test(courierLink)) {
+      return res.status(400).json({ success: false, message: "Courier tracking link must be a valid URL." });
+    }
+    if (orderStatus === "shipped" && !trackingNumber && trackingNumberProvided === false) {
+      return res.status(400).json({ success: false, message: "A tracking number is required to mark an order as shipped." });
+    }
+
+    if (trackingNumber !== undefined) update.trackingNumber = trackingNumber;
+    if (courierLink !== undefined) update.courierLink = courierLink;
+
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
     return res.status(200).json({ success: true, data: order, message: "Order status updated." });
   } catch {
