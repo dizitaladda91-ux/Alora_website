@@ -11,6 +11,24 @@ function sanitizeDuplicateTitleHeading(title = '', content = '') {
     return stripBodyH1Tags(String(content));
 }
 
+// Upload inline image for Quill rich text editor
+export const uploadInlineImage = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ success: false, message: "No image file uploaded." });
+        }
+        return res.status(200).json({
+            success: true,
+            url: req.file.path,
+            imageUrl: req.file.path,
+            message: "Inline image uploaded successfully!"
+        });
+    } catch (error) {
+        console.error("Inline image upload error:", error);
+        return res.status(500).json({ success: false, message: error.message });
+    }
+};
+
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
     try {
