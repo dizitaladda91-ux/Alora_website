@@ -1,0 +1,114 @@
+<!-- ALORA AI CHATBOT WIDGET -->
+<div id="alora-chatbot-wrapper" class="fixed bottom-5 right-5 z-[9999] font-sans antialiased">
+    
+    <!-- Floating Trigger Button -->
+    <button id="alora-chat-trigger" 
+            onclick="window.toggleAloraChat()"
+            class="relative flex items-center justify-center w-14 h-14 bg-gradient-to-r from-[#8B4513] to-[#A0522D] text-white rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-300 group focus:outline-none border-2 border-amber-300/40">
+        <span class="sr-only">Toggle Chat</span>
+        
+        <!-- Closed Icon (Chat Bubble) -->
+        <div id="alora-chat-icon-open" class="flex items-center justify-center text-2xl transition-transform duration-300 group-hover:rotate-6">
+            <i class="fas font-solid fa-[#comments] fa-comments"></i>
+        </div>
+
+        <!-- Open Icon (Close X) -->
+        <div id="alora-chat-icon-close" class="hidden flex items-center justify-center text-xl">
+            <i class="fas fa-times"></i>
+        </div>
+
+        <!-- Notification Pulse Indicator -->
+        <span id="alora-chat-badge" class="absolute -top-1 -right-1 flex h-4 w-4">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-4 w-4 bg-amber-500 border-2 border-white"></span>
+        </span>
+    </button>
+
+    <!-- Floating Chat Modal Window -->
+    <div id="alora-chat-modal"
+         class="hidden fixed bottom-24 right-5 w-[calc(100vw-2.5rem)] sm:w-[390px] h-[580px] max-h-[calc(100vh-8rem)] bg-white rounded-2xl shadow-2xl border border-amber-900/10 flex-col overflow-hidden transition-all duration-300 transform scale-95 opacity-0 origin-bottom-right">
+        
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-[#8B4513] via-[#9A5223] to-[#70360D] text-white p-4 flex items-center justify-between shadow-md">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <div class="w-10 h-10 rounded-full bg-amber-100/20 border border-white/30 flex items-center justify-center text-lg text-amber-200">
+                        ✨
+                    </div>
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-400 border-2 border-[#8B4513] rounded-full"></span>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm tracking-wide text-amber-50 flex items-center gap-1.5">
+                        Alora AI Assistant
+                        <span class="text-[10px] bg-amber-200/20 text-amber-100 font-normal px-1.5 py-0.5 rounded border border-amber-200/30">AI</span>
+                    </h3>
+                    <p class="text-[11px] text-amber-200/80 font-light">Online • Always ready to help</p>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-2 text-amber-200">
+                <button onclick="window.clearAloraChat()" class="hover:text-white transition-colors p-1.5 text-xs rounded hover:bg-white/10" title="Clear Chat History">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+                <button onclick="window.toggleAloraChat()" class="hover:text-white transition-colors p-1.5 text-sm rounded hover:bg-white/10" title="Close Chat">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Body Messages -->
+        <div id="alora-chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3.5 bg-amber-50/30 text-slate-800 text-sm scroll-smooth">
+            
+            <!-- Welcome Message -->
+            <div class="flex items-start space-x-2.5">
+                <div class="w-7 h-7 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
+                    ✨
+                </div>
+                <div class="bg-white border border-amber-900/10 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] space-y-2">
+                    <p class="text-slate-700 leading-relaxed">
+                        Namaste! 🙏 Welcome to **Alora Radiance**.
+                    </p>
+                    <p class="text-slate-600 text-xs leading-relaxed">
+                        I am your skincare & order assistant. How can I help you today?
+                    </p>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Quick Suggestions Chips -->
+        <div id="alora-quick-suggestions" class="px-3 py-2 bg-amber-100/40 border-t border-amber-200/40 flex items-center gap-1.5 overflow-x-auto scrollbar-none text-xs">
+            <button onclick="window.sendAloraQuickQuery('Show me top products')" 
+                    class="whitespace-nowrap px-2.5 py-1 bg-white border border-amber-800/20 text-[#8B4513] font-medium rounded-full hover:bg-[#8B4513] hover:text-white transition-all shadow-xs flex items-center gap-1">
+                🛍️ Top Products
+            </button>
+            <button onclick="window.sendAloraQuickQuery('Track my order')" 
+                    class="whitespace-nowrap px-2.5 py-1 bg-white border border-amber-800/20 text-[#8B4513] font-medium rounded-full hover:bg-[#8B4513] hover:text-white transition-all shadow-xs flex items-center gap-1">
+                📦 Track Order
+            </button>
+            <button onclick="window.sendAloraQuickQuery('Shipping & Delivery')" 
+                    class="whitespace-nowrap px-2.5 py-1 bg-white border border-amber-800/20 text-[#8B4513] font-medium rounded-full hover:bg-[#8B4513] hover:text-white transition-all shadow-xs flex items-center gap-1">
+                🚚 Delivery Info
+            </button>
+            <button onclick="window.sendAloraQuickQuery('Return policy')" 
+                    class="whitespace-nowrap px-2.5 py-1 bg-white border border-amber-800/20 text-[#8B4513] font-medium rounded-full hover:bg-[#8B4513] hover:text-white transition-all shadow-xs flex items-center gap-1">
+                🔄 Returns
+            </button>
+        </div>
+
+        <!-- Footer Input Form -->
+        <form id="alora-chat-form" onsubmit="window.handleAloraChatSubmit(event)" class="p-3 bg-white border-t border-amber-900/10 flex items-center space-x-2">
+            <input type="text" 
+                   id="alora-chat-input" 
+                   placeholder="Type your question..." 
+                   autocomplete="off"
+                   class="flex-1 bg-slate-100 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-full px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-[#8B4513] focus:border-transparent transition-all placeholder:text-slate-400">
+            <button type="submit" 
+                    id="alora-chat-send-btn"
+                    class="w-10 h-10 bg-[#8B4513] hover:bg-[#70360D] text-white rounded-full flex items-center justify-center text-sm transition-all focus:outline-none shadow-md disabled:opacity-50">
+                <i class="fas fa-paper-plane"></i>
+            </button>
+        </form>
+
+    </div>
+</div>

@@ -13,6 +13,7 @@ import blogRoutes from "./routes/blog.routes.js";
 import reviewRoutes from "./routes/review.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";
+import chatbotRoutes from "./routes/chatbot.routes.js";
 import dns from "dns";
 import fs from "fs";
 import path from "path";
@@ -211,6 +212,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/affiliates", affiliateRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/chatbot', chatbotRoutes);
 
 app.get('/favicon.ico', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'static', 'favicon.ico'));

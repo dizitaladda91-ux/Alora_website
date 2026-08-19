@@ -90,10 +90,25 @@ async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
     const footerUrl = isFile ? "./footer.html" : "/footer.html";
+    const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
+    const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
+
     await Promise.all([
         loadPartial("#navbar-placeholder", navUrl),
         loadPartial("#footer-placeholder", footerUrl),
     ]);
+
+    // Load Chatbot partial markup
+    await loadPartial("#chatbot-placeholder", chatbotUrl);
+
+    // Inject chatbot.js
+    if (!document.getElementById("alora-chatbot-js")) {
+        const script = document.createElement("script");
+        script.id = "alora-chatbot-js";
+        script.src = chatbotJsUrl;
+        document.body.appendChild(script);
+    }
+
     document.dispatchEvent(new Event("partialsLoaded"));
 }
 
