@@ -224,18 +224,18 @@
 <div id="navbar-placeholder"></div>
 
 
-<div class="flex w-full overflow-hidden relative group h-[220px] sm:h-[320px] md:h-[420px] lg:h-[500px] xl:h-[550px]">
+<div class="flex w-full overflow-hidden relative group aspect-[1200/525] max-h-[80vh] bg-[#F7F2E7]">
     
     <!-- Prev Button -->
     <button id="prev-btn" aria-label="Previous Slide" 
-        class="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-70 group-hover:opacity-100 active:scale-95">
-        <i class="fa-solid fa-angle-left text-sm md:text-lg"></i>
+        class="absolute left-1 sm:left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
+        <i class="fa-solid fa-angle-left text-xs sm:text-sm md:text-base"></i>
     </button>
     
     <!-- Next Button -->
     <button id="next-btn" aria-label="Next Slide" 
-        class="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white text-gray-800 w-8 h-8 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-md transition-all opacity-70 group-hover:opacity-100 active:scale-95">
-        <i class="fa-solid fa-angle-right text-sm md:text-lg"></i>
+        class="absolute right-1 sm:right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
+        <i class="fa-solid fa-angle-right text-xs sm:text-sm md:text-base"></i>
     </button>
     
     <!-- Slider Track -->
@@ -243,32 +243,32 @@
 
     <!-- 1st Image (Hero Banner): ISPE LAZY LOADING NAHI LAGANI (loading="eager" + fetchpriority="high") -->
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora6.webp" alt="Banner Image" width="1200" height="525" fetchpriority="high" loading="eager" class="w-full h-full object-cover object-center">
+        <img src="./static/alora6.webp" alt="Banner Image" width="1200" height="525" fetchpriority="high" loading="eager" class="w-full h-full object-contain object-center">
     </a>
 
     <!-- Remaining Images: IN SAB PAR LAZY LOADING LAGANI HAI (loading="lazy") -->
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/Radiance Begins Here.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/Radiance Begins Here.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
     
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora2.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/alora2.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
 
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora3.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/alora3.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
 
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora4.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/alora4.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
 
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora5.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/alora5.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
 
     <a href="/products" class="w-full shrink-0 block h-full">
-        <img src="./static/alora1.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-cover object-center">
+        <img src="./static/alora1.webp" alt="Banner Image" width="1200" height="525" loading="lazy" class="w-full h-full object-contain object-center">
     </a>
 
 </div>
