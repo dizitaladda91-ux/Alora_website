@@ -69,8 +69,47 @@
         </div>
 
         <!-- Dynamic Results Container -->
-        <div id="tracking-result-container" class="hidden">
-            <!-- Order tracking card injected here by trackorder.js -->
+        <div id="tracking-result-container">
+            <div class="bg-white rounded-3xl p-8 border border-[#ECE4CE] shadow-sm text-center space-y-6">
+                <div class="w-16 h-16 rounded-2xl bg-parchment text-clay flex items-center justify-center text-2xl mx-auto shadow-inner border border-[#E3DAC6]">
+                    <i class="fa-solid fa-truck-fast"></i>
+                </div>
+                <div>
+                    <h3 class="font-serif font-bold text-ink text-xl">How Order Tracking Works</h3>
+                    <p class="text-xs text-ash max-w-md mx-auto mt-1 leading-relaxed">
+                        Enter your Order ID, Razorpay Payment ID, or registered 10-digit Phone Number in the search box above to fetch live shipment updates.
+                    </p>
+                </div>
+
+                <!-- 4-Step Stepper Visual Preview -->
+                <div class="py-4 border-t border-b border-[#ECE4CE]">
+                    <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-ash mb-5">Order Progress Steps</p>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center max-w-xl mx-auto">
+                        <div class="bg-parchment/60 p-3 rounded-xl border border-[#E7DFC7]">
+                            <i class="fa-solid fa-check text-sage text-lg mb-1 block"></i>
+                            <span class="text-xs font-bold text-ink">1. Order Placed</span>
+                        </div>
+                        <div class="bg-parchment/60 p-3 rounded-xl border border-[#E7DFC7]">
+                            <i class="fa-solid fa-box text-sage text-lg mb-1 block"></i>
+                            <span class="text-xs font-bold text-ink">2. Packed</span>
+                        </div>
+                        <div class="bg-parchment/60 p-3 rounded-xl border border-[#E7DFC7]">
+                            <i class="fa-solid fa-truck-fast text-sage text-lg mb-1 block"></i>
+                            <span class="text-xs font-bold text-ink">3. Out for Delivery</span>
+                        </div>
+                        <div class="bg-parchment/60 p-3 rounded-xl border border-[#E7DFC7]">
+                            <i class="fa-solid fa-house-chimney-check text-sage text-lg mb-1 block"></i>
+                            <span class="text-xs font-bold text-ink">4. Delivered</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2">
+                    <a href="/account" class="inline-flex items-center gap-2 text-xs font-bold text-clay hover:text-clay-dark underline">
+                        <i class="fa-solid fa-user text-xs"></i> Logged in? View full Order History in My Account &rarr;
+                    </a>
+                </div>
+            </div>
         </div>
 
     </main>

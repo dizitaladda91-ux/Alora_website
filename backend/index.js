@@ -167,6 +167,10 @@ app.get('/track-order', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'trackorder.html'));
 });
 
+app.get(['/affiliate', '/affiliate-register'], (req, res) => {
+  res.redirect(301, 'https://affiliation.aloraradiance.com/register');
+});
+
 // Serve post detail HTML at clean slug route: /post/:slug
 app.get('/post/:slug', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));

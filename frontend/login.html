@@ -27,7 +27,12 @@
         </div>
         <div>
           <label class="block text-gray-600 text-sm font-medium">Password</label>
-          <input type="password" id="password" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+          <div class="relative mt-1">
+            <input type="password" id="password" required class="w-full p-2.5 pr-10 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+            <button type="button" onclick="togglePasswordVisibility('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-sm p-1 focus:outline-none" aria-label="Toggle password view">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
         </div>
         <div class="text-right">
           <!-- FIX 1: Added onclick -->

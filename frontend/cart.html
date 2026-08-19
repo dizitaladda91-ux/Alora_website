@@ -143,9 +143,19 @@
                         <div id="checkout-account-fields" class="pt-2 border-t border-[#ECE4CE]">
                             <p class="text-[11px] font-bold text-clay uppercase tracking-wide mb-2">Create your account to continue</p>
                             <label class="block text-[11px] font-semibold text-ash uppercase mb-1">Create Password</label>
-                            <input type="password" id="custPassword" minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password" class="w-full px-3 py-2 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
+                            <div class="relative mb-2">
+                                <input type="password" id="custPassword" minlength="6" placeholder="Minimum 6 characters" autocomplete="new-password" class="w-full px-3 py-2 pr-9 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
+                                <button type="button" onclick="togglePasswordVisibility('custPassword', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs p-1 focus:outline-none" aria-label="Toggle password view">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                             <label class="block text-[11px] font-semibold text-ash uppercase mb-1">Confirm Password</label>
-                            <input type="password" id="custConfirmPassword" minlength="6" placeholder="Re-enter password" autocomplete="new-password" class="w-full px-3 py-2 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
+                            <div class="relative mb-2">
+                                <input type="password" id="custConfirmPassword" minlength="6" placeholder="Re-enter password" autocomplete="new-password" class="w-full px-3 py-2 pr-9 border border-[#DCD3BA] rounded-xl text-xs font-semibold text-ink focus:outline-none focus:border-clay" required>
+                                <button type="button" onclick="togglePasswordVisibility('custConfirmPassword', this)" class="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-xs p-1 focus:outline-none" aria-label="Toggle password view">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                             <p class="mt-1 text-[10px] text-ash">Already have an account? <a class="text-clay font-semibold underline" href="./login.html">Log in</a> first.</p>
                         </div>
                         <p id="checkout-signed-in-note" class="hidden pt-2 text-xs font-semibold text-sage">You are signed in. Your saved mobile number, email and delivery address have been filled in.</p>
