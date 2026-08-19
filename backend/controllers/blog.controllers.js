@@ -1,34 +1,23 @@
 import Blog from '../models/blog.models.js';
-import fs from 'fs';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
-
-function normalizeTitleText(value = '') {
-    return String(value).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
-}
 
 function stripBodyH1Tags(content = '') {
     if (!content) return content;
-
     return String(content).replace(/<h1\b[^>]*>.*?<\/h1>/gis, '');
 }
 
 function sanitizeDuplicateTitleHeading(title = '', content = '') {
     if (!title || !content) return content;
-
-    const normalizedContent = String(content);
-    const withoutH1 = stripBodyH1Tags(normalizedContent);
-    return withoutH1;
+    return stripBodyH1Tags(String(content));
 }
 
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
     try {
-        console.log("=== RECEIVED BODY ===", req.body);
-
-        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl } = req.body;
+        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
 
         if (!title || !slug || !content || !category) {
-            return res.status(400).json({ success: false, message: "Required fields are missing." });
+            return res.status(400).json({ success: false, message: "Title, slug, content, and category are mandatory fields." });
         }
 
         // Slug Formatting
@@ -40,23 +29,19 @@ export const createBlogPost = async (req, res) => {
             return res.status(400).json({ success: false, message: "A post with this slug already exists." });
         }
 
-        let finalCover = coverUrl || "";
-        if (req.file) {
-            finalCover = req.file.path; // Cloudinary URL
-        }
-
+        let finalCover = (req.file ? req.file.path : (coverUrl || coverImageUrl || "")).trim();
         const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
 
         const newBlog = new Blog({
-            title,
+            title: title.trim(),
             slug: formattedSlug,
             content: sanitizedContent,
-            metaTitle,
-            keywords,     
-            category,
-            metaDesc,
-            schema,       
-            publisher,    
+            metaTitle: (metaTitle || "").trim(),
+            keywords: (keywords || "").trim(),     
+            category: (category || "").trim(),
+            metaDesc: (metaDesc || "").trim(),
+            schema: (schema || "").trim(),       
+            publisher: (publisher || "").trim(),    
             coverImage: finalCover
         });
 
@@ -73,12 +58,11 @@ export const createBlogPost = async (req, res) => {
     }
 };
 
-// 2. Fetch All Blog Cards (FIXED RESPONSE FORMAT)
+// 2. Fetch All Blog Cards
 export const getAllBlogs = async (req, res) => {
     try {
         const blogs = await Blog.find().sort({ createdAt: -1 });
         
-        // Response me `blogs` aur `data` dono bhej rahe hain taaki frontend parsing fail na ho
         return res.status(200).json({ 
             success: true, 
             count: blogs.length,
@@ -95,7 +79,6 @@ export const getBlogBySlug = async (req, res) => {
     try {
         const param = req.params.slug;
         
-        // Check if param is ID or Slug
         let blog;
         if (param.match(/^[0-9a-fA-F]{24}$/)) {
             blog = await Blog.findById(param);
@@ -111,17 +94,31 @@ export const getBlogBySlug = async (req, res) => {
     }
 };
 
-// 4. Update Blog (EDIT FUNCTIONALITY)
+// 4. Update Blog
 export const updateBlogPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl } = req.body;
+        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
 
         const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
-        let updateData = { title, content: sanitizedContent, metaTitle, keywords, category, metaDesc, schema, publisher };
+        let updateData = { 
+            title: title ? title.trim() : undefined, 
+            content: sanitizedContent, 
+            metaTitle: metaTitle ? metaTitle.trim() : undefined, 
+            keywords: keywords ? keywords.trim() : undefined, 
+            category: category ? category.trim() : undefined, 
+            metaDesc: metaDesc ? metaDesc.trim() : undefined, 
+            schema: schema ? schema.trim() : undefined, 
+            publisher: publisher ? publisher.trim() : undefined 
+        };
 
         if (slug) {
-            updateData.slug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+            const formattedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+            const existing = await Blog.findOne({ slug: formattedSlug, _id: { $ne: id } });
+            if (existing) {
+                return res.status(400).json({ success: false, message: "Another post with this slug already exists." });
+            }
+            updateData.slug = formattedSlug;
         }
 
         if (req.file) {
@@ -129,9 +126,9 @@ export const updateBlogPost = async (req, res) => {
             if (oldBlog && oldBlog.coverImage) {
                 await deleteFromCloudinary(oldBlog.coverImage);
             }
-            updateData.coverImage = req.file.path; // Cloudinary URL
-        } else if (coverUrl) {
-            updateData.coverImage = coverUrl;
+            updateData.coverImage = req.file.path;
+        } else if (coverUrl || coverImageUrl) {
+            updateData.coverImage = (coverUrl || coverImageUrl).trim();
         }
 
         const updatedBlog = await Blog.findByIdAndUpdate(id, updateData, { new: true });
@@ -140,14 +137,14 @@ export const updateBlogPost = async (req, res) => {
             return res.status(404).json({ success: false, message: "Blog not found to update." });
         }
 
-        return res.status(200).json({ success: true, message: "Blog updated successfully!", data: updatedBlog });
+        return res.status(200).json({ success: true, message: "Blog updated successfully!", data: updatedBlog, blog: updatedBlog });
 
     } catch (error) {
         return res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// 5. Delete Blog Post (DELETE FUNCTIONALITY)
+// 5. Delete Blog Post
 export const deleteBlogPost = async (req, res) => {
     try {
         const { id } = req.params;

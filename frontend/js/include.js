@@ -17,6 +17,62 @@ window.togglePasswordVisibility = function(inputId, btn) {
     }
 };
 
+window.appendSchemaTemplate = function(type) {
+    const textarea = document.getElementById('schema');
+    if (!textarea) return;
+
+    const templates = {
+        article: {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "Blog Title Here",
+            "description": "Short summary of the blog post.",
+            "author": { "@type": "Organization", "name": "Alora Radiance" }
+        },
+        faq: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What are the benefits of this product?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Detailed answer explaining the benefits." }
+                }
+            ]
+        },
+        howto: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to apply product effectively",
+            "step": [
+                { "@type": "HowToStep", "text": "Cleanse face gently with lukewarm water." },
+                { "@type": "HowToStep", "text": "Apply 3 drops of serum and massage evenly." }
+            ]
+        }
+    };
+
+    const newObj = templates[type] || templates.article;
+    const currentVal = textarea.value.trim();
+
+    if (!currentVal) {
+        textarea.value = JSON.stringify([newObj], null, 2);
+    } else {
+        try {
+            let parsed = JSON.parse(currentVal);
+            if (Array.isArray(parsed)) {
+                parsed.push(newObj);
+            } else if (typeof parsed === 'object' && parsed !== null) {
+                parsed = [parsed, newObj];
+            } else {
+                parsed = [newObj];
+            }
+            textarea.value = JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            textarea.value = JSON.stringify([newObj], null, 2);
+        }
+    }
+};
+
 async function loadPartial(selector, url) {
     const el = document.querySelector(selector);
     if (!el) return; // us page par placeholder hi nahi hai to skip
