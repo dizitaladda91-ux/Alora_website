@@ -159,8 +159,8 @@ app.get('/certificates', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'certificates.html'));
 });
 
-app.get('/account', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'account.html'));
+app.get(['/account', '/myorders', '/my-orders'], (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'myorders.html'));
 });
 
 app.get('/track-order', (req, res) => {

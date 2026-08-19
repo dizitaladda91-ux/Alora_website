@@ -65,8 +65,8 @@
       "dest": "/frontend/certificates"
     },
     {
-      "src": "/account/?",
-      "dest": "/frontend/account"
+      "src": "/(account|myorders|my-orders)/?",
+      "dest": "/frontend/myorders"
     },
     {
       "src": "/track-order/?",
