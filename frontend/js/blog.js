@@ -52,27 +52,28 @@ async function renderBlogCards() {
                     : `${BASE_URL}${post.coverImage}`;
 
                 const cardHTML = `
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-200/80 flex flex-col cursor-pointer transition transform hover:-translate-y-1 duration-300" onclick="goToPost('${post.slug}')">
-                                       <div class="w-full overflow-hidden bg-gray-100">
-    <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-auto object-cover">
-</div>
+                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-amber-900/10 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group" onclick="goToPost('${post.slug}')">
+                        <div class="w-full h-52 overflow-hidden bg-slate-100 relative">
+                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        </div>
                         
-                        <div class="p-5 flex flex-col flex-grow justify-between">
+                        <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
                             <div>
-                                <div class="flex items-center space-x-2 mb-2 text-xs tracking-wide">
-                                    <span class="text-ash font-roboto">${formattedDate}</span>
-                                    <span class="text-ash">•</span>
-                                    <span class="bg-sage-light text-sage px-2 py-0.5 rounded text-[11px] font-medium uppercase font-roboto">${post.category}</span>
+                                <div class="flex items-center space-x-2 mb-2.5 text-xs tracking-wide">
+                                    <span class="bg-amber-100/70 text-[#8B4513] px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-roboto border border-amber-300/40">${post.category || 'General'}</span>
+                                    <span class="text-slate-300">•</span>
+                                    <span class="text-slate-500 font-medium">${formattedDate}</span>
                                 </div>
-                                <h3 class="text-base font-bold font-fraunces leading-snug text-ink hover:text-clay transition duration-200 mb-4 line-clamp-2">
+                                <h3 class="text-base sm:text-lg font-bold font-fraunces leading-snug text-slate-900 group-hover:text-[#8B4513] transition-colors duration-200 line-clamp-2">
                                     ${post.title}
                                 </h3>
                             </div>
                             
-                            <div>
-                                <span class="text-clay text-sm font-semibold inline-flex items-center gap-1 hover:underline">
-                                    Continue reading <i class="fa-solid fa-arrow-right text-xs"></i>
+                            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
+                                <span class="text-[#8B4513] text-xs font-bold inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all duration-200">
+                                    Read Article <i class="fa-solid fa-arrow-right text-[10px]"></i>
                                 </span>
+                                <span class="text-[11px] text-slate-400 font-medium">3 min read</span>
                             </div>
                         </div>
                     </div>

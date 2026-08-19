@@ -64,20 +64,114 @@
     </script>
 
     <style>
+        /* Professional Blog Typography & Content Spacing Rules */
+        .post-body-content {
+            font-size: 1.0625rem; /* 17px reading size */
+            line-height: 1.8;
+            color: #2D3748;
+        }
+
+        .post-body-content p {
+            margin-bottom: 1.15rem;
+            color: #374151;
+        }
+
+        /* Automatically collapse empty Quill paragraphs and breaks */
+        .post-body-content p:empty,
+        .post-body-content p:has(> br:only-child) {
+            display: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        .post-body-content h2 {
+            font-size: 1.625rem; /* 26px */
+            font-weight: 700;
+            color: #152219;
+            margin-top: 2rem;
+            margin-bottom: 0.875rem;
+            line-height: 1.35;
+            letter-spacing: -0.01em;
+            padding-bottom: 0.35rem;
+            border-bottom: 1px solid rgba(139, 69, 19, 0.12);
+        }
+
+        .post-body-content h3 {
+            font-size: 1.35rem; /* 21px */
+            font-weight: 600;
+            color: #1F3327;
+            margin-top: 1.75rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .post-body-content h4 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #4A5568;
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-body-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .post-body-content ol {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .post-body-content li {
+            margin-bottom: 0.5rem;
+            color: #374151;
+        }
+
+        .post-body-content blockquote {
+            border-left: 4px solid #8B4513;
+            background-color: rgba(139, 69, 19, 0.04);
+            padding: 1rem 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 0 12px 12px 0;
+            font-style: italic;
+            color: #4A5568;
+        }
+
         .post-body-content img {
             max-width: 100%;
+            max-height: 520px;
             height: auto;
-            border-radius: 12px;
-            margin: 1.5rem auto;
+            border-radius: 16px;
+            margin: 1.75rem auto;
             display: block;
+            object-fit: cover;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
         }
-        .post-body-content p {
-            margin-bottom: 1.25rem;
-            line-height: 1.75;
+
+        .post-body-content a {
+            color: #8B4513;
+            font-weight: 600;
+            text-decoration: underline;
+            text-underline-offset: 3px;
+            transition: color 0.2s;
+        }
+
+        .post-body-content a:hover {
+            color: #70360D;
+        }
+
+        .post-body-content strong, .post-body-content b {
+            color: #152219;
+            font-weight: 700;
         }
     </style>
 </head>
-<body class="bg-parchment font-sans text-ink min-h-screen flex flex-col justify-between">
+<body class="bg-[#FAF7F2] font-sans text-ink min-h-screen flex flex-col justify-between">
 
     <!-- Header Section -->
     <header class="w-full">
@@ -85,37 +179,37 @@
     </header>
 
     <!-- Main Content Section -->
-    <main class="flex-grow max-w-4xl w-full mx-auto px-6 py-12">
+    <main class="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 py-8 md:py-12">
         <!-- Back Button -->
-        <a href="./Blog.html" class="inline-flex items-center gap-2 text-clay font-semibold mb-8 hover:underline">
-            <i class="fa-solid fa-arrow-left"></i> Back to Blogs
+        <a href="./Blog.html" class="inline-flex items-center gap-2 text-[#8B4513] font-semibold mb-6 hover:text-amber-900 transition-colors text-sm">
+            <i class="fa-solid fa-arrow-left text-xs"></i> Back to All Blogs
         </a>
 
-        <!-- Blog Content Area -->
-        <article id="blog-content-area" class="hidden">
-            <div class="mb-6">
-                <div class="flex items-center space-x-3 text-xs tracking-wide mb-3">
-                    <span id="post-date" class="text-ash font-roboto"></span>
-                    <span class="text-ash">•</span>
-                    <span id="post-category" class="bg-emerald-100 text-emerald-800 px-2 py-0.5 rounded text-[11px] font-medium uppercase font-roboto"></span>
+        <!-- Blog Content Container Card -->
+        <article id="blog-content-area" class="hidden bg-white rounded-3xl p-6 sm:p-10 md:p-14 shadow-sm border border-amber-900/10">
+            <div class="mb-8 border-b border-amber-900/10 pb-6">
+                <div class="flex items-center space-x-3 text-xs tracking-wide mb-4">
+                    <span id="post-category" class="bg-amber-100/70 text-[#8B4513] px-3 py-1 rounded-full text-[11px] font-bold uppercase font-roboto border border-amber-300/40"></span>
+                    <span class="text-slate-300">•</span>
+                    <span id="post-date" class="text-slate-500 font-medium"></span>
                 </div>
-                <h1 id="post-title" class="text-3xl md:text-5xl font-fraunces font-bold text-ink leading-tight mb-6"></h1>
+                <h1 id="post-title" class="text-2xl sm:text-4xl md:text-5xl font-fraunces font-bold text-ink leading-tight sm:leading-snug text-slate-900"></h1>
             </div>
 
             <!-- Cover Image -->
-            <div class="w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-sm mb-10 bg-gray-100">
+            <div class="w-full aspect-[16/9] rounded-2xl overflow-hidden shadow-md mb-8 bg-slate-100 border border-amber-900/10">
                 <img id="post-cover" src="" alt="" class="w-full h-full object-cover">
             </div>
 
             <!-- Content Body -->
-            <div id="post-body" class="post-body-content text-base md:text-lg text-ink/90">
+            <div id="post-body" class="post-body-content text-slate-800">
             </div>
         </article>
 
         <!-- Loader -->
-        <div id="post-loader" class="text-center py-20 text-ash">
-            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-clay"></i>
-            <p>Fetching full article details...</p>
+        <div id="post-loader" class="text-center py-24 text-ash">
+            <i class="fa-solid fa-spinner fa-spin text-3xl mb-3 text-[#8B4513]"></i>
+            <p class="text-slate-600 text-sm">Fetching article details...</p>
         </div>
     </main>
 

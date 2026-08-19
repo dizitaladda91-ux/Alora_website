@@ -61,9 +61,20 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contentHtml;
 
+    // Remove redundant h1 tags matching title
     const h1Nodes = tempDiv.querySelectorAll('h1');
     h1Nodes.forEach((headingNode) => {
         headingNode.remove();
+    });
+
+    // Clean up empty paragraphs (<p><br></p> or <p>&nbsp;</p>) that cause huge vertical gaps
+    const pNodes = tempDiv.querySelectorAll('p');
+    pNodes.forEach((p) => {
+        const text = p.innerText ? p.innerText.trim() : '';
+        const html = p.innerHTML.trim().toLowerCase();
+        if (!text && (html === '' || html === '<br>' || html === '&nbsp;')) {
+            p.remove();
+        }
     });
 
     return tempDiv.innerHTML;
