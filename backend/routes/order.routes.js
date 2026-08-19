@@ -1,11 +1,13 @@
 import express from "express";
 import { getAdminOrderById, getAdminOrders, refundAdminOrder, updateAdminOrderStatus, updateExpectedDeliveryDate } from "../controllers/order.controllers.js";
-import { getMyOrders } from "../controllers/customerOrder.controllers.js";
+import { getMyOrders, trackOrder } from "../controllers/customerOrder.controllers.js";
 import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
+router.get("/track/:query", trackOrder);
 router.get("/my", requireAuth, getMyOrders);
+
 router.use(requireAuth, authorizeRoles("admin"));
 router.get("/", getAdminOrders);
 router.get("/:id", getAdminOrderById);

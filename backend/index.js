@@ -159,6 +159,14 @@ app.get('/certificates', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'certificates.html'));
 });
 
+app.get('/account', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'account.html'));
+});
+
+app.get('/track-order', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'trackorder.html'));
+});
+
 // Serve post detail HTML at clean slug route: /post/:slug
 app.get('/post/:slug', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));

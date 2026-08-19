@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Order Tracking | Alora Radiance</title>
+    <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                colors: {
+                    ink: '#152219',
+                    'ink-light': '#1F3327',
+                    parchment: '#F7F2E7',
+                    clay: '#A24C3D',
+                    'clay-dark': '#7E3A2F',
+                    sage: '#6C8763',
+                    gold: '#BB9556',
+                    ash: '#6B685F',
+                },
+                fontFamily: {
+                    serif: ['"Fraunces"', 'Georgia', 'serif'],
+                    sans: ['"Manrope"', 'sans-serif'],
+                }
+            }
+        }
+    }
+    </script>
+</head>
+<body class="bg-parchment text-[#2A2A24] font-sans antialiased min-h-screen flex flex-col justify-between">
+
+    <!-- Header Navigation -->
+    <div id="navbar-placeholder"></div>
+
+    <!-- Hero Section -->
+    <section class="bg-ink text-white py-12 px-4 border-b border-gold/20 relative overflow-hidden">
+        <div class="max-w-4xl mx-auto text-center relative z-10 space-y-3">
+            <span class="inline-block bg-gold/20 text-gold text-xs font-bold uppercase tracking-[0.25em] px-3.5 py-1.5 rounded-full border border-gold/30">
+                <i class="fa-solid fa-location-dot mr-1.5"></i> Real-time Order Tracking
+            </span>
+            <h1 class="text-3xl sm:text-4xl font-serif font-bold text-parchment">
+                Track Your Shipment
+            </h1>
+            <p class="text-parchment/70 text-sm max-w-lg mx-auto font-light">
+                Enter your Order ID, Payment ID, or registered Phone Number to view live shipment status and tracking details.
+            </p>
+        </div>
+    </section>
+
+    <!-- Main Content Area -->
+    <main class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow w-full space-y-8">
+        
+        <!-- Search Input Box -->
+        <div class="bg-white rounded-3xl p-6 sm:p-8 border border-[#ECE4CE] shadow-sm">
+            <form id="track-form" class="flex flex-col sm:flex-row gap-4">
+                <div class="relative flex-1">
+                    <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-ash"></i>
+                    <input type="text" id="track-input" required placeholder="Enter Order ID / Payment ID / Phone Number..." class="w-full pl-11 pr-4 py-3.5 rounded-xl border border-[#DCD3BA] focus:outline-none focus:ring-2 focus:ring-gold text-sm text-ink bg-parchment/30">
+                </div>
+                <button type="submit" id="track-btn" class="bg-clay hover:bg-clay-dark text-white font-semibold text-xs uppercase tracking-wider px-8 py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 shrink-0">
+                    <i class="fa-solid fa-location-arrow"></i> Track Status
+                </button>
+            </form>
+        </div>
+
+        <!-- Dynamic Results Container -->
+        <div id="tracking-result-container" class="hidden">
+            <!-- Order tracking card injected here by trackorder.js -->
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <div id="footer-placeholder"></div>
+
+    <script src="./js/include.js"></script>
+    <script type="module" src="./js/trackorder.js"></script>
+</body>
+</html>

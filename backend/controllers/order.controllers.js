@@ -1,6 +1,7 @@
 import Order from "../models/order.models.js";
 import SimpleProduct from "../models/product.models.js";
 import getRazorpay from "../config/razorpay.js";
+import { sendShippingEmail } from "../services/email.service.js";
 
 const allowedStatuses = ["paid", "processing", "packed", "shipped", "delivered", "cancelled", "refunded"];
 
@@ -80,11 +81,14 @@ export const updateAdminOrderStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid order status." });
     }
 
+    // Fetched before the update so we can detect a genuine transition into
+    // "shipped" — this update endpoint is also called (with the same status)
+    // just to save tracking details, which must NOT re-trigger the email.
+    const previousOrder = await Order.findById(req.params.id).select("orderStatus").lean();
+    if (!previousOrder) return res.status(404).json({ success: false, message: "Order not found." });
+
     const update = { orderStatus };
 
-    // Tracking fields are optional on every status update, but required in practice
-    // once an order moves to "shipped" — enforced here rather than at the schema
-    // level so earlier statuses (paid/processing/packed) can still save without them.
     const trackingNumberProvided = Object.prototype.hasOwnProperty.call(req.body, "trackingNumber");
     const courierLinkProvided = Object.prototype.hasOwnProperty.call(req.body, "courierLink");
     const trackingNumber = trackingNumberProvided ? String(req.body.trackingNumber || "").trim().slice(0, 100) : undefined;
@@ -93,7 +97,10 @@ export const updateAdminOrderStatus = async (req, res) => {
     if (courierLink && !/^https?:\/\//i.test(courierLink)) {
       return res.status(400).json({ success: false, message: "Courier tracking link must be a valid URL." });
     }
-    if (orderStatus === "shipped" && !trackingNumber && trackingNumberProvided === false) {
+    if (orderStatus === "shipped" && trackingNumberProvided === false) {
+      return res.status(400).json({ success: false, message: "A tracking number is required to mark an order as shipped." });
+    }
+    if (orderStatus === "shipped" && trackingNumberProvided && !trackingNumber) {
       return res.status(400).json({ success: false, message: "A tracking number is required to mark an order as shipped." });
     }
 
@@ -102,6 +109,14 @@ export const updateAdminOrderStatus = async (req, res) => {
 
     const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+
+    // Fire the shipping email only on the actual transition into "shipped".
+    // Never awaited into the response — a slow/failed email must not delay
+    // or break the status-update response the admin is waiting on.
+    if (orderStatus === "shipped" && previousOrder.orderStatus !== "shipped") {
+      sendShippingEmail(order).catch((error) => console.error("Shipping email failed:", error.message));
+    }
+
     return res.status(200).json({ success: true, data: order, message: "Order status updated." });
   } catch {
     return res.status(400).json({ success: false, message: "Could not update order status." });

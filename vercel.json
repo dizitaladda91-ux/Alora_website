@@ -65,6 +65,14 @@
       "dest": "/frontend/certificates"
     },
     {
+      "src": "/account/?",
+      "dest": "/frontend/account"
+    },
+    {
+      "src": "/track-order/?",
+      "dest": "/frontend/trackorder"
+    },
+    {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },
