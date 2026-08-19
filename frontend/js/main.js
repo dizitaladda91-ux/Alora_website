@@ -173,11 +173,11 @@ document.addEventListener("DOMContentLoaded", () => {
         container.style.transform = `translateX(-${currentIndex * 100}%)`;
         dots.forEach((dot, index) => {
             if (index === currentIndex) {
-                dot.classList.remove("bg-gray-300");
-                dot.classList.add("bg-gray-800", "scale-110");
+                dot.classList.remove("bg-amber-200", "w-2.5");
+                dot.classList.add("bg-[#8B4513]", "w-8");
             } else {
-                dot.classList.remove("bg-gray-800", "scale-110");
-                dot.classList.add("bg-gray-300");
+                dot.classList.remove("bg-[#8B4513]", "w-8");
+                dot.classList.add("bg-amber-200", "w-2.5");
             }
         });
     }
