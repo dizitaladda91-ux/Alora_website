@@ -1,4 +1,5 @@
 import BASE_URL, { getImageUrl, getProductUrl } from "./config.js";
+import "./toast.js";
 
 // Global variables current selection store karne ke liye
 let currentProductData = null;
@@ -104,7 +105,7 @@ async function loadProductDetails() {
             const gallery = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
             thumbnailsContainer.innerHTML = gallery.map((imagePath, index) => `
                 <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white" onclick="window.selectGalleryImage('${getImageUrl(imagePath, './static/placeholder.png')}')">
-                    <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" class="w-full h-full object-contain p-1">
+                    <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" loading="lazy" class="w-full h-full object-contain p-1">
                 </button>`).join('');
         }
 
@@ -212,9 +213,18 @@ window.selectSize = function(volume, price, comparePrice, stock, buttonElement) 
     if (mrpEl) mrpEl.innerText = comparePrice ? `₹ ${comparePrice}` : '';
 }
 
+// Was previously defined inside the review-submit handler, so gallery
+// thumbnails threw "selectGalleryImage is not a function" until a review had
+// been submitted once. Moved to top-level so it's available as soon as the
+// page loads and the thumbnail buttons are rendered.
+window.selectGalleryImage = function(imageUrl) {
+    const mainImage = document.getElementById('main-product-image');
+    if (mainImage) mainImage.src = imageUrl;
+};
+
 function handleCartButtonClick(btnElement) {
     if (!currentProductData || !currentSelectedVariant) {
-        alert("Please wait for the product to load.");
+        window.showToast("Please wait for the product to load.", "warning");
         return;
     }
 
@@ -222,7 +232,7 @@ function handleCartButtonClick(btnElement) {
     const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
 
     if (!currentProductData.isAvailable || Number(currentSelectedVariant.stock) < quantity) {
-        alert('This selected variant is out of stock or has insufficient quantity.');
+        window.showToast("This selected variant is out of stock or has insufficient quantity.", "error");
         setPurchaseAvailability();
         return;
     }
@@ -334,7 +344,7 @@ function initReviewsFeature() {
             const productId = getProductIdFromURL();
 
             if (ratingValue === 0) {
-                alert('Please select at least 1 star rating before submitting.');
+                window.showToast("Please select at least 1 star rating before submitting.", "warning");
                 return;
             }
 
@@ -343,12 +353,7 @@ function initReviewsFeature() {
                 username: usernameInput.value.trim(),
                 rating: ratingValue,
                 comment: commentInput.value.trim()
-};
-
-window.selectGalleryImage = function(imageUrl) {
-    const mainImage = document.getElementById('main-product-image');
-    if (mainImage) mainImage.src = imageUrl;
-};
+            };
 
             try {
                 const token = getAuthToken();
@@ -364,7 +369,7 @@ window.selectGalleryImage = function(imageUrl) {
                 const result = await response.json();
 
                 if (result.success) {
-                    alert('Review submitted successfully! Thank you.');
+                    window.showToast("Review submitted successfully! Thank you.", "success");
                     
                     // Reset Form states back to base defaults
                     reviewForm.reset();
@@ -377,11 +382,11 @@ window.selectGalleryImage = function(imageUrl) {
                     // Real-time render loop invocation to sync UI immediately
                     fetchAndRenderReviews(productId);
                 } else {
-                    alert(`Failed to save review: ${result.message}`);
+                    window.showToast(`Failed to save review: ${result.message}`, "error");
                 }
             } catch (error) {
                 console.error('Error posting review payload:', error);
-                alert('Backend submission communication failure. Check your server logs.');
+                window.showToast("Backend submission communication failure. Check your server logs.", "error");
             }
         });
     }

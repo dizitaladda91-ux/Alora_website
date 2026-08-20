@@ -599,6 +599,25 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ============================================================
+   LAZY VIDEO PLAYER FACADE (Zero Initial Load Impact)
+   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    const playBtn = document.getElementById('play-routine-video-btn');
+    const containerSlot = document.getElementById('video-container-slot');
+    if (!playBtn || !containerSlot) return;
+
+    playBtn.addEventListener('click', () => {
+        containerSlot.classList.remove('hidden');
+        containerSlot.innerHTML = `
+            <video controls autoplay class="w-full h-full object-contain">
+                <source src="./static/how-to-use.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+    });
+});
+
+/* ============================================================
    GLOBAL SCOPE EXPOSURE FOR COMPATIBILITY
    ============================================================ */
 window.toggleCartState = toggleCartState;

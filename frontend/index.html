@@ -405,8 +405,78 @@
                 </div>
             </div>
 
+    <!-- ============ HOW TO USE SKINCARE ROUTINE VIDEO SECTION ============ -->
+    <section id="how-to-use-section" class="max-w-7xl mx-auto px-4 py-8 sm:py-10">
+        <div class="bg-gradient-to-b from-[#FDFBF7] via-white to-[#FDFBF7] rounded-3xl p-6 sm:p-10 border border-amber-900/15 shadow-xl relative overflow-hidden">
+            
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
+                    🎬 Easy 3-Step Routine
+                </span>
+                <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900">How To Use Alora Radiance</h2>
+                <p class="text-xs sm:text-sm text-slate-600 mt-2 max-w-lg mx-auto leading-relaxed">
+                    Watch our quick step-by-step skincare guide to maximize absorption, lock in hydration, and achieve healthy, glowing skin.
+                </p>
+            </div>
+
+            <!-- Video Player Facade (Lazy Loading - 0ms Performance Impact) -->
+            <div class="relative max-w-4xl mx-auto rounded-3xl overflow-hidden shadow-2xl border border-amber-900/20 group bg-slate-900 aspect-video mb-8">
+                
+                <!-- Poster Image Facade -->
+                <img id="video-poster" src="./static/Radiance Begins Here.webp" alt="How to Use Alora Skincare Routine" loading="lazy" class="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 opacity-90">
+                <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+
+                <!-- Center Play Button Overlay -->
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                    <button id="play-routine-video-btn" aria-label="Play How to Use Video" class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 flex items-center justify-center shadow-2xl hover:scale-110 active:scale-95 transition-all duration-300 border-4 border-white/40 group/btn">
+                        <i class="fa-solid fa-play text-xl sm:text-2xl ml-1 text-slate-950 group-hover/btn:scale-110 transition-transform"></i>
+                    </button>
+                    <p class="text-white font-fraunces font-bold text-base sm:text-xl mt-4 drop-shadow-md">Watch Skincare Tutorial</p>
+                    <span class="text-xs text-amber-300 font-semibold uppercase tracking-widest mt-1">1 Min Guide • Step-by-Step</span>
+                </div>
+
+                <!-- Video Container Slot (Populated on Click for Zero Initial Load Weight) -->
+                <div id="video-container-slot" class="absolute inset-0 hidden bg-black z-30"></div>
+            </div>
+
+            <!-- 3-Step Routine Feature Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                
+                <div class="bg-white p-4 rounded-2xl border border-amber-900/10 shadow-sm flex items-start gap-3.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100/80 text-[#8B4513] font-bold font-fraunces flex items-center justify-center shrink-0 shadow-inner">
+                        1
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Cleanse &amp; Prep</h3>
+                        <p class="text-[11px] text-slate-600 mt-0.5 leading-normal">Wash face with warm water &amp; Alora Gentle Cleanser to remove impurities.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-900/10 shadow-sm flex items-start gap-3.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100/80 text-[#8B4513] font-bold font-fraunces flex items-center justify-center shrink-0 shadow-inner">
+                        2
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Target &amp; Treat</h3>
+                        <p class="text-[11px] text-slate-600 mt-0.5 leading-normal">Apply 3-4 drops of Alora Face Serum. Gently pat into damp skin.</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-4 rounded-2xl border border-amber-900/10 shadow-sm flex items-start gap-3.5">
+                    <div class="w-9 h-9 rounded-xl bg-amber-100/80 text-[#8B4513] font-bold font-fraunces flex items-center justify-center shrink-0 shadow-inner">
+                        3
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wide">Lock Hydration</h3>
+                        <p class="text-[11px] text-slate-600 mt-0.5 leading-normal">Finish with Alora Nourishing Cream for all-day radiant glow.</p>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
-    </header>
+    </section>
 
     <!-- ============ SHOP BY CATEGORY / RITUAL ============ -->
     <section class="max-w-7xl mx-auto px-4 pb-16">

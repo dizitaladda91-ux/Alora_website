@@ -1,4 +1,5 @@
 import BASE_URL from './config.js';
+import "./toast.js";
 
 // Helper: Safe Cart Fetching
 function getSafeCart() {
@@ -125,7 +126,7 @@ button?.addEventListener("click", async (e) => {
 
     // 2. Form Validation
     if (!name || !phone || !email || !address) {
-        alert("Please fill in your delivery details (name, phone, email and address) first.");
+        window.showToast("Please fill in your delivery details (name, phone, email and address) first.", "warning");
         if (!name && nameInput) nameInput.focus();
         else if (!phone && phoneInput) phoneInput.focus();
         else if (!email && emailInput) emailInput.focus();
@@ -134,25 +135,25 @@ button?.addEventListener("click", async (e) => {
     }
 
     if (phone.length !== 10 || isNaN(phone)) {
-        alert(" valid 10-digit mobile number !");
+        window.showToast("Please enter a valid 10-digit mobile number.", "warning");
         phoneInput.focus();
         return;
     }
 
     if (!/^\S+@\S+\.\S+$/.test(email)) {
-        alert("Please enter a valid email address.");
+        window.showToast("Please enter a valid email address.", "warning");
         emailInput.focus();
         return;
     }
 
     if (!signedInCustomer && password.length < 6) {
-        alert("Please create a password with at least 6 characters.");
+        window.showToast("Please create a password with at least 6 characters.", "warning");
         passwordInput?.focus();
         return;
     }
 
     if (!signedInCustomer && password !== confirmPassword) {
-        alert("Password and confirm password must match.");
+        window.showToast("Password and confirm password must match.", "warning");
         confirmPasswordInput?.focus();
         return;
     }
@@ -160,7 +161,7 @@ button?.addEventListener("click", async (e) => {
     // 3. Cart Items Extraction
     const cartItems = getSafeCart();
     if (cartItems.length === 0) {
-        alert("Your cart is empty! Please add a product first.");
+        window.showToast("Your cart is empty! Please add a product first.", "warning");
         return;
     }
 
@@ -229,12 +230,12 @@ button?.addEventListener("click", async (e) => {
         const orderData = await response.json();
 
         if (!response.ok || !orderData.order || !orderData.order.id) {
-            alert(orderData.error || "Order could not be created. Please try again.");
+            window.showToast(orderData.error || "Order could not be created. Please try again.", "error");
             return;
         }
 
         if (Number(orderData.affiliateDiscount) > 0) {
-            alert(`Referral discount applied: ₹${Number(orderData.affiliateDiscount).toFixed(2)}`);
+            window.showToast(`Referral discount applied: ₹${Number(orderData.affiliateDiscount).toFixed(2)}`, "success");
         }
 
         // 6. Razorpay Configuration Options
@@ -277,11 +278,13 @@ button?.addEventListener("click", async (e) => {
                         // Success Popup & Print Option Show Karein
                         showPaymentSuccessPopup(verificationResult.orderData);
                     } else {
-                        alert("❌ Payment verification failed! Support se sampark karein.");
+                        // Kept visible longer than a normal toast — this is a payment
+                        // outcome the customer must not miss by navigating away.
+                        window.showToast("Payment verification failed. Please contact support with your payment details.", "error", 8000);
                     }
                 } catch (error) {
                     console.error("Verification Error:", error);
-                    alert("Verification API call fail ho gayi. Internet check karein!");
+                    window.showToast("Could not reach the server to verify your payment. Please check your internet connection.", "error", 8000);
                 }
             },
             "prefill": {
@@ -298,7 +301,7 @@ button?.addEventListener("click", async (e) => {
 
     } catch (error) {
         console.error("Error creating order:", error);
-        alert(error.message || "Connection failed! Backend server offline lag raha hai.");
+        window.showToast(error.message || "Connection failed! The server may be offline.", "error");
     } finally {
         button.disabled = false;
         button.innerHTML = 'Pay Now <i class="fa-solid fa-arrow-right text-xs"></i>';

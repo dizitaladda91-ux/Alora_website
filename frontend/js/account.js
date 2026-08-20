@@ -23,10 +23,13 @@ async function initAccountPage() {
     const greetingEl = document.getElementById('user-greeting');
     const emailEl = document.getElementById('user-email');
 
-    if (user) {
-        if (greetingEl) greetingEl.textContent = `Hello, ${user.name || user.username || 'Valued Customer'}`;
-        if (emailEl) emailEl.textContent = user.email || 'Alora Radiance Customer';
-    }
+    // naya
+if (user) {
+    if (greetingEl) greetingEl.textContent = `Hello, ${user.name || user.username || 'Valued Customer'}`;
+    if (emailEl) emailEl.textContent = user.phone
+        ? `${user.email || ''} • ${user.phone}`
+        : (user.email || 'Alora Radiance Customer');
+}
 
     const logoutBtn = document.getElementById('logout-btn');
     if (logoutBtn) {
@@ -125,7 +128,8 @@ function renderOrderCard(order) {
         return `
             <div class="flex items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-3">
-                    <img src="${getImageUrl(itemImg, './static/placeholder.png')}" alt="${item.name}" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-parchment/50 p-1">
+                   // naya
+<img src="${getImageUrl(itemImg, './static/placeholder.png')}" alt="${item.name}" loading="lazy" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-parchment/50 p-1">
                     <div>
                         <h4 class="font-semibold text-ink text-sm leading-snug">${item.name}</h4>
                         <p class="text-xs text-ash">Size: ${itemVariant} &bull; Qty: ${itemQty}</p>
