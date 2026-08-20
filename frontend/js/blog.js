@@ -40,13 +40,14 @@ async function renderBlogCards() {
             if (latestPost && latestPost.schema && String(latestPost.schema).trim()) {
                 try {
                     const rawSchema = String(latestPost.schema).trim();
-                    schemaToInject = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
-                        ? JSON.parse(rawSchema) 
-                        : rawSchema;
+                    schemaToInject = JSON.parse(rawSchema);
                 } catch (e) {
-                    schemaToInject = latestPost.schema;
+                    console.warn("⚠️ Custom schema in latest post contains invalid JSON, falling back to Blog collection schema:", e);
+                    schemaToInject = null;
                 }
-            } else if (result.data.length > 0) {
+            }
+
+            if (!schemaToInject && result.data && result.data.length > 0) {
                 // Automatic fallback Blog Collection schema for Blog.html
                 schemaToInject = {
                     "@context": "https://schema.org",
@@ -64,9 +65,7 @@ async function renderBlogCards() {
             }
 
             if (schemaToInject) {
-                schemaScript.textContent = typeof schemaToInject === 'object' 
-                    ? JSON.stringify(schemaToInject, null, 2) 
-                    : schemaToInject;
+                schemaScript.textContent = JSON.stringify(schemaToInject, null, 2);
             }
             }
 

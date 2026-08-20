@@ -160,7 +160,7 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // DYNAMIC JSON-LD SCHEMA INJECTOR (Updates static script tag for immediate crawler & extension detection)
+    // DYNAMIC JSON-LD SCHEMA INJECTOR (Strict Valid JSON + Auto-healing fallback)
     let schemaScript = document.getElementById('dynamic-json-ld');
     if (!schemaScript) {
         schemaScript = document.createElement('script');
@@ -174,35 +174,48 @@ function injectSEO(blog) {
     if (blog.schema && String(blog.schema).trim()) {
         try {
             const rawSchema = String(blog.schema).trim();
-            schemaToInject = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
-                ? JSON.parse(rawSchema) 
-                : rawSchema;
+            schemaToInject = JSON.parse(rawSchema);
         } catch (e) {
-            schemaToInject = blog.schema;
+            console.warn("⚠️ Custom schema in DB contains invalid JSON, auto-healing to Google BlogPosting schema:", e);
+            schemaToInject = null;
         }
-    } else {
-        // Automatic fallback BlogPosting schema if custom schema was not entered by admin
-        const fullImgUrl = blog.coverImage ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) : '';
+    }
+
+    if (!schemaToInject) {
+        // Automatic fallback 100% strict Google-compliant BlogPosting schema
+        const fullImgUrl = blog.coverImage 
+            ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
+            : `${window.location.origin}/static/alora5.webp`;
+
         schemaToInject = {
             "@context": "https://schema.org",
             "@type": "BlogPosting",
-            "headline": blog.title,
-            "description": blog.metaDesc || blog.title,
-            "image": fullImgUrl ? [fullImgUrl] : undefined,
-            "publisher": {
+            "mainEntityOfPage": {
+                "@type": "WebPage",
+                "@id": currentUrl
+            },
+            "headline": blog.title || "Alora Skincare Guide",
+            "description": blog.metaDesc || blog.title || "Skincare guide by Alora Radiance",
+            "image": [fullImgUrl],
+            "datePublished": blog.createdAt || new Date().toISOString(),
+            "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
+            "author": {
                 "@type": "Organization",
                 "name": blog.publisher || "Alora Radiance"
             },
-            "datePublished": blog.createdAt,
-            "mainEntityOfPage": currentUrl
+            "publisher": {
+                "@type": "Organization",
+                "name": blog.publisher || "Alora Radiance",
+                "logo": {
+                    "@type": "ImageObject",
+                    "url": `${window.location.origin}/static/favicon.ico`
+                }
+            }
         };
     }
 
-    if (schemaToInject) {
-        schemaScript.textContent = typeof schemaToInject === 'object' 
-            ? JSON.stringify(schemaToInject, null, 2) 
-            : schemaToInject;
-    }
+    // Always output strict, formatted valid JSON string
+    schemaScript.textContent = JSON.stringify(schemaToInject, null, 2);
 }
 function showError(msg) {
     const loader = document.getElementById('post-loader');
