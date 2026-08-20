@@ -83,20 +83,23 @@
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
+    <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex-grow">
+        <!-- Mobile Filter Backdrop & Drawer -->
+        <div id="filter-backdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
+
         <!-- Mobile Filter Toggle Bar -->
-        <div class="lg:hidden flex items-center justify-between mb-5 bg-white border border-amber-900/15 p-4 rounded-2xl shadow-md">
+        <div class="lg:hidden flex items-center justify-between mb-4 bg-white border border-amber-900/15 p-3.5 rounded-2xl shadow-sm">
             <span class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2 font-fraunces">
-                <i class="fa-solid fa-sliders text-[#8B4513]"></i> Filter &amp; Sort Products
+                <i class="fa-solid fa-sliders text-[#8B4513]"></i> Filter &amp; Sort
             </span>
-            <button id="toggle-filter-btn" type="button" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
+            <button id="toggle-filter-btn" type="button" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 text-xs font-extrabold px-3.5 py-2 rounded-xl flex items-center gap-1.5 shadow-sm transition active:scale-95">
                 <i class="fa-solid fa-filter text-xs"></i> <span>Filter Options</span>
             </button>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
-            <!-- Sidebar Filters -->
-            <aside id="filter-sidebar" class="hidden lg:block w-full lg:w-64 flex-shrink-0 bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-xl h-fit order-2 lg:order-1 relative overflow-hidden">
+            <!-- Sidebar Filters (Slide-up drawer on mobile, sticky sidebar on desktop) -->
+            <aside id="filter-sidebar" class="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl max-h-[85vh] overflow-y-auto bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 shadow-2xl border-t border-amber-900/20 translate-y-full transition-transform duration-300 ease-out hidden lg:block lg:static lg:z-auto lg:rounded-3xl lg:max-h-none lg:overflow-visible lg:border lg:translate-y-0 lg:w-64 lg:flex-shrink-0 lg:shadow-xl lg:h-fit lg:p-6 relative">
                 <!-- YouTube Shimmer Skeleton for Filters -->
                 <div id="filter-skeleton" class="space-y-6">
                     <div class="flex justify-between items-center pb-4 border-b border-dashed border-[#E3D9BC]">
@@ -138,9 +141,14 @@
                         <h2 class="font-fraunces font-bold text-slate-900 tracking-wide text-base flex items-center gap-2">
                             <i class="fa-solid fa-sliders text-[#8B4513] text-sm"></i> Filter Suite
                         </h2>
-                        <button onclick="resetFilters()" class="text-[11px] font-extrabold text-[#8B4513] bg-amber-100/70 hover:bg-[#8B4513] hover:text-white px-2.5 py-1 rounded-full transition shadow-xs">
-                            Clear All
-                        </button>
+                        <div class="flex items-center gap-2">
+                            <button onclick="resetFilters()" class="text-[11px] font-extrabold text-[#8B4513] bg-amber-100/70 hover:bg-[#8B4513] hover:text-white px-2.5 py-1 rounded-full transition shadow-xs">
+                                Clear All
+                            </button>
+                            <button id="close-filter-btn" type="button" class="lg:hidden text-slate-500 hover:text-slate-900 text-xl font-bold p-1">
+                                &times;
+                            </button>
+                        </div>
                     </div>
 
                     <div>
