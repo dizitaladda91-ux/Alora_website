@@ -283,129 +283,154 @@
 </div>
 </div>
 
- <!-- ============ FEATURED PRODUCTS ============ -->
-    <section id="featured" class="max-w-7xl mx-auto px-4 py-6 sm:py-10 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-end mb-6">
-            <div>
-                <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-1">The Collection</p>
-                <h2 class="text-3xl font-robot font-medium text-ink">Featured Products</h2>
+ <!-- ============ FEATURED PRODUCTS COLLECTION ============ -->
+    <section id="featured" class="max-w-7xl mx-auto px-4 py-8 sm:py-12 sm:px-6 lg:px-8">
+        <div class="bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-6 sm:p-10 border border-amber-900/10 shadow-sm relative overflow-hidden">
+            <!-- Top Header Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
+                        ✨ Signature Formulations
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">Featured Collection</h2>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button type="button" aria-label="Previous Product" onclick="slideProducts('left')" class="w-11 h-11 rounded-full bg-white text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/15 flex items-center justify-center shadow-md transition-all duration-300 active:scale-95">
+                        <i class="fa-solid fa-chevron-left text-sm"></i>
+                    </button>
+                    <button type="button" aria-label="Next Product" onclick="slideProducts('right')" class="w-11 h-11 rounded-full bg-white text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/15 flex items-center justify-center shadow-md transition-all duration-300 active:scale-95">
+                        <i class="fa-solid fa-chevron-right text-sm"></i>
+                    </button>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button type="button" onclick="slideProducts('left')" class="w-11 h-11 rounded-full border border-ink/15 flex items-center justify-center hover:bg-ink hover:text-parchment text-ink transition">
-                    <i class="fa-solid fa-chevron-left text-sm"></i>
-                </button>
-                <button type="button" onclick="slideProducts('right')" class="w-11 h-11 rounded-full border border-ink/15 flex items-center justify-center hover:bg-ink hover:text-parchment text-ink transition">
-                    <i class="fa-solid fa-chevron-right text-sm"></i>
-                </button>
-            </div>
-        </div>
 
-        <div class="greensection overflow-hidden w-full py-2">
-            <div id="productSliderWrapper" class="flex gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
-                <!-- Product cards are injected here dynamically by loadSliderProducts() in main.js -->
+            <!-- Product Slider Container -->
+            <div class="greensection overflow-hidden w-full py-2">
+                <div id="productSliderWrapper" class="flex gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
+                    <!-- Product cards are injected here dynamically by loadSliderProducts() in main.js -->
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- ============ HERO ============ -->
-  <header class="max-w-7xl mx-auto px-4 py-6 md:py-10 grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-    
-    <!-- Left Hero Copy -->
-    <div class="animate__animated animate__fadeInLeft pl-0 md:pl-8 flex flex-col items-center md:items-start text-center md:text-left hero-copy">
-        
-        <h1 class="text-3xl sm:text-4xl md:text-6xl font-robot font-medium text-ink leading-[1.1] mb-6">
-            Glow More<br> Save More.<br>
-        </h1>
-        
-        <p class="text-[#5C594E] text-sm md:text-base mb-8 max-w-md leading-relaxed">
-            Bundle your favourites and enjoy a complete skincare routine while unlocking exclusive savings. Build a complete skincare routine with our specially curated combo packs. Each set combines complementary products to cleanse, nourish, protect, and reveal healthy, radiant skin.<br>
-            <span class="font-semibold text-clay block mt-2">Bundle Up Your Glow.</span>
-        </p>
+    <!-- ============ HERO BUNDLE HIGHLIGHT SECTION ============ -->
+    <header class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
+        <div class="bg-gradient-to-br from-[#152219] via-[#1F3327] to-[#152219] rounded-3xl p-6 sm:p-10 md:p-14 text-white shadow-2xl border border-amber-500/20 relative overflow-hidden grid gap-8 md:grid-cols-2 md:gap-12 items-center">
+            
+            <!-- Ambient Background Glow Effect -->
+            <div class="absolute -top-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <!-- CTA Buttons -->
-        <div class="flex items-center gap-4 sm:gap-6 hero-actions">
-            <a href="/products" class="bg-clay text-parchment px-6 sm:px-7 py-3 sm:py-3.5 rounded-md shadow-sm hover:bg-ink-light transition tracking-wide text-xs sm:text-sm font-semibold">Explore More</a>
-            <a href="/products?filter=bestseller" class="text-xs sm:text-sm font-semibold text-ink border-b-2 border-clay pb-1 hover:text-clay transition">Bestsellers</a>
-        </div>
-
-        <!-- Hero Stats (Aligned Single Row on Desktop & Responsive Wrap on Mobile) -->
-        <div class="flex items-center justify-center md:justify-start gap-3 sm:gap-6 md:gap-8 mt-10 pt-8 border-t border-[#DDD4BC] hero-stats w-full">
-            
-            <!-- Stat 1 -->
-            <div class="flex items-center">
-                <p class="text-[11px] sm:text-xs md:text-sm font-robot text-ash uppercase tracking-widest font-semibold">Premium<br class="hidden sm:block"> Ingredients</p>
-            </div>
-            
-            <div class="w-px h-8 bg-[#DDD4BC] shrink-0"></div>
-            
-            <!-- Stat 2 -->
-            <div class="flex items-center">
-                <p class="text-[11px] sm:text-xs md:text-sm font-sans text-ash uppercase tracking-widest font-semibold">Recyclable<br class="hidden sm:block"> Packaging</p>
-            </div>
-            
-            <div class="w-px h-8 bg-[#DDD4BC] shrink-0"></div>
-            
-            <!-- Stat 3 (Now aligned on the right side in the same row) -->
-            <div class="flex flex-col justify-center text-left">
-                <p class="text-xl sm:text-2xl font-robot text-ink font-bold leading-none">4.8/5</p>
-                <p class="text-[9px] sm:text-[11px] uppercase tracking-widest text-ash mt-1 whitespace-nowrap">Customer rated</p>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- Right Slider Container -->
-    <div class="animate__animated animate__fadeInRight flex justify-center w-full">
-        <div class="relative bg-white p-2.5 sm:p-3 rounded-2xl shadow-xl border border-[#EAE3CF] w-full max-w-md overflow-hidden">
-            
-            <!-- Dynamic Auto Slider Track -->
-            <div id="auto-slider" class="bg-sage-light rounded-xl p-4 sm:p-6 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 sm:gap-10 no-scrollbar">
+            <!-- Left Hero Copy -->
+            <div class="relative z-10 flex flex-col items-center md:items-start text-center md:text-left hero-copy">
                 
-                <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block">
-                    <img src="./static/combo1.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
-                </a>
-                <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block">
-                    <img src="./static/combo2.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
-                </a>
-                <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block">
-                    <img src="./static/combo3.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
-                </a>
-                <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block">
-                    <img src="./static/combo4.webp" alt="Alora Product" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
-                </a>
+                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-300 text-[11px] font-bold uppercase tracking-widest border border-amber-400/30 mb-4">
+                    🎁 Limited Edition Bundles
+                </span>
+
+                <h1 class="text-3xl sm:text-5xl md:text-6xl font-fraunces font-bold text-parchment leading-tight mb-6">
+                    Glow More.<br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Save More.</span>
+                </h1>
                 
-            </div>
-        </div>
-    </div>
+                <p class="text-parchment/80 text-sm md:text-base mb-8 max-w-md leading-relaxed font-sans">
+                    Build a complete skincare ritual with our specially curated combo packs. Each set combines complementary products to cleanse, nourish, protect, and reveal healthy, radiant skin.
+                    <span class="font-semibold text-amber-300 block mt-2">Bundle Up &amp; Save Up to 25% Off.</span>
+                </p>
 
-</header>
-
-    <!-- ============ SHOP BY CATEGORY ============ -->
-    <section class="max-w-7xl mx-auto px-4 pb-16 ">
-        <div class="text-center mb-10">
-            <p class="text-xs font-bold tracking-[0.25em] uppercase text-clay mb-2">Shop By Concern</p>
-            <h2 class="text-3xl font-robot  font-medium text-ink">Find Your Ritual</h2>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5 ">
-            <a href="/products" class="group bg-white rounded-2xl border border-[#ECE4CE] p-6 flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-                <div class="w-16 h-16 rounded-full bg-clay/10 text-clay flex items-center justify-center mb-4 group-hover:bg-clay group-hover:text-white transition">
-                    <i class="fa-solid fa-face-smile text-xl"></i>
+                <!-- CTA Buttons -->
+                <div class="flex items-center gap-4 hero-actions">
+                    <a href="/products" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold px-7 py-3.5 rounded-xl shadow-lg hover:shadow-amber-500/25 transition-all duration-300 text-xs sm:text-sm tracking-wide transform hover:-translate-y-0.5">
+                        Explore Bundles <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                    </a>
+                    <a href="/products?filter=bestseller" class="bg-white/10 hover:bg-white/20 text-parchment font-semibold border border-white/20 px-6 py-3.5 rounded-xl transition-all duration-300 text-xs sm:text-sm">
+                        Bestsellers
+                    </a>
                 </div>
-                <h3 class="font-robot font-semibold text-ink text-sm mb-1">Skincare</h3>
-                <p class="text-xs text-ash mb-3">Serums, creams &amp; cleansers</p>
-                <span class="text-[11px] font-semibold uppercase tracking-widest text-clay">Shop Now <i class="fa-solid fa-arrow-right ml-0.5 text-[10px]"></i></span>
+
+                <!-- Hero Stats Row -->
+                <div class="flex items-center justify-center md:justify-start gap-4 sm:gap-8 mt-10 pt-8 border-t border-white/15 hero-stats w-full">
+                    
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-shield-halved text-amber-400 text-base"></i>
+                        <p class="text-[11px] sm:text-xs font-medium text-parchment/90 uppercase tracking-wider text-left">Dermatologically<br>Tested</p>
+                    </div>
+                    
+                    <div class="w-px h-8 bg-white/20 shrink-0"></div>
+                    
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-leaf text-amber-400 text-base"></i>
+                        <p class="text-[11px] sm:text-xs font-medium text-parchment/90 uppercase tracking-wider text-left">Clean &amp; Safe<br>Ingredients</p>
+                    </div>
+                    
+                    <div class="w-px h-8 bg-white/20 shrink-0"></div>
+                    
+                    <div class="flex flex-col justify-center text-left">
+                        <p class="text-xl sm:text-2xl font-fraunces text-amber-300 font-bold leading-none">4.9 ★</p>
+                        <p class="text-[10px] uppercase tracking-widest text-parchment/70 mt-1 whitespace-nowrap">Verified Buyers</p>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Right Slider Container -->
+            <div class="relative z-10 flex justify-center w-full">
+                <div class="relative bg-white/10 backdrop-blur-md p-3 sm:p-4 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md overflow-hidden">
+                    
+                    <!-- Dynamic Auto Slider Track -->
+                    <div id="auto-slider" class="bg-white/5 rounded-2xl p-4 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-6 no-scrollbar">
+                        
+                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                            <img src="./static/combo1.webp" alt="Alora Combo" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        </a>
+                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                            <img src="./static/combo2.webp" alt="Alora Combo" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
+                        </a>
+                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                            <img src="./static/combo3.webp" alt="Alora Combo" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                        </a>
+                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                            <img src="./static/combo4.webp" alt="Alora Combo" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </header>
+
+    <!-- ============ SHOP BY CATEGORY / RITUAL ============ -->
+    <section class="max-w-7xl mx-auto px-4 pb-16">
+        <div class="text-center mb-10">
+            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/70 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
+                🌿 Tailored Skincare
+            </span>
+            <h2 class="text-3xl sm:text-4xl font-fraunces font-bold text-slate-900">Find Your Ritual</h2>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            
+            <a href="/products" class="group bg-gradient-to-br from-white to-[#FDFBF7] rounded-3xl border border-amber-900/10 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 relative overflow-hidden">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/60 text-[#8B4513] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-amber-300/50">
+                    <i class="fa-solid fa-sparkles text-2xl"></i>
+                </div>
+                <h3 class="font-fraunces font-bold text-slate-900 text-xl mb-1.5 group-hover:text-[#8B4513] transition-colors">Facial Skincare</h3>
+                <p class="text-xs text-slate-600 mb-4 max-w-xs">Nourishing serums, gentle cleansers &amp; hydrating face creams.</p>
+                <span class="text-xs font-bold uppercase tracking-widest text-[#8B4513] inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
+                    Explore Skincare <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </span>
             </a>
 
-          <a href="/products?category=body" class="group bg-white rounded-2xl border border-[#ECE4CE] p-6 flex flex-col items-center text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
-    <div class="w-16 h-16 rounded-full bg-gold/15 text-gold flex items-center justify-center mb-4 group-hover:bg-gold group-hover:text-white transition">
-        <i class="fa-solid fa-pump-soap text-xl"></i>
-    </div>
-    <h3 class="font-robot font-semibold text-ink text-sm mb-1">Bodycare</h3>
-    <p class="text-xs text-ash mb-3">Lotions, washes &amp; scrubs</p>
-    <span class="text-[11px] font-semibold uppercase tracking-widest text-gold">Shop Now <i class="fa-solid fa-arrow-right ml-0.5 text-[10px]"></i></span>
-</a>
+            <a href="/products?category=body" class="group bg-gradient-to-br from-white to-[#FDFBF7] rounded-3xl border border-amber-900/10 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 relative overflow-hidden">
+                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/60 text-emerald-800 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-emerald-300/50">
+                    <i class="fa-solid fa-droplet text-2xl"></i>
+                </div>
+                <h3 class="font-fraunces font-bold text-slate-900 text-xl mb-1.5 group-hover:text-emerald-800 transition-colors">Bodycare Rituals</h3>
+                <p class="text-xs text-slate-600 mb-4 max-w-xs">Rich body lotions, refreshing washes &amp; exfoliating scrubs.</p>
+                <span class="text-xs font-bold uppercase tracking-widest text-emerald-800 inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
+                    Explore Bodycare <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                </span>
+            </a>
 
-            
         </div>
     </section>
 
