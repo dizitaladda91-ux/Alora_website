@@ -68,35 +68,35 @@
     <div id="navbar-placeholder"></div>
 
     <!-- SUB-BAR -->
-    <div class="bg-white border-b border-[#ECE4CE]">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between">
+    <div class="bg-gradient-to-r from-[#FBF8F3] via-white to-[#FBF8F3] border-b border-[#ECE4CE] shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-col sm:flex-row items-center justify-between gap-3">
             <div>
-                <p class="text-[10px] font-bold tracking-[0.25em] uppercase text-clay">The Collection</p>
-                <h1 class="text-sm font-serif font-semibold text-ink -mt-0.5">Shop All Products</h1>
+                <span class="text-[10px] font-extrabold tracking-[0.25em] uppercase text-[#8B4513] font-mono">The Skincare Collection</span>
+                <h1 class="text-lg font-fraunces font-bold text-slate-900 leading-tight">Shop All Formulations</h1>
             </div>
-          <div class="flex items-center gap-2">
-    <button onclick="applyQuickFilter('all', event)" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-ink px-3 py-1.5 rounded-full border border-transparent hover:border-[#E3D9BC] transition">View All</button>
-    <button onclick="applyQuickFilter('bestseller', event)" class="text-xs font-semibold uppercase tracking-wide text-ash hover:text-clay px-3 py-1.5 rounded-full border border-transparent hover:border-clay/30 transition">
-        <i class="fa-solid fa-fire text-clay mr-1"></i>Bestsellers
-    </button>
-</div>
+            <div class="flex items-center gap-2 overflow-x-auto no-scrollbar w-full sm:w-auto pb-1 sm:pb-0">
+                <button onclick="applyQuickFilter('all', event)" class="quick-filter-btn text-xs font-extrabold uppercase tracking-wider text-slate-700 hover:text-slate-900 bg-white hover:bg-amber-50 px-3.5 py-1.5 rounded-full border border-amber-900/15 shadow-xs transition shrink-0">View All</button>
+                <button onclick="applyQuickFilter('bestseller', event)" class="quick-filter-btn text-xs font-extrabold uppercase tracking-wider text-amber-800 hover:text-amber-900 bg-amber-100/70 hover:bg-amber-100 px-3.5 py-1.5 rounded-full border border-amber-300 shadow-xs transition shrink-0 flex items-center gap-1.5">
+                    <i class="fa-solid fa-fire text-amber-600 text-xs"></i> Bestsellers
+                </button>
+            </div>
         </div>
     </div>
 
-    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex-grow">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-grow">
         <!-- Mobile Filter Toggle Bar -->
-        <div class="lg:hidden flex items-center justify-between mb-4 bg-white border border-[#ECE4CE] p-3.5 rounded-2xl shadow-sm">
-            <span class="text-xs font-bold uppercase tracking-wider text-ink flex items-center gap-2">
-                <i class="fa-solid fa-sliders text-clay"></i> Filter &amp; Sort
+        <div class="lg:hidden flex items-center justify-between mb-5 bg-white border border-amber-900/15 p-4 rounded-2xl shadow-md">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-900 flex items-center gap-2 font-fraunces">
+                <i class="fa-solid fa-sliders text-[#8B4513]"></i> Filter &amp; Sort Products
             </span>
-            <button id="toggle-filter-btn" type="button" class="bg-clay text-white text-xs font-semibold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-sm hover:bg-clay-dark transition">
+            <button id="toggle-filter-btn" type="button" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 text-xs font-extrabold px-4 py-2 rounded-xl flex items-center gap-1.5 shadow-md transition">
                 <i class="fa-solid fa-filter text-xs"></i> <span>Filter Options</span>
             </button>
         </div>
 
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Sidebar Filters -->
-            <aside id="filter-sidebar" class="hidden lg:block w-full lg:w-64 flex-shrink-0 bg-white p-6 rounded-2xl border border-[#ECE4CE] shadow-sm h-fit order-2 lg:order-1">
+            <aside id="filter-sidebar" class="hidden lg:block w-full lg:w-64 flex-shrink-0 bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-xl h-fit order-2 lg:order-1 relative overflow-hidden">
                 <!-- YouTube Shimmer Skeleton for Filters -->
                 <div id="filter-skeleton" class="space-y-6">
                     <div class="flex justify-between items-center pb-4 border-b border-dashed border-[#E3D9BC]">
@@ -132,54 +132,73 @@
                 </div>
 
                 <!-- Actual Filter Content (Fades in smoothly when ready) -->
-                <div id="filter-content" class="hidden">
-                    <div class="flex items-center justify-between mb-6 border-b border-dashed border-[#E3D9BC] pb-4">
-                        <h2 class="font-serif font-semibold text-ink tracking-wide text-base"><i class="fa-solid fa-sliders mr-2 text-clay text-sm"></i>Filters</h2>
-                        <button onclick="resetFilters()" class="text-xs text-clay hover:text-clay-dark hover:underline font-semibold">Clear All</button>
+                <div id="filter-content" class="hidden space-y-6">
+                    
+                    <div class="flex items-center justify-between border-b border-amber-900/10 pb-3.5">
+                        <h2 class="font-fraunces font-bold text-slate-900 tracking-wide text-base flex items-center gap-2">
+                            <i class="fa-solid fa-sliders text-[#8B4513] text-sm"></i> Filter Suite
+                        </h2>
+                        <button onclick="resetFilters()" class="text-[11px] font-extrabold text-[#8B4513] bg-amber-100/70 hover:bg-[#8B4513] hover:text-white px-2.5 py-1 rounded-full transition shadow-xs">
+                            Clear All
+                        </button>
                     </div>
 
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Sort By</label>
-                        <select id="sort-filter" onchange="filterProducts()" class="w-full bg-parchment border border-[#DCD3BA] rounded-lg p-2.5 text-sm text-ink focus:outline-none focus:border-clay">
-                            <option value="featured">Featured</option>
-                            <option value="price-low-high">Price: Low to High</option>
-                            <option value="price-high-low">Price: High to Low</option>
-                            <option value="rating-high-low">Top Rated</option>
+                    <div>
+                        <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-widest mb-2 font-mono">Sort By Price &amp; Rating</label>
+                        <select id="sort-filter" onchange="filterProducts()" class="w-full bg-[#FDFBF7] border border-amber-900/20 rounded-xl p-3 text-xs font-semibold text-slate-800 focus:ring-2 focus:ring-amber-500/40 outline-none shadow-xs transition">
+                            <option value="featured">✨ Featured Selection</option>
+                            <option value="price-low-high">💵 Price: Low to High</option>
+                            <option value="price-high-low">💎 Price: High to Low</option>
+                            <option value="rating-high-low">★ Top Rated First</option>
                         </select>
                     </div>
 
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Collection</label>
-                        <div class="space-y-2.5">
-                            <label class="flex items-center text-sm text-[#3d3b34] cursor-pointer hover:text-ink">
-                                <input type="checkbox" name="category" value="face" onchange="filterProducts()" class="rounded border-[#DCD3BA] text-clay focus:ring-clay mr-2.5"> Face
+                    <div>
+                        <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-widest mb-2 font-mono">Category Collections</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center p-2.5 rounded-xl border border-amber-900/10 hover:border-amber-400 bg-white hover:bg-amber-50/40 transition cursor-pointer text-xs font-bold text-slate-800">
+                                <input type="checkbox" name="category" value="face" onchange="filterProducts()" class="rounded border-slate-300 text-[#8B4513] focus:ring-amber-500 mr-3 w-4 h-4">
+                                <i class="fa-solid fa-sparkles text-amber-600 mr-2 text-xs"></i> Face Skincare
                             </label>
-                            <label class="flex items-center text-sm text-[#3d3b34] cursor-pointer hover:text-ink">
-                                <input type="checkbox" name="category" value="body" onchange="filterProducts()" class="rounded border-[#DCD3BA] text-clay focus:ring-clay mr-2.5"> Body
+                            <label class="flex items-center p-2.5 rounded-xl border border-amber-900/10 hover:border-amber-400 bg-white hover:bg-amber-50/40 transition cursor-pointer text-xs font-bold text-slate-800">
+                                <input type="checkbox" name="category" value="body" onchange="filterProducts()" class="rounded border-slate-300 text-emerald-700 focus:ring-emerald-500 mr-3 w-4 h-4">
+                                <i class="fa-solid fa-droplet text-emerald-600 mr-2 text-xs"></i> Bodycare Rituals
                             </label>
-                        </div>
-                    </div>
-
-                    <div class="mb-6">
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Max Price</label>
-                        <input type="range" id="price-range" min="200" max="2500" value="2500" oninput="updatePriceLabel(this.value)" onchange="filterProducts()" class="w-full h-1 bg-[#E3D9BC] rounded-lg appearance-none cursor-pointer accent-clay">
-                        <div class="flex justify-between text-xs text-ash mt-2">
-                            <span>₹200</span>
-                            <span id="price-max-label" class="font-semibold text-clay">₹2500</span>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-bold text-ash uppercase tracking-wider mb-2">Customer Review</label>
-                        <div class="space-y-1.5">
-                            <button onclick="setRatingFilter(4)" class="rating-filter-btn flex items-center text-sm text-[#3d3b34] hover:text-clay w-full text-left py-1">
-                                <span class="text-gold mr-2 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star text-[#D9D2BC]"></i></span> &amp; Up
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-[11px] font-extrabold text-slate-700 uppercase tracking-widest font-mono">Maximum Price</label>
+                            <span id="price-max-label" class="text-xs font-extrabold text-[#8B4513] bg-amber-100 px-2 py-0.5 rounded-md border border-amber-300 font-mono">₹2500</span>
+                        </div>
+                        <input type="range" id="price-range" min="200" max="2500" value="2500" oninput="updatePriceLabel(this.value)" onchange="filterProducts()" class="w-full h-2 bg-amber-200/60 rounded-lg appearance-none cursor-pointer accent-[#8B4513]">
+                        <div class="flex justify-between text-[10px] font-mono text-slate-500 mt-1">
+                            <span>₹200</span>
+                            <span>₹2,500</span>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[11px] font-extrabold text-slate-700 uppercase tracking-widest mb-2 font-mono">Customer Reviews</label>
+                        <div class="space-y-2">
+                            <button onclick="setRatingFilter(4)" class="rating-filter-btn w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-900/10 hover:border-amber-400 bg-white hover:bg-amber-50/40 transition text-xs font-bold text-slate-800 text-left">
+                                <span class="flex items-center text-amber-500 text-xs gap-1">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star text-slate-300"></i>
+                                    <span class="text-slate-700 font-semibold ml-1">&amp; Up</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">4.0+</span>
                             </button>
-                            <button onclick="setRatingFilter(3)" class="rating-filter-btn flex items-center text-sm text-[#3d3b34] hover:text-clay w-full text-left py-1">
-                                <span class="text-gold mr-2 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star text-[#D9D2BC]"></i><i class="fa-regular fa-star text-[#D9D2BC]"></i></span> &amp; Up
+                            <button onclick="setRatingFilter(3)" class="rating-filter-btn w-full flex items-center justify-between p-2.5 rounded-xl border border-amber-900/10 hover:border-amber-400 bg-white hover:bg-amber-50/40 transition text-xs font-bold text-slate-800 text-left">
+                                <span class="flex items-center text-amber-500 text-xs gap-1">
+                                    <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-regular fa-star text-slate-300"></i><i class="fa-regular fa-star text-slate-300"></i>
+                                    <span class="text-slate-700 font-semibold ml-1">&amp; Up</span>
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-mono">3.0+</span>
                             </button>
                         </div>
                     </div>
+
                 </div>
             </aside>
 
