@@ -160,13 +160,31 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    const schemaEl = document.getElementById('dynamic-json-ld');
-    if (schemaEl && blog.schema) {
+    // DYNAMIC JSON-LD SCHEMA INJECTOR (Replaces old script tag dynamically for Google/SEO crawlers)
+    const oldSchema = document.getElementById('dynamic-json-ld');
+    if (oldSchema) oldSchema.remove();
+
+    if (blog.schema && String(blog.schema).trim()) {
         try {
-            const parsedSchema = typeof blog.schema === 'string' ? JSON.parse(blog.schema) : blog.schema;
-            schemaEl.textContent = JSON.stringify(parsedSchema, null, 2);
+            const rawSchema = String(blog.schema).trim();
+            const parsedSchema = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
+                ? JSON.parse(rawSchema) 
+                : rawSchema;
+            
+            const scriptTag = document.createElement('script');
+            scriptTag.id = 'dynamic-json-ld';
+            scriptTag.type = 'application/ld+json';
+            scriptTag.textContent = typeof parsedSchema === 'object' 
+                ? JSON.stringify(parsedSchema, null, 2) 
+                : parsedSchema;
+            
+            document.head.appendChild(scriptTag);
         } catch (e) {
-            schemaEl.textContent = blog.schema;
+            const scriptTag = document.createElement('script');
+            scriptTag.id = 'dynamic-json-ld';
+            scriptTag.type = 'application/ld+json';
+            scriptTag.textContent = blog.schema;
+            document.head.appendChild(scriptTag);
         }
     }
 }

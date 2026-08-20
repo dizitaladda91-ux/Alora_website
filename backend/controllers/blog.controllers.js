@@ -126,7 +126,7 @@ export const updateBlogPost = async (req, res) => {
             keywords: keywords ? keywords.trim() : undefined, 
             category: category ? category.trim() : undefined, 
             metaDesc: metaDesc ? metaDesc.trim() : undefined, 
-            schema: schema ? schema.trim() : undefined, 
+            schema: schema !== undefined ? String(schema).trim() : undefined, 
             publisher: publisher ? publisher.trim() : undefined 
         };
 
