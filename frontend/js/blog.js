@@ -27,8 +27,13 @@ async function renderBlogCards() {
                 document.getElementById('dynamic-keywords')?.setAttribute('content', latestPost.keywords || '');
 
             // Schema Injection for Blog.html page (Detailed SEO Extension & Googlebot compatibility)
-            const oldSchema = document.getElementById('dynamic-json-ld');
-            if (oldSchema) oldSchema.remove();
+            let schemaScript = document.getElementById('dynamic-json-ld');
+            if (!schemaScript) {
+                schemaScript = document.createElement('script');
+                schemaScript.id = 'dynamic-json-ld';
+                schemaScript.type = 'application/ld+json';
+                document.head.appendChild(schemaScript);
+            }
 
             let schemaToInject = null;
 
@@ -59,13 +64,9 @@ async function renderBlogCards() {
             }
 
             if (schemaToInject) {
-                const scriptTag = document.createElement('script');
-                scriptTag.id = 'dynamic-json-ld';
-                scriptTag.type = 'application/ld+json';
-                scriptTag.textContent = typeof schemaToInject === 'object' 
+                schemaScript.textContent = typeof schemaToInject === 'object' 
                     ? JSON.stringify(schemaToInject, null, 2) 
                     : schemaToInject;
-                document.head.appendChild(scriptTag);
             }
             }
 
