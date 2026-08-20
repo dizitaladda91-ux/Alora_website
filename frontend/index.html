@@ -84,9 +84,7 @@
 </script>
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
-        /* Anti-FOUC (Flash of Unstyled Content) Guard */
-        html { visibility: hidden; opacity: 0; transition: opacity 0.25s ease-in; scroll-behavior: smooth; }
-        html.fouc-ready { visibility: visible; opacity: 1; }
+        html { scroll-behavior: smooth; }
         body { overflow-x: hidden; }
         img, video { max-width: 100%; display: block; }
         .product-card:hover .add-to-cart-btn { transform: translateY(0); opacity: 1; }
@@ -104,21 +102,6 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         details summary::-webkit-details-marker { display: none; }
 
-        @keyframes appear{
-            from{
-                opacity: 0.3;
-                scale:0.5
-            }to{
-                opacity: 1;
-                scale:1;
-            }
-        }
-        .greensection{
-            animation: appear linear;
-            animation-timeline: view();
-            animation-range: entry 0;
-        }
-        
         .animate-marquee {
           display: inline-block;
           padding-left: 100%; /* Text screen ke right side (bahar) se start hoga */
@@ -282,7 +265,7 @@
 
 <main id="main-content">
 
-<div class="flex w-full overflow-hidden relative group h-[180px] sm:h-[280px] md:h-[360px] lg:h-[440px] xl:h-[480px]">
+<div class="flex w-full overflow-hidden relative group h-[210px] sm:h-[300px] md:h-[380px] lg:h-[450px] xl:h-[490px]">
     
     <!-- Prev Button -->
     <button id="prev-btn" aria-label="Previous Slide" 
