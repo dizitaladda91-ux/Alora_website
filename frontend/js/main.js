@@ -455,7 +455,7 @@ async function loadSliderProducts() {
             }
 
             return `
-            <div data-product-id="${product._id}" class="relative w-full sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-3xl p-4 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
+            <div data-product-id="${product._id}" class="relative w-[calc(85%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-3xl p-3.5 sm:p-4 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
                 
                 <!-- Top Badges Bar -->
                 <div class="flex items-center justify-between z-10 mb-2">
