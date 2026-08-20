@@ -164,28 +164,43 @@ function injectSEO(blog) {
     const oldSchema = document.getElementById('dynamic-json-ld');
     if (oldSchema) oldSchema.remove();
 
+    let schemaToInject = null;
+
     if (blog.schema && String(blog.schema).trim()) {
         try {
             const rawSchema = String(blog.schema).trim();
-            const parsedSchema = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
+            schemaToInject = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
                 ? JSON.parse(rawSchema) 
                 : rawSchema;
-            
-            const scriptTag = document.createElement('script');
-            scriptTag.id = 'dynamic-json-ld';
-            scriptTag.type = 'application/ld+json';
-            scriptTag.textContent = typeof parsedSchema === 'object' 
-                ? JSON.stringify(parsedSchema, null, 2) 
-                : parsedSchema;
-            
-            document.head.appendChild(scriptTag);
         } catch (e) {
-            const scriptTag = document.createElement('script');
-            scriptTag.id = 'dynamic-json-ld';
-            scriptTag.type = 'application/ld+json';
-            scriptTag.textContent = blog.schema;
-            document.head.appendChild(scriptTag);
+            schemaToInject = blog.schema;
         }
+    } else {
+        // Automatic fallback BlogPosting schema if custom schema was not entered by admin
+        const fullImgUrl = blog.coverImage ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) : '';
+        schemaToInject = {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": blog.title,
+            "description": blog.metaDesc || blog.title,
+            "image": fullImgUrl ? [fullImgUrl] : undefined,
+            "publisher": {
+                "@type": "Organization",
+                "name": blog.publisher || "Alora Radiance"
+            },
+            "datePublished": blog.createdAt,
+            "mainEntityOfPage": currentUrl
+        };
+    }
+
+    if (schemaToInject) {
+        const scriptTag = document.createElement('script');
+        scriptTag.id = 'dynamic-json-ld';
+        scriptTag.type = 'application/ld+json';
+        scriptTag.textContent = typeof schemaToInject === 'object' 
+            ? JSON.stringify(schemaToInject, null, 2) 
+            : schemaToInject;
+        document.head.appendChild(scriptTag);
     }
 }
 function showError(msg) {

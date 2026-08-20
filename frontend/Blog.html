@@ -46,67 +46,6 @@
     }
     </script>
 
-    <!-- 🟢 Updated Dynamic SEO Injection Script -->
-    <script type="module">
-      import BASE_URL from './js/config.js'; // Aapke config file ka path
-
-      async function loadBlogSEO() {
-        // Query Parameter se slug nikalna (e.g. blog.html?slug=my-first-blog) 
-        // Ya Path se nikalna (e.g. /blog/my-first-blog)
-        const urlParams = new URLSearchParams(window.location.search);
-        let slug = urlParams.get('slug');
-
-        if (!slug) {
-          const pathArray = window.location.pathname.split('/');
-          slug = pathArray[pathArray.length - 1].replace('.html', '');
-        }
-
-        // Agar blog listing page par hain toh default metadata rehne dein
-        if (!slug || slug === 'blog') return;
-
-        try {
-          // 🟢 Express router route: /api/blogs/post/:slug
-          const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
-          
-          if (!response.ok) return;
-
-          const resData = await response.json();
-          // Handling API response wrapper (agar resData.blog ho ya direct object ho)
-          const blog = resData.data || resData.blog || resData;
-
-          if (blog) {
-            // 1. Title Update
-            document.title = blog.metaTitle || blog.title || "Alora Radiance";
-
-            // 2. Meta Description
-            const metaDescEl = document.getElementById('dynamic-meta-desc');
-            if (metaDescEl && blog.metaDesc) {
-              metaDescEl.setAttribute('content', blog.metaDesc);
-            }
-
-            // 3. Meta Keywords
-            const keywordsEl = document.getElementById('dynamic-keywords');
-            if (keywordsEl && blog.keywords) {
-              keywordsEl.setAttribute('content', blog.keywords);
-            }
-
-            // 4. JSON-LD Schema Injector
-            if (blog.schema) {
-              const schemaScript = document.createElement('script');
-              schemaScript.type = 'application/ld+json';
-              schemaScript.textContent = typeof blog.schema === 'object' 
-                ? JSON.stringify(blog.schema) 
-                : blog.schema;
-              document.head.appendChild(schemaScript);
-            }
-          }
-        } catch (error) {
-          console.error("SEO metadata injection failed:", error);
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", loadBlogSEO);
-    </script>
 </head>
 <body class="bg-parchment font-sans text-ink min-h-screen flex flex-col">
 

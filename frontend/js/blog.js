@@ -26,17 +26,47 @@ async function renderBlogCards() {
                 document.getElementById('dynamic-meta-desc')?.setAttribute('content', latestPost.metaDesc || '');
                 document.getElementById('dynamic-keywords')?.setAttribute('content', latestPost.keywords || '');
 
-                // Schema Injection (Purane script ko remove karke naya lagana taaki duplicate na ho)
-                const oldSchema = document.getElementById('dynamic-json-ld');
-                if (oldSchema) oldSchema.remove();
+            // Schema Injection for Blog.html page (Detailed SEO Extension & Googlebot compatibility)
+            const oldSchema = document.getElementById('dynamic-json-ld');
+            if (oldSchema) oldSchema.remove();
 
-                if (latestPost.schema) {
-                    const scriptTag = document.createElement('script');
-                    scriptTag.id = 'dynamic-json-ld';
-                    scriptTag.type = 'application/ld+json';
-                    scriptTag.text = typeof latestPost.schema === 'string' ? latestPost.schema : JSON.stringify(latestPost.schema);
-                    document.head.appendChild(scriptTag);
+            let schemaToInject = null;
+
+            if (latestPost && latestPost.schema && String(latestPost.schema).trim()) {
+                try {
+                    const rawSchema = String(latestPost.schema).trim();
+                    schemaToInject = (rawSchema.startsWith('{') || rawSchema.startsWith('[')) 
+                        ? JSON.parse(rawSchema) 
+                        : rawSchema;
+                } catch (e) {
+                    schemaToInject = latestPost.schema;
                 }
+            } else if (result.data.length > 0) {
+                // Automatic fallback Blog Collection schema for Blog.html
+                schemaToInject = {
+                    "@context": "https://schema.org",
+                    "@type": "Blog",
+                    "name": "Alora Radiance Skincare Blogs",
+                    "description": "Explore dermatologist-tested skincare tips, guides, and natural beauty insights from Alora Radiance.",
+                    "url": window.location.href,
+                    "blogPost": result.data.map(post => ({
+                        "@type": "BlogPosting",
+                        "headline": post.title,
+                        "url": `${window.location.origin}/post/${post.slug || post._id}`,
+                        "datePublished": post.createdAt
+                    }))
+                };
+            }
+
+            if (schemaToInject) {
+                const scriptTag = document.createElement('script');
+                scriptTag.id = 'dynamic-json-ld';
+                scriptTag.type = 'application/ld+json';
+                scriptTag.textContent = typeof schemaToInject === 'object' 
+                    ? JSON.stringify(schemaToInject, null, 2) 
+                    : schemaToInject;
+                document.head.appendChild(scriptTag);
+            }
             }
 
             // Cards loop rendering as usual
