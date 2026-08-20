@@ -16,24 +16,6 @@ function computeBaseUrl() {
 
     // 3. Vercel & Production Hostinger Domain:
     // Live par empty string "" rahega taaki relative paths (/api/...) same domain par point karein
-// Backend URL configuration
-const DEFAULT_LOCAL_BACKEND_PORT = 5000;
-
-function computeBaseUrl() {
-    const { protocol, hostname } = window.location;
-
-    // 1. When opened as file:// treat as local frontend and point to localhost backend
-    if (protocol === 'file:') {
-        return `http://localhost:${DEFAULT_LOCAL_BACKEND_PORT}`;
-    }
-
-    // 2. Common local development hosts
-    if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return `${protocol}//${hostname}:${DEFAULT_LOCAL_BACKEND_PORT}`;
-    }
-
-    // 3. Vercel & Production Hostinger Domain:
-    // Live par empty string "" rahega taaki relative paths (/api/...) same domain par point karein
     return "";
 }
 
@@ -111,5 +93,14 @@ export async function safeFetchJson(url, options = {}) {
 }
 
 export const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/AKfycbyyeLQYUdCrT8FxwDNLv-wVGF_YfC4aK4G4g4g2rRnWvtqeJeySVghAUFF1eN_atdnk/exec";
+
+// Global Window Fallback Assignment
+if (typeof window !== 'undefined') {
+    window.BASE_URL = BASE_URL;
+    window.getImageUrl = getImageUrl;
+    window.getProductUrl = getProductUrl;
+    window.getAuthHeaders = getAuthHeaders;
+    window.safeFetchJson = safeFetchJson;
+}
 
 export default BASE_URL;
