@@ -196,47 +196,64 @@ function renderProductCatalog(products) {
         `;
 
         return `
-        <div data-product-id="${product.id}" class="animate-fade-in relative w-full h-[470px] product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 overflow-hidden">
-            <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 ${product.isBestseller ? 'bg-orange-600' : 'bg-black'} uppercase text-white rounded-full flex items-center justify-center shadow-md">
-                ${product.isBestseller ? 'Hot' : 'New'}
-            </span>
-          
-            ${imageAreaHTML}
+        <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-3xl p-4 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
+            
+            <!-- Top Badges Bar -->
+            <div class="flex items-center justify-between z-10 mb-2">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[10px] uppercase tracking-wider shadow-xs">
+                    ${product.isBestseller ? '🔥 BESTSELLER' : '✨ NEW'}
+                </span>
+                <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 uppercase font-mono">
+                    30% OFF
+                </span>
+            </div>
 
-            <div class="px-4 flex-1 flex flex-col justify-center gap-1.5">
-                <h3 class="text-base font-robot font-medium text-ink text-center leading-snug capitalize line-clamp-1 product-name">${product.name}</h3>
-                <p class="product-desc-text text-xs text-ash text-center font-robot px-2 line-clamp-2 min-h-[2rem]">
-                    ${product.description}
-                </p>
+            <!-- Image Area -->
+            <div class="bg-amber-50/40 rounded-2xl p-4 flex justify-center items-center h-[170px] overflow-hidden relative border border-amber-900/10 mb-3 group-hover:bg-amber-50/70 transition-colors">
+                <a href="${product.productUrl}" class="block w-full h-full flex items-center justify-center">
+                    <img src="${product.baseImg}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-110">
+                </a>
+            </div>
 
-                <div class="flex items-center justify-center gap-3 mt-1 flex-wrap">
-                    <div class="flex gap-1.5 items-center size-btn-container">
-                        ${sizeButtonsHTML}
-                    </div>
-                    <div class="flex items-center gap-1.5 min-w-[80px] justify-center">
-                        <span class="product-price font-serif font-semibold text-ink text-base">₹${initialSize.price}</span>
-                        <span class="product-mrp font-serif text-xs line-through text-ash opacity-70">${initialSize.mrp ? '₹' + initialSize.mrp : ''}</span>
-                    </div>
+            <!-- Product Info Section -->
+            <div class="flex-1 flex flex-col justify-between space-y-2 mb-3">
+                <div>
+                    <h3 class="text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1 product-name">${product.name}</h3>
+                    <p class="product-desc-text text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[2rem] leading-relaxed">
+                        ${product.description || 'Dermatologist-tested luxury formulation.'}
+                    </p>
+                </div>
+
+                <!-- Rating Stars Row -->
+                <div class="flex items-center justify-center gap-1.5 text-xs text-amber-500 font-bold">
+                    <div class="flex gap-0.5 text-amber-500 text-[11px]">${starsHTML}</div>
+                    <span class="text-[10px] text-slate-500 font-mono font-semibold">(${product.rating || '4.9'})</span>
+                </div>
+
+                <!-- Size Variant Buttons -->
+                <div class="flex justify-center items-center gap-1.5 flex-wrap size-btn-container">
+                    ${sizeButtonsHTML}
+                </div>
+
+                <!-- Price Display -->
+                <div class="flex items-baseline justify-center gap-2 pt-1">
+                    <span class="product-price font-fraunces font-bold text-[#8B4513] text-lg">₹${initialSize.price}</span>
+                    <span class="product-mrp text-xs line-through text-slate-400 font-mono">${initialSize.mrp ? '₹' + initialSize.mrp : ''}</span>
                 </div>
             </div>
 
-            <div class="px-4 mb-3">
-                <p class="text-[10px] font-bold text-ash uppercase tracking-[0.2em] mb-1 text-center">Quantity</p>
-                <div class="flex text-gold text-[11px] justify-center items-center gap-1 mb-2">
-                    <span class="text-black text-xs font-medium">(${product.rating})</span>
-                    <div class="flex text-[#D4AF37] gap-0.5">${starsHTML}</div>
+            <!-- Quantity & Add to Cart Action Bar -->
+            <div class="space-y-2">
+                <div class="flex items-center border border-amber-900/20 rounded-xl overflow-hidden bg-white shadow-xs qty-container">
+                    <button type="button" onclick="updateQty(-1, this)" class="w-9 h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-r border-amber-900/15 text-sm">−</button>
+                    <input type="number" class="quantity flex-1 h-8 text-center font-extrabold text-slate-900 focus:outline-none text-xs min-w-0 bg-transparent" value="1" min="1" readonly>
+                    <button type="button" onclick="updateQty(1, this)" class="w-9 h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-l border-amber-900/15 text-sm">+</button>
                 </div>
 
-                <div class="flex items-center border border-[#DCD3BA] w-full rounded-lg overflow-hidden bg-white shadow-sm qty-container">
-                    <button type="button" onclick="updateQty(-1, this)" class="w-11 h-8 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none border-r border-[#DCD3BA]">−</button>
-                    <input type="number" class="quantity flex-1 h-8 text-center font-semibold text-ink focus:outline-none text-sm min-w-0 bg-transparent" value="1" min="1" readonly>
-                    <button type="button" onclick="updateQty(1, this)" class="w-11 h-8 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none border-l border-[#DCD3BA]">+</button>
-                </div>
+                <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
+                    <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                </button>
             </div>
-
-            <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-[#A0522D] hover:bg-[#8B4513] text-white py-3.5 font-semibold text-xs tracking-[0.15em] uppercase transition flex items-center justify-center gap-2 mt-auto">
-                <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
-            </button>
         </div>`;
     }).join('');
 }
