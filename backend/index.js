@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
 import cors from "cors";
+import compression from "compression";
 import cookieParser from "cookie-parser"; // Cookie parse karne ke liye
 import db from "./config/db.js";
 import productRouter from "./routes/product.routes.js";
@@ -59,6 +60,7 @@ const corsOptions = {
 };
 
 
+app.use(compression());
 app.use(cors(corsOptions));
 app.options(/.*/, cors(corsOptions)); // Express 5 ke liye preflight route compatible hai
 

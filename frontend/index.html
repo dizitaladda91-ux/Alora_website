@@ -4,25 +4,31 @@
     <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alora Radiance</title>
-<link rel="icon" type="image/x-icon" href="./static/favicon.ico">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <title>Alora Radiance | Premium Dermatologically Tested Skincare</title>
+    <meta name="description" content="Discover Alora Radiance dermatologically tested, safe, paraben-free premium skincare products. Shop face serums, cleansers, and creams for healthy, glowing skin across India.">
+    <meta name="keywords" content="Alora Radiance, skincare India, face serum, face wash, face cream, glowing skin, dermatologically tested">
+    <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
+    
+    <!-- Preconnect & DNS-Prefetch to Font & CDN Domains -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://cdnjs.cloudflare.com">
+    <link rel="dns-prefetch" href="https://res.cloudinary.com">
 
+    <!-- 🚀 PRELOAD CRITICAL LCP HERO IMAGE -->
+    <link rel="preload" as="image" href="./static/alora6.webp" type="image/webp" fetchpriority="high">
 
-<link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Asynchronous Non-Blocking Google Fonts Loading -->
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
 
+    <!-- Non-Blocking Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
 
-<link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-
-<script src="https://cdn.tailwindcss.com"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-<link href="https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&display=swap&subset=devanagari" rel="stylesheet">
-   <script>
-    tailwind.config = {
+    <script>
+    window.tailwind = window.tailwind || {};
+    window.tailwind.config = {
         theme: {
             extend: {
                 colors: {
@@ -47,8 +53,9 @@
                 },
             }
         }
-    }
+    };
 </script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
         html { scroll-behavior: smooth; }
         body { overflow-x: hidden; }
@@ -222,6 +229,8 @@
 
 
 <div id="navbar-placeholder"></div>
+
+<main id="main-content">
 
 
 <div class="flex w-full overflow-hidden relative group h-[200px] sm:h-[300px] md:h-[380px] lg:h-[460px] xl:h-[500px] bg-[#F5EAD8]">
@@ -943,27 +952,20 @@
     </section>
 
  
+</main>
+
     <!-- ============ FOOTER ============ -->
   <div id="footer-placeholder"></div>
 
   <!-- ============Popup Form to New Lead============ -->
    <div id="lead-modal-container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <script src="./js/include.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <script src="./js/include.js" defer></script>
     <script type="module" src="./js/navbar-interactions.js"></script>
-    <!-- main.js is a module (it uses `import BASE_URL from "./config.js"`),
-         so it must ONLY be loaded once, with type="module".
-         Loading it a second time as a classic script previously broke
-         everything: the import syntax threw a fatal error in that copy,
-         and even the working module copy doesn't expose its functions
-         to window on its own (module scope != global scope) — that's
-         why quantity +/- and the product carousel buttons stopped
-         responding. main.js now explicitly attaches those functions
-         to window itself, so this single tag is all that's needed. -->
     <script type="module" src="./js/main.js"></script>
-    <script src="./js/cart.js"></script>
+    <script src="./js/cart.js" defer></script>
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/app.js"></script>
     <script type="module" src="./js/lead.js"></script>

@@ -16,6 +16,24 @@ function computeBaseUrl() {
 
     // 3. Vercel & Production Hostinger Domain:
     // Live par empty string "" rahega taaki relative paths (/api/...) same domain par point karein
+// Backend URL configuration
+const DEFAULT_LOCAL_BACKEND_PORT = 5000;
+
+function computeBaseUrl() {
+    const { protocol, hostname } = window.location;
+
+    // 1. When opened as file:// treat as local frontend and point to localhost backend
+    if (protocol === 'file:') {
+        return `http://localhost:${DEFAULT_LOCAL_BACKEND_PORT}`;
+    }
+
+    // 2. Common local development hosts
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return `${protocol}//${hostname}:${DEFAULT_LOCAL_BACKEND_PORT}`;
+    }
+
+    // 3. Vercel & Production Hostinger Domain:
+    // Live par empty string "" rahega taaki relative paths (/api/...) same domain par point karein
     return "";
 }
 
@@ -26,6 +44,11 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
 
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
+
+    // Cloudinary dynamic URL optimization (w_500, c_limit, q_auto, f_auto)
+    if (trimmed.includes('res.cloudinary.com') && trimmed.includes('/upload/') && !trimmed.includes('/w_')) {
+        return trimmed.replace('/upload/', '/upload/w_500,c_limit,q_auto,f_auto/');
+    }
 
     // If already an absolute URL or data URI, return as-is
     if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;

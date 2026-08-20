@@ -21,8 +21,8 @@
             </ul>
             <h3 class="text-parchment font-bold text-xs uppercase tracking-[0.2em] mb-3">Follow Along</h3>
             <div class="flex gap-4 text-lg">
-                <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-facebook-f text-sm"></i></a>
-                <a href="https://www.instagram.com/aloraradiance/" target="_blank" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-instagram"></i></a>
+                <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Follow Alora Radiance on Facebook" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-facebook-f text-sm"></i></a>
+                <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Follow Alora Radiance on Instagram" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-instagram"></i></a>
             </div>
             <p class="text-white text-base mt-6">Need help fast? <a href="tel:8920434560" class="hover:text-gold">8920434560</a></p>
         </div>
@@ -67,18 +67,18 @@
             <h3 class="text-parchment font-robot font-semibold text-lg mb-4">Get in Touch</h3>
             <form id="contactForm" class="space-y-3">
                 <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Name</label>
-                    <input type="text" id="name" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
+                    <label for="name" class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Name</label>
+                    <input type="text" id="name" name="name" aria-label="Name" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
                 </div>
                 <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Email</label>
-                    <input type="email" id="email" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
+                    <label for="email" class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Email</label>
+                    <input type="email" id="email" name="email" aria-label="Email" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
                 </div>
                 <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">MESSAGE</label>
-                    <textarea id="message" required placeholder="Type your message here..." class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10"></textarea>
+                    <label for="message" class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">MESSAGE</label>
+                    <textarea id="message" name="message" aria-label="Message" required placeholder="Type your message here..." class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10"></textarea>
                 </div>
-                <button type="submit" class="w-full bg-clay hover:bg-clay-dark text-white font-semibold py-2.5 rounded-md text-xs transition tracking-[0.15em] uppercase mt-2">Submit</button>
+                <button type="submit" aria-label="Submit Contact Message" class="w-full bg-clay hover:bg-clay-dark text-white font-semibold py-2.5 rounded-md text-xs transition tracking-[0.15em] uppercase mt-2">Submit</button>
             </form>
         </div>
     </div>
