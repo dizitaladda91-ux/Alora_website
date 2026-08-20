@@ -455,61 +455,61 @@ async function loadSliderProducts() {
             }
 
             return `
-            <div data-product-id="${product._id}" class="relative w-[calc(85%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-3xl p-3.5 sm:p-4 shadow-md hover:shadow-2xl hover:-translate-y-1.5 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
+            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
                 
                 <!-- Top Badges Bar -->
-                <div class="flex items-center justify-between z-10 mb-2">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[10px] uppercase tracking-wider shadow-xs">
+                <div class="flex items-center justify-between z-10 mb-1.5">
+                    <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                         ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                     </span>
-                    <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 uppercase font-mono">
+                    <span class="text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">
                         30% OFF
                     </span>
                 </div>
 
                 <!-- Product Image Area (Seamless Blend) -->
-                <div class="w-full flex justify-center items-center h-[180px] overflow-hidden relative my-2">
+                <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2">
                     <a href="${getProductUrl(product)}" class="block w-full h-full flex items-center justify-center">
                         <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-108 filter drop-shadow-sm">
                     </a>
                 </div>
 
                 <!-- Product Info Section -->
-                <div class="flex-1 flex flex-col justify-between space-y-2 mb-3">
+                <div class="flex-1 flex flex-col justify-between space-y-1.5 mb-2.5">
                     <div>
-                        <h3 class="text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1">${product.name}</h3>
-                        <p class="text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[2rem] leading-relaxed">
+                        <h3 class="text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1">${product.name}</h3>
+                        <p class="text-[10px] sm:text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[1.8rem] sm:min-h-[2.2rem] leading-tight sm:leading-relaxed">
                             ${product.description || 'Dermatologist-tested luxury formulation.'}
                         </p>
                     </div>
 
                     <!-- Rating Stars Row -->
-                    <div class="flex items-center justify-center gap-1.5 text-xs text-amber-500 font-bold">
-                        <div class="flex gap-0.5 text-amber-500 text-[11px]">${starsHTML}</div>
-                        <span class="text-[10px] text-slate-500 font-mono font-semibold">(${product.rating || '4.9'})</span>
+                    <div class="flex items-center justify-center gap-1 text-[11px] text-amber-500 font-bold">
+                        <div class="flex gap-0.5 text-amber-500 text-[10px] sm:text-[11px]">${starsHTML}</div>
+                        <span class="text-[9px] sm:text-[10px] text-slate-500 font-mono font-semibold">(${product.rating || '4.9'})</span>
                     </div>
 
                     <!-- Size Variant Buttons -->
-                    <div class="flex justify-center items-center gap-1.5 flex-wrap">
+                    <div class="flex justify-center items-center gap-1 sm:gap-1.5 flex-wrap">
                         ${sizeButtonsHTML}
                     </div>
 
                     <!-- Price Display -->
-                    <div class="flex items-baseline justify-center gap-2 pt-1">
-                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-lg">₹${initialPrice}</span>
-                        <span class="product-mrp text-xs line-through text-slate-400 font-mono">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
+                    <div class="flex items-baseline justify-center gap-1.5 pt-0.5">
+                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg">₹${initialPrice}</span>
+                        <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
                     </div>
                 </div>
 
                 <!-- Quantity & Add to Cart Action Bar -->
-                <div class="space-y-2">
+                <div class="space-y-1.5">
                     <div class="flex items-center border border-amber-900/20 rounded-xl overflow-hidden bg-white shadow-xs">
-                        <button type="button" onclick="updateQty(-1, this)" class="w-9 h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-r border-amber-900/15 text-sm">−</button>
-                        <input type="number" class="quantity flex-1 h-8 text-center font-extrabold text-slate-900 focus:outline-none text-xs min-w-0 bg-transparent" value="1" min="1" readonly>
-                        <button type="button" onclick="updateQty(1, this)" class="w-9 h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-l border-amber-900/15 text-sm">+</button>
+                        <button type="button" onclick="updateQty(-1, this)" class="w-8 sm:w-9 h-7 sm:h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-r border-amber-900/15 text-xs sm:text-sm">−</button>
+                        <input type="number" class="quantity flex-1 h-7 sm:h-8 text-center font-extrabold text-slate-900 focus:outline-none text-xs min-w-0 bg-transparent" value="1" min="1" readonly>
+                        <button type="button" onclick="updateQty(1, this)" class="w-8 sm:w-9 h-7 sm:h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-l border-amber-900/15 text-xs sm:text-sm">+</button>
                     </div>
 
-                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
+                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
                         <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
                     </button>
                 </div>
@@ -553,29 +553,18 @@ function changeCardSize(volume, price, comparePrice, buttonElement) {
 }
 
 function slideProducts(direction) {
+    const container = document.getElementById('productSliderContainer');
     const wrapper = document.getElementById('productSliderWrapper');
-    if (!wrapper) return;
+    if (!container || !wrapper) return;
     const firstCard = wrapper.querySelector('.product-card');
     if (!firstCard) return;
 
-    const cardWidth = firstCard.offsetWidth;
-    const gap = 24;
-    const scrollStep = cardWidth + gap;
-    const maxScroll = wrapper.scrollWidth - wrapper.parentElement.offsetWidth;
-
+    const scrollAmount = firstCard.offsetWidth + 16;
     if (direction === 'right') {
-        currentScrollAmount += scrollStep;
-        if (currentScrollAmount > maxScroll) {
-            currentScrollAmount = 0;
-        }
-    } else if (direction === 'left') {
-        currentScrollAmount -= scrollStep;
-        if (currentScrollAmount < 0) {
-            currentScrollAmount = maxScroll > 0 ? maxScroll : 0;
-        }
+        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    } else {
+        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
-
-    wrapper.style.transform = `translateX(-${currentScrollAmount}px)`;
 }
 
 if (document.readyState === 'loading') {
