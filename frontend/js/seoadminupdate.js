@@ -222,6 +222,22 @@ updateForm.addEventListener('submit', async function(e) {
         return;
     }
 
+    const schemaVal = schemaInput.value.trim();
+    if (schemaVal) {
+        const parsed = (typeof window.parseMultipleSchemas === 'function') 
+            ? window.parseMultipleSchemas(schemaVal) 
+            : [];
+            
+        if (parsed.length === 0) {
+            try {
+                JSON.parse(schemaVal);
+            } catch (e) {
+                alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON object(s) or script tags.");
+                return;
+            }
+        }
+    }
+
     // Check if Base64 images are pasted directly into Quill editor
     if (content.includes('data:image/') && content.length > 1024 * 1024) {
         alert("⚠️ Warning: You have pasted large raw image(s) directly into the text editor. Pasted images increase post size beyond server limits.\n\nPlease upload images using the Toolbar Image Button 🖼️.");

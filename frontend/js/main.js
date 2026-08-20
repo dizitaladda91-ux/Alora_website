@@ -460,7 +460,7 @@ async function loadSliderProducts() {
                 <!-- Top Badges Bar -->
                 <div class="flex items-center justify-between z-10 mb-2">
                     <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[10px] uppercase tracking-wider shadow-xs">
-                        ${product.isBestseller ? '🔥 BESTSELLER' : '✨ NEW'}
+                        ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                     </span>
                     <span class="text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-2 py-0.5 rounded-md border border-emerald-200 uppercase font-mono">
                         30% OFF

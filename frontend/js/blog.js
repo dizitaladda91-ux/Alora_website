@@ -27,46 +27,21 @@ async function renderBlogCards() {
                 document.getElementById('dynamic-keywords')?.setAttribute('content', latestPost.keywords || '');
 
             // Schema Injection for Blog.html page (Detailed SEO Extension & Googlebot compatibility)
-            let schemaScript = document.getElementById('dynamic-json-ld');
-            if (!schemaScript) {
-                schemaScript = document.createElement('script');
-                schemaScript.id = 'dynamic-json-ld';
-                schemaScript.type = 'application/ld+json';
-                document.head.appendChild(schemaScript);
-            }
+            const fallbackBlogCollectionSchema = {
+                "@context": "https://schema.org",
+                "@type": "Blog",
+                "name": "Alora Radiance Skincare Blogs",
+                "description": "Explore dermatologist-tested skincare tips, guides, and natural beauty insights from Alora Radiance.",
+                "url": window.location.href,
+                "blogPost": (result.data || []).map(post => ({
+                    "@type": "BlogPosting",
+                    "headline": post.title,
+                    "url": `${window.location.origin}/post/${post.slug || post._id}`,
+                    "datePublished": post.createdAt
+                }))
+            };
 
-            let schemaToInject = null;
-
-            if (latestPost && latestPost.schema && String(latestPost.schema).trim()) {
-                try {
-                    const rawSchema = String(latestPost.schema).trim();
-                    schemaToInject = JSON.parse(rawSchema);
-                } catch (e) {
-                    console.warn("⚠️ Custom schema in latest post contains invalid JSON, falling back to Blog collection schema:", e);
-                    schemaToInject = null;
-                }
-            }
-
-            if (!schemaToInject && result.data && result.data.length > 0) {
-                // Automatic fallback Blog Collection schema for Blog.html
-                schemaToInject = {
-                    "@context": "https://schema.org",
-                    "@type": "Blog",
-                    "name": "Alora Radiance Skincare Blogs",
-                    "description": "Explore dermatologist-tested skincare tips, guides, and natural beauty insights from Alora Radiance.",
-                    "url": window.location.href,
-                    "blogPost": result.data.map(post => ({
-                        "@type": "BlogPosting",
-                        "headline": post.title,
-                        "url": `${window.location.origin}/post/${post.slug || post._id}`,
-                        "datePublished": post.createdAt
-                    }))
-                };
-            }
-
-            if (schemaToInject) {
-                schemaScript.textContent = JSON.stringify(schemaToInject, null, 2);
-            }
+            injectMultipleSchemasToDOM(latestPost ? latestPost.schema : null, fallbackBlogCollectionSchema);
             }
 
             // Cards loop rendering as usual

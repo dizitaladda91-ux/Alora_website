@@ -160,62 +160,162 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // DYNAMIC JSON-LD SCHEMA INJECTOR (Strict Valid JSON + Auto-healing fallback)
-    let schemaScript = document.getElementById('dynamic-json-ld');
-    if (!schemaScript) {
-        schemaScript = document.createElement('script');
-        schemaScript.id = 'dynamic-json-ld';
-        schemaScript.type = 'application/ld+json';
-        document.head.appendChild(schemaScript);
-    }
+    // DYNAMIC JSON-LD MULTI-SCHEMA INJECTOR (Supports Single, Array, @graph, or Multiple Concatenated Schemas)
+    const fallbackImage = blog.coverImage 
+        ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
+        : `${window.location.origin}/static/alora5.webp`;
 
-    let schemaToInject = null;
+    const defaultFallbackSchema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": currentUrl
+        },
+        "headline": blog.title || "Alora Skincare Guide",
+        "description": blog.metaDesc || blog.title || "Skincare guide by Alora Radiance",
+        "image": [fallbackImage],
+        "datePublished": blog.createdAt || new Date().toISOString(),
+        "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
+        "author": {
+            "@type": "Organization",
+            "name": blog.publisher || "Alora Radiance"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": blog.publisher || "Alora Radiance",
+            "logo": {
+                "@type": "ImageObject",
+                "url": `${window.location.origin}/static/favicon.ico`
+            }
+        }
+    };
 
-    if (blog.schema && String(blog.schema).trim()) {
-        try {
-            const rawSchema = String(blog.schema).trim();
-            schemaToInject = JSON.parse(rawSchema);
-        } catch (e) {
-            console.warn("⚠️ Custom schema in DB contains invalid JSON, auto-healing to Google BlogPosting schema:", e);
-            schemaToInject = null;
+    injectMultipleSchemasToDOM(blog.schema, defaultFallbackSchema);
+}
+
+// 🌐 Universal Multi-Schema Helper Functions
+function parseMultipleSchemas(rawInput) {
+    if (!rawInput || !String(rawInput).trim()) return [];
+    let cleaned = String(rawInput).trim();
+
+    // 1. If wrapped in <script> tags, extract contents of all script tags
+    if (cleaned.includes('<script')) {
+        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scriptMatches && scriptMatches.length > 0) {
+            const extracted = [];
+            for (const match of scriptMatches) {
+                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                if (content) {
+                    const subSchemas = parseMultipleSchemas(content);
+                    extracted.push(...subSchemas);
+                }
+            }
+            if (extracted.length > 0) return extracted;
+        } else {
+            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
         }
     }
 
-    if (!schemaToInject) {
-        // Automatic fallback 100% strict Google-compliant BlogPosting schema
-        const fullImgUrl = blog.coverImage 
-            ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
-            : `${window.location.origin}/static/alora5.webp`;
-
-        schemaToInject = {
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            "mainEntityOfPage": {
-                "@type": "WebPage",
-                "@id": currentUrl
-            },
-            "headline": blog.title || "Alora Skincare Guide",
-            "description": blog.metaDesc || blog.title || "Skincare guide by Alora Radiance",
-            "image": [fullImgUrl],
-            "datePublished": blog.createdAt || new Date().toISOString(),
-            "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
-            "author": {
-                "@type": "Organization",
-                "name": blog.publisher || "Alora Radiance"
-            },
-            "publisher": {
-                "@type": "Organization",
-                "name": blog.publisher || "Alora Radiance",
-                "logo": {
-                    "@type": "ImageObject",
-                    "url": `${window.location.origin}/static/favicon.ico`
-                }
-            }
-        };
+    // 2. Direct JSON.parse (Handles single object, JSON Array [...], or @graph)
+    try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed)) {
+            return parsed.filter(item => item && typeof item === 'object');
+        }
+        if (parsed && typeof parsed === 'object') {
+            return [parsed];
+        }
+    } catch (e) {
+        // Concatenated JSON objects `{...} {...}` fallback
     }
 
-    // Always output strict, formatted valid JSON string
-    schemaScript.textContent = JSON.stringify(schemaToInject, null, 2);
+    // 3. Fallback: Parse multiple concatenated JSON objects `{...}\n{...}`
+    const schemas = [];
+    let depth = 0;
+    let startIndex = -1;
+    let inString = false;
+    let isEscaped = false;
+
+    for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (isEscaped) {
+            isEscaped = false;
+            continue;
+        }
+        if (char === '\\') {
+            isEscaped = true;
+            continue;
+        }
+        if (char === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (!inString) {
+            if (char === '{' || char === '[') {
+                if (depth === 0) startIndex = i;
+                depth++;
+            } else if (char === '}' || char === ']') {
+                depth--;
+                if (depth === 0 && startIndex !== -1) {
+                    const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
+                    try {
+                        const parsedObj = JSON.parse(jsonChunk);
+                        if (Array.isArray(parsedObj)) {
+                            schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
+                        } else if (parsedObj && typeof parsedObj === 'object') {
+                            schemas.push(parsedObj);
+                        }
+                    } catch (err) {
+                        console.warn("Failed parsing schema chunk:", err);
+                    }
+                    startIndex = -1;
+                }
+            }
+        }
+    }
+    return schemas;
+}
+
+function injectMultipleSchemasToDOM(rawSchemaInput, defaultFallbackSchema) {
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
+
+    let schemasToInject = parseMultipleSchemas(rawSchemaInput);
+
+    if (!schemasToInject || schemasToInject.length === 0) {
+        if (defaultFallbackSchema) {
+            schemasToInject = [defaultFallbackSchema];
+        }
+    }
+
+    if (!schemasToInject || schemasToInject.length === 0) return;
+
+    if (schemasToInject.length === 1) {
+        const script = document.createElement('script');
+        script.id = 'dynamic-json-ld';
+        script.type = 'application/ld+json';
+        script.className = 'dynamic-schema-injected';
+        script.textContent = JSON.stringify(schemasToInject[0], null, 2);
+        document.head.appendChild(script);
+    } else {
+        // Multiple schemas: Inject combined Google-compliant @graph schema
+        const script = document.createElement('script');
+        script.id = 'dynamic-json-ld';
+        script.type = 'application/ld+json';
+        script.className = 'dynamic-schema-injected';
+
+        const combinedSchema = {
+            "@context": "https://schema.org",
+            "@graph": schemasToInject.map(s => {
+                const copy = { ...s };
+                if (copy["@context"]) delete copy["@context"];
+                return copy;
+            })
+        };
+
+        script.textContent = JSON.stringify(combinedSchema, null, 2);
+        document.head.appendChild(script);
+    }
 }
 function showError(msg) {
     const loader = document.getElementById('post-loader');

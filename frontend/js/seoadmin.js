@@ -204,13 +204,19 @@ blogForm.addEventListener('submit', async function(event) {
         return;
     }
 
-    // Schema JSON Validator
+    // Schema JSON Validator (Supports Single, Array, @graph, or Multiple Schemas)
     if (schema) {
-        try {
-            JSON.parse(schema);
-        } catch (e) {
-            alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON.");
-            return;
+        const parsed = (typeof window.parseMultipleSchemas === 'function') 
+            ? window.parseMultipleSchemas(schema) 
+            : [];
+            
+        if (parsed.length === 0) {
+            try {
+                JSON.parse(schema);
+            } catch (e) {
+                alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON object(s) or script tags.");
+                return;
+            }
         }
     }
 

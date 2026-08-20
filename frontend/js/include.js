@@ -248,6 +248,130 @@ function trackReferralFromUrl() {
     });
 }
 
+// 🌐 Universal Multi-Schema Parser & Injector Utilities
+window.parseMultipleSchemas = function(rawInput) {
+    if (!rawInput || !String(rawInput).trim()) return [];
+    let cleaned = String(rawInput).trim();
+
+    // 1. Extract content from <script> tags if present
+    if (cleaned.includes('<script')) {
+        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scriptMatches && scriptMatches.length > 0) {
+            const extracted = [];
+            for (const match of scriptMatches) {
+                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                if (content) {
+                    const subSchemas = window.parseMultipleSchemas(content);
+                    extracted.push(...subSchemas);
+                }
+            }
+            if (extracted.length > 0) return extracted;
+        } else {
+            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
+        }
+    }
+
+    // 2. Direct JSON.parse (Handles single object, JSON Array [...], or @graph)
+    try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed)) {
+            return parsed.filter(item => item && typeof item === 'object');
+        }
+        if (parsed && typeof parsed === 'object') {
+            return [parsed];
+        }
+    } catch (e) {
+        // Fallback for concatenated JSON objects
+    }
+
+    // 3. Fallback: Parse multiple concatenated JSON objects `{...}\n{...}`
+    const schemas = [];
+    let depth = 0;
+    let startIndex = -1;
+    let inString = false;
+    let isEscaped = false;
+
+    for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (isEscaped) {
+            isEscaped = false;
+            continue;
+        }
+        if (char === '\\') {
+            isEscaped = true;
+            continue;
+        }
+        if (char === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (!inString) {
+            if (char === '{' || char === '[') {
+                if (depth === 0) startIndex = i;
+                depth++;
+            } else if (char === '}' || char === ']') {
+                depth--;
+                if (depth === 0 && startIndex !== -1) {
+                    const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
+                    try {
+                        const parsedObj = JSON.parse(jsonChunk);
+                        if (Array.isArray(parsedObj)) {
+                            schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
+                        } else if (parsedObj && typeof parsedObj === 'object') {
+                            schemas.push(parsedObj);
+                        }
+                    } catch (err) {
+                        console.warn("Failed parsing schema chunk:", err);
+                    }
+                    startIndex = -1;
+                }
+            }
+        }
+    }
+    return schemas;
+};
+
+window.injectMultipleSchemasToDOM = function(rawSchemaInput, defaultFallbackSchema) {
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
+
+    let schemasToInject = window.parseMultipleSchemas(rawSchemaInput);
+
+    if (!schemasToInject || schemasToInject.length === 0) {
+        if (defaultFallbackSchema) {
+            schemasToInject = [defaultFallbackSchema];
+        }
+    }
+
+    if (!schemasToInject || schemasToInject.length === 0) return;
+
+    if (schemasToInject.length === 1) {
+        const script = document.createElement('script');
+        script.id = 'dynamic-json-ld';
+        script.type = 'application/ld+json';
+        script.className = 'dynamic-schema-injected';
+        script.textContent = JSON.stringify(schemasToInject[0], null, 2);
+        document.head.appendChild(script);
+    } else {
+        // Multiple schemas: Inject combined Google-compliant @graph schema
+        const script = document.createElement('script');
+        script.id = 'dynamic-json-ld';
+        script.type = 'application/ld+json';
+        script.className = 'dynamic-schema-injected';
+
+        const combinedSchema = {
+            "@context": "https://schema.org",
+            "@graph": schemasToInject.map(s => {
+                const copy = { ...s };
+                if (copy["@context"]) delete copy["@context"];
+                return copy;
+            })
+        };
+
+        script.textContent = JSON.stringify(combinedSchema, null, 2);
+        document.head.appendChild(script);
+    }
+};
+
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
 initGoogleTagManager();
