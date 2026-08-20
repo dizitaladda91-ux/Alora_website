@@ -3,88 +3,157 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEO ALORA | All Posts</title>
+    <title>SEO ALORA | Executive Content Studio</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B',
+                        'navy-light': '#1C2541',
+                        gold: '#8B4513',
+                        'gold-light': '#D4AF37',
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        fraunces: ['Fraunces', 'serif'],
+                        mono: ['"Roboto Mono"', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body class="font-['Manrope'] bg-gray-50 flex flex-col h-screen">
+<body class="font-sans bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-800">
 
-    <!-- Top Navigation -->
-    <nav class="h-16 bg-gray-900 text-white flex items-center px-6 shrink-0 shadow-md">
-        <h1 class="text-xl font-bold tracking-wide text-indigo-400">SEO ALORA <span class="text-white text-sm font-normal ml-2">| Admin Panel</span></h1>
+    <!-- Top Executive Navigation Header -->
+    <nav class="h-16 bg-navy text-white flex items-center justify-between px-6 shrink-0 shadow-xl z-20 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20">
+                <i class="fa-solid fa-sparkles text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-extrabold tracking-wider uppercase font-fraunces text-white flex items-center gap-2">
+                    ALORA SEO STUDIO <span class="text-[10px] font-mono bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-400/30">🟢 API LIVE</span>
+                </h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="/index.html" target="_blank" class="text-xs font-semibold text-slate-300 hover:text-amber-400 transition flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+                <i class="fa-solid fa-arrow-up-right-from-square text-amber-400"></i> View Live Site
+            </a>
+        </div>
     </nav>
 
-    <!-- Main Container -->
+    <!-- Main Workspace Container -->
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-        <aside class="bg-gray-800 text-gray-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0">
-            <nav class="w-full">
-                <ul class="space-y-2">
-                    <li>
-                        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg bg-gray-700 text-white font-medium transition">
-                            <i class="fa-solid fa-chart-line text-indigo-400"></i> All Post
-                        </a>
-                    </li>
-                    <li>
-                        <a href="./seoallpost.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-                            <i class="fa-solid fa-tags text-gray-400"></i> Create Post
-                        </a>
-                    </li>
-                    <li>
-                        <a href="./seoproduct.html" class="flex items-center gap-3 px-4 py-2.5 rounded-lg hover:bg-gray-700 text-white font-medium transition">
-                            <i class="fa-solid fa-box text-gray-400"></i> Products
-                        </a>
-                    </li>
-                </ul>
-            </nav>
+        <aside class="bg-navy text-slate-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
+            <div class="space-y-6">
+                
+                <div class="px-2 pt-2">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">Content Navigation</p>
+                    <nav class="w-full">
+                        <ul class="space-y-1.5">
+                            <li>
+                                <a href="./seoadmin.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold shadow-lg shadow-amber-500/20 transition">
+                                    <i class="fa-solid fa-layer-group text-sm"></i> All Blog Posts
+                                </a>
+                            </li>
+                            <li>
+                                <a href="./seoallpost.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
+                                    <i class="fa-solid fa-circle-plus text-slate-400"></i> Create New Post
+                                </a>
+                            </li>
+                            <li>
+                                <a href="./seoproduct.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
+                                    <i class="fa-solid fa-box-archive text-slate-400"></i> Products SEO
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Live Status Info Box -->
+                <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
+                    <div class="flex items-center justify-between text-slate-400 font-mono text-[10px] uppercase">
+                        <span>Schema Status</span>
+                        <span class="text-emerald-400 font-bold">100% Valid</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                        Dynamic JSON-LD Injection active for Googlebot &amp; SEO extensions.
+                    </p>
+                </div>
+
+            </div>
 
             <!-- LOGOUT BUTTON -->
-            <div class="border-t border-gray-700 pt-4">
-                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-400 hover:bg-red-900/30 hover:text-red-300 font-medium transition">
-                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+            <div class="border-t border-slate-800 pt-4">
+                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold transition">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout Studio
                 </a>
             </div>
         </aside>
 
         <!-- Main Workspace Area -->
-        <main class="flex-1 p-8 overflow-y-auto">
-            <div class="animate__animated animate__fadeIn max-w-6xl mx-auto">
+        <main class="flex-1 p-6 sm:p-8 overflow-y-auto bg-[#F8FAFC]">
+            <div class="animate__animated animate__fadeIn max-w-6xl mx-auto space-y-6">
                 
-                <div class="flex justify-between items-center mb-6 border-b border-gray-200 pb-5">
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-900">All Blog Posts</h2>
-                        <p class="mt-1 text-sm text-gray-500">Manage, edit, or delete your published backend blogs seamlessly.</p>
+                <!-- Welcome Stats Header -->
+                <div class="bg-gradient-to-r from-slate-900 via-navy to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-300 text-[11px] font-bold tracking-widest uppercase font-mono border border-amber-400/30 mb-2">
+                            ✨ Published Articles Studio
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-fraunces font-bold text-white">Manage Blog Content &amp; Schemas</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-lg leading-relaxed">
+                            Create rich articles, edit metadata, inject JSON-LD schemas, and optimize Search Engine Rankings.
+                        </p>
                     </div>
-                    <a href="./seoallpost.html" class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold py-2.5 px-4 rounded-lg shadow transition flex items-center gap-2">
-                        <i class="fa-solid fa-plus"></i> Add New Post
+
+                    <a href="./seoallpost.html" class="relative z-10 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm py-3 px-5 rounded-xl shadow-lg hover:shadow-amber-500/25 transition-all duration-300 flex items-center gap-2 tracking-wide shrink-0 transform hover:-translate-y-0.5">
+                        <i class="fa-solid fa-plus text-xs"></i> Create New Article
                     </a>
                 </div>
 
                 <!-- Blogs Dynamic Table Container -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-50 border-b border-gray-200 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                                <th class="px-6 py-4">Cover</th>
-                                <th class="px-6 py-4">Title & Category</th>
-                                <th class="px-6 py-4">Slug</th>
-                                <th class="px-6 py-4 text-right">Actions</th>
-                            </tr>
-                        </thead>
-                        <!-- Yahan JavaScript backend se data laakar fill karegi -->
-                        <tbody id="blog-table-body" class="divide-y divide-gray-200 text-sm text-gray-700">
-                            <tr>
-                                <td colspan="4" class="px-6 py-10 text-center text-gray-400">
-                                    <i class="fa-solid fa-spinner fa-spin mr-2 text-indigo-500"></i> Loading your amazing blogs...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h3 class="font-bold text-slate-900 text-base font-fraunces flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-amber-600 text-sm"></i> Article Directory
+                        </h3>
+                        <span class="text-xs text-slate-500 font-mono">Sorted by Latest Created</span>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-200 text-[11px] font-extrabold uppercase tracking-widest border-b border-slate-800">
+                                    <th class="px-6 py-4">Cover</th>
+                                    <th class="px-6 py-4">Title &amp; Category</th>
+                                    <th class="px-6 py-4">Slug URL</th>
+                                    <th class="px-6 py-4 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <!-- Yahan JavaScript backend se data laakar fill karegi -->
+                            <tbody id="blog-table-body" class="divide-y divide-slate-100 text-sm text-slate-700">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-12 text-center text-slate-400">
+                                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
+                                        <p class="text-xs font-semibold">Loading your amazing blogs from database...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>
@@ -93,7 +162,6 @@
     </div>
     
     <script type="module" src="./js/auth.js"></script>
-    <!-- Humne dynamic control ke liye nayi module file attach kar di -->
     <script type="module" src="./js/seoallpost.js"></script>
 </body>
 </html>
