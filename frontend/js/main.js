@@ -467,10 +467,10 @@ async function loadSliderProducts() {
                     </span>
                 </div>
 
-                <!-- Product Image Box -->
-                <div class="bg-amber-50/40 rounded-2xl p-4 flex justify-center items-center h-[170px] overflow-hidden relative border border-amber-900/10 mb-3 group-hover:bg-amber-50/70 transition-colors">
+                <!-- Product Image Area (Seamless Blend) -->
+                <div class="w-full flex justify-center items-center h-[180px] overflow-hidden relative my-2">
                     <a href="${getProductUrl(product)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-110">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-108 filter drop-shadow-sm">
                     </a>
                 </div>
 
