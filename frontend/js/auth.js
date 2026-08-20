@@ -363,7 +363,7 @@ export function renderNavbarState() {
             authContainer.innerHTML = `
                 <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
                     <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
-                    ${user.role === 'user' ? '<a href="./myorders.html" class="text-[10px] font-bold uppercase text-[#A0522D] hover:underline">My Orders</a>' : ''}
+                    ${user.role === 'user' ? '<a href="/account" class="text-[10px] font-bold uppercase text-[#A0522D] hover:underline">My Orders</a>' : ''}
                     <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                         Logout
                     </button>

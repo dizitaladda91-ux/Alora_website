@@ -1,4 +1,5 @@
 import BASE_URL from "./config.js";
+import "./toast.js";
 
 const ORDER_STATUSES = ["paid", "processing", "packed", "shipped", "delivered", "cancelled"];
 let adminOrders = [];
@@ -80,7 +81,7 @@ window.updateOrderStatus = async (orderId, orderStatus) => {
 
         await patchOrder(orderId, body);
     } catch (error) {
-        alert(error.message);
+        window.showToast(error.message, "error");
         loadOrders();
     }
 };
@@ -91,9 +92,9 @@ window.saveTracking = async (orderId) => {
         const courierLink = document.getElementById(`track-link-${orderId}`)?.value.trim() || "";
         const order = adminOrders.find((entry) => entry._id === orderId);
         await patchOrder(orderId, { orderStatus: order?.orderStatus, trackingNumber, courierLink });
-        alert("Tracking details saved.");
+        window.showToast("Tracking details saved.", "success");
     } catch (error) {
-        alert(error.message);
+        window.showToast(error.message, "error");
         loadOrders();
     }
 };
@@ -112,7 +113,7 @@ window.updateExpectedDelivery = async (orderId, expectedDeliveryDate) => {
         const index = adminOrders.findIndex((order) => order._id === orderId);
         if (index >= 0) adminOrders[index] = result.data;
     } catch (error) {
-        alert(error.message);
+        window.showToast(error.message, "error");
         loadOrders();
     }
 };
@@ -131,10 +132,10 @@ window.refundOrder = async (orderId) => {
         });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || "Refund failed.");
-        alert("Refund successful. Stock has been restored.");
+        window.showToast("Refund successful. Stock has been restored.", "success");
         loadOrders();
     } catch (error) {
-        alert(error.message);
+        window.showToast(error.message, "error");
     }
 };
 
@@ -153,7 +154,7 @@ window.openInvoiceModal = async (orderId) => {
         document.getElementById("invItemsTable").innerHTML = order.items.map((item) => `<tr class="border-b"><td class="p-2">${escapeHtml(item.name)} (${escapeHtml(item.variant)})</td><td class="p-2 text-center">${item.quantity}</td><td class="p-2 text-right">${formatMoney(item.lineTotal)}</td></tr>`).join("");
         document.getElementById("invoiceModal")?.classList.remove("hidden");
     } catch (error) {
-        alert(error.message);
+        window.showToast(error.message, "error");
     }
 };
 

@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Popup show karne ka timer
     setTimeout(() => {
+        popup.style.display = 'flex';
         popup.classList.remove('opacity-0', 'pointer-events-none');
         popupBox.classList.remove('scale-95');
         popup.classList.add('opacity-100', 'pointer-events-auto');
@@ -89,6 +90,9 @@ document.addEventListener("DOMContentLoaded", () => {
         popupBox.classList.remove('scale-100');
         popup.classList.add('opacity-0', 'pointer-events-none');
         popupBox.classList.add('scale-95');
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 300);
         setSeen(); // Safety backup
     }
 
