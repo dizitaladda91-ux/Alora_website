@@ -372,6 +372,36 @@ window.injectMultipleSchemasToDOM = function(rawSchemaInput, defaultFallbackSche
     }
 };
 
+// ⏱️ Dot & Key Style Rakhi Live Countdown Timer Ticker Engine
+(function initRakhiCountdown() {
+    function updateRakhiTimer() {
+        const hoursEl = document.getElementById('rakhi-hours');
+        const minsEl = document.getElementById('rakhi-minutes');
+        const secsEl = document.getElementById('rakhi-seconds');
+        
+        if (!hoursEl || !minsEl || !secsEl) return;
+
+        const now = new Date();
+        const endOfDay = new Date(now);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        let diff = Math.max(0, Math.floor((endOfDay - now) / 1000));
+
+        const hours = Math.floor(diff / 3600);
+        const minutes = Math.floor((diff % 3600) / 60);
+        const seconds = diff % 60;
+
+        hoursEl.textContent = String(hours).padStart(2, '0');
+        minsEl.textContent = String(minutes).padStart(2, '0');
+        secsEl.textContent = String(seconds).padStart(2, '0');
+    }
+
+    setInterval(updateRakhiTimer, 1000);
+    document.addEventListener('DOMContentLoaded', updateRakhiTimer);
+    document.addEventListener('partialsLoaded', updateRakhiTimer);
+    updateRakhiTimer();
+})();
+
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
 initGoogleTagManager();
