@@ -18,7 +18,18 @@ const generateToken = (id, role) => {
     throw new Error("JWT_SECRET is not configured");
   }
 
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn: '1d' });
+  const rawExpires = process.env.JWT_EXPIRES_IN || process.env.JWT_EXPIRE || process.env.JWT_EXPIRES;
+  let expiresIn = '1d';
+  if (rawExpires && String(rawExpires).trim()) {
+    const cleaned = String(rawExpires).trim();
+    if (!isNaN(cleaned)) {
+      expiresIn = Number(cleaned);
+    } else if (/^\d+[smhdw]$/i.test(cleaned)) {
+      expiresIn = cleaned;
+    }
+  }
+
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn });
 };
 
 // Transporter Function (Dynamic Check)
