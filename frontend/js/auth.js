@@ -58,13 +58,12 @@ async function runAuthGuard() {
     localStorage.removeItem("token");
     localStorage.removeItem("userToken");
 
-    const isPublicPage = currentPath.endsWith("login.html") || 
-                         currentPath.endsWith("register.html") || 
-                         currentPath.endsWith("index.html") || 
-                         currentPath === "/" || 
-                         currentPath.endsWith("/");
+    const isLoginPage = currentPath.endsWith("login.html") || 
+                        currentPath.endsWith("/login") ||
+                        currentPath.endsWith("register.html") || 
+                        currentPath.endsWith("/register");
 
-    if (user && isPublicPage && !currentPath.endsWith("index.html")) {
+    if (user && isLoginPage) {
         if (role.includes("seo")) {
             window.location.replace("./seoadmin.html");
             return;
