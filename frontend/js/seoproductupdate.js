@@ -11,6 +11,7 @@ async function loadProduct() {
         if (!response.ok) throw new Error(product.error || 'Product load failed');
         document.getElementById('product-name').textContent = product.name;
         form.description.value = product.description || '';
+        if (form.videoUrl) form.videoUrl.value = product.videoUrl || '';
         form.rating.value = product.rating ?? 4.5;
         const preview = document.getElementById('image-preview');
         preview.src = getImageUrl(product.imagepath, './static/alora image 2.jpeg'); preview.classList.remove('hidden');

@@ -28,7 +28,8 @@ router.get("/:id", getproductbyid);
 // Post Route with custom Multer error handling
 const productUploadFields = upload.fields([
     { name: 'imagepath', maxCount: 1 },
-    { name: 'galleryImages', maxCount: 6 }
+    { name: 'galleryImages', maxCount: 6 },
+    { name: 'productVideo', maxCount: 1 }
 ]);
 
 router.post("/add", requireAuth, authorizeRoles("admin"), (req, res, next) => {

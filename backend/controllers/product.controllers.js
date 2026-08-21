@@ -52,6 +52,10 @@ export const addnewproduct = async (req, res) => {
         const mainImage = req.files?.imagepath?.[0];
         if (mainImage) addproduct.imagepath = mainImage.path;
         addproduct.galleryImages = (req.files?.galleryImages || []).map((file) => file.path);
+        
+        if (req.body.videoUrl) addproduct.videoUrl = req.body.videoUrl;
+        const videoFile = req.files?.productVideo?.[0];
+        if (videoFile) addproduct.videoUrl = videoFile.path;
 
         const newProduct = new SimpleProduct(addproduct);
         const savedProduct = await newProduct.save();
@@ -126,6 +130,10 @@ export const updateproduct = async (req, res) => {
             updateProductData.galleryImages = galleryImages.map((file) => file.path);
         }
 
+        if (req.body.videoUrl !== undefined) updateProductData.videoUrl = req.body.videoUrl;
+        const updateVideoFile = req.files?.productVideo?.[0];
+        if (updateVideoFile) updateProductData.videoUrl = updateVideoFile.path;
+
         const updatedProduct = await SimpleProduct.findByIdAndUpdate(
             id,
             updateProductData, 
@@ -176,6 +184,10 @@ export const updateProductForSeo = async (req, res) => {
             await Promise.all((product.galleryImages || []).map(deleteFromCloudinary));
             product.galleryImages = galleryImages.map((file) => file.path);
         }
+
+        if (req.body.videoUrl !== undefined) product.videoUrl = req.body.videoUrl;
+        const videoFile = req.files?.productVideo?.[0];
+        if (videoFile) product.videoUrl = videoFile.path;
 
         await product.save();
         res.status(200).json(product);

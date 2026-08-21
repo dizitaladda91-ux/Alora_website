@@ -103,11 +103,40 @@ async function loadProductDetails() {
         const thumbnailsContainer = document.getElementById('thumbnails-container');
         if (thumbnailsContainer) {
             const gallery = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
-            thumbnailsContainer.innerHTML = gallery.map((imagePath, index) => `
-                <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white" onclick="window.selectGalleryImage('${getImageUrl(imagePath, './static/placeholder.png')}')">
+            let thumbnailsHTML = gallery.map((imagePath, index) => `
+                <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white hover:border-amber-500 transition" onclick="window.selectGalleryImage('${getImageUrl(imagePath, './static/placeholder.png')}')">
                     <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" loading="lazy" class="w-full h-full object-contain p-1">
                 </button>`).join('');
+
+            if (product.videoUrl && String(product.videoUrl).trim()) {
+                thumbnailsHTML += `
+                <button type="button" class="w-16 h-16 rounded-lg border border-amber-500 overflow-hidden bg-slate-900 text-white flex flex-col items-center justify-center hover:scale-105 transition relative group" onclick="window.selectGalleryVideo('${product.videoUrl}')" title="Play Product Video">
+                    <i class="fa-solid fa-play text-amber-400 text-lg"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-200 mt-0.5 font-mono">Video</span>
+                </button>`;
+            }
+
+            thumbnailsContainer.innerHTML = thumbnailsHTML;
         }
+
+window.selectGalleryImage = function(imgUrl) {
+    const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
+    if (!mediaContainer) return;
+    mediaContainer.innerHTML = `<img id="main-product-image" src="${imgUrl}" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105">`;
+};
+
+window.selectGalleryVideo = function(videoUrl) {
+    const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
+    if (!mediaContainer) return;
+    
+    let fullVideoUrl = getImageUrl(videoUrl, '');
+    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+        let embedUrl = videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
+        mediaContainer.innerHTML = `<iframe src="${embedUrl}?autoplay=1" class="w-full h-full rounded-2xl border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+    } else {
+        mediaContainer.innerHTML = `<video controls autoplay class="w-full h-full object-contain rounded-2xl bg-black"><source src="${fullVideoUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
+    }
+};
 
         const titleEl = document.getElementById('product-title');
         if (titleEl) titleEl.innerText = product.name || "No Title Available";
