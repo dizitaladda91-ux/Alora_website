@@ -372,25 +372,28 @@ window.injectMultipleSchemasToDOM = function(rawSchemaInput, defaultFallbackSche
     }
 };
 
-// ⏱️ Dot & Key Style Rakhi Live Countdown Timer Ticker Engine
+// ⏱️ Dot & Key Style Rakhi Live Countdown Timer Ticker Engine (Target: Rakhi Day Aug 28, 2026)
 (function initRakhiCountdown() {
     function updateRakhiTimer() {
+        const daysEl = document.getElementById('rakhi-days');
         const hoursEl = document.getElementById('rakhi-hours');
         const minsEl = document.getElementById('rakhi-minutes');
         const secsEl = document.getElementById('rakhi-seconds');
         
         if (!hoursEl || !minsEl || !secsEl) return;
 
+        // Target Date: Rakhi Special Festival (August 28, 2026 23:59:59 IST)
+        const rakhiTarget = new Date('2026-08-28T23:59:59+05:30');
         const now = new Date();
-        const endOfDay = new Date(now);
-        endOfDay.setHours(23, 59, 59, 999);
 
-        let diff = Math.max(0, Math.floor((endOfDay - now) / 1000));
+        let diff = Math.max(0, Math.floor((rakhiTarget - now) / 1000));
 
-        const hours = Math.floor(diff / 3600);
+        const days = Math.floor(diff / (3600 * 24));
+        const hours = Math.floor((diff % (3600 * 24)) / 3600);
         const minutes = Math.floor((diff % 3600) / 60);
         const seconds = diff % 60;
 
+        if (daysEl) daysEl.textContent = String(days).padStart(2, '0');
         hoursEl.textContent = String(hours).padStart(2, '0');
         minsEl.textContent = String(minutes).padStart(2, '0');
         secsEl.textContent = String(seconds).padStart(2, '0');
