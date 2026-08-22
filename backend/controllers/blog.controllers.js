@@ -34,29 +34,44 @@ export const createBlogPost = async (req, res) => {
     try {
         const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
 
-        if (!title || !slug || !content || !category) {
-            return res.status(400).json({ success: false, message: "Title, slug, content, and category are mandatory fields." });
+        if (!title || !String(title).trim()) {
+            return res.status(400).json({ success: false, message: "Article title is a required field." });
         }
 
-        // Slug Formatting
-        const formattedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+        if (!content || !String(content).trim()) {
+            return res.status(400).json({ success: false, message: "Article content is a required field." });
+        }
 
-        // Unique Slug Check
-        const existingBlog = await Blog.findOne({ slug: formattedSlug });
+        // Auto-generate slug from title if slug is missing
+        let rawSlug = (slug && String(slug).trim()) ? slug : title;
+        let formattedSlug = String(rawSlug).toLowerCase().trim()
+            .replace(/[^a-z0-9-_]/g, '-')
+            .replace(/-+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
+        if (!formattedSlug) {
+            formattedSlug = `post-${Date.now()}`;
+        }
+
+        // Unique Slug Check with auto-suffix if collision occurs
+        let existingBlog = await Blog.findOne({ slug: formattedSlug });
         if (existingBlog) {
-            return res.status(400).json({ success: false, message: "A post with this slug already exists." });
+            formattedSlug = `${formattedSlug}-${Date.now().toString().slice(-4)}`;
         }
+
+        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
+        const finalCover = req.file ? req.file.path : ((coverUrl || coverImageUrl || "").trim());
 
         const newBlog = new Blog({
-            title: title.trim(),
+            title: String(title).trim(),
             slug: formattedSlug,
             content: sanitizedContent,
             metaTitle: (metaTitle || "").trim(),
             keywords: (keywords || "").trim(),     
-            category: (category || "").trim(),
+            category: (category || "Skincare").trim(),
             metaDesc: (metaDesc || "").trim(),
             schema: (schema || "").trim(),       
-            publisher: (publisher || "").trim(),    
+            publisher: (publisher || "Alora Radiance").trim(),    
             coverImage: finalCover
         });
 
@@ -69,7 +84,8 @@ export const createBlogPost = async (req, res) => {
         });
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("Create blog error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Could not publish blog post." });
     }
 };
 
@@ -85,7 +101,8 @@ export const getAllBlogs = async (req, res) => {
             data: blogs 
         });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("Fetch all blogs error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Could not load blog posts." });
     }
 };
 
@@ -95,9 +112,10 @@ export const getBlogBySlug = async (req, res) => {
         const param = req.params.slug;
         
         let blog;
-        if (param.match(/^[0-9a-fA-F]{24}$/)) {
+        if (param && param.match(/^[0-9a-fA-F]{24}$/)) {
             blog = await Blog.findById(param);
-        } else {
+        }
+        if (!blog && param) {
             blog = await Blog.findOne({ slug: param });
         }
 
@@ -105,7 +123,8 @@ export const getBlogBySlug = async (req, res) => {
         
         return res.status(200).json({ success: true, blog, data: blog });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("Fetch blog detail error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Could not load article." });
     }
 };
 
@@ -115,23 +134,27 @@ export const updateBlogPost = async (req, res) => {
         const { id } = req.params;
         const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
 
-        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
-        let updateData = { 
-            title: title ? title.trim() : undefined, 
-            content: sanitizedContent, 
-            metaTitle: metaTitle ? metaTitle.trim() : undefined, 
-            keywords: keywords ? keywords.trim() : undefined, 
-            category: category ? category.trim() : undefined, 
-            metaDesc: metaDesc ? metaDesc.trim() : undefined, 
-            schema: schema !== undefined ? String(schema).trim() : undefined, 
-            publisher: publisher ? publisher.trim() : undefined 
-        };
+        const sanitizedContent = content ? sanitizeDuplicateTitleHeading(title || "", content) : undefined;
+        let updateData = {};
+
+        if (title !== undefined) updateData.title = String(title).trim();
+        if (content !== undefined) updateData.content = sanitizedContent;
+        if (metaTitle !== undefined) updateData.metaTitle = String(metaTitle).trim();
+        if (keywords !== undefined) updateData.keywords = String(keywords).trim();
+        if (category !== undefined) updateData.category = String(category).trim();
+        if (metaDesc !== undefined) updateData.metaDesc = String(metaDesc).trim();
+        if (schema !== undefined) updateData.schema = String(schema).trim();
+        if (publisher !== undefined) updateData.publisher = String(publisher).trim();
 
         if (slug) {
-            const formattedSlug = slug.toLowerCase().trim().replace(/[^a-z0-9-_]/g, '-').replace(/-+/g, '-');
+            let formattedSlug = String(slug).toLowerCase().trim()
+                .replace(/[^a-z0-9-_]/g, '-')
+                .replace(/-+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
             const existing = await Blog.findOne({ slug: formattedSlug, _id: { $ne: id } });
             if (existing) {
-                return res.status(400).json({ success: false, message: "Another post with this slug already exists." });
+                formattedSlug = `${formattedSlug}-${Date.now().toString().slice(-4)}`;
             }
             updateData.slug = formattedSlug;
         }
@@ -139,7 +162,7 @@ export const updateBlogPost = async (req, res) => {
         if (req.file) {
             const oldBlog = await Blog.findById(id);
             if (oldBlog && oldBlog.coverImage) {
-                await deleteFromCloudinary(oldBlog.coverImage);
+                try { await deleteFromCloudinary(oldBlog.coverImage); } catch (e) { console.warn("Cloudinary delete warning:", e); }
             }
             updateData.coverImage = req.file.path;
         } else if (coverUrl || coverImageUrl) {
@@ -155,7 +178,8 @@ export const updateBlogPost = async (req, res) => {
         return res.status(200).json({ success: true, message: "Blog updated successfully!", data: updatedBlog, blog: updatedBlog });
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("Update blog error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Could not update blog post." });
     }
 };
 
@@ -170,11 +194,12 @@ export const deleteBlogPost = async (req, res) => {
         }
 
         if (deletedBlog.coverImage) {
-            await deleteFromCloudinary(deletedBlog.coverImage);
+            try { await deleteFromCloudinary(deletedBlog.coverImage); } catch (e) { console.warn("Cloudinary delete warning:", e); }
         }
 
         return res.status(200).json({ success: true, message: "Blog deleted successfully!" });
     } catch (error) {
-        return res.status(500).json({ success: false, message: error.message });
+        console.error("Delete blog error:", error);
+        return res.status(500).json({ success: false, message: error.message || "Could not delete blog post." });
     }
 };

@@ -47,23 +47,49 @@ export function renderNavbarState() {
     if (storedUser || token) {
         try {
             const user = storedUser ? JSON.parse(storedUser) : {};
-            const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
+            const role = user.role || sessionStorage.getItem("userRole");
 
-            authActions.innerHTML = `
-                <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
-                    <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
-                        <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
-                    </a>
-                    <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
-                        <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
-                    </a>
-                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
-                        Logout
-                    </button>
-                </div>
-            `;
+            if (role === "admin") {
+                authActions.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm font-medium text-black">
+                        <a href="./admin.html" class="bg-[#2A2A24] hover:bg-black text-amber-300 text-[11px] px-3 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-user-shield text-xs"></i> Admin Portal
+                        </a>
+                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            } else if (role === "seoadmin") {
+                authActions.innerHTML = `
+                    <div class="flex items-center gap-2 text-sm font-medium text-black">
+                        <a href="./seoadmin.html" class="bg-[#1E293B] hover:bg-slate-900 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold flex items-center gap-1 shadow-sm">
+                            <i class="fa-solid fa-pen-nib text-xs"></i> SEO Studio
+                        </a>
+                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            } else {
+                const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
+                authActions.innerHTML = `
+                    <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
+                        <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
+                            <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
+                        </a>
+                        <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
+                            <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
+                        </a>
+                        <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                            Logout
+                        </button>
+                    </div>
+                `;
+            }
 
             document.getElementById("logout-btn")?.addEventListener("click", () => {
+                sessionStorage.clear();
                 localStorage.removeItem("token");
                 localStorage.removeItem("userToken");
                 localStorage.removeItem("user");
