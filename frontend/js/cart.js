@@ -572,41 +572,111 @@ async function loadCartMoreProducts() {
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
     const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
 
+    let products = [];
+
     try {
         const response = await fetch(`${baseUrl}/api/products`);
-        if (!response.ok) throw new Error("Failed to load products");
-
-        const data = await response.json();
-        const products = Array.isArray(data) ? data : (data.products || data.data || []);
-        if (products.length === 0) return;
-
-        // Get currently added items in cart
-        const currentCart = getCart();
-        const cartProductNames = currentCart.map(item => String(item.name || "").trim().toLowerCase());
-        const cartProductIds = currentCart.map(item => String(item.id || item.productId || "").split('__')[0]);
-
-        // Exclude products that are ALREADY in the customer's cart
-        const filteredProducts = products.filter(product => {
-            const pName = String(product.name || "").trim().toLowerCase();
-            const pId = String(product._id || product.id || "");
-            
-            const isNameInCart = cartProductNames.some(name => name && pName && (name.includes(pName) || pName.includes(name)));
-            const isIdInCart = cartProductIds.some(id => id && pId && id === pId);
-
-            return !isNameInCart && !isIdInCart;
-        });
-
-        const displayProducts = filteredProducts.length > 0 ? filteredProducts : [];
-
-        const sectionEl = document.getElementById("more-products-section");
-        if (displayProducts.length === 0) {
-            if (sectionEl) sectionEl.classList.add("hidden");
-            return;
-        } else {
-            if (sectionEl) sectionEl.classList.remove("hidden");
+        if (response.ok) {
+            const data = await response.json();
+            products = Array.isArray(data) ? data : (data.products || data.data || []);
         }
+    } catch (error) {
+        console.warn("Could not fetch products from API, using fallback catalog.", error);
+    }
 
-        sliderTrack.innerHTML = displayProducts.map(product => {
+    if (!products || products.length === 0) {
+        products = [
+            {
+                _id: "p1",
+                name: "Purifying Glow Face Wash",
+                description: "With Saffron & Salicylic Acid Extract.",
+                rating: 4.9,
+                imageUrl: "./static/alora1.webp",
+                price: 149,
+                mrp: 499,
+                sizes: [
+                    { volume: "5ml", price: 149, mrp: 499 },
+                    { volume: "50ml", price: 299, mrp: 599 },
+                    { volume: "100ml", price: 499, mrp: 899 }
+                ]
+            },
+            {
+                _id: "p2",
+                name: "Soothing Face Scrub",
+                description: "With Walnut, Almond and Pomegranate Extract.",
+                rating: 4.8,
+                imageUrl: "./static/alora2.webp",
+                price: 149,
+                mrp: 499,
+                sizes: [
+                    { volume: "5g", price: 149, mrp: 499 },
+                    { volume: "50g", price: 349, mrp: 699 }
+                ]
+            },
+            {
+                _id: "p3",
+                name: "Brightening & Hydrating Face Serum",
+                description: "With Saffron, 2% Niacinamide, Hyaluronic Acid.",
+                rating: 4.9,
+                imageUrl: "./static/alora3.webp",
+                price: 149,
+                mrp: 499,
+                sizes: [
+                    { volume: "5ml", price: 149, mrp: 499 },
+                    { volume: "30ml", price: 599, mrp: 999 }
+                ]
+            },
+            {
+                _id: "p4",
+                name: "Soothing Body Lotion",
+                description: "With Niacinamide, Hyaluronic Acid & Shea butter.",
+                rating: 4.8,
+                imageUrl: "./static/alora4.webp",
+                price: 149,
+                mrp: 499,
+                sizes: [
+                    { volume: "5ml", price: 149, mrp: 499 },
+                    { volume: "200ml", price: 449, mrp: 799 }
+                ]
+            },
+            {
+                _id: "p5",
+                name: "Face Cream + Sunscreen SPF 30++",
+                description: "With Mulberry & Green Tea Extracts.",
+                rating: 4.9,
+                imageUrl: "./static/alora5.webp",
+                price: 149,
+                mrp: 499,
+                sizes: [
+                    { volume: "2g", price: 149, mrp: 499 },
+                    { volume: "50g", price: 399, mrp: 699 }
+                ]
+            }
+        ];
+    }
+
+    // Get currently added items in cart
+    const currentCart = getCart();
+    const cartProductNames = currentCart.map(item => String(item.name || "").trim().toLowerCase());
+    const cartProductIds = currentCart.map(item => String(item.id || item.productId || "").split('__')[0]);
+
+    // Exclude products that are ALREADY in the customer's cart
+    const filteredProducts = products.filter(product => {
+        const pName = String(product.name || "").trim().toLowerCase();
+        const pId = String(product._id || product.id || "");
+        
+        const isNameInCart = cartProductNames.some(name => name && pName && (name === pName));
+        const isIdInCart = cartProductIds.some(id => id && pId && id === pId);
+
+        return !isNameInCart && !isIdInCart;
+    });
+
+    const displayProducts = filteredProducts.length > 0 ? filteredProducts : products;
+
+    const sectionEl = document.getElementById("more-products-section");
+    if (sectionEl) sectionEl.classList.remove("hidden");
+
+    sliderTrack.innerHTML = displayProducts.map(product => {
             const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
                 ? product.sizes
                 : [{ volume: 'Standard', price: product.price || 499, mrp: product.mrp || 599 }];

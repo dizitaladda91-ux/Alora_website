@@ -77,7 +77,7 @@ async function renderBlogCards() {
                             
                             <!-- Category Badge Pill on Top-Left of Image -->
                             <div class="absolute top-3 left-3 z-10">
-                                <span class="bg-white/95 text-slate-900 border border-red-500 text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">
+                                <span class="bg-white/95 text-slate-900 border border-[#800000] text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">
                                     ${categoryName}
                                 </span>
                             </div>
@@ -86,8 +86,8 @@ async function renderBlogCards() {
                         <!-- Card Content Section -->
                         <div class="flex-1 flex flex-col justify-between space-y-3">
                             <div>
-                                <!-- Vibrant Pink Title -->
-                                <h3 class="text-lg sm:text-xl font-bold font-sans leading-snug text-[#ec4899] group-hover:text-[#db2777] transition-colors duration-200 line-clamp-2 mb-2">
+                                <!-- Rich Maroon Title -->
+                                <h3 class="text-lg sm:text-xl font-bold font-sans leading-snug text-[#800000] group-hover:text-[#8B0000] transition-colors duration-200 line-clamp-2 mb-2">
                                     ${post.title}
                                 </h3>
 
@@ -99,7 +99,7 @@ async function renderBlogCards() {
 
                             <!-- Footer Bar: Publisher | Date & Read More Button -->
                             <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
-                                <span class="text-xs font-bold text-[#ec4899] tracking-wide">
+                                <span class="text-xs font-bold text-[#800000] tracking-wide">
                                     ${publisherName} | ${formattedDate}
                                 </span>
 
