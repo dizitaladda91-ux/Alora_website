@@ -22,12 +22,18 @@ import { fileURLToPath } from "url";
 
 import User from "./models/userAuth.models.js"; 
 
+import { setSecurityHeaders, sanitizeNoSql, createRateLimiter } from "./middlewares/security.middleware.js";
+
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+
+// Security Rate Limiters
+const globalLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 300, message: "Too many API requests. Please slow down." });
+const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 25, message: "Too many login/auth attempts. Please try again after 15 minutes." });
 
 // Middleware setup
 const corsOptions = {
@@ -49,7 +55,7 @@ const corsOptions = {
       !origin || 
       allowedOrigins.includes(origin) || 
       /\.netlify\.app$/.test(origin) ||
-      /\.vercel\.app$/.test(origin)  // 👈 Vercel URLs ke liye ye add kiya hai
+      /\.vercel\.app$/.test(origin)
     ) {
       callback(null, true);
     } else {
@@ -59,16 +65,20 @@ const corsOptions = {
   credentials: true
 };
 
-
+app.use(setSecurityHeaders);
 app.use(compression());
 app.use(cors(corsOptions));
-app.options(/.*/, cors(corsOptions)); // Express 5 ke liye preflight route compatible hai
+app.options(/.*/, cors(corsOptions));
 
 // Razorpay signature must be verified against the exact raw body, before JSON parsing.
 app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
 app.use(express.json({ limit: '20mb' }));
 app.use(express.urlencoded({ limit: '20mb', extended: true }));
-app.use(cookieParser()); // Cookie Parser registration
+app.use(cookieParser());
+app.use(sanitizeNoSql);
+
+app.use("/api", globalLimiter);
+app.use("/api/auth", authLimiter);
 
 // A failed Atlas connection should not leave Mongoose requests buffering until
 // they time out. API clients receive a clear temporary-unavailable response,
