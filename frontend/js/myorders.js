@@ -1,4 +1,4 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getAuthHeaders } from "./config.js";
 
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const orderStatusInfo = (status) => {
@@ -25,10 +25,10 @@ async function loadMyOrders() {
   const loader = document.getElementById("orders-loader");
   const list = document.getElementById("orders-list");
   try {
-    const response = await fetch(`${BASE_URL}/api/orders/my`, { credentials: "include" });
+    const response = await fetch(`${BASE_URL}/api/orders/my`, { headers: getAuthHeaders(), credentials: "include" });
     const result = await response.json();
     if (response.status === 401) {
-      window.location.replace("./login.html");
+      if (loader) loader.innerHTML = `<p class="text-stone-500 text-sm">Please <a href="./login.html" class="underline text-[#A0522D] font-bold">Log In</a> to view your order history.</p>`;
       return;
     }
     if (!response.ok || !result.success) throw new Error(result.message || "Could not load your orders.");

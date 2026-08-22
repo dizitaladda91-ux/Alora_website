@@ -52,9 +52,14 @@ export function getProductUrl(product) {
     return `/product/${encodeURIComponent(slug || "product")}`;
 }
 
-// Use this only for admin/SEO actions. Public catalogue, blog and contact APIs do not need it.
+// Returns Auth headers with Bearer token from localStorage for protected user and admin endpoints
 export function getAuthHeaders(headers = {}) {
-    return headers;
+    const token = localStorage.getItem('userToken') || localStorage.getItem('token') || localStorage.getItem('jwt');
+    const authHeaders = { ...headers };
+    if (token && String(token).trim()) {
+        authHeaders['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
+    }
+    return authHeaders;
 }
 
 export async function safeFetchJson(url, options = {}) {

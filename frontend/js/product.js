@@ -216,6 +216,9 @@ window.selectGalleryVideo = function(videoUrl) {
 
         setPurchaseAvailability();
 
+        // Render Good To Know FAQs
+        renderGoodToKnowFaqs(product);
+
         // Product data successfully loaded -> triggers runtime reviews fetch
         fetchAndRenderReviews(productId);
 
@@ -482,7 +485,50 @@ async function fetchAndRenderReviews(productId) {
 
 // XSS Vulnerability injection defense helper function
 function escapeHTML(str) {
-    return str.replace(/[&<>'"]/g, 
+    if (!str) return '';
+    return String(str).replace(/[&<>'"]/g, 
         tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
     );
+}
+
+function renderGoodToKnowFaqs(product) {
+    const faqList = document.getElementById('product-faq-list');
+    if (!faqList) return;
+
+    let faqsToRender = Array.isArray(product?.faqs) && product.faqs.length > 0
+        ? product.faqs
+        : [
+            {
+                question: `Can I use the ${product?.name || 'Alora Radiance'} product every day?`,
+                answer: "Yes! Our products are dermatologist-formulated to be gentle enough for daily use, morning and night, to remove impurities without stripping skin moisture."
+            },
+            {
+                question: "Can I use the Face Serum every day?",
+                answer: "Yes. Apply 3-4 drops daily after cleansing and before your face cream. If you are new to active Retinol, start with alternate nights."
+            },
+            {
+                question: "When should I apply the Face Cream?",
+                answer: "Apply the Face Cream right after your serum, morning and night, to lock in active ingredients and seal 24-hour hydration."
+            },
+            {
+                question: "Can I use the Body Lotion every day?",
+                answer: "Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness."
+            },
+            {
+                question: "How often should I use the Face Scrub?",
+                answer: "Use the Face Scrub 2–3 times a week to gently exfoliate dead skin cells, unclog pores, and restore skin smoothness."
+            }
+        ];
+
+    faqList.innerHTML = faqsToRender.map((faq, index) => `
+        <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md" ${index === 0 ? 'open' : ''}>
+            <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
+                <span>${escapeHTML(faq.question)}</span>
+                <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
+            </summary>
+            <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
+                ${escapeHTML(faq.answer)}
+            </p>
+        </details>
+    `).join('');
 }

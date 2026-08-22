@@ -189,6 +189,15 @@ export const updateProductForSeo = async (req, res) => {
         const videoFile = req.files?.productVideo?.[0];
         if (videoFile) product.videoUrl = videoFile.path;
 
+        if (req.body.faqs !== undefined) {
+            try {
+                let parsedFaqs = typeof req.body.faqs === 'string' ? JSON.parse(req.body.faqs) : req.body.faqs;
+                if (Array.isArray(parsedFaqs)) {
+                    product.faqs = parsedFaqs.filter(f => f && f.question && f.answer);
+                }
+            } catch (e) {}
+        }
+
         await product.save();
         res.status(200).json(product);
     } catch (err) {

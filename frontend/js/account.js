@@ -59,7 +59,14 @@ async function loadMyOrders() {
 
         if (!response.ok) {
             if (response.status === 401) {
-                window.location.href = './login.html';
+                container.innerHTML = `
+                    <div class="bg-amber-50 text-amber-900 p-8 rounded-3xl border border-amber-200 text-center space-y-3">
+                        <i class="fa-solid fa-user-lock text-clay text-3xl mb-1"></i>
+                        <h3 class="font-serif font-bold text-lg">Session Expired or Login Required</h3>
+                        <p class="text-xs text-ash">Please log in again to view your order history and tracking status.</p>
+                        <a href="./login.html" class="inline-block bg-clay hover:bg-clay-dark text-white font-bold text-xs px-6 py-2.5 rounded-xl transition">Log In Now</a>
+                    </div>
+                `;
                 return;
             }
             throw new Error(result.message || 'Could not load order history.');

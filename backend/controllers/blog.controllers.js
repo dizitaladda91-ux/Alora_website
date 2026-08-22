@@ -47,9 +47,6 @@ export const createBlogPost = async (req, res) => {
             return res.status(400).json({ success: false, message: "A post with this slug already exists." });
         }
 
-        let finalCover = (req.file ? req.file.path : (coverUrl || coverImageUrl || "")).trim();
-        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
-
         const newBlog = new Blog({
             title: title.trim(),
             slug: formattedSlug,
