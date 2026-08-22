@@ -27,9 +27,9 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
 
-    // Cloudinary dynamic URL optimization (w_500, c_limit, q_auto, f_auto)
-    if (trimmed.includes('res.cloudinary.com') && trimmed.includes('/upload/') && !trimmed.includes('/w_')) {
-        return trimmed.replace('/upload/', '/upload/w_500,c_limit,q_auto,f_auto/');
+    // Cloudinary images load directly without broken URL string mutations
+    if (trimmed.includes('res.cloudinary.com')) {
+        return trimmed;
     }
 
     // If already an absolute URL or data URI, return as-is
@@ -39,7 +39,6 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
     const base = String(BASE_URL).replace(/\/+$/, '');
     const normalized = trimmed.replace(/^\.?\//, '/');
     
-    // Live domain par relative path /uploads/... banayega jo vercel.json backend routes par send kar dega
     return `${base}${normalized.startsWith('/') ? normalized : '/' + normalized}`;
 }
 

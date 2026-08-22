@@ -96,6 +96,10 @@ async function loadProductDetails() {
         // --- UI Updates ---
         const mainImg = document.getElementById('main-product-image');
         if (mainImg) {
+            mainImg.onerror = function() {
+                this.onerror = null;
+                this.src = './static/placeholder.png';
+            };
             mainImg.src = getImageUrl(product.imagepath, "./static/placeholder.png");
             mainImg.alt = product.name || "Product Image";
         }
@@ -105,7 +109,7 @@ async function loadProductDetails() {
             const gallery = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
             let thumbnailsHTML = gallery.map((imagePath, index) => `
                 <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white hover:border-amber-500 transition" onclick="window.selectGalleryImage('${getImageUrl(imagePath, './static/placeholder.png')}')">
-                    <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" loading="lazy" class="w-full h-full object-contain p-1">
+                    <img src="${getImageUrl(imagePath, './static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" loading="lazy" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='./static/placeholder.png'">
                 </button>`).join('');
 
             if (product.videoUrl && String(product.videoUrl).trim()) {
@@ -122,7 +126,7 @@ async function loadProductDetails() {
 window.selectGalleryImage = function(imgUrl) {
     const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
     if (!mediaContainer) return;
-    mediaContainer.innerHTML = `<img id="main-product-image" src="${imgUrl}" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105">`;
+    mediaContainer.innerHTML = `<img id="main-product-image" src="${imgUrl}" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='./static/placeholder.png'">`;
 };
 
 window.selectGalleryVideo = function(videoUrl) {

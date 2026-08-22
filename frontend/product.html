@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Details | Alora Radiance</title>
@@ -56,7 +57,7 @@
                 <!-- LEFT SIDE: IMAGES & GALLERY -->
                 <div class="space-y-4 sticky top-24">
                     <div id="main-media-container" class="imagesection bg-white rounded-2xl border border-[#E7DFC7] aspect-square flex items-center justify-center p-6 shadow-sm relative overflow-hidden">
-                        <img id="main-product-image" src="./static/placeholder.png" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105">
+                        <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </div>
 
                     <!-- THUMBNAILS & VIDEO ICON -->
@@ -228,12 +229,12 @@
     <div id="footer-placeholder"></div>
 
     <!-- SCRIPTS -->
-    <script src="./js/include.js"></script>
-    <script type="module" src="./js/navbar-interactions.js"></script>
-    <script type="module" src="./js/product.js"></script>
-    <script src="./js/cart.js"></script>
-    <script src="./js/app.js"></script>
-    <script type="module" src="./js/contacts.js"></script>
-    <script type="module" src="./js/lead.js"></script>
+    <script src="/js/include.js"></script>
+    <script type="module" src="/js/navbar-interactions.js"></script>
+    <script type="module" src="/js/product.js"></script>
+    <script src="/js/cart.js"></script>
+    <script src="/js/app.js"></script>
+    <script type="module" src="/js/contacts.js"></script>
+    <script type="module" src="/js/lead.js"></script>
 </body>
 </html>
