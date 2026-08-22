@@ -60,6 +60,63 @@ function compressImageFile(file, maxWidth = 1920, quality = 0.82) {
     });
 }
 
+// Helper: Convert Base64 data URI to File object
+function dataURItoFile(dataURI, filename = 'pasted-image.jpg') {
+    try {
+        const arr = dataURI.split(',');
+        const mime = arr[0].match(/:(.*?);/)[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new File([u8arr], filename, { type: mime });
+    } catch (e) {
+        return null;
+    }
+}
+
+// Auto-upload and replace any base64 images inside Quill HTML before form submission
+async function sanitizeAndUploadQuillImages(quillInstance) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = quillInstance.root.innerHTML;
+    const base64Imgs = tempDiv.querySelectorAll('img[src^="data:image/"]');
+    
+    if (base64Imgs.length === 0) return quillInstance.root.innerHTML;
+
+    console.log(`Found ${base64Imgs.length} base64 images in content. Uploading to Cloudinary...`);
+
+    for (const img of base64Imgs) {
+        const dataSrc = img.getAttribute('src');
+        const file = dataURItoFile(dataSrc);
+        if (file) {
+            try {
+                const compressed = await compressImageFile(file);
+                const formData = new FormData();
+                formData.append('image', compressed);
+
+                const response = await fetch(`${BASE_URL}/api/blogs/upload-image`, {
+                    method: 'POST',
+                    headers: getAuthHeaders(),
+                    credentials: 'include',
+                    body: formData
+                });
+
+                const data = await response.json();
+                if (response.ok && data.success && (data.url || data.imageUrl)) {
+                    img.setAttribute('src', data.url || data.imageUrl);
+                }
+            } catch (err) {
+                console.error("Failed to upload inline base64 image:", err);
+            }
+        }
+    }
+
+    quillInstance.root.innerHTML = tempDiv.innerHTML;
+    return tempDiv.innerHTML;
+}
+
 // Custom Cloudinary Image Uploader for Quill Editor
 async function uploadImageFile(file) {
     if (!file) return;
@@ -115,15 +172,39 @@ quill.getModule('toolbar').addHandler('image', () => {
     };
 });
 
-// Auto-upload pasted images
-quill.root.addEventListener('paste', (e) => {
+// Auto-upload pasted images & screenshots
+quill.root.addEventListener('paste', async (e) => {
     const clipboardData = e.clipboardData || window.clipboardData;
-    if (!clipboardData || !clipboardData.files || clipboardData.files.length === 0) return;
+    if (!clipboardData) return;
 
-    const file = clipboardData.files[0];
-    if (file && file.type.startsWith('image/')) {
-        e.preventDefault();
-        uploadImageFile(file);
+    const items = clipboardData.items || [];
+    for (let i = 0; i < items.length; i++) {
+        if (items[i].type && items[i].type.indexOf('image') !== -1) {
+            const file = items[i].getAsFile();
+            if (file) {
+                e.preventDefault();
+                await uploadImageFile(file);
+                return;
+            }
+        }
+    }
+
+    const pastedHtml = clipboardData.getData('text/html');
+    if (pastedHtml && pastedHtml.includes('data:image/')) {
+        setTimeout(async () => {
+            await sanitizeAndUploadQuillImages(quill);
+        }, 100);
+    }
+});
+
+// Intercept drag-and-drop images
+quill.root.addEventListener('drop', (e) => {
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        const file = e.dataTransfer.files[0];
+        if (file && file.type.startsWith('image/')) {
+            e.preventDefault();
+            uploadImageFile(file);
+        }
     }
 });
 
@@ -194,8 +275,17 @@ blogForm.addEventListener('submit', async function(event) {
     const publisher = document.getElementById('publisher').value.trim();
     const coverUrl = document.getElementById('cover-url').value.trim();
     
-    // Quill Rich text editor se direct HTML string nikalna
-    const content = quill.root.innerHTML; 
+    // Form validation checks
+    if (!title || !slug || quill.getText().trim().length === 0) {
+        alert("Bro! Title, Slug, and Blog Content are mandatory fields");
+        return;
+    }
+
+    // Auto-compress & upload any base64 images inside Quill content before sending to server
+    submitBtn.innerText = "Processing & Uploading Images...";
+    submitBtn.disabled = true;
+
+    const content = await sanitizeAndUploadQuillImages(quill);
     const coverFile = coverUpload.files[0];
 
     // Form validation checks
