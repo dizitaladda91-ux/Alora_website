@@ -74,6 +74,9 @@ function removeAppliedCoupon(code) {
 /* =========================================================
    UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (NORMALIZED & BULLETPROOF)
    ========================================================= */
+/* =========================================================
+   UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (NORMALIZED & BULLETPROOF)
+   ========================================================= */
 function getCart() {
     try {
         let cart1 = [];
@@ -89,16 +92,27 @@ function getCart() {
             if (raw2) cart2 = JSON.parse(raw2);
         } catch (e) {}
 
-        const rawList = (Array.isArray(cart1) && cart1.length > 0) ? cart1 : (Array.isArray(cart2) ? cart2 : []);
+        let rawList = [];
+        if (Array.isArray(cart1) && cart1.length > 0) {
+            rawList = cart1;
+        } else if (Array.isArray(cart2) && cart2.length > 0) {
+            rawList = cart2;
+        } else if (Array.isArray(cart1)) {
+            rawList = cart1;
+        } else if (Array.isArray(cart2)) {
+            rawList = cart2;
+        }
 
         const normalizedCart = rawList.map(item => {
-            const id = item.id || item.uniqueCartItemKeyId || `${item.productId || 'p'}__${item.size || item.activeSelectedSizeConfig || 'Standard'}`;
-            const name = item.name || item.productName || 'Alora Skincare Product';
-            const size = item.size || item.activeSelectedSizeConfig || 'Standard';
+            if (!item || typeof item !== "object") return null;
+
+            const id = String(item.id || item.uniqueCartItemKeyId || item._id || `${item.productId || 'product'}__${item.size || item.activeSelectedSizeConfig || 'Standard'}`);
+            const name = String(item.name || item.productName || item.title || 'Alora Skincare Product').trim();
+            const size = String(item.size || item.activeSelectedSizeConfig || 'Standard').trim();
             const price = Number(item.price || item.unitPriceItemConfig || 0);
-            const mrp = Number(item.mrp || item.unitPriceItemConfig || price);
-            const qty = Number(item.qty || item.qtyCountOrderMetric || 1);
-            const img = item.img || item.baseImg || './static/placeholder.png';
+            const mrp = Number(item.mrp || item.comparePrice || item.unitPriceItemConfig || price) || price;
+            const qty = Math.max(1, Number(item.qty || item.qtyCountOrderMetric || item.quantity || 1));
+            const img = String(item.img || item.baseImg || item.image || item.imageUrl || './static/placeholder.png');
 
             return {
                 id,
@@ -115,7 +129,7 @@ function getCart() {
                 img,
                 baseImg: img
             };
-        }).filter(item => item.qty > 0 && item.id);
+        }).filter(item => item && item.id && item.qty > 0);
 
         return normalizedCart;
     } catch (e) {
