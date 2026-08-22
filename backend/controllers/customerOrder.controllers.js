@@ -1,17 +1,32 @@
 import Order from "../models/order.models.js";
+import User from "../models/userAuth.models.js";
 
 export const getMyOrders = async (req, res) => {
   try {
     const page = Math.max(1, Number.parseInt(req.query.page, 10) || 1);
     const limit = Math.min(25, Math.max(1, Number.parseInt(req.query.limit, 10) || 10));
-    const filter = { userId: req.user.id };
+    
+    // Find logged in user to get their registered email and phone number
+    const user = await User.findById(req.user.id).select("email phone").lean();
+    
+    const queryConditions = [{ userId: req.user.id }];
+    if (user?.email) {
+      queryConditions.push({ "customer.email": user.email.toLowerCase().trim() });
+    }
+    if (user?.phone) {
+      queryConditions.push({ "customer.phone": user.phone.trim() });
+    }
+    
+    const filter = { $or: queryConditions };
+
     const [orders, total] = await Promise.all([
       Order.find(filter).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(limit).lean(),
       Order.countDocuments(filter)
     ]);
 
     return res.status(200).json({ success: true, data: orders, pagination: { page, limit, total, totalPages: Math.ceil(total / limit) } });
-  } catch {
+  } catch (error) {
+    console.error("GET_MY_ORDERS_ERROR:", error);
     return res.status(500).json({ success: false, message: "Could not load your orders." });
   }
 };

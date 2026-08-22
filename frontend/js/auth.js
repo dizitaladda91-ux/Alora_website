@@ -249,9 +249,10 @@ function initLoginForm() {
                 };
 
                 localStorage.setItem("user", JSON.stringify(userObjToStore)); 
-                // JWT stays in the HttpOnly cookie and must never be stored in localStorage.
-                localStorage.removeItem("token");
-                localStorage.removeItem("userToken");
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("userToken", data.token);
+                }
 
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
                 

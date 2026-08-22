@@ -105,7 +105,8 @@ export const register = async (req, res, next) => {
     res.status(201).json({
       success: true,
       message: 'Registration successful!',
-      user: { name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
+      token,
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
     });
   } catch (error) {
     console.error("REGISTER_ERROR:", error);
@@ -139,7 +140,8 @@ export const login = async (req, res, next) => {
     res.status(200).json({ 
       success: true,
       message: 'Login successful!', 
-      user: { name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
+      token,
+      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
     });
   } catch (error) {
     console.error("LOGIN_ERROR:", error);
