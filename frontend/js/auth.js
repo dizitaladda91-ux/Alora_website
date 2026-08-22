@@ -361,9 +361,13 @@ export function renderNavbarState() {
             const userName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
 
             authContainer.innerHTML = `
-                <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
-                    <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
-                    ${user.role === 'user' ? '<a href="/account" class="text-[10px] font-bold uppercase text-[#A0522D] hover:underline">My Orders</a>' : ''}
+                <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
+                    <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
+                        <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
+                    </a>
+                    <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
+                        <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
+                    </a>
                     <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                         Logout
                     </button>

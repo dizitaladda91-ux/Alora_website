@@ -1,8 +1,9 @@
 import BASE_URL, { getImageUrl, getProductUrl } from "./config.js";
-const RUPEE_SYMBOL = '\u20B9';
+
+const RUPEE_SYMBOL = "₹";
 
 // ==========================================
-// 1. GLOBAL CUSTOM SUCCESS MODAL
+// 1. UTILITY: MODAL NOTIFICATIONS
 // ==========================================
 export function showSuccessModal(title, message, callback) {
     const existingModal = document.getElementById("custom-success-modal");
@@ -10,13 +11,11 @@ export function showSuccessModal(title, message, callback) {
 
     const modal = document.createElement("div");
     modal.id = "custom-success-modal";
-    modal.className = "fixed inset-0 flex items-center justify-center z-[9999] bg-black/60 backdrop-blur-sm";
+    modal.className = "fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 transition-all duration-300";
     modal.innerHTML = `
-        <div class="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-gold/20 text-center">
-            <div class="flex items-center justify-center w-12 h-12 mx-auto mb-4 bg-green-100 rounded-full">
-                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+        <div class="bg-white rounded-2xl p-6 max-w-sm w-full text-center shadow-2xl border border-gray-100 transform scale-100 animate-in fade-in zoom-in duration-200">
+            <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-check"></i>
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-1">${title}</h3>
             <p class="text-gray-500 text-sm mb-6">${message}</p>
@@ -39,36 +38,40 @@ export function showSuccessModal(title, message, callback) {
 export function renderNavbarState() {
     const authActions = document.getElementById("auth-actions");
     const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("userToken") || localStorage.getItem("token");
 
     if (!authActions) {
         return;
     }
 
-    if (storedUser && token) {
+    if (storedUser || token) {
         try {
-            const user = JSON.parse(storedUser);
-            const displayName = user.name || "User";
+            const user = storedUser ? JSON.parse(storedUser) : {};
+            const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
 
             authActions.innerHTML = `
-                <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
-                    <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
-                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
+                <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
+                    <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
+                        <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
+                    </a>
+                    <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
+                        <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
+                    </a>
+                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                         Logout
                     </button>
                 </div>
             `;
 
-            document.getElementById("logout-btn").addEventListener("click", () => {
+            document.getElementById("logout-btn")?.addEventListener("click", () => {
                 localStorage.removeItem("token");
+                localStorage.removeItem("userToken");
                 localStorage.removeItem("user");
                 window.location.href = "./index.html";
             });
 
         } catch (err) {
             console.error("Localstorage data read error:", err);
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
         }
     } else {
         authActions.innerHTML = `
@@ -120,23 +123,23 @@ function initSearchFunctionality() {
         }
 
         debounceTimer = setTimeout(() => {
-            fetchSuggestions(query, suggestionsBox);
+            fetchSearchSuggestions(query, suggestionsBox);
         }, 300);
     });
 
     document.addEventListener("click", (e) => {
         if (!searchContainer.contains(e.target) && !searchOpenBtn.contains(e.target)) {
+            searchContainer.classList.add("hidden");
             suggestionsBox.classList.add("hidden");
         }
     });
 }
 
-async function fetchSuggestions(query, suggestionsBox) {
+async function fetchSearchSuggestions(query, suggestionsBox) {
     try {
-        const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
-        
-        if (!response.ok) throw new Error("Search API response error");
-        
+        const response = await fetch(`${BASE_URL}/api/product?search=${encodeURIComponent(query)}`);
+        if (!response.ok) return;
+
         const data = await response.json();
         const productsList = data.products || (Array.isArray(data) ? data : []);
 
@@ -180,45 +183,5 @@ function setupAppLifecycle() {
     initSearchFunctionality();
 }
 
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", setupAppLifecycle);
-} else {
-    setupAppLifecycle();
-}
-
-document.addEventListener("partialsLoaded", () => {
-    setupAppLifecycle();
-});
-
-// partialsLoaded event ke baad hi renderNavbarState/initSearch chalega (see listener above)
-// Note: setTimeout fallback hataya gaya tha — navbar partial load hone se pehle #auth-actions DOM me nahi hota
-
-// Global query form handler
-document.addEventListener("submit", async (e) => {
-    if (e.target && e.target.id === "contactForm") {
-        e.preventDefault();
-        const form = e.target;
-        const name = document.getElementById("name").value;
-        const email = document.getElementById("email").value;
-        const message = document.getElementById("message").value;
-
-        try {
-            const response = await fetch(`${BASE_URL}/api/queries`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, message })
-            });
-
-            const data = await response.json();
-            if (response.ok) {
-                form.reset();
-                showSuccessModal("Weldone!", "Aapki query hume mil chuki hai. Hum jald aapse connect karenge.");
-            } else {
-                alert("Error: " + (data.message || "Something went wrong"));
-            }
-        } catch (error) {
-            console.error("Query Submit Error:", error);
-            alert("Server connected nahi hai.");
-        }
-    }
-});
+document.addEventListener("DOMContentLoaded", setupAppLifecycle);
+document.addEventListener("partialsLoaded", setupAppLifecycle);
