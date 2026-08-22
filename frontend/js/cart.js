@@ -622,6 +622,7 @@ async function applyCoupon() {
 async function loadCartMoreProducts() {
     try {
         const sliderTrack = document.getElementById("cart-product-slider");
+        const sectionEl = document.getElementById("more-products-section");
         if (!sliderTrack) return;
 
         const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
@@ -629,141 +630,92 @@ async function loadCartMoreProducts() {
 
         let products = [];
 
-    try {
-        const response = await fetch(`${baseUrl}/api/products`);
-        if (response.ok) {
-            const data = await response.json();
-            products = Array.isArray(data) ? data : (data.products || data.data || []);
-        }
-    } catch (error) {
-        console.warn("Could not fetch products from API, using fallback catalog.", error);
-    }
-
-    if (!products || products.length === 0) {
-        products = [
-            {
-                _id: "p1",
-                name: "Purifying Glow Face Wash",
-                description: "With Saffron & Salicylic Acid Extract.",
-                rating: 4.9,
-                imageUrl: "./static/alora1.webp",
-                price: 149,
-                mrp: 499,
-                sizes: [
-                    { volume: "5ml", price: 149, mrp: 499 },
-                    { volume: "50ml", price: 299, mrp: 599 },
-                    { volume: "100ml", price: 499, mrp: 899 }
-                ]
-            },
-            {
-                _id: "p2",
-                name: "Soothing Face Scrub",
-                description: "With Walnut, Almond and Pomegranate Extract.",
-                rating: 4.8,
-                imageUrl: "./static/alora2.webp",
-                price: 149,
-                mrp: 499,
-                sizes: [
-                    { volume: "5g", price: 149, mrp: 499 },
-                    { volume: "50g", price: 349, mrp: 699 }
-                ]
-            },
-            {
-                _id: "p3",
-                name: "Brightening & Hydrating Face Serum",
-                description: "With Saffron, 2% Niacinamide, Hyaluronic Acid.",
-                rating: 4.9,
-                imageUrl: "./static/alora3.webp",
-                price: 149,
-                mrp: 499,
-                sizes: [
-                    { volume: "5ml", price: 149, mrp: 499 },
-                    { volume: "30ml", price: 599, mrp: 999 }
-                ]
-            },
-            {
-                _id: "p4",
-                name: "Soothing Body Lotion",
-                description: "With Niacinamide, Hyaluronic Acid & Shea butter.",
-                rating: 4.8,
-                imageUrl: "./static/alora4.webp",
-                price: 149,
-                mrp: 499,
-                sizes: [
-                    { volume: "5ml", price: 149, mrp: 499 },
-                    { volume: "200ml", price: 449, mrp: 799 }
-                ]
-            },
-            {
-                _id: "p5",
-                name: "Face Cream + Sunscreen SPF 30++",
-                description: "With Mulberry & Green Tea Extracts.",
-                rating: 4.9,
-                imageUrl: "./static/alora5.webp",
-                price: 149,
-                mrp: 499,
-                sizes: [
-                    { volume: "2g", price: 149, mrp: 499 },
-                    { volume: "50g", price: 399, mrp: 699 }
-                ]
+        try {
+            const response = await fetch(`${baseUrl}/api/product/all`);
+            if (response.ok) {
+                const data = await response.json();
+                products = Array.isArray(data) ? data : (data.products || data.data || []);
             }
-        ];
-    }
+        } catch (error) {
+            console.warn("Could not fetch products from DB API:", error);
+        }
 
-    // Get currently added items in cart
-    const currentCart = getCart();
-    const cartProductNames = currentCart.map(item => String(item.name || "").trim().toLowerCase());
-    const cartProductIds = currentCart.map(item => String(item.id || item.productId || "").split('__')[0]);
+        if (!products || products.length === 0) {
+            if (sectionEl) sectionEl.classList.add("hidden");
+            return;
+        }
 
-    // Exclude products that are ALREADY in the customer's cart
-    const filteredProducts = products.filter(product => {
-        const pName = String(product.name || "").trim().toLowerCase();
-        const pId = String(product._id || product.id || "");
-        
-        const isNameInCart = cartProductNames.some(name => name && pName && (name === pName));
-        const isIdInCart = cartProductIds.some(id => id && pId && id === pId);
+        // Get currently added items in cart
+        const currentCart = getCart();
+        const cartProductNames = currentCart.map(item => String(item.name || "").trim().toLowerCase());
+        const cartProductIds = currentCart.map(item => String(item.id || item.productId || "").split('__')[0]);
 
-        return !isNameInCart && !isIdInCart;
-    });
+        // Exclude products that are ALREADY in the customer's cart
+        const filteredProducts = products.filter(product => {
+            const pName = String(product.name || "").trim().toLowerCase();
+            const pId = String(product._id || product.id || "");
+            
+            const isNameInCart = cartProductNames.some(name => name && pName && (name === pName));
+            const isIdInCart = cartProductIds.some(id => id && pId && id === pId);
 
-    const displayProducts = filteredProducts.length > 0 ? filteredProducts : products;
+            return !isNameInCart && !isIdInCart;
+        });
 
-    const sectionEl = document.getElementById("more-products-section");
-    if (sectionEl) sectionEl.classList.remove("hidden");
+        const displayProducts = filteredProducts.length > 0 ? filteredProducts : products;
 
-    sliderTrack.innerHTML = displayProducts.map(product => {
-            const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
-                ? product.sizes
-                : [{ volume: 'Standard', price: product.price || 499, mrp: product.mrp || 599 }];
+        if (displayProducts.length === 0) {
+            if (sectionEl) sectionEl.classList.add("hidden");
+            return;
+        } else {
+            if (sectionEl) sectionEl.classList.remove("hidden");
+        }
 
-            const initialSize = sizes[0];
-            const initialPrice = initialSize.price || product.price || 499;
-            const initialComparePrice = initialSize.mrp || product.mrp || 0;
-            const discountPercent = initialComparePrice ? Math.round(((initialComparePrice - initialPrice) / initialComparePrice) * 100) : 0;
+        const resolveImgUrl = (path) => {
+            if (!path) return "./static/placeholder.png";
+            if (path.startsWith("http://") || path.startsWith("https://")) return path;
+            const cleaned = path.replace(/\\/g, "/").replace(/^\/+/, "");
+            return baseUrl ? `${baseUrl}/${cleaned}` : `./${cleaned}`;
+        };
 
-            const fullImgUrl = product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "./static/placeholder.png";
+        sliderTrack.innerHTML = displayProducts.map(product => {
+            const variants = Array.isArray(product.variants) && product.variants.length > 0
+                ? product.variants
+                : (Array.isArray(product.sizes) && product.sizes.length > 0 
+                    ? product.sizes 
+                    : [{ volume: 'Standard', price: product.price || 149, comparePrice: product.comparePrice || product.mrp || 499 }]);
+
+            const initialVariant = variants[0];
+            const initialPrice = Number(initialVariant.price || product.price || 149);
+            const initialComparePrice = Number(initialVariant.comparePrice || initialVariant.mrp || product.comparePrice || product.mrp || 0);
+            const discountPercent = initialComparePrice > initialPrice ? Math.round(((initialComparePrice - initialPrice) / initialComparePrice) * 100) : 0;
+
+            const fullImgUrl = resolveImgUrl(product.imagepath || product.imageUrl || (Array.isArray(product.galleryImages) && product.galleryImages[0]));
 
             const starsHTML = Array.from({ length: 5 }, (_, i) => {
-                const rating = product.rating || 5;
-                if (i < Math.floor(rating)) return `<i class="fa-solid fa-star text-amber-400"></i>`;
-                if (i < rating) return `<i class="fa-solid fa-star-half-stroke text-amber-400"></i>`;
+                const rating = Math.round(product.rating || 5);
+                if (i < rating) return `<i class="fa-solid fa-star text-amber-400"></i>`;
                 return `<i class="fa-regular fa-star text-slate-300"></i>`;
             }).join("");
 
-            const sizeButtonsHTML = sizes.map((s, index) => `
+            const sizeButtonsHTML = variants.map((v, index) => {
+                const vol = v.volume || v.size || 'Standard';
+                const p = Number(v.price || initialPrice);
+                const cp = Number(v.comparePrice || v.mrp || 0);
+                return `
                 <button type="button" 
-                    onclick="selectSize('${s.volume}', ${s.price}, ${s.mrp || 0}, this)"
+                    onclick="selectSize('${vol}', ${p}, ${cp}, this)"
                     class="size-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition border ${index === 0 ? 'bg-ink text-parchment border-ink font-semibold' : 'border-[#DCD3BA] text-ash hover:border-ink'}">
-                    ${s.volume}
+                    ${vol}
                 </button>
-            `).join("");
+                `;
+            }).join("");
 
             const slug = String(product.slug || product.name || "product").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
             return `
             <div class="product-card flex-none w-[240px] sm:w-[280px] bg-white rounded-2xl p-3.5 sm:p-4 border border-amber-900/10 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between group relative overflow-hidden" 
                  data-product-id="${product._id || product.id}" 
-                 data-size="${initialSize.volume}" 
+                 data-size="${initialVariant.volume || 'Standard'}" 
                  data-price="${initialPrice}" 
                  data-mrp="${initialComparePrice}">
                 
@@ -776,7 +728,7 @@ async function loadCartMoreProducts() {
 
                 <div class="w-full flex justify-center items-center h-[130px] sm:h-[160px] overflow-hidden relative my-1">
                     <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm" onerror="this.onerror=null; this.src='./static/placeholder.png'">
                     </a>
                 </div>
 
