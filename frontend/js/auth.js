@@ -125,31 +125,33 @@ if (document.readyState === "loading") {
 }
 
 // ==========================================
-// 3. LOGOUT LOGIC
-// ==========================================
 async function handleLogout() {
     try {
         await fetch(`${BASE_URL}/api/auth/logout`, { 
             method: "POST",
+            headers: getAuthHeaders(),
             credentials: "include" 
         });
     } catch (err) {
         console.error("Logout API error:", err);
+    } finally {
+        sessionStorage.clear();
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userToken");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("tabAuthActive");
+        localStorage.removeItem("admin_token");
+        localStorage.removeItem("seo_token");
+        window.location.replace("./login.html");
     }
-    localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userToken");
-    window.location.replace("./login.html");
 }
 
 document.addEventListener("click", (e) => {
-    if (e.target && (
-        e.target.id === "adminLogoutBtn" || 
-        e.target.closest("#adminLogoutBtn") || 
-        e.target.id === "logout-btn" || 
-        e.target.closest("#logout-btn")
-    )) {
+    const logoutBtn = e.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
+    if (logoutBtn) {
         e.preventDefault();
+        e.stopPropagation();
         handleLogout();
     }
 });

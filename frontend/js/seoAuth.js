@@ -42,21 +42,44 @@ async function protectSeoPage() {
     sessionStorage.setItem("user", JSON.stringify(user));
 }
 
+function clearAllAuthStorageAndRedirect() {
+    sessionStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("tabAuthActive");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("seo_token");
+    window.location.replace("./login.html");
+}
+
+async function handleSeoLogout(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { 
+            method: "POST", 
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+    } catch (err) {
+        console.warn("Logout request failed:", err);
+    } finally {
+        clearAllAuthStorageAndRedirect();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     protectSeoPage();
-
-    document.querySelectorAll(".seo-logout-btn, #seoLogoutBtn").forEach(btn => {
-        btn.addEventListener("click", async (event) => {
-            event.preventDefault();
-            try {
-                await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
-            } finally {
-                sessionStorage.clear();
-                localStorage.removeItem("user");
-                localStorage.removeItem("token");
-                localStorage.removeItem("userToken");
-                window.location.href = "./login.html";
-            }
-        });
-    });
 });
+
+document.addEventListener("click", (event) => {
+    const logoutBtn = event.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
+    if (logoutBtn) {
+        handleSeoLogout(event);
+    }
+});
+

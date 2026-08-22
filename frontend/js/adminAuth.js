@@ -46,19 +46,44 @@ async function protectAdminPage() {
     }
 }
 
+function clearAllAuthStorageAndRedirect() {
+    sessionStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("tabAuthActive");
+    localStorage.removeItem("admin_token");
+    localStorage.removeItem("seo_token");
+    window.location.replace("./login.html");
+}
+
+async function handleAdminLogout(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { 
+            method: "POST", 
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+    } catch (err) {
+        console.warn("Logout request failed:", err);
+    } finally {
+        clearAllAuthStorageAndRedirect();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", () => {
     protectAdminPage();
-
-    document.getElementById("adminLogoutBtn")?.addEventListener("click", async (event) => {
-        event.preventDefault();
-        try {
-            await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
-        } finally {
-            sessionStorage.clear();
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
-            localStorage.removeItem("userToken");
-            window.location.href = "./login.html";
-        }
-    });
 });
+
+document.addEventListener("click", (event) => {
+    const logoutBtn = event.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
+    if (logoutBtn) {
+        handleAdminLogout(event);
+    }
+});
+

@@ -160,10 +160,21 @@ window.openInvoiceModal = async (orderId) => {
 
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.getElementById("adminLogoutBtn");
-    logout?.addEventListener("click", async () => {
-        await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
-        localStorage.removeItem("user");
-        window.location.href = "./login.html";
+    logout?.addEventListener("click", async (e) => {
+        e.preventDefault();
+        try {
+            await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
+        } catch (err) {
+            console.warn("Logout error:", err);
+        } finally {
+            sessionStorage.clear();
+            localStorage.removeItem("user");
+            localStorage.removeItem("token");
+            localStorage.removeItem("userToken");
+            localStorage.removeItem("userRole");
+            localStorage.removeItem("tabAuthActive");
+            window.location.replace("./login.html");
+        }
     });
 
     document.getElementById("closeInvoiceBtn")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
