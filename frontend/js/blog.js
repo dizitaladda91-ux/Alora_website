@@ -44,41 +44,68 @@ async function renderBlogCards() {
             injectMultipleSchemasToDOM(latestPost ? latestPost.schema : null, fallbackBlogCollectionSchema);
             }
 
-            // Cards loop rendering as usual
+            // Helper to strip HTML tags for clean description snippet
+            const getSnippet = (post) => {
+                if (post.metaDesc && post.metaDesc.trim()) return post.metaDesc.trim();
+                if (!post.content) return "Explore dermatologist-tested skincare tips and natural beauty insights from Alora Radiance.";
+                const cleanText = post.content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+                return cleanText.length > 140 ? cleanText.slice(0, 140) + '...' : cleanText;
+            };
+
+            // Cards loop rendering as specified in design mock
             result.data.forEach(post => {
-                const formattedDate = new Date(post.createdAt).toLocaleDateString('en-US', {
-                    month: 'short',
+                const formattedDate = new Date(post.createdAt).toLocaleDateString('en-GB', {
                     day: 'numeric',
+                    month: 'short',
                     year: 'numeric'
                 });
 
-                const absoluteCoverImage = post.coverImage.startsWith('http') 
-                    ? post.coverImage 
-                    : `${BASE_URL}${post.coverImage}`;
+                const absoluteCoverImage = post.coverImage 
+                    ? (post.coverImage.startsWith('http') ? post.coverImage : `${BASE_URL}${post.coverImage}`)
+                    : './static/alora5.webp';
+
+                const publisherName = post.publisher || 'Alora Radiance';
+                const snippetText = getSnippet(post);
+                const categoryName = post.category || 'Skincare';
 
                 const cardHTML = `
-                    <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-amber-900/10 flex flex-col cursor-pointer transition-all duration-300 hover:shadow-lg hover:-translate-y-1 group" onclick="goToPost('${post.slug}')">
-                        <div class="w-full h-52 overflow-hidden bg-slate-100 relative">
-                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
-                        </div>
+                    <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer" onclick="goToPost('${post.slug}')">
                         
-                        <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
+                        <!-- Top Image Area with Overlay Category Pill -->
+                        <div class="relative w-full h-52 sm:h-56 rounded-2xl overflow-hidden mb-4 bg-slate-100">
+                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                            
+                            <!-- Category Badge Pill on Top-Left of Image -->
+                            <div class="absolute top-3 left-3 z-10">
+                                <span class="bg-white/95 text-slate-900 border border-red-500 text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">
+                                    ${categoryName}
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Card Content Section -->
+                        <div class="flex-1 flex flex-col justify-between space-y-3">
                             <div>
-                                <div class="flex items-center space-x-2 mb-2.5 text-xs tracking-wide">
-                                    <span class="bg-amber-100/70 text-[#8B4513] px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase font-roboto border border-amber-300/40">${post.category || 'General'}</span>
-                                    <span class="text-slate-300">•</span>
-                                    <span class="text-slate-500 font-medium">${formattedDate}</span>
-                                </div>
-                                <h3 class="text-base sm:text-lg font-bold font-fraunces leading-snug text-slate-900 group-hover:text-[#8B4513] transition-colors duration-200 line-clamp-2">
+                                <!-- Vibrant Pink Title -->
+                                <h3 class="text-lg sm:text-xl font-bold font-sans leading-snug text-[#ec4899] group-hover:text-[#db2777] transition-colors duration-200 line-clamp-2 mb-2">
                                     ${post.title}
                                 </h3>
+
+                                <!-- Description Snippet -->
+                                <p class="text-xs sm:text-sm text-slate-600 font-sans leading-relaxed line-clamp-3">
+                                    ${snippetText}
+                                </p>
                             </div>
-                            
-                            <div class="pt-2 border-t border-slate-100 flex items-center justify-between">
-                                <span class="text-[#8B4513] text-xs font-bold inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all duration-200">
-                                    Read Article <i class="fa-solid fa-arrow-right text-[10px]"></i>
+
+                            <!-- Footer Bar: Publisher | Date & Read More Button -->
+                            <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
+                                <span class="text-xs font-bold text-[#ec4899] tracking-wide">
+                                    ${publisherName} | ${formattedDate}
                                 </span>
-                                <span class="text-[11px] text-slate-400 font-medium">3 min read</span>
+
+                                <span class="bg-black hover:bg-slate-900 text-white text-xs font-extrabold px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 shadow-sm group-hover:scale-105">
+                                    Read More <i class="fa-solid fa-angle-right text-[10px]"></i>
+                                </span>
                             </div>
                         </div>
                     </div>
