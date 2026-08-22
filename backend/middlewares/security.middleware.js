@@ -24,33 +24,29 @@ export const setSecurityHeaders = (req, res, next) => {
     next();
 };
 
-// 2. Anti-NoSQL Query Injection Middleware
+// 2. Anti-NoSQL Query Injection Middleware (Express 5 Compatible)
 export const sanitizeNoSql = (req, res, next) => {
-    const cleanObject = (obj) => {
-        if (!obj || typeof obj !== "object") return obj;
-        
-        if (Array.isArray(obj)) {
-            return obj.map(cleanObject);
-        }
-
-        const cleaned = {};
+    const sanitizeInPlace = (obj) => {
+        if (!obj || typeof obj !== "object") return;
         for (const key of Object.keys(obj)) {
-            // Strip out $ operators or . paths that could cause MongoDB query injection
-            const sanitizedKey = key.replace(/^\$|\./g, "");
-            const val = obj[key];
-
-            if (typeof val === "object" && val !== null) {
-                cleaned[sanitizedKey] = cleanObject(val);
-            } else {
-                cleaned[sanitizedKey] = val;
+            if (key.startsWith("$") || key.includes(".")) {
+                const cleanKey = key.replace(/^\$|\./g, "");
+                obj[cleanKey] = obj[key];
+                delete obj[key];
+            }
+            if (typeof obj[key] === "object" && obj[key] !== null) {
+                sanitizeInPlace(obj[key]);
             }
         }
-        return cleaned;
     };
 
-    if (req.body) req.body = cleanObject(req.body);
-    if (req.query) req.query = cleanObject(req.query);
-    if (req.params) req.params = cleanObject(req.params);
+    try {
+        if (req.body) sanitizeInPlace(req.body);
+        if (req.query) sanitizeInPlace(req.query);
+        if (req.params) sanitizeInPlace(req.params);
+    } catch (e) {
+        console.warn("Sanitization warning:", e);
+    }
 
     next();
 };
