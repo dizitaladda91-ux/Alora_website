@@ -560,6 +560,125 @@ async function applyCoupon() {
 }
 
 /* =========================================================
+   MORE PRODUCTS SLIDER FOR CHECKOUT PAGE
+   ========================================================= */
+async function loadCartMoreProducts() {
+    const sliderTrack = document.getElementById("cart-product-slider");
+    if (!sliderTrack) return;
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
+
+    try {
+        const response = await fetch(`${baseUrl}/api/products`);
+        if (!response.ok) throw new Error("Failed to load products");
+
+        const data = await response.json();
+        const products = Array.isArray(data) ? data : (data.products || data.data || []);
+        if (products.length === 0) return;
+
+        sliderTrack.innerHTML = products.map(product => {
+            const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
+                ? product.sizes
+                : [{ volume: 'Standard', price: product.price || 499, mrp: product.mrp || 599 }];
+
+            const initialSize = sizes[0];
+            const initialPrice = initialSize.price || product.price || 499;
+            const initialComparePrice = initialSize.mrp || product.mrp || 0;
+            const discountPercent = initialComparePrice ? Math.round(((initialComparePrice - initialPrice) / initialComparePrice) * 100) : 0;
+
+            const fullImgUrl = product.imageUrl || (Array.isArray(product.images) && product.images[0]) || "./static/placeholder.png";
+
+            const starsHTML = Array.from({ length: 5 }, (_, i) => {
+                const rating = product.rating || 5;
+                if (i < Math.floor(rating)) return `<i class="fa-solid fa-star text-amber-400"></i>`;
+                if (i < rating) return `<i class="fa-solid fa-star-half-stroke text-amber-400"></i>`;
+                return `<i class="fa-regular fa-star text-slate-300"></i>`;
+            }).join("");
+
+            const sizeButtonsHTML = sizes.map((s, index) => `
+                <button type="button" 
+                    onclick="selectSize('${s.volume}', ${s.price}, ${s.mrp || 0}, this)"
+                    class="size-btn px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-md text-[10px] sm:text-[11px] font-semibold transition border ${index === 0 ? 'bg-ink text-parchment border-ink font-semibold' : 'border-[#DCD3BA] text-ash hover:border-ink'}">
+                    ${s.volume}
+                </button>
+            `).join("");
+
+            const slug = String(product.slug || product.name || "product").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+
+            return `
+            <div class="product-card flex-none w-[240px] sm:w-[280px] bg-white rounded-2xl p-3.5 sm:p-4 border border-amber-900/10 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col justify-between group relative overflow-hidden" 
+                 data-product-id="${product._id || product.id}" 
+                 data-size="${initialSize.volume}" 
+                 data-price="${initialPrice}" 
+                 data-mrp="${initialComparePrice}">
+                
+                ${discountPercent > 0 ? `
+                <div class="absolute top-3 right-3 z-10">
+                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-extrabold px-2 py-0.5 rounded-full border border-emerald-300/40">
+                        ${discountPercent}% OFF
+                    </span>
+                </div>` : ''}
+
+                <div class="w-full flex justify-center items-center h-[130px] sm:h-[160px] overflow-hidden relative my-1">
+                    <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm">
+                    </a>
+                </div>
+
+                <div class="flex-1 flex flex-col justify-between space-y-1 mb-2">
+                    <div>
+                        <h3 class="product-name text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1">${product.name}</h3>
+                        <p class="text-[10px] sm:text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 leading-tight">
+                            ${product.description || 'Dermatologist-tested luxury skincare.'}
+                        </p>
+                    </div>
+
+                    <div class="flex items-center justify-center gap-1 text-[11px] text-amber-500 font-bold">
+                        <div class="flex gap-0.5 text-amber-500 text-[10px] sm:text-[11px]">${starsHTML}</div>
+                        <span class="text-[9px] text-slate-500 font-mono font-semibold">(${product.rating || '4.9'})</span>
+                    </div>
+
+                    <div class="flex justify-center items-center gap-1 flex-wrap">
+                        ${sizeButtonsHTML}
+                    </div>
+
+                    <div class="flex items-baseline justify-center gap-1.5 pt-0.5">
+                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base">₹${initialPrice}</span>
+                        <span class="product-mrp text-[11px] line-through text-slate-400 font-mono">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
+                    </div>
+                </div>
+
+                <div class="pt-1">
+                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 rounded-xl text-[11px] uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
+                        <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                    </button>
+                </div>
+            </div>
+            `;
+        }).join("");
+
+        // Attach Arrow Scroll Listeners
+        const prevBtn = document.getElementById("cart-prev-btn");
+        const nextBtn = document.getElementById("cart-next-btn");
+
+        if (prevBtn) {
+            prevBtn.onclick = () => {
+                sliderTrack.parentElement.scrollBy({ left: -300, behavior: "smooth" });
+            };
+        }
+        if (nextBtn) {
+            nextBtn.onclick = () => {
+                sliderTrack.parentElement.scrollBy({ left: 300, behavior: "smooth" });
+            };
+        }
+
+    } catch (error) {
+        console.warn("More products slider load warning:", error);
+    }
+}
+
+/* =========================================================
    INITIALIZATION BOOT
    ========================================================= */
 document.addEventListener("DOMContentLoaded", () => {
@@ -574,6 +693,7 @@ document.addEventListener("DOMContentLoaded", () => {
     renderAppliedCoupons();
     updateHeaderCartCount();
     renderCartPage(); 
+    loadCartMoreProducts();
 
     const founderCheckbox = document.getElementById("founder-delivery");
     if (founderCheckbox) {
