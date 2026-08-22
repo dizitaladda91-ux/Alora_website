@@ -524,7 +524,10 @@ function commitProductToCart(productId, actionBtnElement) {
 
     syncCartCounterIcon();
 
-    if (typeof window.updateHeaderCartCount === 'function') {
+    const cardImg = cardElement ? cardElement.querySelector("img") : null;
+    if (cardImg && typeof window.flyToCartAnimation === "function") {
+        window.flyToCartAnimation(cardImg);
+    } else if (typeof window.updateHeaderCartCount === 'function') {
         window.updateHeaderCartCount();
     }
 

@@ -212,12 +212,58 @@ function updateQty(amount, btnEl) {
     }
 }
 
+function flyToCartAnimation(imgElement) {
+    if (!imgElement) return;
+
+    const targetBadge = document.querySelector("#cart-count-badge, .cart-badge, #cart-count, #cart-icon, .fa-cart-shopping");
+    if (!targetBadge) return;
+
+    const imgRect = imgElement.getBoundingClientRect();
+    const targetRect = targetBadge.getBoundingClientRect();
+
+    if (imgRect.width === 0 || imgRect.height === 0) return;
+
+    const clone = imgElement.cloneNode(true);
+    clone.style.position = "fixed";
+    clone.style.top = `${imgRect.top}px`;
+    clone.style.left = `${imgRect.left}px`;
+    clone.style.width = `${imgRect.width}px`;
+    clone.style.height = `${imgRect.height}px`;
+    clone.style.borderRadius = "50%";
+    clone.style.boxShadow = "0 10px 25px rgba(0,0,0,0.3)";
+    clone.style.objectFit = "cover";
+    clone.style.zIndex = "99999";
+    clone.style.pointerEvents = "none";
+    clone.style.transition = "all 0.75s cubic-bezier(0.18, 0.89, 0.32, 1.28)";
+
+    document.body.appendChild(clone);
+
+    requestAnimationFrame(() => {
+        clone.style.top = `${targetRect.top + (targetRect.height / 2) - 15}px`;
+        clone.style.left = `${targetRect.left + (targetRect.width / 2) - 15}px`;
+        clone.style.width = "30px";
+        clone.style.height = "30px";
+        clone.style.opacity = "0.4";
+        clone.style.transform = "scale(0.25) rotate(360deg)";
+    });
+
+    setTimeout(() => {
+        if (clone.parentNode) {
+            clone.parentNode.removeChild(clone);
+        }
+        updateHeaderCartCount();
+    }, 750);
+}
+
+window.flyToCartAnimation = flyToCartAnimation;
+
 function toggleCartState(btnEl) {
     const card = btnEl.closest(".product-card");
     if (!card) return;
 
     const name = card.querySelector(".product-name")?.innerText.trim() || card.querySelector("h3")?.innerText.trim() || "Product";
-    const img = card.querySelector("img")?.getAttribute("src") || "";
+    const imgEl = card.querySelector("img");
+    const img = imgEl?.getAttribute("src") || "";
     const qty = parseInt(card.querySelector(".quantity")?.value) || 1;
     const size = card.dataset.size || card.querySelector(".size-btn.bg-ink")?.innerText.trim() || "Standard";
     
@@ -231,6 +277,10 @@ function toggleCartState(btnEl) {
     const id = `${productId}__${size}`;
 
     addToCart({ id, name, size, price, mrp, qty: 1, img });
+
+    if (imgEl) {
+        flyToCartAnimation(imgEl);
+    }
 
     const originalHTML = btnEl.innerHTML;
     btnEl.innerHTML = `<i class="fa-solid fa-check text-xs"></i> ADDED!`;
