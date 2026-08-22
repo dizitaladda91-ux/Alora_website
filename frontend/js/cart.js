@@ -310,14 +310,55 @@ function toggleCartState(btnEl) {
     }, 1000);
 }
 
-function addToCart(product) {
-    const cart = getCart();
-    const existing = cart.find(item => item.id === product.id);
+function addToCart(firstArg, nameArg, priceArg, imgArg, qtyArg = 1, sizeArg = "Standard", mrpArg = 0) {
+    let itemObj = {};
+
+    if (typeof firstArg === "object" && firstArg !== null) {
+        itemObj = firstArg;
+    } else if (typeof firstArg === "string" || typeof firstArg === "number") {
+        itemObj = {
+            id: String(firstArg),
+            name: nameArg,
+            price: priceArg,
+            img: imgArg,
+            qty: qtyArg,
+            size: sizeArg,
+            mrp: mrpArg || priceArg
+        };
+    } else {
+        return;
+    }
+
+    const productId = String(itemObj.id || itemObj.uniqueCartItemKeyId || itemObj._id || `${itemObj.productId || 'p'}__${itemObj.size || 'Standard'}`);
+    const name = String(itemObj.name || itemObj.productName || 'Alora Skincare Product').trim();
+    const size = String(itemObj.size || itemObj.activeSelectedSizeConfig || 'Standard').trim();
+    const price = Number(itemObj.price || itemObj.unitPriceItemConfig || 0);
+    const mrp = Number(itemObj.mrp || itemObj.comparePrice || price) || price;
+    const qty = Math.max(1, Number(itemObj.qty || itemObj.qtyCountOrderMetric || 1));
+    const img = String(itemObj.img || itemObj.baseImg || itemObj.image || itemObj.imageUrl || './static/placeholder.png');
+
+    let cart = getCart();
+    let existing = cart.find(item => item.id === productId || item.uniqueCartItemKeyId === productId);
 
     if (existing) {
-        existing.qty += product.qty;
+        existing.qty = Number(existing.qty || 1) + qty;
+        existing.qtyCountOrderMetric = existing.qty;
     } else {
-        cart.push(product);
+        cart.push({
+            id: productId,
+            uniqueCartItemKeyId: productId,
+            name: name,
+            productName: name,
+            size: size,
+            activeSelectedSizeConfig: size,
+            price: price,
+            unitPriceItemConfig: price,
+            mrp: mrp,
+            qty: qty,
+            qtyCountOrderMetric: qty,
+            img: img,
+            baseImg: img
+        });
     }
 
     saveCart(cart);
@@ -579,13 +620,14 @@ async function applyCoupon() {
    MORE PRODUCTS SLIDER FOR CHECKOUT PAGE
    ========================================================= */
 async function loadCartMoreProducts() {
-    const sliderTrack = document.getElementById("cart-product-slider");
-    if (!sliderTrack) return;
+    try {
+        const sliderTrack = document.getElementById("cart-product-slider");
+        if (!sliderTrack) return;
 
-    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
+        const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+        const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
 
-    let products = [];
+        let products = [];
 
     try {
         const response = await fetch(`${baseUrl}/api/products`);
