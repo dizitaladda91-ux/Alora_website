@@ -501,14 +501,8 @@ async function loadSliderProducts() {
                     </div>
                 </div>
 
-                <!-- Quantity & Add to Cart Action Bar -->
-                <div class="space-y-1.5">
-                    <div class="flex items-center border border-amber-900/20 rounded-xl overflow-hidden bg-white shadow-xs">
-                        <button type="button" onclick="updateQty(-1, this)" class="w-8 sm:w-9 h-7 sm:h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-r border-amber-900/15 text-xs sm:text-sm">−</button>
-                        <input type="number" class="quantity flex-1 h-7 sm:h-8 text-center font-extrabold text-slate-900 focus:outline-none text-xs min-w-0 bg-transparent" value="1" min="1" readonly>
-                        <button type="button" onclick="updateQty(1, this)" class="w-8 sm:w-9 h-7 sm:h-8 bg-amber-50/80 hover:bg-amber-100 text-slate-900 font-extrabold transition flex items-center justify-center select-none border-l border-amber-900/15 text-xs sm:text-sm">+</button>
-                    </div>
-
+                <!-- Add to Cart Action Bar -->
+                <div class="pt-1">
                     <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
                         <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
                     </button>

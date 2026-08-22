@@ -146,9 +146,18 @@ function updateHeaderCartCount() {
     const cart = getCart();
     const totalItems = cart.reduce((sum, item) => sum + (parseInt(item.qty) || 0), 0);
     
-    // Updates standard header icons across all dynamic layouts seamlessly
-    document.querySelectorAll(".cart-badge, #cart-count").forEach(badge => {
+    // Updates standard header icons and floating cart count badges across all layouts
+    document.querySelectorAll(".cart-badge, #cart-count, #global-cart-badge, #cart-count-badge, .cart-count-badge").forEach(badge => {
+        if (!badge) return;
         badge.innerText = totalItems;
+        
+        // Dynamic Bounce & Scale Pulse Animation on Cart Quantity Increase
+        badge.classList.remove("animate-bounce", "scale-125");
+        void badge.offsetWidth; // trigger DOM reflow
+        badge.classList.add("scale-125", "transition-transform", "duration-300");
+        setTimeout(() => {
+            badge.classList.remove("scale-125");
+        }, 400);
     });
 }
 
@@ -221,15 +230,20 @@ function toggleCartState(btnEl) {
     const productId = card.dataset.productId || img; 
     const id = `${productId}__${size}`;
 
-    addToCart({ id, name, size, price, mrp, qty, img });
+    addToCart({ id, name, size, price, mrp, qty: 1, img });
 
     const originalHTML = btnEl.innerHTML;
-    btnEl.innerHTML = `<i class="fa-solid fa-check text-xs"></i> Added to Cart`;
+    btnEl.innerHTML = `<i class="fa-solid fa-check text-xs"></i> ADDED!`;
+    btnEl.classList.add("bg-emerald-600", "text-white", "scale-105");
     btnEl.disabled = true;
+
+    updateHeaderCartCount();
+
     setTimeout(() => {
         btnEl.innerHTML = originalHTML;
+        btnEl.classList.remove("bg-emerald-600", "text-white", "scale-105");
         btnEl.disabled = false;
-    }, 1200);
+    }, 1000);
 }
 
 function addToCart(product) {
