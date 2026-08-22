@@ -288,6 +288,7 @@ function toggleCartState(btnEl) {
     btnEl.disabled = true;
 
     updateHeaderCartCount();
+    if (typeof loadCartMoreProducts === "function") loadCartMoreProducts();
 
     setTimeout(() => {
         btnEl.innerHTML = originalHTML;
@@ -386,6 +387,7 @@ function changeCartQty(id, amount) {
     }
     saveCart(cart);
     renderCartPage();
+    if (typeof loadCartMoreProducts === "function") loadCartMoreProducts();
 }
 
 function removeFromCart(id) {
@@ -393,6 +395,7 @@ function removeFromCart(id) {
     cart = cart.filter(i => i.id !== id);
     saveCart(cart);
     renderCartPage();
+    if (typeof loadCartMoreProducts === "function") loadCartMoreProducts();
 }
 
 /* =========================================================
@@ -577,7 +580,33 @@ async function loadCartMoreProducts() {
         const products = Array.isArray(data) ? data : (data.products || data.data || []);
         if (products.length === 0) return;
 
-        sliderTrack.innerHTML = products.map(product => {
+        // Get currently added items in cart
+        const currentCart = getCart();
+        const cartProductNames = currentCart.map(item => String(item.name || "").trim().toLowerCase());
+        const cartProductIds = currentCart.map(item => String(item.id || item.productId || "").split('__')[0]);
+
+        // Exclude products that are ALREADY in the customer's cart
+        const filteredProducts = products.filter(product => {
+            const pName = String(product.name || "").trim().toLowerCase();
+            const pId = String(product._id || product.id || "");
+            
+            const isNameInCart = cartProductNames.some(name => name && pName && (name.includes(pName) || pName.includes(name)));
+            const isIdInCart = cartProductIds.some(id => id && pId && id === pId);
+
+            return !isNameInCart && !isIdInCart;
+        });
+
+        const displayProducts = filteredProducts.length > 0 ? filteredProducts : [];
+
+        const sectionEl = document.getElementById("more-products-section");
+        if (displayProducts.length === 0) {
+            if (sectionEl) sectionEl.classList.add("hidden");
+            return;
+        } else {
+            if (sectionEl) sectionEl.classList.remove("hidden");
+        }
+
+        sliderTrack.innerHTML = displayProducts.map(product => {
             const sizes = Array.isArray(product.sizes) && product.sizes.length > 0
                 ? product.sizes
                 : [{ volume: 'Standard', price: product.price || 499, mrp: product.mrp || 599 }];

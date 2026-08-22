@@ -113,6 +113,40 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- ============ EXPLORE OUR MORE PRODUCTS SLIDER (INLINE LEFT COLUMN) ============ -->
+                <div id="more-products-section" class="mt-6 bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-4 sm:p-6 border border-amber-900/10 shadow-sm relative overflow-hidden">
+                    <!-- Header Bar -->
+                    <div class="flex items-center justify-between gap-2 mb-4">
+                        <div>
+                            <span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-amber-100/80 text-[#8B4513] text-[10px] font-bold tracking-widest uppercase border border-amber-300/40 mb-1">
+                                Add More To Your Bag
+                            </span>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg sm:text-xl tracking-tight">
+                                Explore Our More Products
+                            </h3>
+                        </div>
+
+                        <!-- Navigation Arrows -->
+                        <div class="flex items-center gap-1.5 shrink-0">
+                            <button id="cart-prev-btn" aria-label="Previous Products" 
+                                class="w-8 h-8 rounded-full bg-white hover:bg-amber-50 text-slate-800 flex items-center justify-center border border-amber-900/15 shadow-sm transition active:scale-95 hover:scale-105">
+                                <i class="fa-solid fa-angle-left text-xs"></i>
+                            </button>
+                            <button id="cart-next-btn" aria-label="Next Products" 
+                                class="w-8 h-8 rounded-full bg-white hover:bg-amber-50 text-slate-800 flex items-center justify-center border border-amber-900/15 shadow-sm transition active:scale-95 hover:scale-105">
+                                <i class="fa-solid fa-angle-right text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Product Cards Carousel Track -->
+                    <div class="overflow-hidden relative w-full rounded-2xl">
+                        <div id="cart-product-slider" class="flex gap-3 sm:gap-4 transition-transform duration-500 ease-out py-1">
+                            <!-- Dynamic Product Cards Loading Here -->
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- Right Side: Summary & Checkout Forms -->
@@ -248,42 +282,6 @@
                 </div>
             </div>
         </div>
-
-        <!-- ============ EXPLORE OUR MORE PRODUCTS SLIDER ============ -->
-        <section id="more-products-section" class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 mt-6">
-            <div class="bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-6 sm:p-10 border border-amber-900/10 shadow-sm relative overflow-hidden">
-                <!-- Header Bar -->
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6">
-                    <div>
-                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
-                            Add More To Your Bag
-                        </span>
-                        <h2 class="font-fraunces font-bold text-slate-900 text-2xl sm:text-3xl lg:text-4xl tracking-tight">
-                            Explore Our More Products
-                        </h2>
-                    </div>
-
-                    <!-- Navigation Arrows -->
-                    <div class="flex items-center gap-2 self-end sm:self-auto">
-                        <button id="cart-prev-btn" aria-label="Previous Products" 
-                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-amber-50 text-slate-800 flex items-center justify-center border border-amber-900/15 shadow-sm transition active:scale-95 hover:scale-105">
-                            <i class="fa-solid fa-angle-left text-sm"></i>
-                        </button>
-                        <button id="cart-next-btn" aria-label="Next Products" 
-                            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white hover:bg-amber-50 text-slate-800 flex items-center justify-center border border-amber-900/15 shadow-sm transition active:scale-95 hover:scale-105">
-                            <i class="fa-solid fa-angle-right text-sm"></i>
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Product Cards Carousel Track -->
-                <div class="overflow-hidden relative w-full rounded-2xl">
-                    <div id="cart-product-slider" class="flex gap-4 sm:gap-6 transition-transform duration-500 ease-out py-2">
-                        <!-- Dynamic Product Cards Loading Here -->
-                    </div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- Scripts -->
