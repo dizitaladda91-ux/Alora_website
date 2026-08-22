@@ -48,22 +48,32 @@ export function renderNavbarState() {
     if (storedUser && token) {
         try {
             const user = JSON.parse(storedUser);
-            const displayName = user.name || "User";
+            const role = user.role || sessionStorage.getItem("userRole");
 
-            authActions.innerHTML = `
-                <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
-                    <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
-                    <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
-                        Logout
-                    </button>
-                </div>
-            `;
+            if (role === "admin" || role === "seoadmin") {
+                authActions.innerHTML = `
+                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
+                `;
+            } else {
+                const displayName = user.name || "User";
+                authActions.innerHTML = `
+                    <div class="flex items-center gap-3 text-sm font-medium text-black normal-case">
+                        <span>Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
+                        <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm">
+                            Logout
+                        </button>
+                    </div>
+                `;
 
-            document.getElementById("logout-btn").addEventListener("click", () => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("user");
-                window.location.href = "./index.html";
-            });
+                document.getElementById("logout-btn")?.addEventListener("click", () => {
+                    sessionStorage.clear();
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("user");
+                    window.location.href = "./index.html";
+                });
+            }
 
         } catch (err) {
             console.error("Localstorage data read error:", err);

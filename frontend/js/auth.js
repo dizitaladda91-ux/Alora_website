@@ -379,27 +379,11 @@ export function renderNavbarState() {
             const user = JSON.parse(storedUser);
             const role = user.role || sessionStorage.getItem("userRole");
 
-            if (role === "admin") {
+            if (role === "admin" || role === "seoadmin") {
                 authContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-sm font-medium text-black">
-                        <a href="./admin.html" class="bg-[#2A2A24] hover:bg-black text-amber-300 text-[11px] px-3 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-user-shield text-xs"></i> Admin Portal
-                        </a>
-                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
-                            Logout
-                        </button>
-                    </div>
-                `;
-            } else if (role === "seoadmin") {
-                authContainer.innerHTML = `
-                    <div class="flex items-center gap-2 text-sm font-medium text-black">
-                        <a href="./seoadmin.html" class="bg-[#1E293B] hover:bg-slate-900 text-amber-300 text-[11px] px-3 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-pen-nib text-xs"></i> SEO Studio
-                        </a>
-                        <button id="logout-btn" class="bg-red-600 hover:bg-red-700 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
-                            Logout
-                        </button>
-                    </div>
+                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
                 `;
             } else {
                 const userName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
