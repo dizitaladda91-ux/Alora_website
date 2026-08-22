@@ -248,13 +248,30 @@ function initLoginForm() {
                     name: displayName
                 };
 
-                localStorage.setItem("user", JSON.stringify(userObjToStore)); 
+                const role = userData.role ? userData.role.toLowerCase().trim() : "user";
+
+                // Tab-bound session storage for single tab isolation
+                sessionStorage.setItem("tabAuthActive", "true");
+                sessionStorage.setItem("userRole", role);
+                sessionStorage.setItem("user", JSON.stringify(userObjToStore));
                 if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("userToken", data.token);
+                    sessionStorage.setItem("token", data.token);
+                    sessionStorage.setItem("userToken", data.token);
                 }
 
-                const role = userData.role ? userData.role.toLowerCase().trim() : "user";
+                if (role === "user") {
+                    localStorage.setItem("user", JSON.stringify(userObjToStore)); 
+                    if (data.token) {
+                        localStorage.setItem("token", data.token);
+                        localStorage.setItem("userToken", data.token);
+                    }
+                } else {
+                    // Admin & SEO staff: remove admin tokens from global localStorage
+                    // so opening new tabs to the storefront opens clean customer site!
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userToken");
+                }
                 
                 let targetUrl = "./index.html"; 
                 if (role === "admin") {

@@ -1,23 +1,45 @@
-import BASE_URL from "./config.js";
+import BASE_URL, { getAuthHeaders } from "./config.js";
 
 async function getCurrentSession() {
-    const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
-    if (!response.ok) return null;
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/session`, { 
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+        if (!response.ok) return null;
 
-    const data = await response.json();
-    return data.success ? data.user : null;
+        const data = await response.json();
+        return data.success ? data.user : null;
+    } catch {
+        return null;
+    }
 }
 
 async function protectAdminPage() {
-    const user = await getCurrentSession();
-    if (!user || user.role !== "admin") {
+    const isTabActive = sessionStorage.getItem("tabAuthActive");
+    const role = sessionStorage.getItem("userRole");
+
+    // Enforce strict single-tab session scope for Admin Portal
+    if (!isTabActive || role !== "admin") {
+        sessionStorage.clear();
         localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userToken");
         window.location.replace("./login.html");
         return;
     }
 
-    // Non-sensitive display data only; authentication remains cookie/server based.
-    localStorage.setItem("user", JSON.stringify(user));
+    const user = await getCurrentSession();
+    if (!user || user.role !== "admin") {
+        sessionStorage.clear();
+        localStorage.removeItem("user");
+        localStorage.removeItem("token");
+        localStorage.removeItem("userToken");
+        window.location.replace("./login.html");
+        return;
+    }
+
+    sessionStorage.setItem("user", JSON.stringify(user));
     const welcomeText = document.querySelector("main h2");
     if (welcomeText && user.name) {
         welcomeText.innerHTML = `Hello ${user.name.toUpperCase()}`;
@@ -32,6 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
         } finally {
+            sessionStorage.clear();
             localStorage.removeItem("user");
             localStorage.removeItem("token");
             localStorage.removeItem("userToken");

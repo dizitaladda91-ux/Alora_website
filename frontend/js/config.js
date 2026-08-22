@@ -51,9 +51,13 @@ export function getProductUrl(product) {
     return `/product/${encodeURIComponent(slug || "product")}`;
 }
 
-// Returns Auth headers with Bearer token from localStorage for protected user and admin endpoints
+// Returns Auth headers with Bearer token from sessionStorage or localStorage for protected endpoints
 export function getAuthHeaders(headers = {}) {
-    const token = localStorage.getItem('userToken') || localStorage.getItem('token') || localStorage.getItem('jwt');
+    const token = sessionStorage.getItem('userToken') 
+        || sessionStorage.getItem('token') 
+        || localStorage.getItem('userToken') 
+        || localStorage.getItem('token') 
+        || localStorage.getItem('jwt');
     const authHeaders = { ...headers };
     if (token && String(token).trim()) {
         authHeaders['Authorization'] = token.startsWith('Bearer ') ? token : `Bearer ${token}`;
