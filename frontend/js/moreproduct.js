@@ -483,8 +483,8 @@ function commitProductToCart(productId, actionBtnElement) {
     const selectedRawPriceText = cardElement.querySelector('.product-price').innerText;
     const parsedPriceVal = parseInt(selectedRawPriceText.replace(/[^\d.]/g, '').trim()) || 0;
 
-    const currentQtyVal = parseInt(cardElement.querySelector('.quantity').value) || 1;
-    const targetNameText = cardElement.querySelector('.product-name').innerText;
+    const currentQtyVal = parseInt(cardElement.querySelector('.quantity')?.value) || 1;
+    const targetNameText = cardElement.querySelector('.product-name')?.innerText || cardElement.querySelector('h3')?.innerText || 'Product';
     
     const descriptionElement = cardElement.querySelector('.product-desc-text');
     const targetDescText = descriptionElement ? descriptionElement.innerText.trim() : 'No description available';
@@ -492,26 +492,35 @@ function commitProductToCart(productId, actionBtnElement) {
     const imgElement = cardElement.querySelector('img');
     const targetImgSrc = imgElement ? imgElement.getAttribute('src') : '';
 
-    let localCartArr = JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
+    let localCartArr = JSON.parse(localStorage.getItem('glowCart')) || JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
 
-    const uniqueCartKey = `${productId}_${targetSizeText}`;
-    let matchingItem = localCartArr.find(cartItem => cartItem.uniqueCartItemKeyId === uniqueCartKey);
+    const uniqueCartKey = `${productId}__${targetSizeText}`;
+    let matchingItem = localCartArr.find(cartItem => cartItem.id === uniqueCartKey || cartItem.uniqueCartItemKeyId === uniqueCartKey);
 
     if (matchingItem) {
-        matchingItem.qtyCountOrderMetric += currentQtyVal;
+        matchingItem.qty = (matchingItem.qty || matchingItem.qtyCountOrderMetric || 0) + currentQtyVal;
+        matchingItem.qtyCountOrderMetric = matchingItem.qty;
     } else {
         localCartArr.push({
+            id: uniqueCartKey,
             uniqueCartItemKeyId: uniqueCartKey,
             productId: productId,
+            name: targetNameText,
             productName: targetNameText,
             productDescription: targetDescText,
+            size: targetSizeText,
             activeSelectedSizeConfig: targetSizeText,
+            price: parsedPriceVal,
             unitPriceItemConfig: parsedPriceVal,
+            mrp: parsedPriceVal,
+            qty: currentQtyVal,
             qtyCountOrderMetric: currentQtyVal,
+            img: targetImgSrc,
             baseImg: targetImgSrc
         });
     }
 
+    localStorage.setItem('glowCart', JSON.stringify(localCartArr));
     localStorage.setItem('glowRitualCartData', JSON.stringify(localCartArr));
     document.dispatchEvent(new Event('cartUpdated'));
 

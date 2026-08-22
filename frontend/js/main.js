@@ -290,24 +290,32 @@ function toggleCartState(button) {
     }, 1200);
 }
 function addToCart(id, name, price, img, qty = 1, size = 'Standard', mrp = 0) {
-    let cart = JSON.parse(localStorage.getItem('glowCart')) || [];
-    let existingProduct = cart.find(item => item.id === id);
+    let cart = JSON.parse(localStorage.getItem('glowCart')) || JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
+    let existingProduct = cart.find(item => item.id === id || item.uniqueCartItemKeyId === id);
 
     if (existingProduct) {
-        existingProduct.qty += qty;
+        existingProduct.qty = (existingProduct.qty || existingProduct.qtyCountOrderMetric || 0) + qty;
+        existingProduct.qtyCountOrderMetric = existingProduct.qty;
     } else {
         cart.push({ 
             id: id, 
+            uniqueCartItemKeyId: id,
             name: name, 
+            productName: name,
             price: price, 
+            unitPriceItemConfig: price,
             mrp: mrp || price, 
             img: img, 
+            baseImg: img,
             qty: qty, 
-            size: size 
+            qtyCountOrderMetric: qty,
+            size: size,
+            activeSelectedSizeConfig: size
         });
     }
 
     localStorage.setItem('glowCart', JSON.stringify(cart));
+    localStorage.setItem('glowRitualCartData', JSON.stringify(cart));
     document.dispatchEvent(new Event('cartUpdated'));
     updateHeaderCartCount();
 }

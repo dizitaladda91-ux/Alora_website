@@ -273,37 +273,51 @@ function handleCartButtonClick(btnElement) {
         return;
     }
 
-    let cart = JSON.parse(localStorage.getItem(PRIMARY_CART_KEY)) || [];
+    let cart = JSON.parse(localStorage.getItem("glowCart")) || JSON.parse(localStorage.getItem(PRIMARY_CART_KEY)) || [];
 
     const productId = currentProductData._id || currentProductData.id;
     const targetVolumeText = currentSelectedVariant.volume || "Standard";
-    const compositeCartUniqueIdKeyString = `${productId}_${targetVolumeText}`;
+    const compositeCartUniqueIdKeyString = `${productId}__${targetVolumeText}`;
 
     const targetProductImageSrc = getImageUrl(currentProductData.imagepath, "./static/placeholder.png");
 
-    const existingItem = cart.find(item => item.uniqueCartItemKeyId === compositeCartUniqueIdKeyString);
+    const existingItem = cart.find(item => item.id === compositeCartUniqueIdKeyString || item.uniqueCartItemKeyId === compositeCartUniqueIdKeyString);
 
     if (existingItem) {
-        existingItem.qtyCountOrderMetric += quantity;
+        existingItem.qty = (existingItem.qty || existingItem.qtyCountOrderMetric || 0) + quantity;
+        existingItem.qtyCountOrderMetric = existingItem.qty;
     } else {
         cart.push({
+            id: compositeCartUniqueIdKeyString,
             uniqueCartItemKeyId: compositeCartUniqueIdKeyString,
             productId: productId,
+            name: currentProductData.name,
             productName: currentProductData.name,
-            productDescription: currentProductData.description || 'No description available',
+            productDescription: currentProductData.description || 'Luxury Formulation',
+            size: targetVolumeText,
             activeSelectedSizeConfig: targetVolumeText,
-            unitPriceItemConfig: parseInt(currentSelectedVariant.price) || 0,
+            price: Number(currentSelectedVariant.price) || 0,
+            unitPriceItemConfig: Number(currentSelectedVariant.price) || 0,
+            mrp: Number(currentSelectedVariant.comparePrice) || Number(currentSelectedVariant.price) || 0,
+            qty: quantity,
             qtyCountOrderMetric: quantity,
+            img: targetProductImageSrc,
             baseImg: targetProductImageSrc
         });
     }
 
-    localStorage.setItem(PRIMARY_CART_KEY, JSON.stringify(cart));
+    localStorage.setItem("glowCart", JSON.stringify(cart));
+    localStorage.setItem("glowRitualCartData", JSON.stringify(cart));
     document.dispatchEvent(new Event('cartUpdated'));
     console.log("Cart localstorage successfully synchronized:", cart);
     
     if (typeof window.updateHeaderCartCount === 'function') {
         window.updateHeaderCartCount();
+    }
+
+    const mainImgEl = document.getElementById("main-product-image");
+    if (mainImgEl && typeof window.flyToCartAnimation === "function") {
+        window.flyToCartAnimation(mainImgEl);
     }
     
     // UI Feedback state logic
