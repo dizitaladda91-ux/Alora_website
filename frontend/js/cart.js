@@ -71,69 +71,68 @@ function removeAppliedCoupon(code) {
 /* =========================================================
    UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (FIXED ACCUMULATION LOOP)
    ========================================================= */
+/* =========================================================
+   UNIFIED CROSS-PAGE LOCALSTORAGE LAYER (NORMALIZED & BULLETPROOF)
+   ========================================================= */
 function getCart() {
     try {
-        let unifiedCart = [];
+        let cart1 = [];
+        let cart2 = [];
 
-        // 1. Read cleanly from your standard primary key
-        const primaryData = localStorage.getItem(PRIMARY_CART_KEY);
-        if (primaryData) {
-            unifiedCart = JSON.parse(primaryData);
-        }
+        try {
+            const raw1 = localStorage.getItem(PRIMARY_CART_KEY);
+            if (raw1) cart1 = JSON.parse(raw1);
+        } catch (e) {}
 
-        // 2. Intercept alternate page storage key ONLY ONCE
-        const legacyData = localStorage.getItem(LEGACY_CART_KEY);
-        if (legacyData) {
-            const rawLegacyList = JSON.parse(legacyData);
+        try {
+            const raw2 = localStorage.getItem(LEGACY_CART_KEY);
+            if (raw2) cart2 = JSON.parse(raw2);
+        } catch (e) {}
 
-            if (Array.isArray(rawLegacyList) && rawLegacyList.length > 0) {
-                rawLegacyList.forEach(legacyItem => {
-                    // Check if this item is using old object properties
-                    const convertedId = legacyItem.id || legacyItem.uniqueCartItemKeyId || `${legacyItem.productId}__${legacyItem.activeSelectedSizeConfig || 'Standard'}`;
-                    const normalizedSize = legacyItem.size || legacyItem.activeSelectedSizeConfig || "Standard";
-                    const normalizedQty = parseInt(legacyItem.qty || legacyItem.qtyCountOrderMetric || 0);
-                    const normalizedPrice = parseInt(legacyItem.price || legacyItem.unitPriceItemConfig || 0);
-                    
-                    if (!convertedId || normalizedQty <= 0) return;
+        const rawList = (Array.isArray(cart1) && cart1.length > 0) ? cart1 : (Array.isArray(cart2) ? cart2 : []);
 
-                    // Search if it already exists in the primary cart array to prevent duplicate math stacking
-                    let existingItem = unifiedCart.find(i => i.id === convertedId);
-                    if (existingItem) {
-                        // If it matches an item already in unifiedCart, use the maximum or keep primary
-                        // change to existingItem.qty = normalizedQty if you want it to perfectly overwrite
-                    } else {
-                        unifiedCart.push({
-                            id: convertedId,
-                            name: legacyItem.name || legacyItem.productName || "Product",
-                            size: normalizedSize,
-                            price: normalizedPrice,
-                            mrp: parseInt(legacyItem.mrp || legacyItem.unitPriceItemConfig || normalizedPrice),
-                            qty: normalizedQty,
-                            img: legacyItem.img || legacyItem.baseImg || ""
-                        });
-                    }
-                });
+        const normalizedCart = rawList.map(item => {
+            const id = item.id || item.uniqueCartItemKeyId || `${item.productId || 'p'}__${item.size || item.activeSelectedSizeConfig || 'Standard'}`;
+            const name = item.name || item.productName || 'Alora Skincare Product';
+            const size = item.size || item.activeSelectedSizeConfig || 'Standard';
+            const price = Number(item.price || item.unitPriceItemConfig || 0);
+            const mrp = Number(item.mrp || item.unitPriceItemConfig || price);
+            const qty = Number(item.qty || item.qtyCountOrderMetric || 1);
+            const img = item.img || item.baseImg || './static/placeholder.png';
 
-                // Write the clean, merged list to the primary key
-                localStorage.setItem(PRIMARY_CART_KEY, JSON.stringify(unifiedCart));
-            }
-            
-            // 3. CRITICAL: Wipe out the legacy key completely so it NEVER loops on next load/refresh!
-            localStorage.removeItem(LEGACY_CART_KEY);
-        }
+            return {
+                id,
+                uniqueCartItemKeyId: id,
+                name,
+                productName: name,
+                size,
+                activeSelectedSizeConfig: size,
+                price,
+                unitPriceItemConfig: price,
+                mrp,
+                qty,
+                qtyCountOrderMetric: qty,
+                img,
+                baseImg: img
+            };
+        }).filter(item => item.qty > 0 && item.id);
 
-        return unifiedCart;
+        return normalizedCart;
     } catch (e) {
-        console.error("Error reading or merging cross-page cart records:", e);
+        console.error("Error reading cart records:", e);
         return [];
     }
 }
+
 function saveCart(cart) {
     try {
-        // Save the aligned layout structure to both keys simultaneously
-        localStorage.setItem(PRIMARY_CART_KEY, JSON.stringify(cart));
-        localStorage.setItem(LEGACY_CART_KEY, JSON.stringify(cart));
+        const jsonStr = JSON.stringify(cart);
+        localStorage.setItem(PRIMARY_CART_KEY, jsonStr);
+        localStorage.setItem(LEGACY_CART_KEY, jsonStr);
         updateHeaderCartCount();
+        if (document.getElementById("cart-items-list")) {
+            renderCartPage();
+        }
     } catch (e) {
         console.error("Error saving updated cart records:", e);
     }
