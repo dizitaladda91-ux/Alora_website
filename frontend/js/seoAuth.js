@@ -32,13 +32,14 @@ async function protectSeoPage() {
         return;
     }
 
-    // Background session verification (does not wipe valid tab session if network/cookie is delayed)
+    // Portal access is fail-closed: browser storage alone must never grant it.
     const freshUser = await getCurrentSession();
     if (freshUser && (freshUser.role === "seoadmin" || freshUser.role === "admin")) {
         sessionStorage.setItem("user", JSON.stringify(freshUser));
         sessionStorage.setItem("userRole", freshUser.role);
-    } else if (!storedUser) {
+    } else {
         clearAllAuthStorageAndRedirect();
+        return;
         return;
     }
 }
@@ -83,4 +84,3 @@ document.addEventListener("click", (event) => {
         handleSeoLogout(event);
     }
 });
-

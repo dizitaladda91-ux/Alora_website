@@ -78,7 +78,7 @@
       "headers": { "Location": "https://affiliation.aloraradiance.com/register" }
     },
     {
-      "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|affiliate)(\\.html)?",
+      "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|seoproduct|seoproductupdate|affiliate)(\\.html)?",
       "dest": "backend/index.js"
     },
     {

@@ -1,23 +1,13 @@
 // Security Middleware for Antigravity Enterprise Protection
 
-const requestLogs = new Map();
-
-// Cleanup stale IP logs every 10 minutes
-setInterval(() => {
-    const now = Date.now();
-    for (const [ip, log] of requestLogs.entries()) {
-        if (now > log.resetTime) {
-            requestLogs.delete(ip);
-        }
-    }
-}, 10 * 60 * 1000);
-
 // 1. Security Headers Middleware (Clickjacking, XSS, MIME Sniffing Protection)
 export const setSecurityHeaders = (req, res, next) => {
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "SAMEORIGIN");
     res.setHeader("X-XSS-Protection", "1; mode=block");
     res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+    res.setHeader("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
     if (req.secure || req.headers["x-forwarded-proto"] === "https") {
         res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
     }
@@ -53,9 +43,10 @@ export const sanitizeNoSql = (req, res, next) => {
 
 // 3. Dynamic Rate Limiter Middleware (Anti-DDoS, Anti-BruteForce - Generous Limits)
 export const createRateLimiter = ({ windowMs = 15 * 60 * 1000, max = 500, message = "Too many requests. Please try again later." } = {}) => {
+    const requestLogs = new Map();
     return (req, res, next) => {
         // Skip rate limiting on local development (localhost / 127.0.0.1)
-        const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown_ip";
+        const clientIp = req.ip || req.socket.remoteAddress || "unknown_ip";
         if (clientIp.includes("127.0.0.1") || clientIp.includes("::1") || clientIp.includes("localhost")) {
             return next();
         }
@@ -72,6 +63,7 @@ export const createRateLimiter = ({ windowMs = 15 * 60 * 1000, max = 500, messag
         log.count++;
 
         if (log.count > max) {
+            res.setHeader("Retry-After", Math.ceil((log.resetTime - now) / 1000));
             return res.status(429).json({
                 success: false,
                 message: message,

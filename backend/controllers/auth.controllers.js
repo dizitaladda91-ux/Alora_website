@@ -7,7 +7,9 @@ import nodemailer from "nodemailer";
 const authCookieOptions = {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL),
-  sameSite: "lax",
+  // The storefront does not need cross-site authenticated requests. Strict
+  // cookies prevent a third-party site from replaying a logged-in session.
+  sameSite: "strict",
   path: "/",
   maxAge: 24 * 60 * 60 * 1000
 };
@@ -29,7 +31,7 @@ const generateToken = (id, role) => {
     }
   }
 
-  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn });
+  return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn, issuer: "alora-radiance", audience: "alora-web" });
 };
 
 // Older deployments keep the staff credentials in environment variables.  The
@@ -185,12 +187,16 @@ export const login = async (req, res, next) => {
 
     res.cookie("token", token, authCookieOptions);
     
-    res.status(200).json({ 
+    const response = {
       success: true,
       message: 'Login successful!', 
-      token,
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
-    });
+    };
+
+    // Admin and SEO sessions use the HttpOnly cookie only. This keeps their
+    // JWT out of JavaScript-readable browser storage.
+    if (user.role !== "admin" && user.role !== "seoadmin") response.token = token;
+    res.status(200).json(response);
   } catch (error) {
     console.error("LOGIN_ERROR:", error);
     res.status(500).json({ message: 'Server error', error: error.message });

@@ -32,14 +32,15 @@ async function protectAdminPage() {
         return;
     }
 
-    // Background session verification (does not wipe valid tab session if network/cookie is delayed)
+    // Portal access is fail-closed: browser storage alone must never grant it.
     const freshUser = await getCurrentSession();
     if (freshUser && freshUser.role === "admin") {
         sessionStorage.setItem("user", JSON.stringify(freshUser));
         sessionStorage.setItem("userRole", freshUser.role);
         storedUser = freshUser;
-    } else if (!storedUser) {
+    } else {
         clearAllAuthStorageAndRedirect();
+        return;
         return;
     }
 
@@ -89,4 +90,3 @@ document.addEventListener("click", (event) => {
         handleAdminLogout(event);
     }
 });
-

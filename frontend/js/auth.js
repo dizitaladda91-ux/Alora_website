@@ -256,20 +256,20 @@ function initLoginForm() {
                 sessionStorage.setItem("tabAuthActive", "true");
                 sessionStorage.setItem("userRole", role);
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));
-                if (data.token) {
-                    sessionStorage.setItem("token", data.token);
-                    sessionStorage.setItem("userToken", data.token);
-                }
 
                 if (role === "user") {
                     localStorage.setItem("user", JSON.stringify(userObjToStore)); 
                     if (data.token) {
+                        sessionStorage.setItem("token", data.token);
+                        sessionStorage.setItem("userToken", data.token);
                         localStorage.setItem("token", data.token);
                         localStorage.setItem("userToken", data.token);
                     }
                 } else {
-                    // Admin & SEO staff: remove admin tokens from global localStorage
-                    // so opening new tabs to the storefront opens clean customer site!
+                    // Privileged sessions are cookie-only so an injected script
+                    // cannot read or exfiltrate their JWT.
+                    sessionStorage.removeItem("token");
+                    sessionStorage.removeItem("userToken");
                     localStorage.removeItem("user");
                     localStorage.removeItem("token");
                     localStorage.removeItem("userToken");

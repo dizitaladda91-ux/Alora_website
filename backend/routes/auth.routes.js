@@ -1,7 +1,8 @@
 import express from "express";
 import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
-import { requireAuth } from "../middlewares/auth.middleware.js";
+import { requireAuth, verifyAuthToken } from "../middlewares/auth.middleware.js";
+import User from "../models/userAuth.models.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,7 +16,7 @@ const router = express.Router();
 // ==========================================
 
 // Safe Protect Middleware (Optional Chaining added to avoid undefined error crashes)
-const protectView = (req, res, next) => {
+const protectView = async (req, res, next) => {
   const token = req.cookies?.token;
 
   // Agar token nahi mila, toh directly login page par redirect kar do
@@ -29,8 +30,13 @@ const protectView = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Contains { id, role }
+    const decoded = verifyAuthToken(token);
+    const user = await User.findById(decoded.id).select("role").lean();
+    if (!user || user.role !== decoded.role) {
+      res.clearCookie("token");
+      return res.redirect("/login.html");
+    }
+    req.user = { ...decoded, role: user.role };
     next();
   } catch (error) {
     res.clearCookie("token");

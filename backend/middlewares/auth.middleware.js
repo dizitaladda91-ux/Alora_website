@@ -1,4 +1,7 @@
 import jwt from "jsonwebtoken";
+import User from "../models/userAuth.models.js";
+
+const jwtOptions = { issuer: "alora-radiance", audience: "alora-web" };
 
 const getTokenFromRequest = (req) => {
   const authorization = req.headers.authorization || "";
@@ -9,7 +12,12 @@ const getTokenFromRequest = (req) => {
   return req.cookies?.token || "";
 };
 
-export const requireAuth = (req, res, next) => {
+export const verifyAuthToken = (token) => {
+  if (!process.env.JWT_SECRET) throw new Error("JWT_SECRET is missing");
+  return jwt.verify(token, process.env.JWT_SECRET, jwtOptions);
+};
+
+export const requireAuth = async (req, res, next) => {
   const token = getTokenFromRequest(req);
 
   if (!token) {
@@ -22,7 +30,12 @@ export const requireAuth = (req, res, next) => {
   }
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    const claims = verifyAuthToken(token);
+    const user = await User.findById(claims.id).select("role").lean();
+    if (!user || user.role !== claims.role) {
+      return res.status(401).json({ success: false, message: "Session is no longer valid." });
+    }
+    req.user = { ...claims, role: user.role };
     return next();
   } catch {
     return res.status(401).json({ success: false, message: "Invalid or expired session." });
@@ -35,7 +48,7 @@ export const optionalAuth = (req, res, next) => {
   if (!token || !process.env.JWT_SECRET) return next();
 
   try {
-    req.user = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = verifyAuthToken(token);
   } catch {
     // A guest checkout must not fail because an old/expired browser cookie exists.
   }

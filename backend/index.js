@@ -30,10 +30,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
+app.set("trust proxy", 1);
 
 // Security Rate Limiters (Bypassed for local development, generous thresholds for production)
 const globalLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 2000, message: "Too many API requests. Please slow down." });
-const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 300, message: "Too many login/auth attempts. Please try again after 15 minutes." });
+const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 20, message: "Too many login/auth attempts. Please try again after 15 minutes." });
 
 // Middleware setup
 const corsOptions = {
@@ -50,12 +51,12 @@ const corsOptions = {
       'https://www.aloraradiance.com'
     ];
     
-    // Allow requests with no origin, Netlify, Vercel preview domains, or matched origins
+    // Only trusted first-party origins may make credentialed browser requests.
+    // Wildcard Netlify/Vercel origins would let an unrelated deployment call the
+    // API with credentials if cookie settings are relaxed in the future.
     if (
       !origin || 
-      allowedOrigins.includes(origin) || 
-      /\.netlify\.app$/.test(origin) ||
-      /\.vercel\.app$/.test(origin)
+      allowedOrigins.includes(origin)
     ) {
       callback(null, true);
     } else {
