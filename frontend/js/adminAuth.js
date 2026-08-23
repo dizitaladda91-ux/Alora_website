@@ -18,31 +18,34 @@ async function getCurrentSession() {
 async function protectAdminPage() {
     const isTabActive = sessionStorage.getItem("tabAuthActive");
     const role = sessionStorage.getItem("userRole");
+    const storedUserStr = sessionStorage.getItem("user");
 
-    // Enforce strict single-tab session scope for Admin Portal
-    if (!isTabActive || role !== "admin") {
-        sessionStorage.clear();
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
-        window.location.replace("./login.html");
+    let storedUser = null;
+    try {
+        if (storedUserStr) storedUser = JSON.parse(storedUserStr);
+    } catch (e) {}
+
+    const isRoleValid = role === "admin" || (storedUser && storedUser.role === "admin");
+
+    if (!isTabActive || !isRoleValid) {
+        clearAllAuthStorageAndRedirect();
         return;
     }
 
-    const user = await getCurrentSession();
-    if (!user || user.role !== "admin") {
-        sessionStorage.clear();
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
-        window.location.replace("./login.html");
+    // Background session verification (does not wipe valid tab session if network/cookie is delayed)
+    const freshUser = await getCurrentSession();
+    if (freshUser && freshUser.role === "admin") {
+        sessionStorage.setItem("user", JSON.stringify(freshUser));
+        sessionStorage.setItem("userRole", freshUser.role);
+        storedUser = freshUser;
+    } else if (!storedUser) {
+        clearAllAuthStorageAndRedirect();
         return;
     }
 
-    sessionStorage.setItem("user", JSON.stringify(user));
     const welcomeText = document.querySelector("main h2");
-    if (welcomeText && user.name) {
-        welcomeText.innerHTML = `Hello ${user.name.toUpperCase()}`;
+    if (welcomeText && storedUser?.name) {
+        welcomeText.innerHTML = `Hello ${storedUser.name.toUpperCase()}`;
     }
 }
 

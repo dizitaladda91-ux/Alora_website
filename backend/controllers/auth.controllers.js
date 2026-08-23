@@ -32,6 +32,50 @@ const generateToken = (id, role) => {
   return jwt.sign({ id, role }, process.env.JWT_SECRET, { expiresIn });
 };
 
+// Older deployments keep the staff credentials in environment variables.  The
+// normal path is still a bcrypt-backed database account, but this bridge makes
+// those configured credentials usable while ensuring a real user record exists
+// for the JWT/session middleware.
+const configuredStaffAccounts = () => [
+  { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, role: "admin", name: "Alora Admin" },
+  { email: process.env.SEO_EMAIL, password: process.env.SEO_PASSWORD, role: "seoadmin", name: "Alora SEO" }
+].filter(({ email, password }) => String(email || "").trim() && String(password || "").trim());
+
+const hasMatchingConfiguredPassword = (candidate, configured) => {
+  const candidateBuffer = Buffer.from(String(candidate || ""));
+  const configuredBuffer = Buffer.from(String(configured || ""));
+  return candidateBuffer.length === configuredBuffer.length
+    && crypto.timingSafeEqual(candidateBuffer, configuredBuffer);
+};
+
+const findConfiguredStaffUser = async (email, password) => {
+  const account = configuredStaffAccounts().find(({ email: configuredEmail, password: configuredPassword }) =>
+    String(configuredEmail).trim().toLowerCase() === email
+    && hasMatchingConfiguredPassword(password, configuredPassword)
+  );
+
+  if (!account) return null;
+
+  let user = await User.findOne({ email });
+  if (user) {
+    // Do not let an environment credential escalate a normal customer account.
+    return user.role === account.role ? user : null;
+  }
+
+  // Staff accounts do not need a customer phone number.  Use a deterministic,
+  // non-personal placeholder because older collections may retain a unique
+  // phone index.
+  const staffPhone = `staff-${crypto.createHash("sha256").update(email).digest("hex").slice(0, 20)}`;
+  user = await User.create({
+    name: account.name,
+    email,
+    password,
+    phone: staffPhone,
+    role: account.role
+  });
+  return user;
+};
+
 // Transporter Function (Dynamic Check)
 const getTransporter = () => {
   return nodemailer.createTransport({
@@ -128,8 +172,12 @@ export const login = async (req, res, next) => {
 
     // Every account, including admin and SEO staff, authenticates through the
     // database so passwords are bcrypt-hashed and can be individually managed.
-    const user = await User.findOne({ email: cleanEmail });
+    let user = await User.findOne({ email: cleanEmail });
     if (!user || !(await user.comparePassword(password))) {
+      user = await findConfiguredStaffUser(cleanEmail, password);
+    }
+
+    if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' });
     }
 

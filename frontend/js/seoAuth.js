@@ -18,28 +18,29 @@ async function getCurrentSession() {
 async function protectSeoPage() {
     const isTabActive = sessionStorage.getItem("tabAuthActive");
     const role = sessionStorage.getItem("userRole");
+    const storedUserStr = sessionStorage.getItem("user");
 
-    // Enforce strict single-tab session scope for SEO Studio
-    if (!isTabActive || (role !== "seoadmin" && role !== "admin")) {
-        sessionStorage.clear();
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
-        window.location.replace("./login.html");
+    let storedUser = null;
+    try {
+        if (storedUserStr) storedUser = JSON.parse(storedUserStr);
+    } catch (e) {}
+
+    const isRoleValid = role === "seoadmin" || role === "admin" || (storedUser && (storedUser.role === "seoadmin" || storedUser.role === "admin"));
+
+    if (!isTabActive || !isRoleValid) {
+        clearAllAuthStorageAndRedirect();
         return;
     }
 
-    const user = await getCurrentSession();
-    if (!user || (user.role !== "seoadmin" && user.role !== "admin")) {
-        sessionStorage.clear();
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
-        window.location.replace("./login.html");
+    // Background session verification (does not wipe valid tab session if network/cookie is delayed)
+    const freshUser = await getCurrentSession();
+    if (freshUser && (freshUser.role === "seoadmin" || freshUser.role === "admin")) {
+        sessionStorage.setItem("user", JSON.stringify(freshUser));
+        sessionStorage.setItem("userRole", freshUser.role);
+    } else if (!storedUser) {
+        clearAllAuthStorageAndRedirect();
         return;
     }
-
-    sessionStorage.setItem("user", JSON.stringify(user));
 }
 
 function clearAllAuthStorageAndRedirect() {
