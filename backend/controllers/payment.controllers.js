@@ -107,47 +107,24 @@ const reservePaidOrderStock = async (items) => {
                     isAvailable: true,
                     variants: { $elemMatch: { volume: item.variant, stock: { $gte: item.quantity } } }
                 },
-                [
-                    {
-                        $set: {
-                            variants: {
-                                $map: {
-                                    input: "$variants",
-                                    as: "v",
-                                    in: {
-                                        $cond: [
-                                            { $eq: ["$$v.volume", item.variant] },
-                                            { $mergeObjects: ["$$v", { stock: { $subtract: ["$$v.stock", item.quantity] } }] },
-                                            "$$v"
-                                        ]
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    {
-                        // Recompute availability from the just-updated variants array so
-                        // a product is only hidden once every variant is truly at 0 —
-                        // depleting one size/volume must not hide the others.
-                        $set: {
-                            isAvailable: { $gt: [{ $sum: "$variants.stock" }, 0] }
-                        }
-                    }
-                ]
+                {
+                    $inc: { "variants.$.stock": -item.quantity }
+                }
             );
 
-            if (result.modifiedCount !== 1) {
-                throw new Error(`${item.name} (${item.variant}) is no longer in stock.`);
+            if (result.modifiedCount === 0) {
+                throw new Error(`Insufficient stock for item variant: ${item.variant}`);
             }
 
             reducedItems.push(item);
         }
     } catch (error) {
-        await restoreStock(reducedItems);
+        if (reducedItems.length > 0) {
+            await restoreStock(reducedItems);
+        }
         throw error;
     }
 };
-
 
 const buildOrderResponse = (order) => ({
     order_id: order.razorpayOrderId,
@@ -281,26 +258,10 @@ const sendOrderSideEffects = async (savedOrder) => {
 
 const restoreStock = (items) => Promise.all(items.map((item) => SimpleProduct.updateOne(
     { _id: item.productId, "variants.volume": item.variant },
-    [
-        {
-            $set: {
-                variants: {
-                    $map: {
-                        input: "$variants",
-                        as: "v",
-                        in: {
-                            $cond: [
-                                { $eq: ["$$v.volume", item.variant] },
-                                { $mergeObjects: ["$$v", { stock: { $add: ["$$v.stock", item.quantity] } }] },
-                                "$$v"
-                            ]
-                        }
-                    }
-                },
-                isAvailable: true
-            }
-        }
-    ]
+    {
+        $inc: { "variants.$.stock": item.quantity },
+        $set: { isAvailable: true }
+    }
 )));
 
 // Used by both the signed browser callback and the signed Razorpay webhook.
