@@ -6,6 +6,7 @@ import SimpleProduct from "../models/product.models.js";
 import User from "../models/userAuth.models.js";
 import WebhookEvent from "../models/webhookEvent.models.js";
 import { createAffiliateConversion, validateReferral } from "../services/affiliate.service.js";
+import { AffiliateReferral, AffiliateConversion } from "../models/affiliate.models.js";
 import { sendMail, escapeHtml } from "../services/email.service.js";
 
 // Checkout prices must be calculated here, never from browser-rendered totals.
@@ -237,6 +238,31 @@ const sendOrderSideEffects = async (savedOrder) => {
 
     if (savedOrder.referral?.code) {
         try {
+            const refCode = String(savedOrder.referral.code).trim().toUpperCase();
+            const referralDoc = await AffiliateReferral.findOne({ code: refCode });
+            if (referralDoc) {
+                const commissionRate = Number(referralDoc.commissionPercent || 10);
+                const commissionAmount = Number((savedOrder.totalAmount * commissionRate / 100).toFixed(2));
+                
+                await AffiliateConversion.create({
+                    referralId: referralDoc._id,
+                    affiliateId: referralDoc.affiliateId,
+                    orderId: String(savedOrder._id),
+                    customerEmail: savedOrder.customer.email,
+                    clickId: savedOrder.referral.clickId || null,
+                    orderAmount: savedOrder.totalAmount,
+                    grossAmount: savedOrder.subtotal,
+                    discountAmount: savedOrder.affiliateDiscount || 0,
+                    commissionAmount,
+                    status: "approved"
+                }).catch(err => console.warn("Local affiliate conversion notice:", err.message));
+
+                await AffiliateReferral.updateOne(
+                    { _id: referralDoc._id },
+                    { $inc: { totalConversions: 1, totalCommission: commissionAmount } }
+                );
+            }
+
             await createAffiliateConversion({
                 referralCode: savedOrder.referral.code,
                 clickId: savedOrder.referral.clickId,
@@ -247,7 +273,8 @@ const sendOrderSideEffects = async (savedOrder) => {
                 discountAmount: savedOrder.affiliateDiscount,
                 eligibleAmount: savedOrder.totalAmount,
                 currency: savedOrder.currency
-            });
+            }).catch(err => console.warn("External affiliate API notice:", err.message));
+
             await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date(), "referral.externalSyncedAt": new Date(), "referral.lastSyncError": "" }, $inc: { "referral.syncAttempts": 1 } });
         } catch (error) {
             await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.lastSyncError": String(error.message || "Affiliate conversion sync failed.").slice(0, 1000) }, $inc: { "referral.syncAttempts": 1 } });
@@ -335,17 +362,28 @@ export const createOrder = async (req, res) => {
         }
 
         let discountPercent = 0;
-        let flatDiscount = 0;
         let referralCode = null;
         let clickId = referral?.clickId ? String(referral.clickId) : null;
         const appliedCoupons = [];
         const candidateCodes = getRequestedCouponCodes(req.body);
 
         for (const candidateCode of candidateCodes) {
-            if (candidateCode === "SECRET200" || candidateCode === "SECRET150" || candidateCode === "ALORA200" || candidateCode === "ALORA150" || candidateCode === "TEST200" || candidateCode === "TEST150") {
-                flatDiscount += 200;
-                appliedCoupons.push(candidateCode);
-                continue;
+            // Strict Single-Use Per Account/Email Check
+            if (customerEmail) {
+                const usedOrder = await Order.findOne({
+                    $or: [
+                        { "customer.email": customerEmail },
+                        ...(req.user?.id && /^[0-9a-fA-F]{24}$/.test(req.user.id) ? [{ userId: req.user.id }] : [])
+                    ],
+                    $or: [
+                        { appliedCoupons: candidateCode },
+                        { "referral.code": candidateCode }
+                    ]
+                }).lean();
+
+                if (usedOrder) {
+                    throw new Error(`Coupon '${candidateCode}' has already been redeemed on your account and can only be used once.`);
+                }
             }
 
             if (candidateCode === "RAKHI30" || candidateCode === "RAKHI" || candidateCode === "FESTIVE30" || candidateCode === "RAKHI30OFF") {
@@ -377,7 +415,7 @@ export const createOrder = async (req, res) => {
         const { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount } = calculateCheckoutTotals({
             subtotal,
             discountPercent,
-            flatDiscount,
+            flatDiscount: 0,
             founderHandDelivery
         });
 

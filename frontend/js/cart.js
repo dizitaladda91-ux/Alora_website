@@ -8,7 +8,7 @@ const FREE_SHIPPING_LIMIT = 499;
 const DELIVERY_FEE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000; 
 const APPLIED_COUPONS_KEY = "aloraAppliedCoupons";
-const MAX_STACKED_COUPONS = 4;
+const MAX_STACKED_COUPONS = 3;
 
 let appliedCoupons = [];
 
@@ -531,25 +531,13 @@ async function applyCoupon() {
         return;
     }
 
-    if (typedCode === "SECRET200" || typedCode === "SECRET150" || typedCode === "ALORA200" || typedCode === "ALORA150" || typedCode === "TEST200" || typedCode === "TEST150") {
-        if (addAppliedCoupon(typedCode, 200, "coupon", true)) {
-            couponMessage.innerText = `🔒 Secret Test Coupon '${typedCode}' applied successfully! (₹200 OFF)`;
-            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-            couponInput.value = "";
-        } else {
-            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 4 coupons.";
-            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
-        }
-        return;
-    }
-
     if (typedCode === "RAKHI30" || typedCode === "RAKHI" || typedCode === "FESTIVE30" || typedCode === "RAKHI30OFF") {
         if (addAppliedCoupon(typedCode, 30)) {
             couponMessage.innerText = `🪔 Rakhi Special Coupon '${typedCode}' applied successfully! (30% Off)`;
             couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
             couponInput.value = "";
         } else {
-            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 4 coupons.";
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
             couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         }
         return;
@@ -590,10 +578,20 @@ async function applyCoupon() {
         couponMessage.innerText = "Validating code...";
         couponMessage.className = "text-xs font-semibold mt-2 text-ash block";
 
+        let customerEmail = "";
+        try {
+            const userObj = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user") || "null");
+            if (userObj?.email) customerEmail = userObj.email;
+        } catch (e) {}
+        if (!customerEmail) {
+            const emailInput = document.getElementById("customer-email");
+            if (emailInput) customerEmail = emailInput.value.trim();
+        }
+
         const res = await fetch(`${baseUrl}/api/affiliates/track-click`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ code: typedCode, landingPage: "/cart.html" })
+            body: JSON.stringify({ code: typedCode, customerEmail, landingPage: "/cart.html" })
         });
         const data = await res.json();
         if (res.ok && data.success) {

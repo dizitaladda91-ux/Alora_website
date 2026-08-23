@@ -1,5 +1,6 @@
 import crypto from "crypto";
 import User from "../models/userAuth.models.js";
+import Order from "../models/order.models.js";
 import { AffiliateClick, AffiliateConversion, AffiliateReferral } from "../models/affiliate.models.js";
 import { createAffiliateClick } from "../services/affiliate.service.js";
 
@@ -18,18 +19,19 @@ const createUniqueReferral = async (affiliateId) => {
 
 export const registerAffiliate = async (req, res) => {
   try {
-    const name = String(req.body.name || "").trim();
-    const email = String(req.body.email || "").trim().toLowerCase();
-    const phone = String(req.body.phone || "").trim();
-    const password = String(req.body.password || "");
-    if (!name || !/^\S+@\S+\.\S+$/.test(email) || !/^\d{10}$/.test(phone) || password.length < 6) {
-      return res.status(400).json({ success: false, message: "Name, valid email, 10-digit phone, and a 6-character password are required." });
+    const { name, email, phone, password } = req.body;
+    if (!name || !email || !phone || !password) {
+      return res.status(400).json({ success: false, message: "All fields are required." });
     }
-    if (await User.exists({ $or: [{ email }, { phone }] })) {
-      return res.status(409).json({ success: false, message: "An account already exists with this email or phone number." });
+
+    const existingUser = await User.findOne({ email: String(email).trim().toLowerCase() });
+    if (existingUser) {
+      return res.status(409).json({ success: false, message: "User with this email already exists." });
     }
+
     const user = await User.create({ name, email, phone, password, role: "affiliate" });
     const referral = await createUniqueReferral(user._id);
+
     return res.status(201).json({ success: true, message: "Affiliate account created. Please sign in to access your dashboard.", referralCode: referral.code });
   } catch (error) {
     console.error("Affiliate registration failed:", error.message);
@@ -40,12 +42,34 @@ export const registerAffiliate = async (req, res) => {
 export const trackReferralClick = async (req, res) => {
   try {
     const code = String(req.body.code || "").trim().toUpperCase();
+    const customerEmail = String(req.body.customerEmail || req.user?.email || "").trim().toLowerCase();
+
     if (!/^[A-Z0-9_-]{3,50}$/.test(code)) {
       return res.status(400).json({ success: false, message: "Invalid referral tracking data." });
     }
+
+    if (customerEmail) {
+      const usedOrder = await Order.findOne({
+        "customer.email": customerEmail,
+        $or: [
+          { appliedCoupons: code },
+          { "referral.code": code }
+        ]
+      }).lean();
+
+      if (usedOrder) {
+        return res.status(400).json({ success: false, message: `Coupon '${code}' has already been redeemed on your account and can only be used once.` });
+      }
+    }
+
     if (code === "GLOW10") {
       return res.status(200).json({ success: true, referralCode: "GLOW10", clickId: null, discountPercent: 10 });
     }
+
+    if (code === "RAKHI30" || code === "RAKHI" || code === "FESTIVE30" || code === "RAKHI30OFF") {
+      return res.status(200).json({ success: true, referralCode: code, clickId: null, discountPercent: 30 });
+    }
+
     const click = await createAffiliateClick({ referralCode: code });
     return res.status(200).json({ success: true, ...click });
   } catch (error) {

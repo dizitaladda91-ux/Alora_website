@@ -62,7 +62,7 @@ async function renderBlogCards() {
                 const rawCover = post.coverImage || post.coverUrl || '';
                 const absoluteCoverImage = rawCover 
                     ? (rawCover.startsWith('http') ? rawCover : `${BASE_URL}${rawCover.startsWith('/') ? '' : '/'}${rawCover}`)
-                    : './static/alora5.webp';
+                    : './static/logo2.png';
 
                 const publisherName = escapeHtml(post.publisher || 'Alora Radiance');
                 const snippetText = escapeHtml(getSnippet(post));
@@ -75,7 +75,7 @@ async function renderBlogCards() {
                         
                         <!-- Top Image Area with Overlay Category Pill (Aspect Ratio Preserved to Avoid Text Cropping) -->
                         <div class="relative w-full aspect-[16/9.5] sm:aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 flex items-center justify-center">
-                            <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/alora5.webp'">
+                            <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/logo2.png'">
                             
                             <!-- Category Badge Pill on Top-Left of Image -->
                             <div class="absolute top-3 left-3 z-10">
