@@ -1,5 +1,6 @@
 import Blog from '../models/blog.models.js';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
+import { sanitizeBlogHtml, sanitizePlainText } from '../services/contentSanitizer.service.js';
 
 function stripBodyH1Tags(content = '') {
     if (!content) return content;
@@ -9,6 +10,13 @@ function stripBodyH1Tags(content = '') {
 function sanitizeDuplicateTitleHeading(title = '', content = '') {
     if (!title || !content) return content;
     return stripBodyH1Tags(String(content));
+}
+
+// Helper to extract Cloudinary URLs from Quill HTML body content for cleanup
+function extractCloudinaryUrls(html = '') {
+    if (!html || typeof html !== 'string') return [];
+    const matches = html.match(/https:\/\/res\.cloudinary\.com\/[^\s"'<>\(\)]+/gi);
+    return matches ? [...new Set(matches)] : [];
 }
 
 // Upload inline image for Quill rich text editor
@@ -32,7 +40,7 @@ export const uploadInlineImage = async (req, res) => {
 // 1. Create and Publish Blog Post
 export const createBlogPost = async (req, res) => {
     try {
-        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
+        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl, status } = req.body;
 
         if (!title || !String(title).trim()) {
             return res.status(400).json({ success: false, message: "Article title is a required field." });
@@ -40,6 +48,19 @@ export const createBlogPost = async (req, res) => {
 
         if (!content || !String(content).trim()) {
             return res.status(400).json({ success: false, message: "Article content is a required field." });
+        }
+
+        // Server-side Schema JSON Validation if provided
+        if (schema && String(schema).trim()) {
+            const rawSchema = String(schema).trim();
+            const containsScript = rawSchema.includes('<script');
+            if (!containsScript) {
+                try {
+                    JSON.parse(rawSchema);
+                } catch (e) {
+                    return res.status(400).json({ success: false, message: "Invalid JSON-LD Schema format provided." });
+                }
+            }
         }
 
         // Auto-generate slug from title if slug is missing
@@ -59,20 +80,21 @@ export const createBlogPost = async (req, res) => {
             formattedSlug = `${formattedSlug}-${Date.now().toString().slice(-4)}`;
         }
 
-        const sanitizedContent = sanitizeDuplicateTitleHeading(title, content);
+        const sanitizedContent = sanitizeBlogHtml(sanitizeDuplicateTitleHeading(title, content));
         const finalCover = req.file ? req.file.path : ((coverUrl || coverImageUrl || "").trim());
 
         const newBlog = new Blog({
-            title: String(title).trim(),
+            title: sanitizePlainText(title, 200),
             slug: formattedSlug,
             content: sanitizedContent,
-            metaTitle: (metaTitle || "").trim(),
-            keywords: (keywords || "").trim(),     
-            category: (category || "Skincare").trim(),
-            metaDesc: (metaDesc || "").trim(),
+            metaTitle: sanitizePlainText(metaTitle || "", 200),
+            keywords: sanitizePlainText(keywords || "", 300),     
+            category: sanitizePlainText(category || "Skincare", 100),
+            metaDesc: sanitizePlainText(metaDesc || "", 500),
             schema: (schema || "").trim(),       
-            publisher: (publisher || "Alora Radiance").trim(),    
-            coverImage: finalCover
+            publisher: sanitizePlainText(publisher || "Alora Radiance", 100),    
+            coverImage: finalCover,
+            status: status === 'draft' ? 'draft' : 'published'
         });
 
         await newBlog.save();
@@ -85,18 +107,39 @@ export const createBlogPost = async (req, res) => {
 
     } catch (error) {
         console.error("Create blog error:", error);
+        if (error.code === 11000) {
+            return res.status(409).json({ success: false, message: "A post with an identical slug already exists. Please try a different title or slug." });
+        }
         return res.status(500).json({ success: false, message: error.message || "Could not publish blog post." });
     }
 };
 
-// 2. Fetch All Blog Cards
+// 2. Fetch All Blog Cards (Optimized Projection + Optional Pagination)
 export const getAllBlogs = async (req, res) => {
     try {
-        const blogs = await Blog.find().sort({ createdAt: -1 });
+        const page = Math.max(1, parseInt(req.query.page) || 1);
+        const limit = Math.max(1, Math.min(100, parseInt(req.query.limit) || 50));
+        const skip = (page - 1) * limit;
+
+        const isPublic = !req.user || req.user.role === 'user';
+        const filter = isPublic ? { status: { $ne: 'draft' } } : {};
+
+        // Light Projection excluding heavy rich text content for card listing performance
+        const blogs = await Blog.find(filter)
+            .select("title slug metaTitle category metaDesc publisher coverImage status createdAt updatedAt")
+            .sort({ createdAt: -1 })
+            .skip(skip)
+            .limit(limit)
+            .lean();
+
+        const totalCount = await Blog.countDocuments(filter);
         
         return res.status(200).json({ 
             success: true, 
             count: blogs.length,
+            totalCount,
+            page,
+            totalPages: Math.ceil(totalCount / limit),
             blogs: blogs, 
             data: blogs 
         });
@@ -132,19 +175,20 @@ export const getBlogBySlug = async (req, res) => {
 export const updateBlogPost = async (req, res) => {
     try {
         const { id } = req.params;
-        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl } = req.body;
+        const { title, slug, content, metaTitle, keywords, category, metaDesc, schema, publisher, coverUrl, coverImageUrl, status } = req.body;
 
-        const sanitizedContent = content ? sanitizeDuplicateTitleHeading(title || "", content) : undefined;
+        const sanitizedContent = content ? sanitizeBlogHtml(sanitizeDuplicateTitleHeading(title || "", content)) : undefined;
         let updateData = {};
 
-        if (title !== undefined) updateData.title = String(title).trim();
+        if (title !== undefined) updateData.title = sanitizePlainText(title, 200);
         if (content !== undefined) updateData.content = sanitizedContent;
-        if (metaTitle !== undefined) updateData.metaTitle = String(metaTitle).trim();
-        if (keywords !== undefined) updateData.keywords = String(keywords).trim();
-        if (category !== undefined) updateData.category = String(category).trim();
-        if (metaDesc !== undefined) updateData.metaDesc = String(metaDesc).trim();
+        if (metaTitle !== undefined) updateData.metaTitle = sanitizePlainText(metaTitle, 200);
+        if (keywords !== undefined) updateData.keywords = sanitizePlainText(keywords, 300);
+        if (category !== undefined) updateData.category = sanitizePlainText(category, 100);
+        if (metaDesc !== undefined) updateData.metaDesc = sanitizePlainText(metaDesc, 500);
         if (schema !== undefined) updateData.schema = String(schema).trim();
-        if (publisher !== undefined) updateData.publisher = String(publisher).trim();
+        if (publisher !== undefined) updateData.publisher = sanitizePlainText(publisher, 100);
+        if (status !== undefined) updateData.status = status === 'draft' ? 'draft' : 'published';
 
         if (slug) {
             let formattedSlug = String(slug).toLowerCase().trim()
@@ -179,11 +223,14 @@ export const updateBlogPost = async (req, res) => {
 
     } catch (error) {
         console.error("Update blog error:", error);
+        if (error.code === 11000) {
+            return res.status(409).json({ success: false, message: "A post with an identical slug already exists." });
+        }
         return res.status(500).json({ success: false, message: error.message || "Could not update blog post." });
     }
 };
 
-// 5. Delete Blog Post
+// 5. Delete Blog Post (Including Cover Image + Inline Cloudinary Images Cleanup)
 export const deleteBlogPost = async (req, res) => {
     try {
         const { id } = req.params;
@@ -193,11 +240,18 @@ export const deleteBlogPost = async (req, res) => {
             return res.status(404).json({ success: false, message: "Blog not found to delete." });
         }
 
+        // Delete cover image from Cloudinary
         if (deletedBlog.coverImage) {
-            try { await deleteFromCloudinary(deletedBlog.coverImage); } catch (e) { console.warn("Cloudinary delete warning:", e); }
+            try { await deleteFromCloudinary(deletedBlog.coverImage); } catch (e) { console.warn("Cloudinary cover delete warning:", e); }
         }
 
-        return res.status(200).json({ success: true, message: "Blog deleted successfully!" });
+        // Delete all orphan inline images stored in Cloudinary
+        const inlineUrls = extractCloudinaryUrls(deletedBlog.content);
+        for (const inlineUrl of inlineUrls) {
+            try { await deleteFromCloudinary(inlineUrl); } catch (e) { console.warn("Cloudinary inline delete warning:", e); }
+        }
+
+        return res.status(200).json({ success: true, message: "Blog and associated assets deleted successfully!" });
     } catch (error) {
         console.error("Delete blog error:", error);
         return res.status(500).json({ success: false, message: error.message || "Could not delete blog post." });

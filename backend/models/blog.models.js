@@ -42,7 +42,13 @@ const blogSchema = new mongoose.Schema({
     },
     coverImage: { 
         type: String 
-    } // File upload path ya fir external image URL dono handle karega
+    }, // File upload path ya fir external image URL dono handle karega
+    status: {
+        type: String,
+        enum: ['published', 'draft'],
+        default: 'published',
+        index: true
+    }
 }, { timestamps: true });
 
 const Blog = mongoose.model('Blog', blogSchema);

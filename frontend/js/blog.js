@@ -22,27 +22,26 @@ async function renderBlogCards() {
             const latestPost = result.data[0]; 
             if (latestPost) {
                 // Head Elements Update
-                document.getElementById('dynamic-title').innerText = `Alora Radiance Blogs | Latest: ${latestPost.metaTitle || latestPost.title}`;
+                if (document.getElementById('dynamic-title')) {
+                    document.getElementById('dynamic-title').innerText = `Alora Radiance Blogs | Latest: ${latestPost.metaTitle || latestPost.title}`;
+                }
                 document.getElementById('dynamic-meta-desc')?.setAttribute('content', latestPost.metaDesc || '');
                 document.getElementById('dynamic-keywords')?.setAttribute('content', latestPost.keywords || '');
 
-            // Schema Injection for Blog.html page (Detailed SEO Extension & Googlebot compatibility)
-            const fallbackBlogCollectionSchema = {
-                "@context": "https://schema.org",
-                "@type": "Blog",
-                "name": "Alora Radiance Skincare Blogs",
-                "description": "Explore dermatologist-tested skincare tips, guides, and natural beauty insights from Alora Radiance.",
-                "url": window.location.href,
-                "blogPost": (result.data || []).map(post => ({
-                    "@type": "BlogPosting",
-                    "headline": post.title,
-                    "url": `${window.location.origin}/post/${post.slug || post._id}`,
-                    "datePublished": post.createdAt
-                }))
-            };
-
-            injectMultipleSchemasToDOM(latestPost ? latestPost.schema : null, fallbackBlogCollectionSchema);
+                if (typeof window.injectMultipleSchemasToDOM === 'function' && latestPost.schema) {
+                    window.injectMultipleSchemasToDOM(latestPost.schema);
+                }
             }
+
+            const escapeHtml = (str) => {
+                if (str === null || str === undefined) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            };
 
             // Helper to strip HTML tags for clean description snippet
             const getSnippet = (post) => {
@@ -60,20 +59,23 @@ async function renderBlogCards() {
                     year: 'numeric'
                 });
 
-                const absoluteCoverImage = post.coverImage 
-                    ? (post.coverImage.startsWith('http') ? post.coverImage : `${BASE_URL}${post.coverImage}`)
+                const rawCover = post.coverImage || post.coverUrl || '';
+                const absoluteCoverImage = rawCover 
+                    ? (rawCover.startsWith('http') ? rawCover : `${BASE_URL}${rawCover.startsWith('/') ? '' : '/'}${rawCover}`)
                     : './static/alora5.webp';
 
-                const publisherName = post.publisher || 'Alora Radiance';
-                const snippetText = getSnippet(post);
-                const categoryName = post.category || 'Skincare';
+                const publisherName = escapeHtml(post.publisher || 'Alora Radiance');
+                const snippetText = escapeHtml(getSnippet(post));
+                const categoryName = escapeHtml(post.category || 'Skincare');
+                const safeTitle = escapeHtml(post.title || 'Untitled');
+                const safeSlug = escapeHtml(post.slug || '');
 
                 const cardHTML = `
-                    <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer" onclick="goToPost('${post.slug}')">
+                    <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer" onclick="goToPost('${safeSlug}')">
                         
                         <!-- Top Image Area with Overlay Category Pill (Aspect Ratio Preserved to Avoid Text Cropping) -->
                         <div class="relative w-full aspect-[16/9.5] sm:aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 flex items-center justify-center">
-                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105">
+                            <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/alora5.webp'">
                             
                             <!-- Category Badge Pill on Top-Left of Image -->
                             <div class="absolute top-3 left-3 z-10">
@@ -88,7 +90,7 @@ async function renderBlogCards() {
                             <div>
                                 <!-- Rich Maroon Title -->
                                 <h3 class="text-lg sm:text-xl font-bold font-sans leading-snug text-[#800000] group-hover:text-[#8B0000] transition-colors duration-200 line-clamp-2 mb-2">
-                                    ${post.title}
+                                    ${safeTitle}
                                 </h3>
 
                                 <!-- Description Snippet -->
@@ -100,7 +102,7 @@ async function renderBlogCards() {
                             <!-- Footer Bar: Publisher | Date & Read More Button -->
                             <div class="pt-3 border-t border-slate-100 flex items-center justify-between mt-auto">
                                 <span class="text-xs font-bold text-[#800000] tracking-wide">
-                                    ${publisherName} | ${formattedDate}
+                                    ${publisherName} | ${escapeHtml(formattedDate)}
                                 </span>
 
                                 <span class="bg-black hover:bg-slate-900 text-white text-xs font-extrabold px-4 py-2 rounded-full transition-all duration-200 flex items-center gap-1.5 shadow-sm group-hover:scale-105">
