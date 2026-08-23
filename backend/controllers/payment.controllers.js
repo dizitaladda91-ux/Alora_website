@@ -12,7 +12,7 @@ import { sendMail, escapeHtml } from "../services/email.service.js";
 const FREE_SHIPPING_LIMIT = 499;
 const STANDARD_DELIVERY_CHARGE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000;
-const MAX_STACKED_COUPONS = 3;
+const MAX_STACKED_COUPONS = 4;
 const MAX_COUPON_DISCOUNT_PERCENT = 50;
 
 const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
@@ -381,8 +381,8 @@ export const createOrder = async (req, res) => {
         const candidateCodes = getRequestedCouponCodes(req.body);
 
         for (const candidateCode of candidateCodes) {
-            if (candidateCode === "SECRET150" || candidateCode === "ALORA150" || candidateCode === "TEST150") {
-                flatDiscount += 150;
+            if (candidateCode === "SECRET200" || candidateCode === "SECRET150" || candidateCode === "ALORA200" || candidateCode === "ALORA150" || candidateCode === "TEST200" || candidateCode === "TEST150") {
+                flatDiscount += 200;
                 appliedCoupons.push(candidateCode);
                 continue;
             }

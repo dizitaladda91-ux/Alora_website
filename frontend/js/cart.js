@@ -8,7 +8,7 @@ const FREE_SHIPPING_LIMIT = 499;
 const DELIVERY_FEE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000; 
 const APPLIED_COUPONS_KEY = "aloraAppliedCoupons";
-const MAX_STACKED_COUPONS = 3;
+const MAX_STACKED_COUPONS = 4;
 
 let appliedCoupons = [];
 
@@ -31,7 +31,7 @@ function renderAppliedCoupons() {
 
     container.innerHTML = appliedCoupons.map((coupon) => `
         <span class="inline-flex items-center gap-1 rounded border border-sage/30 bg-sage-light px-2 py-1 text-xs font-semibold text-sage">
-            ${coupon.code} (${coupon.rate}% off)
+            ${coupon.code} (${coupon.isFlat ? '₹' : ''}${coupon.rate}${coupon.isFlat ? ' off' : '% off'})
             <button type="button" onclick="removeAppliedCoupon('${coupon.code}')" class="ml-1 text-sage hover:text-red-600" aria-label="Remove ${coupon.code}">
                 <i class="fa-solid fa-xmark"></i>
             </button>
@@ -531,13 +531,13 @@ async function applyCoupon() {
         return;
     }
 
-    if (typedCode === "SECRET150" || typedCode === "ALORA150" || typedCode === "TEST150") {
-        if (addAppliedCoupon(typedCode, 150, "coupon", true)) {
-            couponMessage.innerText = `🔒 Secret Test Coupon '${typedCode}' applied successfully! (₹150 OFF)`;
+    if (typedCode === "SECRET200" || typedCode === "SECRET150" || typedCode === "ALORA200" || typedCode === "ALORA150" || typedCode === "TEST200" || typedCode === "TEST150") {
+        if (addAppliedCoupon(typedCode, 200, "coupon", true)) {
+            couponMessage.innerText = `🔒 Secret Test Coupon '${typedCode}' applied successfully! (₹200 OFF)`;
             couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
             couponInput.value = "";
         } else {
-            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 4 coupons.";
             couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         }
         return;
@@ -549,7 +549,7 @@ async function applyCoupon() {
             couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
             couponInput.value = "";
         } else {
-            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 4 coupons.";
             couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         }
         return;
