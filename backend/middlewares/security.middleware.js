@@ -51,12 +51,16 @@ export const sanitizeNoSql = (req, res, next) => {
     next();
 };
 
-// 3. Dynamic Rate Limiter Middleware (Anti-DDoS, Anti-BruteForce)
-export const createRateLimiter = ({ windowMs = 15 * 60 * 1000, max = 100, message = "Too many requests. Please try again later." } = {}) => {
+// 3. Dynamic Rate Limiter Middleware (Anti-DDoS, Anti-BruteForce - Generous Limits)
+export const createRateLimiter = ({ windowMs = 15 * 60 * 1000, max = 500, message = "Too many requests. Please try again later." } = {}) => {
     return (req, res, next) => {
+        // Skip rate limiting on local development (localhost / 127.0.0.1)
         const clientIp = req.headers["x-forwarded-for"] || req.socket.remoteAddress || "unknown_ip";
-        const now = Date.now();
+        if (clientIp.includes("127.0.0.1") || clientIp.includes("::1") || clientIp.includes("localhost")) {
+            return next();
+        }
 
+        const now = Date.now();
         let log = requestLogs.get(clientIp);
 
         if (!log || now > log.resetTime) {

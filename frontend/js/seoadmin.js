@@ -294,19 +294,67 @@ blogForm.addEventListener('submit', async function(event) {
         return;
     }
 
-    // Schema JSON Validator (Supports Single, Array, @graph, or Multiple Schemas)
-    if (schema) {
-        const parsed = (typeof window.parseMultipleSchemas === 'function') 
-            ? window.parseMultipleSchemas(schema) 
-            : [];
-            
-        if (parsed.length === 0) {
-            try {
-                JSON.parse(schema);
-            } catch (e) {
-                alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON object(s) or script tags.");
-                return;
+function parseMultipleSchemas(rawInput) {
+    if (!rawInput || !String(rawInput).trim()) return [];
+    let cleaned = String(rawInput).trim();
+
+    if (cleaned.includes('<script')) {
+        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scriptMatches && scriptMatches.length > 0) {
+            const extracted = [];
+            for (const match of scriptMatches) {
+                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                if (content) {
+                    const subSchemas = parseMultipleSchemas(content);
+                    extracted.push(...subSchemas);
+                }
             }
+            if (extracted.length > 0) return extracted;
+        } else {
+            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
+        }
+    }
+
+    try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed)) return parsed.filter(item => item && typeof item === 'object');
+        if (parsed && typeof parsed === 'object') return [parsed];
+    } catch (e) {}
+
+    const schemas = [];
+    let depth = 0, startIndex = -1, inString = false, isEscaped = false;
+
+    for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (isEscaped) { isEscaped = false; continue; }
+        if (char === '\\') { isEscaped = true; continue; }
+        if (char === '"') { inString = !inString; continue; }
+        if (!inString) {
+            if (char === '{') {
+                if (depth === 0) startIndex = i;
+                depth++;
+            } else if (char === '}') {
+                depth--;
+                if (depth === 0 && startIndex !== -1) {
+                    const jsonCandidate = cleaned.substring(startIndex, i + 1);
+                    try {
+                        const parsedObj = JSON.parse(jsonCandidate);
+                        if (parsedObj && typeof parsedObj === 'object') schemas.push(parsedObj);
+                    } catch (e) {}
+                    startIndex = -1;
+                }
+            }
+        }
+    }
+    return schemas;
+}
+
+    // Schema JSON Validator (Supports Single, Array, @graph, or Multiple <script> Schemas)
+    if (schema) {
+        const parsed = parseMultipleSchemas(schema);
+        if (parsed.length === 0) {
+            alert("⚠️ The Schema (JSON-LD) format is invalid! Please enter valid JSON object(s) or script tags.");
+            return;
         }
     }
 

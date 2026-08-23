@@ -31,9 +31,9 @@ const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Security Rate Limiters
-const globalLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 300, message: "Too many API requests. Please slow down." });
-const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 25, message: "Too many login/auth attempts. Please try again after 15 minutes." });
+// Security Rate Limiters (Bypassed for local development, generous thresholds for production)
+const globalLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 2000, message: "Too many API requests. Please slow down." });
+const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 300, message: "Too many login/auth attempts. Please try again after 15 minutes." });
 
 // Middleware setup
 const corsOptions = {
