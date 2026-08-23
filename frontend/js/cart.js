@@ -39,13 +39,13 @@ function renderAppliedCoupons() {
     `).join("");
 }
 
-function addAppliedCoupon(code, rate, source = "coupon") {
+function addAppliedCoupon(code, rate, source = "coupon", isFlat = false) {
     const normalizedCode = String(code || "").trim().toUpperCase();
     if (!/^[A-Z0-9_-]{5,64}$/.test(normalizedCode)) return false;
     if (appliedCoupons.some((coupon) => coupon.code === normalizedCode)) return false;
     if (appliedCoupons.length >= MAX_STACKED_COUPONS) return false;
 
-    appliedCoupons.push({ code: normalizedCode, rate: Number(rate) || 0, source });
+    appliedCoupons.push({ code: normalizedCode, rate: Number(rate) || 0, source, isFlat: Boolean(isFlat) });
     persistAppliedCoupons();
     renderAppliedCoupons();
     recalculateBill();
@@ -471,12 +471,14 @@ function recalculateBill() {
     if (!billSubtotalEl) return;
 
     const subtotal = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
-    billSubtotalEl.innerText = `₹${subtotal}`;
+    if (billSubtotalEl) billSubtotalEl.innerText = `₹${subtotal}`;
 
-    const totalDiscountRate = Math.min(50, appliedCoupons.reduce((sum, coupon) => sum + (Number(coupon.rate) || 0), 0));
-    const discount = Math.round(subtotal * totalDiscountRate / 100);
+    const flatDiscountTotal = appliedCoupons.filter(c => c.isFlat).reduce((sum, c) => sum + (Number(c.rate) || 0), 0);
+    const totalDiscountRate = Math.min(50, appliedCoupons.filter(c => !c.isFlat).reduce((sum, coupon) => sum + (Number(coupon.rate) || 0), 0));
+    const percentDiscount = Math.round(subtotal * totalDiscountRate / 100);
+    const discount = Math.min(subtotal, percentDiscount + flatDiscountTotal);
 
-    if (totalDiscountRate > 0 && subtotal > 0) {
+    if (discount > 0 && subtotal > 0) {
         if (billDiscountEl) billDiscountEl.innerText = `${discount}`;
         if (appliedCouponName) appliedCouponName.innerText = appliedCoupons.map((coupon) => coupon.code).join(" + ");
         if (discountRow) discountRow.classList.remove("hidden");
@@ -526,6 +528,18 @@ async function applyCoupon() {
         couponMessage.innerText = "Please enter a coupon or referral code.";
         couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
         recalculateBill();
+        return;
+    }
+
+    if (typedCode === "SECRET150" || typedCode === "ALORA150" || typedCode === "TEST150") {
+        if (addAppliedCoupon(typedCode, 150, "coupon", true)) {
+            couponMessage.innerText = `🔒 Secret Test Coupon '${typedCode}' applied successfully! (₹150 OFF)`;
+            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
+            couponInput.value = "";
+        } else {
+            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
+            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
+        }
         return;
     }
 

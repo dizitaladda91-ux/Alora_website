@@ -17,13 +17,14 @@ const MAX_COUPON_DISCOUNT_PERCENT = 50;
 
 const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
 
-const calculateCheckoutTotals = ({ subtotal, discountPercent, founderHandDelivery }) => {
-    const affiliateDiscount = roundCurrency(subtotal * discountPercent / 100);
+const calculateCheckoutTotals = ({ subtotal, discountPercent, flatDiscount = 0, founderHandDelivery }) => {
+    const percentDiscount = roundCurrency(subtotal * discountPercent / 100);
+    const totalDiscount = Math.min(subtotal, roundCurrency(percentDiscount + flatDiscount));
     const deliveryCharge = subtotal >= FREE_SHIPPING_LIMIT ? 0 : STANDARD_DELIVERY_CHARGE;
     const founderDeliveryCharge = founderHandDelivery ? FOUNDER_DELIVERY_CHARGE : 0;
-    const totalAmount = roundCurrency(Math.max(0, subtotal - affiliateDiscount + deliveryCharge + founderDeliveryCharge));
+    const totalAmount = roundCurrency(Math.max(0, subtotal - totalDiscount + deliveryCharge + founderDeliveryCharge));
 
-    return { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
+    return { affiliateDiscount: totalDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
 };
 
 const getRequestedCouponCodes = (body) => {
@@ -373,29 +374,40 @@ export const createOrder = async (req, res) => {
         }
 
         let discountPercent = 0;
+        let flatDiscount = 0;
         let referralCode = null;
         let clickId = referral?.clickId ? String(referral.clickId) : null;
         const appliedCoupons = [];
         const candidateCodes = getRequestedCouponCodes(req.body);
 
         for (const candidateCode of candidateCodes) {
+            if (candidateCode === "SECRET150" || candidateCode === "ALORA150" || candidateCode === "TEST150") {
+                flatDiscount += 150;
+                appliedCoupons.push(candidateCode);
+                continue;
+            }
+
+            if (candidateCode === "RAKHI30" || candidateCode === "RAKHI" || candidateCode === "FESTIVE30" || candidateCode === "RAKHI30OFF") {
+                discountPercent += 30;
+                appliedCoupons.push(candidateCode);
+                continue;
+            }
+
             if (candidateCode === "GLOW10") {
                 discountPercent += 10;
                 appliedCoupons.push(candidateCode);
                 continue;
             }
 
-            // An order can attribute commission to one affiliate only. GLOW10 can
-            // still be combined with that referral coupon.
             if (referralCode) continue;
 
             const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
             const referralMatchesCandidate = String(referral?.code || "").trim().toUpperCase() === candidateCode;
             if (referralStatus.valid === true && referralStatus.eligible === true && referralMatchesCandidate && clickId) {
-                    discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
-                    referralCode = candidateCode;
-                    appliedCoupons.push(candidateCode);
-                }
+                discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
+                referralCode = candidateCode;
+                appliedCoupons.push(candidateCode);
+            }
         }
 
         discountPercent = Math.min(MAX_COUPON_DISCOUNT_PERCENT, discountPercent);
@@ -404,6 +416,7 @@ export const createOrder = async (req, res) => {
         const { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount } = calculateCheckoutTotals({
             subtotal,
             discountPercent,
+            flatDiscount,
             founderHandDelivery
         });
 
