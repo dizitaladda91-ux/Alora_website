@@ -71,9 +71,9 @@ async function renderBlogCards() {
                 const cardHTML = `
                     <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer" onclick="goToPost('${post.slug}')">
                         
-                        <!-- Top Image Area with Overlay Category Pill -->
-                        <div class="relative w-full h-52 sm:h-56 rounded-2xl overflow-hidden mb-4 bg-slate-100">
-                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105">
+                        <!-- Top Image Area with Overlay Category Pill (Aspect Ratio Preserved to Avoid Text Cropping) -->
+                        <div class="relative w-full aspect-[16/9.5] sm:aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 flex items-center justify-center">
+                            <img src="${absoluteCoverImage}" alt="${post.title}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105">
                             
                             <!-- Category Badge Pill on Top-Left of Image -->
                             <div class="absolute top-3 left-3 z-10">

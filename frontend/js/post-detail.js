@@ -160,38 +160,8 @@ function injectSEO(blog) {
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
 
-    // DYNAMIC JSON-LD MULTI-SCHEMA INJECTOR (Supports Single, Array, @graph, or Multiple Concatenated Schemas)
-    const fallbackImage = blog.coverImage 
-        ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
-        : `${window.location.origin}/static/alora5.webp`;
-
-    const defaultFallbackSchema = {
-        "@context": "https://schema.org",
-        "@type": "BlogPosting",
-        "mainEntityOfPage": {
-            "@type": "WebPage",
-            "@id": currentUrl
-        },
-        "headline": blog.title || "Alora Skincare Guide",
-        "description": blog.metaDesc || blog.title || "Skincare guide by Alora Radiance",
-        "image": [fallbackImage],
-        "datePublished": blog.createdAt || new Date().toISOString(),
-        "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
-        "author": {
-            "@type": "Organization",
-            "name": blog.publisher || "Alora Radiance"
-        },
-        "publisher": {
-            "@type": "Organization",
-            "name": blog.publisher || "Alora Radiance",
-            "logo": {
-                "@type": "ImageObject",
-                "url": `${window.location.origin}/static/favicon.ico`
-            }
-        }
-    };
-
-    injectMultipleSchemasToDOM(blog.schema, defaultFallbackSchema);
+    // DYNAMIC JSON-LD MULTI-SCHEMA INJECTOR (Only injects schemas explicitly entered in Admin)
+    injectMultipleSchemasToDOM(blog.schema);
 }
 
 // 🌐 Universal Multi-Schema Helper Functions
@@ -277,16 +247,12 @@ function parseMultipleSchemas(rawInput) {
     return schemas;
 }
 
-function injectMultipleSchemasToDOM(rawSchemaInput, defaultFallbackSchema) {
+function injectMultipleSchemasToDOM(rawSchemaInput) {
     document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
 
-    let schemasToInject = parseMultipleSchemas(rawSchemaInput);
+    if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
 
-    if (!schemasToInject || schemasToInject.length === 0) {
-        if (defaultFallbackSchema) {
-            schemasToInject = [defaultFallbackSchema];
-        }
-    }
+    let schemasToInject = parseMultipleSchemas(rawSchemaInput);
 
     if (!schemasToInject || schemasToInject.length === 0) return;
 

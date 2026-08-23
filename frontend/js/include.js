@@ -331,16 +331,12 @@ window.parseMultipleSchemas = function(rawInput) {
     return schemas;
 };
 
-window.injectMultipleSchemasToDOM = function(rawSchemaInput, defaultFallbackSchema) {
+window.injectMultipleSchemasToDOM = function(rawSchemaInput) {
     document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
 
-    let schemasToInject = window.parseMultipleSchemas(rawSchemaInput);
+    if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
 
-    if (!schemasToInject || schemasToInject.length === 0) {
-        if (defaultFallbackSchema) {
-            schemasToInject = [defaultFallbackSchema];
-        }
-    }
+    let schemasToInject = window.parseMultipleSchemas(rawSchemaInput);
 
     if (!schemasToInject || schemasToInject.length === 0) return;
 
