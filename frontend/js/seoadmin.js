@@ -1,5 +1,24 @@
 import BASE_URL, { getAuthHeaders } from './config.js'; // Make sure config.js provides your API domain URL
 
+// Register native Table Embed Blot for Quill Editor
+if (typeof Quill !== 'undefined') {
+    const BlockEmbed = Quill.import('blots/block/embed');
+    class TableBlot extends BlockEmbed {
+        static create(value) {
+            const node = super.create();
+            node.innerHTML = typeof value === 'string' ? value : (value?.outerHTML || '');
+            return node;
+        }
+        static value(node) {
+            return node.innerHTML;
+        }
+    }
+    TableBlot.blotName = 'tableEmbed';
+    TableBlot.tagName = 'div';
+    TableBlot.className = 'blog-table-embed';
+    Quill.register(TableBlot, true);
+}
+
 // 1. Initialize Quill Editor
 const quill = new Quill('#editor-container', {
     modules: {
@@ -17,62 +36,11 @@ const quill = new Quill('#editor-container', {
     theme: 'snow'
 });
 
-// Table & HTML Code View Support
-const btnInsertTable = document.getElementById('btnInsertTable');
-const btnToggleCodeView = document.getElementById('btnToggleCodeView');
-const rawHtmlEditor = document.getElementById('raw-html-editor');
-const editorContainer = document.getElementById('editor-container');
-let isCodeView = false;
-
-if (btnToggleCodeView && rawHtmlEditor) {
-    btnToggleCodeView.addEventListener('click', () => {
-        isCodeView = !isCodeView;
-        if (isCodeView) {
-            rawHtmlEditor.value = quill.root.innerHTML;
-            editorContainer.parentElement.querySelector('.ql-toolbar')?.classList.add('hidden');
-            editorContainer.classList.add('hidden');
-            rawHtmlEditor.classList.remove('hidden');
-            btnToggleCodeView.innerHTML = '<i class="fa-solid fa-eye text-emerald-400"></i> Visual Editor Mode';
-            btnToggleCodeView.className = 'px-3 py-1.5 rounded-xl bg-slate-900 text-emerald-400 text-xs font-bold transition flex items-center gap-1.5 border border-emerald-500/40 shadow-md';
-        } else {
-            quill.clipboard.dangerouslyPasteHTML(rawHtmlEditor.value);
-            rawHtmlEditor.classList.add('hidden');
-            editorContainer.classList.remove('hidden');
-            editorContainer.parentElement.querySelector('.ql-toolbar')?.classList.remove('hidden');
-            btnToggleCodeView.innerHTML = '<i class="fa-solid fa-code text-slate-600"></i> HTML Code Mode';
-            btnToggleCodeView.className = 'px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition flex items-center gap-1.5 border border-slate-300 shadow-xs';
-        }
-    });
-}
-
-if (btnInsertTable) {
-    btnInsertTable.addEventListener('click', () => {
-        const colCount = parseInt(prompt("Enter number of table columns:", "3") || "0", 10);
-        const rowCount = parseInt(prompt("Enter number of table rows (excluding header):", "3") || "0", 10);
-        if (!colCount || !rowCount || colCount < 1 || rowCount < 1) return;
-
-        let tableHtml = '<table class="w-full my-6 border-collapse rounded-xl overflow-hidden shadow-sm border border-slate-200">\n<thead>\n<tr class="bg-slate-900 text-white">\n';
-        for (let c = 1; c <= colCount; c += 1) {
-            tableHtml += `  <th class="p-3 text-left border border-slate-700 font-bold">Header ${c}</th>\n`;
-        }
-        tableHtml += '</tr>\n</thead>\n<tbody>\n';
-        for (let r = 1; r <= rowCount; r += 1) {
-            tableHtml += '<tr>\n';
-            for (let c = 1; c <= colCount; c += 1) {
-                tableHtml += `  <td class="p-3 border border-slate-200 text-slate-700">Row ${r} Cell ${c}</td>\n`;
-            }
-            tableHtml += '</tr>\n';
-        }
-        tableHtml += '</tbody>\n</table>\n<p><br></p>';
-
-        if (isCodeView && rawHtmlEditor) {
-            rawHtmlEditor.value += `\n${tableHtml}`;
-        } else {
-            const range = quill.getSelection(true) || { index: quill.getLength() };
-            quill.clipboard.dangerouslyPasteHTML(range.index, tableHtml);
-        }
-    });
-}
+// Natively catch and preserve pasted <table> elements in editor
+quill.clipboard.addMatcher('TABLE', (node) => {
+    const Delta = Quill.import('delta');
+    return new Delta().insert({ tableEmbed: node.outerHTML });
+});
 
 // Client-side Image Compressor Helper
 function compressImageFile(file, maxWidth = 1920, quality = 0.82) {
@@ -136,9 +104,6 @@ function dataURItoFile(dataURI, filename = 'pasted-image.jpg') {
 
 // Auto-upload and replace any base64 images inside Quill HTML before form submission
 async function sanitizeAndUploadQuillImages(quillInstance) {
-    if (isCodeView && rawHtmlEditor) {
-        quillInstance.clipboard.dangerouslyPasteHTML(rawHtmlEditor.value);
-    }
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = quillInstance.root.innerHTML;
     const base64Imgs = tempDiv.querySelectorAll('img[src^="data:image/"]');
