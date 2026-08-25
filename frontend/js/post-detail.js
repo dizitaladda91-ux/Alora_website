@@ -186,11 +186,28 @@ function renderArticle(blog) {
     }
 
     const coverImg = document.getElementById('post-cover');
-    if (coverImg && blog.coverImage) {
-        coverImg.src = blog.coverImage.startsWith('http') 
-            ? blog.coverImage 
-            : `${BASE_URL}${blog.coverImage}`;
-        coverImg.alt = blog.title || 'Blog Cover';
+    const coverContainer = coverImg?.parentElement;
+    const coverUrl = blog.coverImage || blog.coverUrl || '';
+
+    if (coverImg) {
+        if (coverUrl && typeof coverUrl === 'string' && coverUrl.trim()) {
+            let finalUrl = coverUrl.trim();
+            if (!finalUrl.startsWith('http') && !finalUrl.startsWith('/')) {
+                finalUrl = `/${finalUrl}`;
+            }
+            if (!finalUrl.startsWith('http') && BASE_URL) {
+                finalUrl = `${BASE_URL}${finalUrl}`;
+            }
+            coverImg.src = finalUrl;
+            coverImg.alt = blog.title || 'Blog Cover';
+            if (coverContainer) coverContainer.classList.remove('hidden');
+
+            coverImg.onerror = () => {
+                if (coverContainer) coverContainer.classList.add('hidden');
+            };
+        } else {
+            if (coverContainer) coverContainer.classList.add('hidden');
+        }
     }
 }
 
