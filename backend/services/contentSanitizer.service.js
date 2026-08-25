@@ -4,7 +4,7 @@ const BLOG_ALLOWED_TAGS = [
   "p", "br", "h2", "h3", "h4", "h5", "h6", "ul", "ol", "li",
   "strong", "b", "em", "i", "u", "s", "blockquote", "pre", "code",
   "a", "img", "figure", "figcaption", "table", "thead", "tbody", "tr",
-  "th", "td", "hr"
+  "th", "td", "hr", "div", "span"
 ];
 
 export const sanitizePlainText = (value, maxLength = 500) => sanitizeHtml(String(value ?? ""), {
@@ -17,8 +17,15 @@ export const sanitizeBlogHtml = (value) => sanitizeHtml(String(value ?? "").repl
   allowedAttributes: {
     a: ["href", "target", "title"],
     img: ["src", "alt", "width", "height", "loading"],
-    th: ["colspan", "rowspan"],
-    td: ["colspan", "rowspan"]
+    table: ["class", "style", "border", "cellpadding", "cellspacing", "align"],
+    thead: ["class", "style"],
+    tbody: ["class", "style"],
+    tr: ["class", "style"],
+    th: ["colspan", "rowspan", "style", "class", "scope", "align"],
+    td: ["colspan", "rowspan", "style", "class", "align"],
+    div: ["class", "style"],
+    span: ["class", "style"],
+    p: ["class", "style"]
   },
   allowedSchemes: ["http", "https", "mailto"],
   allowedSchemesByTag: { img: ["http", "https"] },

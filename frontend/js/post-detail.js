@@ -77,6 +77,17 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
         }
     });
 
+    // Wrap tables in responsive scroll container
+    const tableNodes = tempDiv.querySelectorAll('table');
+    tableNodes.forEach((table) => {
+        if (!table.parentElement || !table.parentElement.classList.contains('blog-table-responsive')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-2xl border border-amber-900/10 shadow-sm bg-white';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        }
+    });
+
     return tempDiv.innerHTML;
 }
 
