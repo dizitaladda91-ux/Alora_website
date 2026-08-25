@@ -77,75 +77,13 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
         }
     });
 
-    // Target conversion of stacked table paragraphs (Image 2) into clean grid tables (Image 1)
-    const allParagraphs = Array.from(tempDiv.querySelectorAll('p'));
-    if (allParagraphs.length >= 6 && tempDiv.querySelectorAll('table').length === 0) {
-        for (let i = 0; i <= allParagraphs.length - 6; i += 1) {
-            const t1 = allParagraphs[i]?.innerText.trim() || '';
-            const t2 = allParagraphs[i+1]?.innerText.trim() || '';
-            const t3 = allParagraphs[i+2]?.innerText.trim() || '';
-
-            const isKnownTableHead = (
-                (t1 === 'Ingredient' || t1 === 'Skin Concern' || t1 === 'Header 1') &&
-                (t2 === 'Key Benefit' || t2 === 'Recommended Ingredient' || t2 === 'Header 2') &&
-                (t3 === 'Best Skin Type' || t3 === 'Suggested Serum Type' || t3 === 'Header 3')
-            );
-
-            if (isKnownTableHead) {
-                const tableRows = [];
-                let currIndex = i + 3;
-                while (currIndex + 2 < allParagraphs.length) {
-                    const c1 = allParagraphs[currIndex]?.innerText.trim() || '';
-                    const c2 = allParagraphs[currIndex+1]?.innerText.trim() || '';
-                    const c3 = allParagraphs[currIndex+2]?.innerText.trim() || '';
-                    if (!c1 && !c2 && !c3) break;
-                    if (allParagraphs[currIndex].tagName.startsWith('H')) break;
-
-                    tableRows.push([allParagraphs[currIndex].innerHTML, allParagraphs[currIndex+1].innerHTML, allParagraphs[currIndex+2].innerHTML]);
-                    currIndex += 3;
-                }
-
-                if (tableRows.length > 0) {
-                    const table = document.createElement('table');
-                    table.className = 'w-full my-6 border-collapse border border-slate-300 shadow-sm bg-white';
-                    table.innerHTML = `
-                        <thead>
-                            <tr class="bg-white border-b border-slate-300">
-                                <th class="p-3 font-bold border border-slate-300 text-center">${allParagraphs[i].innerHTML}</th>
-                                <th class="p-3 font-bold border border-slate-300 text-center">${allParagraphs[i+1].innerHTML}</th>
-                                <th class="p-3 font-bold border border-slate-300 text-center">${allParagraphs[i+2].innerHTML}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${tableRows.map((row) => `
-                                <tr class="border-b border-slate-200">
-                                    <td class="p-3 border border-slate-300">${row[0]}</td>
-                                    <td class="p-3 border border-slate-300">${row[1]}</td>
-                                    <td class="p-3 border border-slate-300">${row[2]}</td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    `;
-
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-xl border border-slate-300 shadow-sm bg-white';
-                    wrapper.appendChild(table);
-
-                    allParagraphs[i].parentNode.insertBefore(wrapper, allParagraphs[i]);
-                    allParagraphs.slice(i, currIndex).forEach((node) => node.remove());
-                    break;
-                }
-            }
-        }
-    }
-
-    // Wrap HTML tables in responsive scroll container and apply luxury table styling
+    // Wrap HTML tables in responsive scroll container and apply clean table styling
     const tableNodes = tempDiv.querySelectorAll('table');
     tableNodes.forEach((table) => {
         table.classList.add('w-full', 'my-6', 'border-collapse', 'rounded-xl', 'overflow-hidden');
         if (!table.parentElement || !table.parentElement.classList.contains('blog-table-responsive')) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-2xl border border-amber-900/10 shadow-sm bg-white';
+            wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-2xl border border-slate-300 shadow-sm bg-white';
             table.parentNode.insertBefore(wrapper, table);
             wrapper.appendChild(table);
         }
