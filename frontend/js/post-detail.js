@@ -77,6 +77,72 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
         }
     });
 
+    // Reconstruct stacked paragraphs into responsive grid tables if content has sequential table-like paragraphs
+    const paragraphs = Array.from(tempDiv.querySelectorAll('p'));
+    if (paragraphs.length >= 6 && tempDiv.querySelectorAll('table').length === 0) {
+        for (const numCols of [3, 4, 2]) {
+            let i = 0;
+            while (i <= paragraphs.length - (numCols * 2)) {
+                const headerCandidates = paragraphs.slice(i, i + numCols);
+                const isHeaderCandidate = headerCandidates.every((p) => {
+                    const txt = p.innerText.trim();
+                    const hasStrong = p.querySelector('strong, b') !== null;
+                    return txt.length > 0 && txt.length < 60 && (hasStrong || /^[A-Z]/.test(txt));
+                });
+
+                if (isHeaderCandidate) {
+                    let currIndex = i + numCols;
+                    const rowCells = [];
+                    while (currIndex + numCols <= paragraphs.length) {
+                        const cellSlice = paragraphs.slice(currIndex, currIndex + numCols);
+                        const validCells = cellSlice.every((p) => p.innerText.trim().length > 0);
+                        if (!validCells) break;
+                        rowCells.push(cellSlice.map((p) => p.innerHTML));
+                        currIndex += numCols;
+                    }
+
+                    if (rowCells.length >= 1) {
+                        const table = document.createElement('table');
+                        table.className = 'w-full my-6 border-collapse rounded-xl overflow-hidden shadow-sm';
+
+                        const thead = document.createElement('thead');
+                        const headerTr = document.createElement('tr');
+                        headerCandidates.forEach((p) => {
+                            const th = document.createElement('th');
+                            th.innerHTML = p.innerHTML;
+                            headerTr.appendChild(th);
+                        });
+                        thead.appendChild(headerTr);
+                        table.appendChild(thead);
+
+                        const tbody = document.createElement('tbody');
+                        rowCells.forEach((row) => {
+                            const tr = document.createElement('tr');
+                            row.forEach((cellHtml) => {
+                                const td = document.createElement('td');
+                                td.innerHTML = cellHtml;
+                                tr.appendChild(td);
+                            });
+                            tbody.appendChild(tr);
+                        });
+                        table.appendChild(tbody);
+
+                        const wrapper = document.createElement('div');
+                        wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-2xl border border-amber-900/10 shadow-sm bg-white';
+                        wrapper.appendChild(table);
+
+                        const firstHeaderNode = headerCandidates[0];
+                        firstHeaderNode.parentNode.insertBefore(wrapper, firstHeaderNode);
+
+                        paragraphs.slice(i, currIndex).forEach((node) => node.remove());
+                        break;
+                    }
+                }
+                i += 1;
+            }
+        }
+    }
+
     // Wrap tables in responsive scroll container
     const tableNodes = tempDiv.querySelectorAll('table');
     tableNodes.forEach((table) => {
