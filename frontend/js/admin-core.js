@@ -8,42 +8,76 @@ let activeStatusFilter = "";
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 
+function renderOrderRow(order) {
+    return `
+        <tr class="hover:bg-gray-50 border-b">
+            <td class="p-4 font-mono text-xs font-bold text-gray-700">${escapeHtml(order.razorpayOrderId)}</td>
+            <td class="p-4">
+                <div class="font-bold text-gray-800">${escapeHtml(order.customer?.name)}</div>
+                <div class="text-xs text-gray-500">${escapeHtml(order.customer?.phone)}</div>
+                <div class="text-[11px] text-gray-400 max-w-[200px] truncate" title="${escapeHtml(order.customer?.address)}">${escapeHtml(order.customer?.address)}</div>
+            </td>
+            <td class="p-4 font-bold text-gray-900">${formatMoney(order.totalAmount)}</td>
+            <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
+            <td class="p-4">${order.orderStatus === "refunded" ? `<span class="text-xs font-semibold text-purple-700 uppercase">refunded</span>` : `<select class="border border-gray-300 rounded-md text-xs p-1.5 bg-white font-medium shadow-sm outline-none focus:ring-2 focus:ring-amber-500" onchange="window.updateOrderStatus('${order._id}', this.value)">${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.orderStatus ? "selected" : ""}>${status.toUpperCase()}</option>`).join("")}</select>`}</td>
+            <td class="p-4"><input type="date" value="${order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().slice(0, 10) : ""}" class="border border-gray-300 rounded-md text-xs p-1.5 bg-white font-medium" onchange="window.updateExpectedDelivery('${order._id}', this.value)"></td>
+            <td class="p-4">
+                <div class="flex flex-col gap-1 w-44">
+                    <input id="track-num-${order._id}" type="text" placeholder="Tracking No." value="${escapeHtml(order.trackingNumber || "")}" class="border border-gray-300 rounded-md text-xs p-1.5 bg-white">
+                    <input id="track-link-${order._id}" type="text" placeholder="Courier link (https://...)" value="${escapeHtml(order.courierLink || "")}" class="border border-gray-300 rounded-md text-xs p-1.5 bg-white">
+                    <button onclick="window.saveTracking('${order._id}')" class="bg-gray-700 hover:bg-gray-800 text-white text-xs py-1 rounded-md transition font-medium">Save Details</button>
+                </div>
+            </td>
+            <td class="p-4 flex flex-col gap-1.5 justify-center">
+                <button onclick="window.openInvoiceModal('${order._id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition inline-flex items-center justify-center gap-1"><i class="fa-solid fa-receipt"></i> Invoice</button>
+                ${order.paymentStatus === "paid" && order.orderStatus !== "refunded" ? `<button onclick="window.refundOrder('${order._id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs font-medium transition">Refund</button>` : ""}
+            </td>
+        </tr>`;
+}
+
 async function loadOrders() {
-    const tableBody = document.getElementById("ordersTableBody");
-    if (!tableBody) return;
-    tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500">Loading orders...</td></tr>`;
+    const activeTableBody = document.getElementById("activeOrdersTableBody") || document.getElementById("ordersTableBody");
+    const deliveredTableBody = document.getElementById("deliveredOrdersTableBody");
+    const activeCountEl = document.getElementById("activeOrderCount");
+    const deliveredCountEl = document.getElementById("deliveredOrderCount");
+
+    if (!activeTableBody) return;
+    
+    activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading orders...</td></tr>`;
+    if (deliveredTableBody) {
+        deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading delivered orders...</td></tr>`;
+    }
 
     try {
         const statusQuery = activeStatusFilter ? `&status=${encodeURIComponent(activeStatusFilter)}` : "";
-        const response = await fetch(`${BASE_URL}/api/orders?limit=100${statusQuery}`, { credentials: "include" });
+        const response = await fetch(`${BASE_URL}/api/orders?limit=200${statusQuery}`, { credentials: "include" });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || "Could not load orders.");
         adminOrders = result.data || [];
 
-        if (!adminOrders.length) {
-            tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500">No saved orders yet.</td></tr>`;
-            return;
+        const activeOrders = adminOrders.filter((o) => o.orderStatus !== "delivered");
+        const deliveredOrders = adminOrders.filter((o) => o.orderStatus === "delivered");
+
+        if (activeCountEl) activeCountEl.innerText = activeOrders.length;
+        if (deliveredCountEl) deliveredCountEl.innerText = deliveredOrders.length;
+
+        // Render Active Orders Table
+        if (!activeOrders.length) {
+            activeTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-boxes-packing text-2xl mb-2 block"></i> No new or active orders currently.</td></tr>`;
+        } else {
+            activeTableBody.innerHTML = activeOrders.map(renderOrderRow).join("");
         }
 
-        tableBody.innerHTML = adminOrders.map((order) => `
-            <tr class="hover:bg-gray-50 border-b">
-                <td class="p-4 font-mono text-xs">${escapeHtml(order.razorpayOrderId)}</td>
-                <td class="p-4"><div class="font-bold text-gray-800">${escapeHtml(order.customer?.name)}</div><div class="text-xs text-gray-500">${escapeHtml(order.customer?.phone)}</div></td>
-                <td class="p-4 font-bold">${formatMoney(order.totalAmount)}</td>
-                <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
-                <td class="p-4">${order.orderStatus === "refunded" ? `<span class="text-xs font-semibold text-purple-700 uppercase">refunded</span>` : `<select class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateOrderStatus('${order._id}', this.value)">${ORDER_STATUSES.map((status) => `<option value="${status}" ${status === order.orderStatus ? "selected" : ""}>${status}</option>`).join("")}</select>`}</td>
-                <td class="p-4"><input type="date" value="${order.expectedDeliveryDate ? new Date(order.expectedDeliveryDate).toISOString().slice(0, 10) : ""}" class="border rounded-md text-xs p-1.5 bg-white" onchange="window.updateExpectedDelivery('${order._id}', this.value)"></td>
-                <td class="p-4">
-                    <div class="flex flex-col gap-1 w-40">
-                        <input id="track-num-${order._id}" type="text" placeholder="Tracking No." value="${escapeHtml(order.trackingNumber || "")}" class="border rounded-md text-xs p-1.5 bg-white">
-                        <input id="track-link-${order._id}" type="text" placeholder="Courier link (https://...)" value="${escapeHtml(order.courierLink || "")}" class="border rounded-md text-xs p-1.5 bg-white">
-                        <button onclick="window.saveTracking('${order._id}')" class="bg-gray-700 hover:bg-gray-800 text-white text-xs py-1 rounded-md">Save</button>
-                    </div>
-                </td>
-                <td class="p-4 flex gap-2"><button onclick="window.openInvoiceModal('${order._id}')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded-md text-xs"><i class="fa-solid fa-receipt"></i> Invoice</button>${order.paymentStatus === "paid" ? `<button onclick="window.refundOrder('${order._id}')" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1.5 rounded-md text-xs">Refund</button>` : ""}</td>
-            </tr>`).join("");
+        // Render Delivered Orders Table
+        if (deliveredTableBody) {
+            if (!deliveredOrders.length) {
+                deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-circle-check text-2xl mb-2 block"></i> No delivered orders yet.</td></tr>`;
+            } else {
+                deliveredTableBody.innerHTML = deliveredOrders.map(renderOrderRow).join("");
+            }
+        }
     } catch (error) {
-        tableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
+        activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
 }
 
@@ -80,6 +114,8 @@ window.updateOrderStatus = async (orderId, orderStatus) => {
         }
 
         await patchOrder(orderId, body);
+        window.showToast(`Order status updated to '${orderStatus}'.`, "success");
+        loadOrders();
     } catch (error) {
         window.showToast(error.message, "error");
         loadOrders();

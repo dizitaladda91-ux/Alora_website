@@ -64,16 +64,14 @@
 
         <main class="flex-1 p-8 overflow-y-auto no-print">
             <div class="animate__animated animate__fadeIn space-y-6">
-                <div>
-                    <h2 class="text-3xl font-bold text-gray-800">Hello Gurpreet Singh</h2>
-                    <p class="mt-1 text-gray-600">Customer Orders aur unki Invoices yahan se view & print karein.</p>
-                </div>
-
-                <!-- ORDERS TABLE -->
-                <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                    <div class="p-4 bg-gray-50 border-b border-gray-200 flex items-center justify-between">
-                        <h3 class="font-bold text-gray-700">Recent Payment Slips / Orders</h3>
-                        <select id="statusFilter" class="border rounded-md text-sm p-2 bg-white">
+                <!-- TOP HEADER & STATS -->
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-800">Hello Admin</h2>
+                        <p class="mt-1 text-gray-600">Customer Orders & Invoices Management Studio</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <select id="statusFilter" class="border border-gray-300 rounded-lg text-sm p-2.5 bg-white shadow-sm font-medium outline-none focus:ring-2 focus:ring-amber-500">
                             <option value="">All Statuses</option>
                             <option value="paid">Paid</option>
                             <option value="processing">Processing</option>
@@ -84,23 +82,68 @@
                             <option value="refunded">Refunded</option>
                         </select>
                     </div>
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-gray-100 text-gray-600 text-sm border-b">
-                                <th class="p-4">Order ID</th>
-                                <th class="p-4">Customer Name</th>
-                                <th class="p-4">Amount</th>
-                                <th class="p-4">Payment Status</th>
-                                <th class="p-4">Order Status</th>
-                                <th class="p-4">Expected Delivery</th>
-                                <th class="p-4">Tracking</th>
-                                <th class="p-4">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="ordersTableBody" class="divide-y text-sm text-gray-700">
-                            <!-- JS se data dynamic load hoga -->
-                        </tbody>
-                    </table>
+                </div>
+
+                <!-- TABLE 1: NEW & ACTIVE ORDERS -->
+                <div class="bg-white rounded-xl shadow-sm border border-amber-200/80 overflow-hidden">
+                    <div class="p-4 bg-amber-50/60 border-b border-amber-200/80 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-packing text-amber-700 text-lg"></i>
+                            <h3 class="font-bold text-gray-800 text-lg">New & Active Orders</h3>
+                            <span id="activeOrderCount" class="bg-amber-700 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full ml-1">0</span>
+                        </div>
+                        <span class="text-xs text-amber-800 font-semibold hidden sm:inline">Requires Processing & Dispatch</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider border-b">
+                                    <th class="p-4">Order ID</th>
+                                    <th class="p-4">Customer Name</th>
+                                    <th class="p-4">Amount</th>
+                                    <th class="p-4">Payment Status</th>
+                                    <th class="p-4">Order Status</th>
+                                    <th class="p-4">Expected Delivery</th>
+                                    <th class="p-4">Tracking Info</th>
+                                    <th class="p-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activeOrdersTableBody" class="divide-y text-sm text-gray-700">
+                                <tr><td colspan="8" class="p-4 text-center text-gray-500">Loading orders...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- TABLE 2: DELIVERED & COMPLETED ORDERS -->
+                <div class="bg-white rounded-xl shadow-sm border border-emerald-200/80 overflow-hidden">
+                    <div class="p-4 bg-emerald-50/60 border-b border-emerald-200/80 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-circle-check text-emerald-700 text-lg"></i>
+                            <h3 class="font-bold text-gray-800 text-lg">Delivered & Completed Orders</h3>
+                            <span id="deliveredOrderCount" class="bg-emerald-700 text-white text-xs font-extrabold px-2.5 py-0.5 rounded-full ml-1">0</span>
+                        </div>
+                        <span class="text-xs text-emerald-800 font-semibold hidden sm:inline">Successfully Fulfilled</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-100 text-gray-600 text-xs uppercase tracking-wider border-b">
+                                    <th class="p-4">Order ID</th>
+                                    <th class="p-4">Customer Name</th>
+                                    <th class="p-4">Amount</th>
+                                    <th class="p-4">Payment Status</th>
+                                    <th class="p-4">Order Status</th>
+                                    <th class="p-4">Expected Delivery</th>
+                                    <th class="p-4">Tracking Info</th>
+                                    <th class="p-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="deliveredOrdersTableBody" class="divide-y text-sm text-gray-700">
+                                <tr><td colspan="8" class="p-4 text-center text-gray-500">Loading delivered orders...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </main>
