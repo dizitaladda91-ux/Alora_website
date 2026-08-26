@@ -7,10 +7,31 @@ const BLOG_ALLOWED_TAGS = [
   "th", "td", "hr", "div", "span"
 ];
 
-export const sanitizePlainText = (value, maxLength = 500) => sanitizeHtml(String(value ?? ""), {
-  allowedTags: [],
-  allowedAttributes: {}
-}).replace(/\s+/g, " ").trim().slice(0, maxLength);
+export const decodeEntities = (str) => {
+  if (str === null || str === undefined) return "";
+  let decoded = String(str);
+  let previous;
+  let iterations = 0;
+  do {
+    previous = decoded;
+    decoded = decoded
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#039;|&#39;|&apos;/gi, "'");
+    iterations++;
+  } while (decoded !== previous && iterations < 5);
+  return decoded;
+};
+
+export const sanitizePlainText = (value, maxLength = 500) => {
+  const stripped = sanitizeHtml(String(value ?? ""), {
+    allowedTags: [],
+    allowedAttributes: {}
+  });
+  return decodeEntities(stripped).replace(/\s+/g, " ").trim().slice(0, maxLength);
+};
 
 export const sanitizeBlogHtml = (value) => sanitizeHtml(String(value ?? "").replace(/<h1\b[^>]*>.*?<\/h1>/gis, ""), {
   allowedTags: BLOG_ALLOWED_TAGS,

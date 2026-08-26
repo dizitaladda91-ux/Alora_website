@@ -226,6 +226,24 @@ const updateForm = document.getElementById('update-blog-form');
 const submitBtn = document.getElementById('submit-btn');
 const urlParams = new URLSearchParams(window.location.search);
 const blogId = urlParams.get('id');
+function decodeEntities(str) {
+    if (str === null || str === undefined) return '';
+    let decoded = String(str);
+    let previous;
+    let iterations = 0;
+    do {
+        previous = decoded;
+        decoded = decoded
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;|&#39;|&apos;/gi, "'");
+        iterations++;
+    } while (decoded !== previous && iterations < 5);
+    return decoded;
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!blogId) {
         alert("⚠️ Invalid Request: No Blog ID found!");
@@ -240,14 +258,14 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
         const blog = data.blog || data.data;
-        titleInput.value = blog.title || '';
+        titleInput.value = decodeEntities(blog.title || '');
         slugInput.value = blog.slug || '';
-        metaTitleInput.value = blog.metaTitle || '';
-        keywordsInput.value = blog.keywords || '';
-        categoryInput.value = blog.category || '';
-        metaDescInput.value = blog.metaDesc || '';
+        metaTitleInput.value = decodeEntities(blog.metaTitle || '');
+        keywordsInput.value = decodeEntities(blog.keywords || '');
+        categoryInput.value = decodeEntities(blog.category || '');
+        metaDescInput.value = decodeEntities(blog.metaDesc || '');
         schemaInput.value = typeof blog.schema === 'object' ? JSON.stringify(blog.schema) : (blog.schema || '');
-        publisherInput.value = blog.publisher || '';
+        publisherInput.value = decodeEntities(blog.publisher || '');
         if (blog.content) {
             quill.clipboard.dangerouslyPasteHTML(blog.content);
         }

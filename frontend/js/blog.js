@@ -24,9 +24,27 @@ async function renderBlogCards() {
                     window.injectMultipleSchemasToDOM(latestPost.schema);
                 }
             }
+            const decodeEntities = (str) => {
+                if (str === null || str === undefined) return '';
+                let decoded = String(str);
+                let previous;
+                let iterations = 0;
+                do {
+                    previous = decoded;
+                    decoded = decoded
+                        .replace(/&amp;/g, '&')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&quot;/g, '"')
+                        .replace(/&#039;|&#39;|&apos;/gi, "'");
+                    iterations++;
+                } while (decoded !== previous && iterations < 5);
+                return decoded;
+            };
             const escapeHtml = (str) => {
                 if (str === null || str === undefined) return '';
-                return String(str)
+                const unescaped = decodeEntities(str);
+                return String(unescaped)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;')

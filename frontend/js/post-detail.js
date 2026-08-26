@@ -102,13 +102,31 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
 
     return tempDiv.innerHTML;
 }
+function decodeEntities(str) {
+    if (str === null || str === undefined) return '';
+    let decoded = String(str);
+    let previous;
+    let iterations = 0;
+    do {
+        previous = decoded;
+        decoded = decoded
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;|&#39;|&apos;/gi, "'");
+        iterations++;
+    } while (decoded !== previous && iterations < 5);
+    return decoded;
+}
+
 function renderArticle(blog) {
     document.getElementById('post-loader')?.classList.add('hidden');
     document.getElementById('blog-content-area')?.classList.remove('hidden');
     const titleEl = document.getElementById('post-title');
-    if (titleEl) titleEl.innerText = blog.title || '';
+    if (titleEl) titleEl.innerText = decodeEntities(blog.title || '');
     const categoryEl = document.getElementById('post-category');
-    if (categoryEl) categoryEl.innerText = blog.category || 'General';
+    if (categoryEl) categoryEl.innerText = decodeEntities(blog.category || 'General');
     let contentHtml = blog.content || '';
     contentHtml = sanitizePostBodyContent(contentHtml, blog.title || '');
     const bodyEl = document.getElementById('post-body');
@@ -334,7 +352,7 @@ function generateTableOfContents() {
 }
 function injectSEO(blog) {
     const currentUrl = window.location.href;
-    const finalTitle = blog.metaTitle || blog.title || "Alora Radiance";
+    const finalTitle = decodeEntities(blog.metaTitle || blog.title || "Alora Radiance");
     document.title = finalTitle;
     const titleEl = document.getElementById('dynamic-title');
     if (titleEl) {
@@ -342,7 +360,7 @@ function injectSEO(blog) {
     }
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
-        metaDescEl.setAttribute('content', blog.metaDesc);
+        metaDescEl.setAttribute('content', decodeEntities(blog.metaDesc));
     }
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {

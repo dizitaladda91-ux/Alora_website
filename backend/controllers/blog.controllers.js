@@ -1,6 +1,35 @@
 import Blog from '../models/blog.models.js';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
-import { sanitizeBlogHtml, sanitizePlainText } from '../services/contentSanitizer.service.js';
+import { sanitizeBlogHtml, sanitizePlainText, decodeEntities } from '../services/contentSanitizer.service.js';
+
+function cleanBlogFieldsAndSave(blog) {
+    if (!blog) return blog;
+    const doc = typeof blog.toObject === 'function' ? blog.toObject() : { ...blog };
+    let needsUpdate = false;
+    const fields = ['title', 'metaTitle', 'category', 'publisher', 'metaDesc', 'keywords'];
+    for (const f of fields) {
+        if (doc[f] && typeof doc[f] === 'string') {
+            const cleaned = decodeEntities(doc[f]);
+            if (cleaned !== doc[f]) {
+                doc[f] = cleaned;
+                needsUpdate = true;
+            }
+        }
+    }
+    if (needsUpdate && doc._id) {
+        Blog.updateOne({ _id: doc._id }, {
+            $set: {
+                title: doc.title,
+                metaTitle: doc.metaTitle,
+                category: doc.category,
+                publisher: doc.publisher,
+                metaDesc: doc.metaDesc,
+                keywords: doc.keywords
+            }
+        }).catch(e => console.warn("Auto-clean DB update warning:", e));
+    }
+    return doc;
+}
 
 function stripBodyH1Tags(content = '') {
     if (!content) return content;
@@ -133,15 +162,16 @@ export const getAllBlogs = async (req, res) => {
             .lean();
 
         const totalCount = await Blog.countDocuments(filter);
+        const cleanedBlogs = blogs.map(cleanBlogFieldsAndSave);
         
         return res.status(200).json({ 
             success: true, 
-            count: blogs.length,
+            count: cleanedBlogs.length,
             totalCount,
             page,
             totalPages: Math.ceil(totalCount / limit),
-            blogs: blogs, 
-            data: blogs 
+            blogs: cleanedBlogs, 
+            data: cleanedBlogs 
         });
     } catch (error) {
         console.error("Fetch all blogs error:", error);
@@ -164,7 +194,8 @@ export const getBlogBySlug = async (req, res) => {
 
         if (!blog) return res.status(404).json({ success: false, message: "Article not found." });
         
-        return res.status(200).json({ success: true, blog, data: blog });
+        const cleanedBlog = cleanBlogFieldsAndSave(blog);
+        return res.status(200).json({ success: true, blog: cleanedBlog, data: cleanedBlog });
     } catch (error) {
         console.error("Fetch blog detail error:", error);
         return res.status(500).json({ success: false, message: error.message || "Could not load article." });
