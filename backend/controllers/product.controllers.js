@@ -69,11 +69,10 @@ export const addnewproduct = async (req, res) => {
     }
 };
 
-// 2. READ (Saare Products Get Karna)
+// 2. READ (Saare Products Get Karna - Ultra Fast Lean Query)
 export const readproduct = async (req, res) => {
     try {
-        const products = await SimpleProduct.find();
-        await Promise.all(products.map(ensureProductSlug));
+        const products = await SimpleProduct.find().lean();
         res.status(200).json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -226,16 +225,16 @@ export const deleteproduct = async (req, res) => {
     }
 };
 
-// 5. GET SINGLE PRODUCT
+// 5. GET SINGLE PRODUCT (Ultra Fast Lean Query)
 export const getproductbyid = async (req, res) => {
     try {
         const { id } = req.params;
-        let product = await SimpleProduct.findOne({ slug: id });
+        let product = await SimpleProduct.findOne({ slug: id }).lean();
         if (!product && /^[a-f\d]{24}$/i.test(id)) {
-            product = await SimpleProduct.findById(id);
+            product = await SimpleProduct.findById(id).lean();
         }
         if (!product) {
-            const products = await SimpleProduct.find();
+            const products = await SimpleProduct.find().lean();
             product = products.find((item) => toProductSlug(item.name) === id);
         }
 

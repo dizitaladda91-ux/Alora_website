@@ -66,6 +66,29 @@ export function getAuthHeaders(headers = {}) {
 }
 
 export async function safeFetchJson(url, options = {}) {
+    const isGetMethod = !options.method || options.method.toUpperCase() === 'GET';
+    const cacheKey = isGetMethod ? `alora_fast_cache_${url}` : null;
+
+    // Check 5-minute Session Storage Cache for lightning fast 0ms loads
+    if (cacheKey && typeof sessionStorage !== 'undefined') {
+        try {
+            const cachedItem = sessionStorage.getItem(cacheKey);
+            if (cachedItem) {
+                const { timestamp, data } = JSON.parse(cachedItem);
+                const isFresh = (Date.now() - timestamp) < (5 * 60 * 1000);
+                if (isFresh && data) {
+                    // Return cached data immediately in 0ms!
+                    fetch(url, options).then(res => res.ok ? res.json() : null).then(freshData => {
+                        if (freshData) {
+                            sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data: freshData }));
+                        }
+                    }).catch(() => {});
+                    return data;
+                }
+            }
+        } catch (e) {}
+    }
+
     let response;
 
     try {
@@ -95,6 +118,12 @@ export async function safeFetchJson(url, options = {}) {
 
     if (data === null) {
         throw new Error(rawText.trim() || "Server returned an empty JSON response.");
+    }
+
+    if (cacheKey && data && typeof sessionStorage !== 'undefined') {
+        try {
+            sessionStorage.setItem(cacheKey, JSON.stringify({ timestamp: Date.now(), data }));
+        } catch (e) {}
     }
 
     return data;

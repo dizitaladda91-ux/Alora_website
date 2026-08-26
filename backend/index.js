@@ -81,6 +81,14 @@ app.use(sanitizeNoSql);
 app.use("/api", globalLimiter);
 app.use("/api/auth", authLimiter);
 
+// High-Speed HTTP Response Caching for Public Catalog GET Endpoints
+app.use(['/api/product/all', '/api/product/search', '/api/blogs/all', '/api/reviews'], (req, res, next) => {
+  if (req.method === 'GET') {
+    res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
+  }
+  next();
+});
+
 // A failed Atlas connection should not leave Mongoose requests buffering until
 // they time out. API clients receive a clear temporary-unavailable response,
 // while static pages can still be served.
