@@ -214,20 +214,16 @@ function initLoginForm() {
                 sessionStorage.setItem("tabAuthActive", "true");
                 sessionStorage.setItem("userRole", role);
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));
-                if (role === "user") {
-                    localStorage.setItem("user", JSON.stringify(userObjToStore)); 
-                    if (data.token) {
-                        sessionStorage.setItem("token", data.token);
-                        sessionStorage.setItem("userToken", data.token);
-                        localStorage.setItem("token", data.token);
-                        localStorage.setItem("userToken", data.token);
-                    }
-                } else {
-                    sessionStorage.removeItem("token");
-                    sessionStorage.removeItem("userToken");
-                    localStorage.removeItem("user");
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userToken");
+                localStorage.setItem("userRole", role);
+                localStorage.setItem("user", JSON.stringify(userObjToStore));
+
+                if (data.token) {
+                    sessionStorage.setItem("token", data.token);
+                    sessionStorage.setItem("userToken", data.token);
+                    localStorage.setItem("token", data.token);
+                    localStorage.setItem("userToken", data.token);
+                    if (role === "admin") localStorage.setItem("admin_token", data.token);
+                    if (role === "seoadmin") localStorage.setItem("seo_token", data.token);
                 }
                 let targetUrl = "./index.html"; 
                 if (role === "admin") {

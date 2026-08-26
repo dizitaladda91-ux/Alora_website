@@ -13,28 +13,38 @@ async function getCurrentSession() {
     }
 }
 async function protectAdminPage() {
-    const isTabActive = sessionStorage.getItem("tabAuthActive");
-    const role = sessionStorage.getItem("userRole");
-    const storedUserStr = sessionStorage.getItem("user");
+    const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+    const storedUserStr = sessionStorage.getItem("user") || localStorage.getItem("user");
+    const token = sessionStorage.getItem("userToken") || sessionStorage.getItem("token") || localStorage.getItem("admin_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+
     let storedUser = null;
     try {
         if (storedUserStr) storedUser = JSON.parse(storedUserStr);
     } catch (e) {}
+
     const isRoleValid = role === "admin" || (storedUser && storedUser.role === "admin");
-    if (!isTabActive || !isRoleValid) {
+
+    if (!isRoleValid && !token) {
         clearAllAuthStorageAndRedirect();
         return;
     }
+
+    sessionStorage.setItem("tabAuthActive", "true");
+    if (role) sessionStorage.setItem("userRole", role);
+    if (storedUserStr) sessionStorage.setItem("user", storedUserStr);
+
     const freshUser = await getCurrentSession();
     if (freshUser && freshUser.role === "admin") {
         sessionStorage.setItem("user", JSON.stringify(freshUser));
         sessionStorage.setItem("userRole", freshUser.role);
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        localStorage.setItem("userRole", freshUser.role);
         storedUser = freshUser;
-    } else {
+    } else if (!isRoleValid) {
         clearAllAuthStorageAndRedirect();
         return;
-        return;
     }
+
     const welcomeText = document.querySelector("main h2");
     if (welcomeText && storedUser?.name) {
         welcomeText.innerHTML = `Hello ${storedUser.name.toUpperCase()}`;

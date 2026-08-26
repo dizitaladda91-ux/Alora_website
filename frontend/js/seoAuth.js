@@ -13,25 +13,34 @@ async function getCurrentSession() {
     }
 }
 async function protectSeoPage() {
-    const isTabActive = sessionStorage.getItem("tabAuthActive");
-    const role = sessionStorage.getItem("userRole");
-    const storedUserStr = sessionStorage.getItem("user");
+    const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+    const storedUserStr = sessionStorage.getItem("user") || localStorage.getItem("user");
+    const token = sessionStorage.getItem("userToken") || sessionStorage.getItem("token") || localStorage.getItem("seo_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
+
     let storedUser = null;
     try {
         if (storedUserStr) storedUser = JSON.parse(storedUserStr);
     } catch (e) {}
+
     const isRoleValid = role === "seoadmin" || role === "admin" || (storedUser && (storedUser.role === "seoadmin" || storedUser.role === "admin"));
-    if (!isTabActive || !isRoleValid) {
+
+    if (!isRoleValid && !token) {
         clearAllAuthStorageAndRedirect();
         return;
     }
+
+    sessionStorage.setItem("tabAuthActive", "true");
+    if (role) sessionStorage.setItem("userRole", role);
+    if (storedUserStr) sessionStorage.setItem("user", storedUserStr);
+
     const freshUser = await getCurrentSession();
     if (freshUser && (freshUser.role === "seoadmin" || freshUser.role === "admin")) {
         sessionStorage.setItem("user", JSON.stringify(freshUser));
         sessionStorage.setItem("userRole", freshUser.role);
-    } else {
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        localStorage.setItem("userRole", freshUser.role);
+    } else if (!isRoleValid) {
         clearAllAuthStorageAndRedirect();
-        return;
         return;
     }
 }
