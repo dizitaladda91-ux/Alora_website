@@ -5,7 +5,7 @@ function computeBaseUrl() {
         return `http://localhost:${DEFAULT_LOCAL_BACKEND_PORT}`;
     }
     if (hostname === 'localhost' || hostname === '127.0.0.1') {
-        return `${protocol}
+        return `${protocol}//${hostname}:${DEFAULT_LOCAL_BACKEND_PORT}`;
     }
     return "";
 }
@@ -20,9 +20,10 @@ export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
         }
         return trimmed;
     }
-    if (/^https?:\/\
+    if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
+
     const base = String(BASE_URL).replace(/\/+$/, '');
-    const normalized = trimmed.replace(/^\.?\
+    const normalized = trimmed.replace(/^\.?\//, '/');
     return `${base}${normalized.startsWith('/') ? normalized : '/' + normalized}`;
 }
 export function getProductUrl(product) {
