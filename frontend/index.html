@@ -47,16 +47,18 @@
     <link rel="preload" as="image" href="./static/hero_banner_1_mob.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
     <link rel="preload" as="image" href="./static/hero_banner_1_desk.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high">
 
+    <!-- 🚀 BREAK MODULE WATERFALL: MODULEPRELOAD CRITICAL ES MODULES AT 0ms -->
+    <link rel="modulepreload" href="./js/config.js">
+    <link rel="modulepreload" href="./js/navbar-interactions.js">
+    <link rel="modulepreload" href="./js/main.js">
+
     <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES RENDER-BLOCKING DELAY) -->
-    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap"></noscript>
 
-    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
 
-    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></noscript>
 
@@ -80,22 +82,46 @@
                     ash: '#6B685F',
                 },
                 fontFamily: {
-                   
-                    robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
-                    sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
+                    serif: ['"Fraunces"', '"Fraunces-Fallback"', 'Georgia', 'serif'],
+                    sans: ['"PT Sans"', '"PTSans-Fallback"', '"Manrope"', '"Manrope-Fallback"', 'Arial', 'sans-serif'],
                     roboto: ['"Roboto Mono"', 'monospace'],
                 },
             }
         }
     };
 </script>
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <script src="https://cdn.tailwindcss.com" async defer></script>
     <style>
-        /* 🚀 Ensure text remains visible during webfont load (Eliminates FOIT & saves 70ms) */
+        /* 🚀 Font Display Swap & Font Metric Overrides (Zero Layout Shift on Font Load) */
         @font-face { font-family: 'Fraunces'; font-display: swap; }
         @font-face { font-family: 'PT Sans'; font-display: swap; }
         @font-face { font-family: 'Manrope'; font-display: swap; }
         @font-face { font-family: 'Roboto Mono'; font-display: swap; }
+
+        @font-face {
+            font-family: 'Fraunces-Fallback';
+            src: local('Georgia'), local('Times New Roman');
+            ascent-override: 96%;
+            descent-override: 24%;
+            line-gap-override: 0%;
+            size-adjust: 100%;
+        }
+        @font-face {
+            font-family: 'PTSans-Fallback';
+            src: local('Arial'), local('Helvetica'), local('sans-serif');
+            ascent-override: 90%;
+            descent-override: 20%;
+            line-gap-override: 0%;
+            size-adjust: 100%;
+        }
+        @font-face {
+            font-family: 'Manrope-Fallback';
+            src: local('Arial'), local('Helvetica'), local('sans-serif');
+            ascent-override: 90%;
+            descent-override: 20%;
+            line-gap-override: 0%;
+            size-adjust: 100%;
+        }
 
         html { scroll-behavior: smooth; }
         body { overflow-x: hidden; }
@@ -316,7 +342,7 @@
         </div>
    </div>
 
-<div id="navbar-placeholder"></div>
+<div id="navbar-placeholder" class="min-h-[75px] sm:min-h-[90px] w-full bg-[#FAF5EE]"></div>
 
 <main id="main-content">
 
@@ -336,7 +362,7 @@
     </button>
     
     <!-- Slider Track -->
-<div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
+<div id="slider-track" class="flex w-full h-full min-h-[200px] sm:min-h-[300px] md:min-h-[450px] transition-transform duration-700 ease-in-out">
 
     <!-- Slide 1 (Travel Ready Kit / Sachets) -->
     <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
@@ -411,7 +437,7 @@
             </div>
 
             <!-- Product Slider Container -->
-            <div id="productSliderContainer" class="overflow-x-auto lg:overflow-hidden w-full py-2 scroll-smooth snap-x snap-mandatory no-scrollbar">
+            <div id="productSliderContainer" class="overflow-x-auto lg:overflow-hidden w-full py-2 min-h-[380px] sm:min-h-[420px] scroll-smooth snap-x snap-mandatory no-scrollbar">
                 <div id="productSliderWrapper" class="flex gap-4 sm:gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
                     <!-- Product cards are injected here dynamically by loadSliderProducts() in main.js -->
                 </div>
@@ -1395,13 +1421,31 @@
             }
         })();
     </script>
-    <script src="./js/include.js" defer></script>
+    <script src="./js/include.js" async defer></script>
     <script type="module" src="./js/navbar-interactions.js"></script>
     <script type="module" src="./js/main.js"></script>
-    <script src="./js/cart.js" defer></script>
-    <script type="module" src="./js/auth.js"></script>
-    <script type="module" src="./js/app.js"></script>
-    <script type="module" src="./js/lead.js"></script>
+    <script>
+        // Defer secondary interaction scripts (cart.js, auth.js, app.js, lead.js) to idle time to eliminate unused JS on initial render
+        window.addEventListener('load', () => {
+            const loadSecondaryScripts = () => {
+                ['./js/cart.js', './js/auth.js', './js/app.js', './js/lead.js'].forEach(src => {
+                    if (!document.querySelector(`script[src="${src}"]`)) {
+                        const s = document.createElement('script');
+                        s.src = src;
+                        if (src !== './js/cart.js') {
+                            s.type = 'module';
+                        }
+                        document.body.appendChild(s);
+                    }
+                });
+            };
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadSecondaryScripts);
+            } else {
+                setTimeout(loadSecondaryScripts, 2500);
+            }
+        });
+    </script>
 
 
     

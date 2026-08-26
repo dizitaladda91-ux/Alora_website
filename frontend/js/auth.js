@@ -95,10 +95,22 @@ async function runAuthGuard() {
         }
     }
 }
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", runAuthGuard);
+// On public customer pages, defer auth session check to idle time to eliminate critical request chain
+const isProtectedAdminPage = window.location.pathname.toLowerCase().includes('admin') || window.location.pathname.toLowerCase().includes('seo');
+if (isProtectedAdminPage) {
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", runAuthGuard);
+    } else {
+        runAuthGuard();
+    }
 } else {
-    runAuthGuard();
+    window.addEventListener("load", () => {
+        if ('requestIdleCallback' in window) {
+            requestIdleCallback(runAuthGuard, { timeout: 3000 });
+        } else {
+            setTimeout(runAuthGuard, 2000);
+        }
+    });
 }
 async function handleLogout() {
     try {

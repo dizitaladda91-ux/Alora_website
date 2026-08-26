@@ -73,53 +73,60 @@ document.addEventListener("DOMContentLoaded", () => {
         if (e.target === popup) hidePopup();
     });
 });
-document.addEventListener("DOMContentLoaded", () => {
-    const counterElement = document.getElementById("tree-counter");
-    const sectionElement = document.getElementById("green-initiative-section");
-    if (!counterElement || !sectionElement) return;
-    const targetCount = 1093966;
-    const duration = 2000;
-    let animationFrameId = null;
-    function formatNumber(num) {
-        return num.toLocaleString('en-IN');
-    }
-    function startCounting() {
-        let startTime = null;
-        function animate(currentTime) {
-            if (!startTime) startTime = currentTime;
-            const progress = currentTime - startTime;
-            const progressPercentage = Math.min(progress / duration, 1);
-            const easeOutQuad = progressPercentage * (2 - progressPercentage);
-            const currentCount = Math.floor(easeOutQuad * targetCount);
-            counterElement.innerText = formatNumber(currentCount) + "+";
-            if (progress < duration) {
-                animationFrameId = requestAnimationFrame(animate);
-            } else {
-                counterElement.innerText = formatNumber(targetCount) + "+";
-                counterElement.classList.add("scale-110", "text-white");
-                setTimeout(() => {
-                    counterElement.classList.remove("scale-110", "text-white");
-                }, 300);
-            }
+window.addEventListener("load", () => {
+    const initTreeCounter = () => {
+        const counterElement = document.getElementById("tree-counter");
+        const sectionElement = document.getElementById("green-initiative-section");
+        if (!counterElement || !sectionElement) return;
+        const targetCount = 1093966;
+        const duration = 2000;
+        let animationFrameId = null;
+        function formatNumber(num) {
+            return num.toLocaleString('en-IN');
         }
-        animationFrameId = requestAnimationFrame(animate);
-    }
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                sectionElement.classList.remove("opacity-0", "translate-y-10");
-                sectionElement.classList.add("opacity-100", "translate-y-0");
-                cancelAnimationFrame(animationFrameId);
-                setTimeout(() => startCounting(), 300);
-            } else {
-                sectionElement.classList.remove("opacity-100", "translate-y-0");
-                sectionElement.classList.add("opacity-0", "translate-y-10");
-                cancelAnimationFrame(animationFrameId);
-                counterElement.innerText = "0+";
+        function startCounting() {
+            let startTime = null;
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = currentTime - startTime;
+                const progressPercentage = Math.min(progress / duration, 1);
+                const easeOutQuad = progressPercentage * (2 - progressPercentage);
+                const currentCount = Math.floor(easeOutQuad * targetCount);
+                counterElement.innerText = formatNumber(currentCount) + "+";
+                if (progress < duration) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    counterElement.innerText = formatNumber(targetCount) + "+";
+                    counterElement.classList.add("scale-110", "text-white");
+                    setTimeout(() => {
+                        counterElement.classList.remove("scale-110", "text-white");
+                    }, 300);
+                }
             }
-        });
-    }, { threshold: 0.2 });
-    observer.observe(sectionElement);
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    sectionElement.classList.remove("opacity-0", "translate-y-10");
+                    sectionElement.classList.add("opacity-100", "translate-y-0");
+                    cancelAnimationFrame(animationFrameId);
+                    setTimeout(() => startCounting(), 300);
+                } else {
+                    sectionElement.classList.remove("opacity-100", "translate-y-0");
+                    sectionElement.classList.add("opacity-0", "translate-y-10");
+                    cancelAnimationFrame(animationFrameId);
+                    counterElement.innerText = "0+";
+                }
+            });
+        }, { threshold: 0.2 });
+        observer.observe(sectionElement);
+    };
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(initTreeCounter);
+    } else {
+        setTimeout(initTreeCounter, 2000);
+    }
 });
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("testimonialContainer");

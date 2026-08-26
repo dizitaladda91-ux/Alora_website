@@ -124,10 +124,10 @@ function updateHeaderCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + (parseInt(item.qty) || 0), 0);
     document.querySelectorAll(".cart-badge, #cart-count, #global-cart-badge, #cart-count-badge, .cart-count-badge").forEach(badge => {
         if (!badge) return;
-        badge.innerText = totalItems;
         badge.classList.remove("animate-bounce", "scale-125");
-        void badge.offsetWidth; 
-        badge.classList.add("scale-125", "transition-transform", "duration-300");
+        requestAnimationFrame(() => {
+            badge.classList.add("scale-125", "transition-transform", "duration-300");
+        });
         setTimeout(() => {
             badge.classList.remove("scale-125");
         }, 400);
