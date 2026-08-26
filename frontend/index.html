@@ -290,7 +290,7 @@
 </div>
 
    <!-- ============ TOP RAKHI LIVE COUNTDOWN ANNOUNCEMENT BAR ============ -->
-   <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30">
+   <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30 min-h-[60px] sm:min-h-[44px]">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-center sm:text-left">
             
             <!-- Left Text Banner -->
@@ -342,7 +342,7 @@
         </div>
    </div>
 
-<div id="navbar-placeholder" class="min-h-[75px] sm:min-h-[90px] w-full bg-[#FAF5EE]"></div>
+<div id="navbar-placeholder" class="min-h-[64px] md:min-h-[74px] w-full bg-white"></div>
 
 <main id="main-content">
 
@@ -1414,11 +1414,8 @@
                 document.body.appendChild(gsapScript);
             }
             window.addEventListener('scroll', loadGSAP, { passive: true, once: true });
-            if ('requestIdleCallback' in window) {
-                requestIdleCallback(loadGSAP, { timeout: 3000 });
-            } else {
-                setTimeout(loadGSAP, 3000);
-            }
+            window.addEventListener('mousemove', loadGSAP, { passive: true, once: true });
+            window.addEventListener('touchstart', loadGSAP, { passive: true, once: true });
         })();
     </script>
     <script src="./js/include.js" async defer></script>

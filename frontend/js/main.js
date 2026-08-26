@@ -475,12 +475,18 @@ function updateHeroBannerProductLinks(productList) {
         }
     });
 }
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadSliderProducts);
-} else {
+let sliderProductsInitialized = false;
+function safeInitSliderProducts() {
+    if (sliderProductsInitialized) return;
+    sliderProductsInitialized = true;
     loadSliderProducts();
 }
-document.addEventListener('partialsLoaded', loadSliderProducts);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', safeInitSliderProducts);
+} else {
+    safeInitSliderProducts();
+}
+document.addEventListener('partialsLoaded', safeInitSliderProducts);
 document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById('auto-slider');
     if (!slider) return;
