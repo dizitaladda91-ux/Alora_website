@@ -45,18 +45,50 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
     if (!contentHtml) return contentHtml;
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contentHtml;
+    
+    // 1. Remove duplicate H1 tags if present
     const h1Nodes = tempDiv.querySelectorAll('h1');
     h1Nodes.forEach((headingNode) => {
         headingNode.remove();
     });
+
+    // 2. Clean empty paragraphs & unwrap accidental full-paragraph bolding from pasted text
     const pNodes = tempDiv.querySelectorAll('p');
     pNodes.forEach((p) => {
         const text = p.innerText ? p.innerText.trim() : '';
         const html = p.innerHTML.trim().toLowerCase();
+
         if (!text && (html === '' || html === '<br>' || html === '&nbsp;')) {
             p.remove();
+            return;
+        }
+
+        // Strip inline font-weight on paragraph level
+        if (p.style && p.style.fontWeight) {
+            p.style.fontWeight = '';
+        }
+
+        // Strip inline font-weight on span level if wrapping full text
+        p.querySelectorAll('span').forEach((span) => {
+            if (span.style && (span.style.fontWeight === 'bold' || span.style.fontWeight === '700' || span.style.fontWeight === '600')) {
+                if (span.innerText && span.innerText.trim() === text) {
+                    span.style.fontWeight = '';
+                }
+            }
+        });
+
+        // Unwrap <strong> or <b> if it wraps 100% of paragraph text (accidental full-paragraph bold)
+        const children = Array.from(p.childNodes).filter((node) => node.nodeType === 1 || (node.nodeType === 3 && node.textContent.trim().length > 0));
+        if (children.length === 1 && (children[0].tagName === 'STRONG' || children[0].tagName === 'B')) {
+            const boldElem = children[0];
+            while (boldElem.firstChild) {
+                p.insertBefore(boldElem.firstChild, boldElem);
+            }
+            boldElem.remove();
         }
     });
+
+    // 3. Style grid tables
     const tableNodes = tempDiv.querySelectorAll('table');
     tableNodes.forEach((table) => {
         table.classList.add('w-full', 'my-6', 'border-collapse', 'rounded-xl', 'overflow-hidden');
@@ -67,6 +99,7 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
             wrapper.appendChild(table);
         }
     });
+
     return tempDiv.innerHTML;
 }
 function renderArticle(blog) {
@@ -112,6 +145,97 @@ function renderArticle(blog) {
             if (coverContainer) coverContainer.classList.add('hidden');
         }
     }
+    // Generate Left Table of Contents Sidebar & Mobile Accordion
+    generateTableOfContents();
+}
+
+function generateTableOfContents() {
+    const postBody = document.getElementById('post-body');
+    const tocList = document.getElementById('toc-list');
+    const mobileTocList = document.getElementById('mobile-toc-list');
+    const tocSidebarContainer = document.getElementById('toc-sidebar-container');
+    const mobileTocContainer = document.getElementById('mobile-toc-container');
+
+    if (!postBody || (!tocList && !mobileTocList)) return;
+
+    const headings = Array.from(postBody.querySelectorAll('h2, h3'));
+
+    if (headings.length === 0) {
+        if (tocSidebarContainer) tocSidebarContainer.classList.add('hidden');
+        if (mobileTocContainer) mobileTocContainer.classList.add('hidden');
+        return;
+    }
+
+    let tocHtml = '';
+    let mobileTocHtml = '';
+
+    headings.forEach((heading, index) => {
+        if (!heading.id) {
+            heading.id = `section-heading-${index + 1}`;
+        }
+
+        const headingText = heading.innerText.trim();
+        const isH3 = heading.tagName.toLowerCase() === 'h3';
+        const indentClass = isH3 ? 'pl-5 text-xs font-normal text-slate-500' : 'font-bold text-slate-800 text-xs sm:text-sm';
+
+        tocHtml += `
+            <a href="#${heading.id}" data-heading-id="${heading.id}" class="toc-link group flex items-start gap-2 py-2 px-3 rounded-xl hover:bg-amber-100/60 text-slate-600 hover:text-[#8B4513] transition-all duration-200 ${indentClass}">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0 group-hover:scale-125 transition-transform"></span>
+                <span class="line-clamp-2">${headingText}</span>
+            </a>
+        `;
+
+        mobileTocHtml += `
+            <a href="#${heading.id}" class="mobile-toc-link block py-1.5 px-2 rounded-lg hover:bg-amber-100/50 text-slate-700 hover:text-[#8B4513] ${indentClass}">
+                ${headingText}
+            </a>
+        `;
+    });
+
+    if (tocList) tocList.innerHTML = tocHtml;
+    if (mobileTocList) mobileTocList.innerHTML = mobileTocHtml;
+
+    if (tocSidebarContainer) tocSidebarContainer.classList.remove('hidden');
+    if (mobileTocContainer) mobileTocContainer.classList.remove('hidden');
+
+    document.querySelectorAll('.toc-link, .mobile-toc-link').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href')?.replace('#', '');
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const navHeight = 100;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({
+                    top: elementPosition - navHeight,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '-80px 0px -60% 0px',
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                const activeId = entry.target.id;
+                document.querySelectorAll('.toc-link').forEach((link) => {
+                    if (link.getAttribute('data-heading-id') === activeId) {
+                        link.classList.add('bg-amber-100', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs');
+                    } else {
+                        link.classList.remove('bg-amber-100', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs');
+                    }
+                });
+            }
+        });
+    }, observerOptions);
+
+    headings.forEach((heading) => observer.observe(heading));
 }
 function injectSEO(blog) {
     const currentUrl = window.location.href;

@@ -116,6 +116,24 @@ async function sanitizeAndUploadQuillImages(quillInstance) {
             }
         }
     }
+    // Clean accidental full-paragraph bolding from pasted content
+    tempDiv.querySelectorAll('p').forEach((p) => {
+        const text = p.innerText ? p.innerText.trim() : '';
+        if (p.style && p.style.fontWeight) p.style.fontWeight = '';
+        p.querySelectorAll('span').forEach((span) => {
+            if (span.style && (span.style.fontWeight === 'bold' || span.style.fontWeight === '700' || span.style.fontWeight === '600')) {
+                if (span.innerText && span.innerText.trim() === text) span.style.fontWeight = '';
+            }
+        });
+        const children = Array.from(p.childNodes).filter((node) => node.nodeType === 1 || (node.nodeType === 3 && node.textContent.trim().length > 0));
+        if (children.length === 1 && (children[0].tagName === 'STRONG' || children[0].tagName === 'B')) {
+            const boldElem = children[0];
+            while (boldElem.firstChild) {
+                p.insertBefore(boldElem.firstChild, boldElem);
+            }
+            boldElem.remove();
+        }
+    });
     quillInstance.root.innerHTML = tempDiv.innerHTML;
     return tempDiv.innerHTML;
 }
