@@ -1,4 +1,4 @@
-import BASE_URL from './config.js';
+import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from './config.js';
 function getSlugFromLocation() {
     const urlParams = new URLSearchParams(window.location.search);
     const querySlug = urlParams.get('slug');
@@ -147,6 +147,97 @@ function renderArticle(blog) {
     }
     // Generate Left Table of Contents Sidebar & Mobile Accordion
     generateTableOfContents();
+    // Render Category-Related Products Below Blog Article
+    renderRelatedProducts(blog);
+}
+
+async function renderRelatedProducts(blog) {
+    const sectionEl = document.getElementById('related-products-section');
+    const gridEl = document.getElementById('related-products-grid');
+    const headingEl = document.getElementById('related-products-heading');
+
+    if (!sectionEl || !gridEl) return;
+
+    try {
+        const apiPath = BASE_URL ? `${BASE_URL}/api/product/all` : `/api/product/all`;
+        const result = await safeFetchJson(apiPath);
+        
+        if (!result || !result.success || !Array.isArray(result.products) || result.products.length === 0) {
+            return;
+        }
+
+        const allProducts = result.products;
+
+        const category = (blog.category || '').toLowerCase().trim();
+        const blogTitle = (blog.title || '').toLowerCase().trim();
+        const blogKeywords = (blog.keywords || '').toLowerCase().trim();
+
+        const categoryKeywords = ['lotion', 'serum', 'face wash', 'facewash', 'scrub', 'cream', 'sunscreen', 'kit', 'cleanser', 'travel', 'radiance'];
+        let matchedCategoryKey = categoryKeywords.find(key => category.includes(key) || blogTitle.includes(key) || blogKeywords.includes(key)) || category;
+
+        let matchedProducts = allProducts.filter(p => {
+            const pCat = (p.category || '').toLowerCase();
+            const pName = (p.name || p.title || '').toLowerCase();
+            const pDesc = (p.description || '').toLowerCase();
+
+            if (category && pCat.includes(category)) return true;
+            if (matchedCategoryKey && (pCat.includes(matchedCategoryKey) || pName.includes(matchedCategoryKey) || pDesc.includes(matchedCategoryKey))) return true;
+            return false;
+        });
+
+        if (matchedProducts.length === 0) {
+            matchedProducts = allProducts.slice(0, 3);
+        } else if (matchedProducts.length < 3) {
+            const otherProducts = allProducts.filter(p => !matchedProducts.includes(p));
+            matchedProducts = matchedProducts.concat(otherProducts.slice(0, 3 - matchedProducts.length));
+        }
+
+        matchedProducts = matchedProducts.slice(0, 3);
+
+        if (headingEl) {
+            headingEl.innerText = blog.category ? `Recommended ${blog.category} Products` : `Recommended Products for You`;
+        }
+
+        gridEl.innerHTML = '';
+
+        matchedProducts.forEach(product => {
+            const prodName = product.name || product.title || 'Product';
+            const prodSlug = product.slug || '';
+            const prodPrice = product.price || (product.sizes && product.sizes[0]?.price) || 0;
+            const prodMrp = product.mrp || (product.sizes && product.sizes[0]?.mrp) || 0;
+            const imgRaw = (product.images && product.images[0]) || product.image || '';
+            const prodImg = getImageUrl(imgRaw) || './static/logo2.png';
+            const prodUrl = getProductUrl(prodSlug);
+
+            const cardHtml = `
+                <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                    <a href="${prodUrl}" class="block relative aspect-square rounded-xl overflow-hidden mb-3 bg-slate-50">
+                        <img src="${prodImg}" alt="${prodName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='./static/logo2.png'">
+                        ${prodMrp > prodPrice ? `<span class="absolute top-2 left-2 bg-[#800000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">SALE</span>` : ''}
+                    </a>
+                    <div>
+                        <a href="${prodUrl}" class="font-bold text-sm text-slate-900 hover:text-[#8B4513] transition-colors line-clamp-2 mb-1">
+                            ${prodName}
+                        </a>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="font-extrabold text-sm text-[#800000]">₹${prodPrice}</span>
+                            ${prodMrp > prodPrice ? `<span class="text-xs text-slate-400 line-through">₹${prodMrp}</span>` : ''}
+                        </div>
+                    </div>
+                    <a href="${prodUrl}" class="w-full bg-[#152219] hover:bg-amber-950 text-white text-xs font-bold py-2 rounded-xl text-center transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                        <i class="fa-solid fa-bag-shopping text-[11px]"></i> Shop Now
+                    </a>
+                </div>
+            `;
+
+            gridEl.innerHTML += cardHtml;
+        });
+
+        sectionEl.classList.remove('hidden');
+
+    } catch (err) {
+        console.warn("Failed to load related category products:", err);
+    }
 }
 
 function generateTableOfContents() {
