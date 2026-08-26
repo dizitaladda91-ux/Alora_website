@@ -409,12 +409,16 @@ let currentScrollAmount = 0;
 
 async function loadSliderProducts() {
     const wrapper = document.getElementById('productSliderWrapper');
-    if (!wrapper) return;
 
     try {
         const products = await safeFetchJson(`${BASE_URL}/api/product/all`);
-
         const productList = Array.isArray(products) ? products : (products?.products || products?.data || []);
+
+        // Dynamically update Hero Banner slides to point directly to matched product detail page
+        updateHeroBannerProductLinks(productList);
+
+        if (!wrapper) return;
+
         const top5Products = productList.slice(0, 5);
 
         if (top5Products.length === 0) {
@@ -567,6 +571,30 @@ function slideProducts(direction) {
     } else {
         container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
     }
+}
+
+// Dynamically match hero slider banners to DB product links
+function updateHeroBannerProductLinks(productList) {
+    if (!Array.isArray(productList) || productList.length === 0) return;
+
+    const heroLinks = document.querySelectorAll('.hero-slide-link');
+    heroLinks.forEach((linkEl) => {
+        const keywordsAttr = linkEl.getAttribute('data-banner-keyword');
+        if (!keywordsAttr) return;
+
+        const keywords = keywordsAttr.split(',').map((k) => k.trim().toLowerCase()).filter(Boolean);
+
+        const matchedProd = productList.find((p) => {
+            const pName = (p.name || '').toLowerCase();
+            const pCat = (p.category || '').toLowerCase();
+            const pSlug = (p.slug || '').toLowerCase();
+            return keywords.some((kw) => pName.includes(kw) || pCat.includes(kw) || pSlug.includes(kw));
+        });
+
+        if (matchedProd) {
+            linkEl.href = getProductUrl(matchedProd);
+        }
+    });
 }
 
 if (document.readyState === 'loading') {
