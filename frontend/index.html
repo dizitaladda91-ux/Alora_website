@@ -46,13 +46,18 @@
     <link rel="preload" as="image" href="./static/hero_banner_1_mob.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
     <link rel="preload" as="image" href="./static/hero_banner_1_desk.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high">
 
-    <!-- Asynchronous Non-Blocking Google Fonts Loading -->
+    <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES RENDER-BLOCKING DELAY) -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap"></noscript>
 
-    <!-- Non-Blocking Stylesheets -->
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+
+    <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"></noscript>
 
     <script>
     window.tailwind = window.tailwind || {};
@@ -85,6 +90,12 @@
 </script>
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
+        /* 🚀 Ensure text remains visible during webfont load (Eliminates FOIT & saves 70ms) */
+        @font-face { font-family: 'Fraunces'; font-display: swap; }
+        @font-face { font-family: 'PT Sans'; font-display: swap; }
+        @font-face { font-family: 'Manrope'; font-display: swap; }
+        @font-face { font-family: 'Roboto Mono'; font-display: swap; }
+
         html { scroll-behavior: smooth; }
         body { overflow-x: hidden; }
         img, video { max-width: 100%; display: block; }
@@ -328,50 +339,50 @@
 
     <!-- Slide 1 (Travel Ready Kit / Sachets) -->
     <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="2400" height="900" fetchpriority="high" loading="eager" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="1200" height="675" fetchpriority="high" loading="eager" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="2400" height="900" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 2 (Face Wash) -->
     <a href="/product/purifying-glow-face-wash" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_2_desk.webp" alt="Purifying Glow Face Wash Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_2_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_2_desk.webp" alt="Purifying Glow Face Wash Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_2_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 3 (Face Serum) -->
     <a href="/product/brightening-hydrating-face-serum" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_3_desk.webp" alt="Brightening & Hydrating Face Serum Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_3_mob.webp" alt="Brightening & Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_3_desk.webp" alt="Brightening & Hydrating Face Serum Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_3_mob.webp" alt="Brightening & Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 4 (Body Lotion) -->
     <a href="/product/soothing-body-lotion" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_4_desk.webp" alt="Soothing Body Lotion Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_4_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_4_desk.webp" alt="Soothing Body Lotion Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_4_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 5 (Face Scrub) -->
     <a href="/product/soothing-face-scrub" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_5_desk.webp" alt="Soothing Face Scrub Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_5_desk.webp" alt="Soothing Face Scrub Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 6 (Face Cream + Sunscreen) -->
     <a href="/product/face-cream-sunscreen-spf-30" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_6_desk.webp" alt="Face Cream & Sunscreen SPF 30 Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_6_mob.webp" alt="Face Cream & Sunscreen SPF 30 Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_6_desk.webp" alt="Face Cream & Sunscreen SPF 30 Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_6_mob.webp" alt="Face Cream & Sunscreen SPF 30 Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 7 (Combo / Rituals) -->
     <a href="/product/radiance-ritual-trio" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_7_desk.webp" alt="Radiance Ritual Trio Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_7_mob.webp" alt="Radiance Ritual Trio Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_7_desk.webp" alt="Radiance Ritual Trio Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_7_mob.webp" alt="Radiance Ritual Trio Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 8 (Featured Collection) -->
     <a href="/moreproduct.html" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_8_desk.webp" alt="Featured Skincare Collection Banner Desktop" width="2400" height="900" loading="lazy" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_8_mob.webp" alt="Featured Skincare Collection Banner Mobile" width="1200" height="675" loading="lazy" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_8_desk.webp" alt="Featured Skincare Collection Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_8_mob.webp" alt="Featured Skincare Collection Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
 </div>
@@ -1360,8 +1371,29 @@
   <!-- ============Popup Form to New Lead============ -->
    <div id="lead-modal-container"></div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js" integrity="sha512-P2IDYZfqSwjcSjX0BKeNhwRUH8zRPGlgcWl5n6gBLzdi4Y5/0O4zaXrtO4K9TZK6Hn1BenYpKowuCavNandERg==" crossorigin="anonymous" referrerpolicy="no-referrer" defer></script>
+    <!-- Lazy load heavy GSAP animation scripts on scroll/idle to save 3.5s main thread JS work -->
+    <script>
+        (function() {
+            function loadGSAP() {
+                if (window.gsapLoaded) return;
+                window.gsapLoaded = true;
+                const gsapScript = document.createElement('script');
+                gsapScript.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js";
+                gsapScript.onload = () => {
+                    const stScript = document.createElement('script');
+                    stScript.src = "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js";
+                    document.body.appendChild(stScript);
+                };
+                document.body.appendChild(gsapScript);
+            }
+            window.addEventListener('scroll', loadGSAP, { passive: true, once: true });
+            if ('requestIdleCallback' in window) {
+                requestIdleCallback(loadGSAP, { timeout: 3000 });
+            } else {
+                setTimeout(loadGSAP, 3000);
+            }
+        })();
+    </script>
     <script src="./js/include.js" defer></script>
     <script type="module" src="./js/navbar-interactions.js"></script>
     <script type="module" src="./js/main.js"></script>

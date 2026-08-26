@@ -1,12 +1,7 @@
 import BASE_URL from "./config.js";
-
-// ==========================================
-// 1. GLOBAL CUSTOM SUCCESS MODAL
-// ==========================================
 export function showSuccessModal(title, message, callback) {
     const existingModal = document.getElementById("custom-success-modal");
     if (existingModal) existingModal.remove();
-
     const modal = document.createElement("div");
     modal.id = "custom-success-modal";
     modal.className = "fixed inset-0 flex items-center justify-center z-[9999] bg-black/60 backdrop-blur-sm";
@@ -25,21 +20,15 @@ export function showSuccessModal(title, message, callback) {
         </div>
     `;
     document.body.appendChild(modal);
-
     document.getElementById("modal-ok-btn").addEventListener("click", () => {
         modal.remove();
         if (callback) callback();
     });
 }
-
-// ==========================================
-// 2. ROUTE & GUARD LOGIC
-// ==========================================
 async function runAuthGuard() {
     const currentPath = window.location.pathname.toLowerCase();
     let user = null;
     let role = "";
-
     try {
         const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
         if (response.ok) {
@@ -53,16 +42,12 @@ async function runAuthGuard() {
     } catch (error) {
         console.warn("Could not check server session:", error);
     }
-
-    // Clear legacy browser tokens from older versions. The JWT now remains HttpOnly.
     localStorage.removeItem("token");
     localStorage.removeItem("userToken");
-
     const isLoginPage = currentPath.endsWith("login.html") || 
                         currentPath.endsWith("/login") ||
                         currentPath.endsWith("register.html") || 
                         currentPath.endsWith("/register");
-
     if (user && isLoginPage) {
         if (role.includes("seo")) {
             window.location.replace("./seoadmin.html");
@@ -72,22 +57,18 @@ async function runAuthGuard() {
             return;
         }
     }
-
     const isSeoPage = currentPath.includes("seoadmin") || 
                       currentPath.includes("seoallpost") || 
                       currentPath.includes("seoadminupdate") ||
                       currentPath.includes("seoproduct");
-
     if (isSeoPage) {
         const isSeoUser = role.includes("seo") || role.includes("admin");
-
         if (!user || !isSeoUser) {
             console.warn("Unauthorized access to SEO page. Redirecting...");
             localStorage.removeItem("user");
             window.location.replace("./login.html");
             return;
         }
-
         const welcomeText = document.querySelector("main h2");
         if (welcomeText && user.name) {
             const currentText = welcomeText.innerText.toLowerCase();
@@ -96,7 +77,6 @@ async function runAuthGuard() {
             }
         }
     }
-
     const adminPagesList = [
         "admin.html",
         "addnewproduct.html",
@@ -105,9 +85,7 @@ async function runAuthGuard() {
         "adminupdateproduct.html",
         "adminuserquery.html"
     ];
-
     const isAdminPage = adminPagesList.some(page => currentPath.includes(page));
-
     if (isAdminPage) {
         if (!user || !role.includes("admin")) {
             console.warn("Unauthorized access to Admin page. Redirecting...");
@@ -117,14 +95,11 @@ async function runAuthGuard() {
         }
     }
 }
-
 if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", runAuthGuard);
 } else {
     runAuthGuard();
 }
-
-// ==========================================
 async function handleLogout() {
     try {
         await fetch(`${BASE_URL}/api/auth/logout`, { 
@@ -146,7 +121,6 @@ async function handleLogout() {
         window.location.replace("./login.html");
     }
 }
-
 document.addEventListener("click", (e) => {
     const logoutBtn = e.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
     if (logoutBtn) {
@@ -155,38 +129,26 @@ document.addEventListener("click", (e) => {
         handleLogout();
     }
 });
-
-// ==========================================
-// 4. FORM HANDLERS (REGISTER, LOGIN, FORGOT)
-// ==========================================
-
-// 4.1 NORMAL USER REGISTER FORM HANDLER
 function initRegisterForm() {
     const registerForm = document.getElementById("registerForm") || document.getElementById("signupForm");
     if (!registerForm) return;
-
     const newForm = registerForm.cloneNode(true);
     registerForm.parentNode.replaceChild(newForm, registerForm);
-
     newForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
         const nameEl = document.getElementById("fullName") || document.getElementById("name") || document.getElementById("regName");
         const emailEl = document.getElementById("regEmail") || document.getElementById("email");
         const passwordEl = document.getElementById("regPassword") || document.getElementById("password");
         const phoneEl = document.getElementById("phone") || document.getElementById("phoneNumber") || document.getElementById("regPhone");
-
         if (!nameEl || !emailEl || !passwordEl || !phoneEl) {
             showSuccessModal("Error", "Registration inputs ID missing. Check HTML input IDs!", null);
             return;
         }
-
         const name = nameEl.value.trim();
         const email = emailEl.value.trim();
         const password = passwordEl.value;
         const phone = phoneEl.value.trim();
-
         try {
             const response = await fetch(`${BASE_URL}/api/auth/register`, {
                 method: "POST",
@@ -194,12 +156,9 @@ function initRegisterForm() {
                 body: JSON.stringify({ name, email, password, phone }),
                 credentials: "include"
             });
-
             const data = await response.json();
-
             if (response.ok) {
                 showSuccessModal("Registration Successful!", data.message || "Account successful created!", () => {
-                    // Register API creates the authenticated session automatically.
                     window.location.href = "./index.html";
                 });
             } else {
@@ -211,26 +170,19 @@ function initRegisterForm() {
         }
     });
 }
-
-// 4.2 LOGIN FORM HANDLER
 function initLoginForm() {
     const loginForm = document.getElementById("loginForm");
     if (!loginForm) return;
-
     const newForm = loginForm.cloneNode(true);
     loginForm.parentNode.replaceChild(newForm, loginForm);
-
     newForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
         const emailEl = document.getElementById("email");
         const passwordEl = document.getElementById("password");
         if (!emailEl || !passwordEl) return;
-
         const email = emailEl.value.trim();
         const password = passwordEl.value;
-
         try {
             const response = await fetch(`${BASE_URL}/api/auth/login`, {
                 method: "POST",
@@ -238,25 +190,18 @@ function initLoginForm() {
                 body: JSON.stringify({ email, password }),
                 credentials: "include" 
             });
-
             const data = await response.json();
-
             if (response.ok && data.success !== false) {
                 const userData = data.user || data.data || {};
                 const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
-                
                 const userObjToStore = {
                     ...userData,
                     name: displayName
                 };
-
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
-
-                // Tab-bound session storage for single tab isolation
                 sessionStorage.setItem("tabAuthActive", "true");
                 sessionStorage.setItem("userRole", role);
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));
-
                 if (role === "user") {
                     localStorage.setItem("user", JSON.stringify(userObjToStore)); 
                     if (data.token) {
@@ -266,15 +211,12 @@ function initLoginForm() {
                         localStorage.setItem("userToken", data.token);
                     }
                 } else {
-                    // Privileged sessions are cookie-only so an injected script
-                    // cannot read or exfiltrate their JWT.
                     sessionStorage.removeItem("token");
                     sessionStorage.removeItem("userToken");
                     localStorage.removeItem("user");
                     localStorage.removeItem("token");
                     localStorage.removeItem("userToken");
                 }
-                
                 let targetUrl = "./index.html"; 
                 if (role === "admin") {
                     targetUrl = "./admin.html";
@@ -283,7 +225,6 @@ function initLoginForm() {
                 } else if (role === "affiliate") {
                     targetUrl = "./affiliate.html";
                 }
-
                 showSuccessModal("Login Successful!", `Welcome back, ${displayName}!`, () => {
                     window.location.href = targetUrl;
                 });
@@ -296,28 +237,21 @@ function initLoginForm() {
         }
     });
 }
-
-// 4.3 FORGOT PASSWORD FORM HANDLER
 function initForgotForm() {
     const forgotForm = document.getElementById("forgotForm");
     if (!forgotForm) return;
-
     const newForgotForm = forgotForm.cloneNode(true);
     forgotForm.parentNode.replaceChild(newForgotForm, forgotForm);
-
     newForgotForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-
         const forgotEmailEl = document.getElementById("forgotEmail");
         if (!forgotEmailEl) return;
-
         const email = forgotEmailEl.value.trim();
         if (!email) {
             showSuccessModal("Warning", "Kripya email enter karein!", null);
             return;
         }
-
         try {
             const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
                 method: "POST",
@@ -325,9 +259,7 @@ function initForgotForm() {
                 body: JSON.stringify({ email }),
                 credentials: "include"
             });
-
             const data = await response.json();
-
             if (response.ok) {
                 showSuccessModal("Reset Link Sent", data.message || "Reset link aapki email par bhej diya gaya hai!", () => {
                     const loginSection = document.getElementById('loginSection');
@@ -346,25 +278,18 @@ function initForgotForm() {
         }
     });
 }
-
 function initAuthForms() {
     initRegisterForm();
     initLoginForm();
     initForgotForm();
 }
-
 if (document.readyState === "complete" || document.readyState === "interactive") {
     initAuthForms();
 } else {
     document.addEventListener("DOMContentLoaded", initAuthForms);
 }
-
-// ==========================================
-// 5. NAVBAR STATE RENDERING
-// ==========================================
 export function renderNavbarState() {
     const storedUser = localStorage.getItem("user");
-
     const updateUI = (authContainer) => {
         if (!storedUser) {
             authContainer.innerHTML = `
@@ -374,11 +299,9 @@ export function renderNavbarState() {
             `;
             return;
         }
-
         try {
             const user = JSON.parse(storedUser);
             const role = user.role || sessionStorage.getItem("userRole");
-
             if (role === "admin" || role === "seoadmin") {
                 authContainer.innerHTML = `
                     <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
@@ -406,7 +329,6 @@ export function renderNavbarState() {
             localStorage.removeItem("user");
         }
     };
-
     const checkAndRender = () => {
         const authActions = document.getElementById("auth-actions");
         if (authActions) {
@@ -415,9 +337,7 @@ export function renderNavbarState() {
         }
         return false;
     };
-
     if (checkAndRender()) return;
-
     let attempts = 0;
     const interval = setInterval(() => {
         attempts++;
@@ -426,7 +346,6 @@ export function renderNavbarState() {
         }
     }, 100);
 }
-
 document.addEventListener("partialsLoaded", renderNavbarState);
 document.addEventListener("DOMContentLoaded", renderNavbarState);
 window.addEventListener("load", renderNavbarState);

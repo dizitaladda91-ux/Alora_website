@@ -1,13 +1,10 @@
 import BASE_URL from "./config.js";
 import "./toast.js";
-
 const ORDER_STATUSES = ["paid", "processing", "packed", "shipped", "delivered", "cancelled"];
 let adminOrders = [];
 let activeStatusFilter = "";
-
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
-
 function renderOrderRow(order) {
     return `
         <tr class="hover:bg-gray-50 border-b">
@@ -34,41 +31,31 @@ function renderOrderRow(order) {
             </td>
         </tr>`;
 }
-
 async function loadOrders() {
     const activeTableBody = document.getElementById("activeOrdersTableBody") || document.getElementById("ordersTableBody");
     const deliveredTableBody = document.getElementById("deliveredOrdersTableBody");
     const activeCountEl = document.getElementById("activeOrderCount");
     const deliveredCountEl = document.getElementById("deliveredOrderCount");
-
     if (!activeTableBody) return;
-    
     activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading orders...</td></tr>`;
     if (deliveredTableBody) {
         deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading delivered orders...</td></tr>`;
     }
-
     try {
         const statusQuery = activeStatusFilter ? `&status=${encodeURIComponent(activeStatusFilter)}` : "";
         const response = await fetch(`${BASE_URL}/api/orders?limit=200${statusQuery}`, { credentials: "include" });
         const result = await response.json();
         if (!response.ok || !result.success) throw new Error(result.message || "Could not load orders.");
         adminOrders = result.data || [];
-
         const activeOrders = adminOrders.filter((o) => o.orderStatus !== "delivered");
         const deliveredOrders = adminOrders.filter((o) => o.orderStatus === "delivered");
-
         if (activeCountEl) activeCountEl.innerText = activeOrders.length;
         if (deliveredCountEl) deliveredCountEl.innerText = deliveredOrders.length;
-
-        // Render Active Orders Table
         if (!activeOrders.length) {
             activeTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-boxes-packing text-2xl mb-2 block"></i> No new or active orders currently.</td></tr>`;
         } else {
             activeTableBody.innerHTML = activeOrders.map(renderOrderRow).join("");
         }
-
-        // Render Delivered Orders Table
         if (deliveredTableBody) {
             if (!deliveredOrders.length) {
                 deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-circle-check text-2xl mb-2 block"></i> No delivered orders yet.</td></tr>`;
@@ -80,9 +67,6 @@ async function loadOrders() {
         activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
 }
-
-// Sends both orderStatus and, if present, tracking fields in one request so a
-// switch to "shipped" can carry the tracking number the backend requires.
 async function patchOrder(orderId, body) {
     const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
         method: "PATCH",
@@ -96,11 +80,9 @@ async function patchOrder(orderId, body) {
     if (index >= 0) adminOrders[index] = result.data;
     return result.data;
 }
-
 window.updateOrderStatus = async (orderId, orderStatus) => {
     try {
         const body = { orderStatus };
-
         if (orderStatus === "shipped") {
             const trackingInput = document.getElementById(`track-num-${orderId}`);
             let trackingNumber = trackingInput?.value.trim() || "";
@@ -112,7 +94,6 @@ window.updateOrderStatus = async (orderId, orderStatus) => {
             body.trackingNumber = trackingNumber;
             if (courierLink) body.courierLink = courierLink;
         }
-
         await patchOrder(orderId, body);
         window.showToast(`Order status updated to '${orderStatus}'.`, "success");
         loadOrders();
@@ -121,7 +102,6 @@ window.updateOrderStatus = async (orderId, orderStatus) => {
         loadOrders();
     }
 };
-
 window.saveTracking = async (orderId) => {
     try {
         const trackingNumber = document.getElementById(`track-num-${orderId}`)?.value.trim() || "";
@@ -134,7 +114,6 @@ window.saveTracking = async (orderId) => {
         loadOrders();
     }
 };
-
 window.updateExpectedDelivery = async (orderId, expectedDeliveryDate) => {
     if (!expectedDeliveryDate) return;
     try {
@@ -153,12 +132,10 @@ window.updateExpectedDelivery = async (orderId, expectedDeliveryDate) => {
         loadOrders();
     }
 };
-
 window.refundOrder = async (orderId) => {
     const reason = window.prompt("Refund reason (optional):", "Requested by admin");
     if (reason === null) return;
     if (!window.confirm("This will issue a real full refund through Razorpay and restore inventory. Continue?")) return;
-
     try {
         const response = await fetch(`${BASE_URL}/api/orders/${orderId}/refund`, {
             method: "POST",
@@ -174,7 +151,6 @@ window.refundOrder = async (orderId) => {
         window.showToast(error.message, "error");
     }
 };
-
 window.openInvoiceModal = async (orderId) => {
     try {
         const response = await fetch(`${BASE_URL}/api/orders/${orderId}`, { credentials: "include" });
@@ -193,7 +169,6 @@ window.openInvoiceModal = async (orderId) => {
         window.showToast(error.message, "error");
     }
 };
-
 document.addEventListener("DOMContentLoaded", async () => {
     const logout = document.getElementById("adminLogoutBtn");
     logout?.addEventListener("click", async (e) => {
@@ -212,7 +187,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.replace("./login.html");
         }
     });
-
     document.getElementById("closeInvoiceBtn")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
     document.getElementById("closeInvoiceBtn2")?.addEventListener("click", () => document.getElementById("invoiceModal")?.classList.add("hidden"));
     document.getElementById("statusFilter")?.addEventListener("change", (event) => {

@@ -1,12 +1,7 @@
 import BASE_URL from "./config.js";
-
-// ==========================================
-// 1. GLOBAL CUSTOM SUCCESS MODAL
-// ==========================================
 export function showSuccessModal(title, message, callback) {
     const existingModal = document.getElementById("custom-success-modal");
     if (existingModal) existingModal.remove();
-
     const modal = document.createElement("div");
     modal.id = "custom-success-modal";
     modal.className = "fixed inset-0 flex items-center justify-center z-[9999] bg-black/60 backdrop-blur-sm";
@@ -25,31 +20,23 @@ export function showSuccessModal(title, message, callback) {
         </div>
     `;
     document.body.appendChild(modal);
-
     document.getElementById("modal-ok-btn").addEventListener("click", () => {
         modal.remove();
         if (callback) callback();
     });
 }
-
-// ==========================================
-// 2. DYNAMIC NAVBAR RENDERING FUNCTION
-// ==========================================
 export function renderNavbarState() {
     const authActions = document.getElementById("auth-actions");
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
-
     if (!authActions) {
         console.warn("Auth placeholder (#auth-actions) abhi DOM me nahi mila. Wait kar rahe hain...");
         return;
     }
-
     if (storedUser && token) {
         try {
             const user = JSON.parse(storedUser);
             const role = user.role || sessionStorage.getItem("userRole");
-
             if (role === "admin" || role === "seoadmin") {
                 authActions.innerHTML = `
                     <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
@@ -66,7 +53,6 @@ export function renderNavbarState() {
                         </button>
                     </div>
                 `;
-
                 document.getElementById("logout-btn")?.addEventListener("click", () => {
                     sessionStorage.clear();
                     localStorage.removeItem("token");
@@ -74,7 +60,6 @@ export function renderNavbarState() {
                     window.location.href = "./index.html";
                 });
             }
-
         } catch (err) {
             console.error("Localstorage data read error:", err);
             localStorage.removeItem("user");
@@ -88,57 +73,38 @@ export function renderNavbarState() {
         `;
     }
 }
-
-// ==========================================
-// 3. LISTEN TO PARTIALS LOADED
-// ==========================================
 document.addEventListener("partialsLoaded", () => {
     console.log("Navbar successfully injected! Applying states...");
     renderNavbarState();
 });
-
 if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(renderNavbarState, 150);
 }
-
-// ==========================================
-// 4. CONTACT FORM SUBMISSION (SINGLE INSTANCE WITH DEBOUNCE)
-// ==========================================
 let isSubmitting = false; 
-
 document.addEventListener("submit", async (e) => {
     if (e.target && e.target.id === "contactForm") {
         e.preventDefault();
-
-        // Agar process already chal raha hai, to click ignore hoga
         if (isSubmitting) return;
-
         const form = e.target;
         const submitBtn = form.querySelector('button[type="submit"]');
         const name = document.getElementById("name").value;
         const email = document.getElementById("email").value;
         const message = document.getElementById("message").value;
-
         try {
             isSubmitting = true;
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerText = "Submitting...";
             }
-
             console.log("Form submit caught! Sending data:", { name, email, message });
-
             const response = await fetch(`${BASE_URL}/api/queries`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ name, email, message })
             });
-
             const data = await response.json();
             console.log("Response:", data);
-
             if (response.ok) {
-                // Success popup custom modal ke sath
                 showSuccessModal(
                     "Success!", 
                     "Aapki query successfully save ho gayi hai. Hum aapse jald hi contact karenge.", 
@@ -153,7 +119,6 @@ document.addEventListener("submit", async (e) => {
             console.error("Fetch Error:", error);
             alert("*The server is not connected. Please try again later.**");
         } finally {
-            // Sahi timing par state aur button reset karna
             isSubmitting = false;
             if (submitBtn) {
                 submitBtn.disabled = false;

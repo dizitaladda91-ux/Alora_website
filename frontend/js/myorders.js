@@ -1,5 +1,4 @@
 import BASE_URL, { getAuthHeaders } from "./config.js";
-
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const orderStatusInfo = (status) => {
   const states = {
@@ -14,13 +13,11 @@ const orderStatusInfo = (status) => {
   const [label, message, step] = states[String(status || "paid").toLowerCase()] || states.paid;
   return { label, message, step };
 };
-
 const orderProgress = (step) => {
   if (step < 0) return "";
   return `<div class="grid grid-cols-5 gap-1 mt-4">${["Booked", "Processing", "Packed", "Shipped", "Delivered"].map((stage, index) => `<div class="text-center"><div class="h-1.5 rounded-full ${index <= step ? "bg-[#A0522D]" : "bg-stone-200"}"></div><p class="mt-1.5 text-[10px] ${index <= step ? "text-[#A0522D] font-semibold" : "text-stone-400"}">${stage}</p></div>`).join("")}</div>`;
 };
 const money = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
-
 async function loadMyOrders() {
   const loader = document.getElementById("orders-loader");
   const list = document.getElementById("orders-list");
@@ -57,5 +54,4 @@ async function loadMyOrders() {
     loader.innerHTML = `<p class="text-red-600">${escapeHtml(error.message)}</p>`;
   }
 }
-
 document.addEventListener("DOMContentLoaded", loadMyOrders);

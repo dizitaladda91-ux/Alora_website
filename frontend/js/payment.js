@@ -1,7 +1,5 @@
 import BASE_URL from './config.js';
 import "./toast.js";
-
-// Helper: Safe Cart Fetching
 function getSafeCart() {
     try {
         const primary = localStorage.getItem("glowCart");
@@ -14,8 +12,6 @@ function getSafeCart() {
         return [];
     }
 }
-
-// Helper: Complete Cart Reset
 function clearAllCart() {
     localStorage.removeItem("glowCart");
     localStorage.removeItem("glowRitualCartData");
@@ -23,11 +19,9 @@ function clearAllCart() {
         window.updateHeaderCartCount();
     }
 }
-
 const button = document.getElementById("payNow");
 let signedInCustomer = false;
 let savedCustomer = null;
-
 async function registerAndAuthenticate({ name, email, phone, address, password }) {
     const registerResponse = await fetch(`${BASE_URL}/api/auth/register`, {
         method: "POST",
@@ -36,26 +30,19 @@ async function registerAndAuthenticate({ name, email, phone, address, password }
         body: JSON.stringify({ name, email, phone, address, source: "checkout", password })
     });
     const registerData = await registerResponse.json();
-
     if (!registerResponse.ok) {
         throw new Error(registerData.message || "Account could not be created.");
     }
-
     signedInCustomer = true;
     return registerData.user;
 }
-
 function fillSignedInCustomer(user) {
     document.getElementById("custName").value = user.name || "";
     document.getElementById("custEmail").value = user.email || "";
     document.getElementById("custPhone").value = user.phone || "";
     document.getElementById("custAddress").value = user.address || "";
-
     savedCustomer = user;
     const hasSavedAddress = Boolean(String(user.address || "").trim());
-
-    // A returning customer only needs to see their saved contact and delivery
-    // details—there is no need to create an account again or re-enter a name.
     document.getElementById("checkout-name-field")?.classList.add("hidden");
     document.getElementById("checkout-phone-field")?.classList.add("hidden");
     document.getElementById("checkout-email-field")?.classList.add("hidden");
@@ -75,10 +62,8 @@ function fillSignedInCustomer(user) {
         : "You are signed in. Add your delivery address once to save it to your account.";
     signedInCustomer = true;
 }
-
 async function saveMissingDeliveryAddress(address) {
     if (!signedInCustomer || String(savedCustomer?.address || "").trim()) return;
-
     const response = await fetch(`${BASE_URL}/api/auth/profile`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
@@ -89,42 +74,32 @@ async function saveMissingDeliveryAddress(address) {
     if (!response.ok) throw new Error(data.message || "Could not save the delivery address.");
     savedCustomer = data.user;
 }
-
 async function restoreSignedInCustomer() {
     try {
         const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
         if (!response.ok) return;
-
         const { user } = await response.json();
         if (!user || user.role !== "user") return;
-
         fillSignedInCustomer(user);
     } catch (error) {
         console.warn("Could not restore checkout account.", error);
     }
 }
-
 restoreSignedInCustomer();
-
 button?.addEventListener("click", async (e) => {
     e.preventDefault();
-
-    // 1. Delivery Details Fetching
     const nameInput = document.getElementById("custName");
     const phoneInput = document.getElementById("custPhone");
     const emailInput = document.getElementById("custEmail");
     const addressInput = document.getElementById("custAddress");
     const passwordInput = document.getElementById("custPassword");
     const confirmPasswordInput = document.getElementById("custConfirmPassword");
-
     const name = nameInput?.value.trim();
     const phone = phoneInput?.value.trim();
     const email = emailInput?.value.trim().toLowerCase();
     const address = addressInput?.value.trim();
     const password = passwordInput?.value || "";
     const confirmPassword = confirmPasswordInput?.value || "";
-
-    // 2. Form Validation
     if (!name || !phone || !email || !address) {
         window.showToast("Please fill in your delivery details (name, phone, email and address) first.", "warning");
         if (!name && nameInput) nameInput.focus();
@@ -133,52 +108,39 @@ button?.addEventListener("click", async (e) => {
         else if (!address && addressInput) addressInput.focus();
         return;
     }
-
     if (phone.length !== 10 || isNaN(phone)) {
         window.showToast("Please enter a valid 10-digit mobile number.", "warning");
         phoneInput.focus();
         return;
     }
-
     if (!/^\S+@\S+\.\S+$/.test(email)) {
         window.showToast("Please enter a valid email address.", "warning");
         emailInput.focus();
         return;
     }
-
     if (!signedInCustomer && password.length < 6) {
         window.showToast("Please create a password with at least 6 characters.", "warning");
         passwordInput?.focus();
         return;
     }
-
     if (!signedInCustomer && password !== confirmPassword) {
         window.showToast("Password and confirm password must match.", "warning");
         confirmPasswordInput?.focus();
         return;
     }
-
-    // 3. Cart Items Extraction
     const cartItems = getSafeCart();
     if (cartItems.length === 0) {
         window.showToast("Your cart is empty! Please add a product first.", "warning");
         return;
     }
-
     try {
         button.disabled = true;
         if (!signedInCustomer) {
             button.innerHTML = 'Creating account... <i class="fa-solid fa-spinner fa-spin text-xs"></i>';
             const registeredUser = await registerAndAuthenticate({ name, email, phone, address, password });
-            // The API registration response already sets the HttpOnly login cookie.
-            // Reflect that state immediately, without requiring a page refresh.
             fillSignedInCustomer(registeredUser || { name, email, phone, address });
         }
-
-        // Accounts made through the standalone register page may not yet have
-        // an address. Save it now so the next checkout is prefilled too.
         await saveMissingDeliveryAddress(address);
-
         let referral = null;
         let couponCode = null;
         try {
@@ -193,7 +155,6 @@ button?.addEventListener("click", async (e) => {
         } catch (error) {
             console.warn("Referral data could not be read.", error);
         }
-
         const inputCoupon = document.getElementById("coupon-input")?.value?.trim()?.toUpperCase();
         const founderHandDelivery = document.getElementById("founder-delivery")?.checked === true;
         let couponCodes = [];
@@ -211,7 +172,6 @@ button?.addEventListener("click", async (e) => {
                 referral = { code: inputCoupon, clickId: null };
             }
         }
-
         const response = await fetch(`${BASE_URL}/api/payments/create-order`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -222,23 +182,17 @@ button?.addEventListener("click", async (e) => {
                 referral,
                 couponCode,
                 couponCodes,
-                // This selects a service only. The backend owns all resulting charges.
                 deliveryOption: { founderHandDelivery }
             })
         });
-
         const orderData = await response.json();
-
         if (!response.ok || !orderData.order || !orderData.order.id) {
             window.showToast(orderData.error || "Order could not be created. Please try again.", "error");
             return;
         }
-
         if (Number(orderData.affiliateDiscount) > 0) {
             window.showToast(`Referral discount applied: ₹${Number(orderData.affiliateDiscount).toFixed(2)}`, "success");
         }
-
-        // 6. Razorpay Configuration Options
         const options = {
             "key": orderData.razorpay_key_id,
             "amount": orderData.order.amount,
@@ -254,9 +208,7 @@ button?.addEventListener("click", async (e) => {
             },
             "handler": async function (response) {
                 console.log("Razorpay Response:", response);
-
                 try {
-                    // The server uses its saved checkout snapshot; browser cart values are not trusted here.
                     const verifyResponse = await fetch(`${BASE_URL}/api/payments/verify-payment`, {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
@@ -268,18 +220,11 @@ button?.addEventListener("click", async (e) => {
                             customer: { name, email, phone, address }
                         })
                     });
-
                     const verificationResult = await verifyResponse.json();
-
                     if (verificationResult.status === "success") {
-                        // Cart Clear karein
                         clearAllCart();
-
-                        // Success Popup & Print Option Show Karein
                         showPaymentSuccessPopup(verificationResult.orderData);
                     } else {
-                        // Kept visible longer than a normal toast — this is a payment
-                        // outcome the customer must not miss by navigating away.
                         window.showToast("Payment verification failed. Please contact support with your payment details.", "error", 8000);
                     }
                 } catch (error) {
@@ -295,10 +240,8 @@ button?.addEventListener("click", async (e) => {
                 "color": "#A0522D"
             }
         };
-
         const rzp = new window.Razorpay(options);
         rzp.open();
-
     } catch (error) {
         console.error("Error creating order:", error);
         window.showToast(error.message || "Connection failed! The server may be offline.", "error");
@@ -307,8 +250,6 @@ button?.addEventListener("click", async (e) => {
         button.innerHTML = 'Pay Now <i class="fa-solid fa-arrow-right text-xs"></i>';
     }
 });
-
-// Success Popup Modal Logic
 function showPaymentSuccessPopup(orderInfo) {
     const modal = document.createElement('div');
     modal.id = 'payment-success-modal';
@@ -340,22 +281,16 @@ function showPaymentSuccessPopup(orderInfo) {
             </div>
         </div>
     `;
-    
     document.body.appendChild(modal);
-
     document.getElementById('download-receipt-btn')?.addEventListener('click', function() {
         printReceipt(orderInfo);
     });
-
     document.getElementById('success-ok-btn')?.addEventListener('click', function() {
         window.location.href = "./index.html";
     });
 }
-
-// Receipt Printing Logic
 function printReceipt(info) {
     if (!info) return;
-    
     const itemsRows = (info.cart || []).map((item, idx) => `
         <tr>
             <td style="padding: 8px; border-bottom: 1px solid #eee;">${idx + 1}</td>
@@ -365,7 +300,6 @@ function printReceipt(info) {
             <td style="padding: 8px; border-bottom: 1px solid #eee; text-align: right;">₹${item.price * item.qty}</td>
         </tr>
     `).join('');
-
     const win = window.open('', '_blank');
     win.document.write(`
         <!DOCTYPE html>

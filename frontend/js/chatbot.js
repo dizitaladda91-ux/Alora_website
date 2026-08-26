@@ -1,8 +1,6 @@
 (function () {
     let isChatOpen = false;
     let isWaitingForResponse = false;
-
-    // Helper: Determine Backend Base URL
     function getApiBaseUrl() {
         if (typeof window.BASE_URL !== "undefined" && window.BASE_URL) {
             return window.BASE_URL;
@@ -10,32 +8,24 @@
         const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
         return isLocal ? "http://localhost:5000" : "";
     }
-
-    // Toggle Chat Window Visibility
     window.toggleAloraChat = function () {
         const modal = document.getElementById("alora-chat-modal");
         const iconOpen = document.getElementById("alora-chat-icon-open");
         const iconClose = document.getElementById("alora-chat-icon-close");
         const badge = document.getElementById("alora-chat-badge");
         const input = document.getElementById("alora-chat-input");
-
         if (!modal) return;
-
         isChatOpen = !isChatOpen;
-
         if (isChatOpen) {
             modal.classList.remove("hidden");
-            // Trigger animation frame
             setTimeout(() => {
                 modal.classList.remove("scale-95", "opacity-0");
                 modal.classList.add("scale-100", "opacity-100", "flex");
             }, 10);
-
             if (iconOpen) iconOpen.classList.add("hidden");
             if (iconClose) iconClose.classList.remove("hidden");
             if (badge) badge.classList.add("hidden");
             if (input) input.focus();
-
             scrollToBottom();
         } else {
             modal.classList.remove("scale-100", "opacity-100");
@@ -44,51 +34,32 @@
                 modal.classList.add("hidden");
                 modal.classList.remove("flex");
             }, 200);
-
             if (iconOpen) iconOpen.classList.remove("hidden");
             if (iconClose) iconClose.classList.add("hidden");
         }
     };
-
-    // Scroll Chat Container to Bottom
     function scrollToBottom() {
         const container = document.getElementById("alora-chat-messages");
         if (container) {
             container.scrollTop = container.scrollHeight;
         }
     }
-
-    // Parse simple Markdown syntax to HTML
     function formatMessageText(text) {
         if (!text) return "";
         let formatted = text
             .replace(/&/g, "&amp;")
             .replace(/</g, "&lt;")
             .replace(/>/g, "&gt;");
-
-        // Bold text **bold**
         formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-        
-        // Inline Code `code`
         formatted = formatted.replace(/`(.*?)`/g, '<code class="bg-amber-100 text-amber-900 px-1 py-0.5 rounded text-[11px] font-mono">$1</code>');
-
-        // Markdown Links [text](url)
         formatted = formatted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-[#8B4513] font-semibold underline hover:text-amber-800">$1</a>');
-
-        // Bullet points • or \n- 
         formatted = formatted.replace(/(?:^|\n)[•-]\s*(.*?)(?=\n|$)/g, '<li class="ml-3 list-disc text-slate-700 my-0.5">$1</li>');
-
-        // Line breaks
         formatted = formatted.replace(/\n/g, '<br>');
-
         return formatted;
     }
-
-    // Append User Message to Chat UI
     function appendUserMessage(text) {
         const container = document.getElementById("alora-chat-messages");
         if (!container) return;
-
         const msgDiv = document.createElement("div");
         msgDiv.className = "flex items-end justify-end space-x-2 animate-fadeIn";
         msgDiv.innerHTML = `
@@ -99,15 +70,11 @@
         container.appendChild(msgDiv);
         scrollToBottom();
     }
-
-    // Append Assistant Message to Chat UI
     function appendAssistantMessage(htmlContent, products = []) {
         const container = document.getElementById("alora-chat-messages");
         if (!container) return;
-
         const msgDiv = document.createElement("div");
         msgDiv.className = "flex items-start space-x-2.5 animate-fadeIn";
-
         let productCardsHtml = "";
         if (products && products.length > 0) {
             productCardsHtml = `
@@ -116,7 +83,6 @@
                         const isFile = location.protocol === "file:";
                         const pUrl = isFile ? `./product.html?id=${p.id}` : (p.slug ? `/product/${p.slug}` : `/product.html?id=${p.id}`);
                         const img = p.imagepath || '/static/images/placeholder.jpg';
-                        
                         return `
                             <div class="flex items-center space-x-3 bg-white p-2 border border-amber-900/15 rounded-xl shadow-2xs hover:shadow-md transition-all">
                                 <img src="${img}" alt="${p.name}" class="w-12 h-12 object-cover rounded-lg flex-shrink-0 bg-slate-100">
@@ -133,7 +99,6 @@
                 </div>
             `;
         }
-
         msgDiv.innerHTML = `
             <div class="w-7 h-7 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
                 ✨
@@ -143,16 +108,12 @@
                 ${productCardsHtml}
             </div>
         `;
-
         container.appendChild(msgDiv);
         scrollToBottom();
     }
-
-    // Show Loading Typing Indicator
     function showTypingIndicator() {
         const container = document.getElementById("alora-chat-messages");
         if (!container) return null;
-
         const typingDiv = document.createElement("div");
         typingDiv.id = "alora-chat-typing";
         typingDiv.className = "flex items-start space-x-2.5 animate-pulse";
@@ -170,39 +131,28 @@
         scrollToBottom();
         return typingDiv;
     }
-
-    // Remove Typing Indicator
     function removeTypingIndicator() {
         const typingDiv = document.getElementById("alora-chat-typing");
         if (typingDiv) typingDiv.remove();
     }
-
-    // Handle Quick Query Button Clicks
     window.sendAloraQuickQuery = function (queryText) {
         if (isWaitingForResponse) return;
         const input = document.getElementById("alora-chat-input");
         if (input) input.value = queryText;
         window.handleAloraChatSubmit(new Event('submit'));
     };
-
-    // Handle Chat Form Submission
     window.handleAloraChatSubmit = async function (e) {
         if (e && e.preventDefault) e.preventDefault();
-
         const input = document.getElementById("alora-chat-input");
         const sendBtn = document.getElementById("alora-chat-send-btn");
         if (!input) return;
-
         const userMsg = input.value.trim();
         if (!userMsg || isWaitingForResponse) return;
-
         input.value = "";
         isWaitingForResponse = true;
         if (sendBtn) sendBtn.disabled = true;
-
         appendUserMessage(userMsg);
         showTypingIndicator();
-
         try {
             const baseUrl = getApiBaseUrl();
             const response = await fetch(`${baseUrl}/api/chatbot/message`, {
@@ -210,21 +160,17 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ message: userMsg })
             });
-
             removeTypingIndicator();
-
             if (!response.ok) {
                 appendAssistantMessage("⚠️ Sorry, I'm having trouble connecting to the server. Please try again shortly.");
                 return;
             }
-
             const data = await response.json();
             if (data && data.reply) {
                 appendAssistantMessage(formatMessageText(data.reply), data.products || []);
             } else {
                 appendAssistantMessage("Thank you for your message. How else can I assist you with Alora Radiance?");
             }
-
         } catch (err) {
             console.error("Alora Chatbot fetch error:", err);
             removeTypingIndicator();
@@ -235,8 +181,6 @@
             if (input) input.focus();
         }
     };
-
-    // Clear Chat
     window.clearAloraChat = function () {
         const container = document.getElementById("alora-chat-messages");
         if (!container) return;
@@ -253,5 +197,4 @@
             </div>
         `;
     };
-
 })();

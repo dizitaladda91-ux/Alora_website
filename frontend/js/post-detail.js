@@ -1,48 +1,35 @@
 import BASE_URL from './config.js';
-
 function getSlugFromLocation() {
     const urlParams = new URLSearchParams(window.location.search);
     const querySlug = urlParams.get('slug');
     if (querySlug) return querySlug;
-
-    // Path structure: /post/saffron-benefits-for-skin ya /blog/saffron-benefits-for-skin
     const pathParts = window.location.pathname.split('/').filter(Boolean);
     const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog');
-    
     if (postIndex >= 0 && pathParts[postIndex + 1]) {
         return decodeURIComponent(pathParts[postIndex + 1]);
     }
-
     if (pathParts.length > 0) {
         const lastPart = pathParts[pathParts.length - 1];
         if (!lastPart.endsWith('.html')) {
             return decodeURIComponent(lastPart);
         }
     }
-
     return '';
 }
-
 async function fetchPostDetails() {
     const slug = getSlugFromLocation();
-
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
         return;
     }
-
     try {
         const apiPath = BASE_URL ? `${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}` : `/api/blogs/post/${encodeURIComponent(slug)}`;
-
         const response = await fetch(apiPath);
         const result = await response.json();
-
         if (!response.ok) {
             throw new Error(result.message || 'Failed to fetch article');
         }
-
         const blog = result.data || result.blog || result;
-
         if (blog) {
             renderArticle(blog);
             injectSEO(blog);
@@ -54,20 +41,14 @@ async function fetchPostDetails() {
         showError("Failed to load article: " + err.message);
     }
 }
-
 function sanitizePostBodyContent(contentHtml, blogTitle) {
     if (!contentHtml) return contentHtml;
-
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contentHtml;
-
-    // Remove redundant h1 tags matching title
     const h1Nodes = tempDiv.querySelectorAll('h1');
     h1Nodes.forEach((headingNode) => {
         headingNode.remove();
     });
-
-    // Clean up empty paragraphs (<p><br></p> or <p>&nbsp;</p>) that cause huge vertical gaps
     const pNodes = tempDiv.querySelectorAll('p');
     pNodes.forEach((p) => {
         const text = p.innerText ? p.innerText.trim() : '';
@@ -76,8 +57,6 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
             p.remove();
         }
     });
-
-    // Wrap HTML tables in responsive scroll container and apply clean table styling
     const tableNodes = tempDiv.querySelectorAll('table');
     tableNodes.forEach((table) => {
         table.classList.add('w-full', 'my-6', 'border-collapse', 'rounded-xl', 'overflow-hidden');
@@ -88,27 +67,19 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
             wrapper.appendChild(table);
         }
     });
-
     return tempDiv.innerHTML;
 }
-
-// 🟢 Article Details DOM Rendering
 function renderArticle(blog) {
     document.getElementById('post-loader')?.classList.add('hidden');
     document.getElementById('blog-content-area')?.classList.remove('hidden');
-
     const titleEl = document.getElementById('post-title');
     if (titleEl) titleEl.innerText = blog.title || '';
-
     const categoryEl = document.getElementById('post-category');
     if (categoryEl) categoryEl.innerText = blog.category || 'General';
-
     let contentHtml = blog.content || '';
     contentHtml = sanitizePostBodyContent(contentHtml, blog.title || '');
-
     const bodyEl = document.getElementById('post-body');
     if (bodyEl) bodyEl.innerHTML = contentHtml;
-
     if (blog.createdAt) {
         const dateEl = document.getElementById('post-date');
         if (dateEl) {
@@ -119,11 +90,9 @@ function renderArticle(blog) {
             });
         }
     }
-
     const coverImg = document.getElementById('post-cover');
     const coverContainer = coverImg?.parentElement;
     const coverUrl = blog.coverImage || blog.coverUrl || '';
-
     if (coverImg) {
         if (coverUrl && typeof coverUrl === 'string' && coverUrl.trim()) {
             let finalUrl = coverUrl.trim();
@@ -136,7 +105,6 @@ function renderArticle(blog) {
             coverImg.src = finalUrl;
             coverImg.alt = blog.title || 'Blog Cover';
             if (coverContainer) coverContainer.classList.remove('hidden');
-
             coverImg.onerror = () => {
                 if (coverContainer) coverContainer.classList.add('hidden');
             };
@@ -145,60 +113,42 @@ function renderArticle(blog) {
         }
     }
 }
-
-// 🟢 Dynamic SEO & Schema Injector Function
 function injectSEO(blog) {
     const currentUrl = window.location.href;
     const finalTitle = blog.metaTitle || blog.title || "Alora Radiance";
-
-    // 1. Browser Tab Title Update
     document.title = finalTitle;
-
-    // 2. DOM Title Element Update (Safe Side)
     const titleEl = document.getElementById('dynamic-title');
     if (titleEl) {
         titleEl.textContent = finalTitle;
     }
-
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
         metaDescEl.setAttribute('content', blog.metaDesc);
     }
-
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {
         keywordsEl.setAttribute('content', blog.keywords);
     }
-
     const publisherEl = document.getElementById('dynamic-publisher');
     if (publisherEl && blog.publisher) {
         publisherEl.setAttribute('content', blog.publisher);
     }
-
     const canonicalEl = document.getElementById('dynamic-canonical');
     if (canonicalEl) {
         canonicalEl.setAttribute('href', currentUrl);
     }
-
     document.getElementById('og-title')?.setAttribute('content', finalTitle);
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
-
     if (blog.coverImage) {
         const fullImgUrl = blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`;
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
-
-    // DYNAMIC JSON-LD MULTI-SCHEMA INJECTOR (Only injects schemas explicitly entered in Admin)
     injectMultipleSchemasToDOM(blog.schema);
 }
-
-// 🌐 Universal Multi-Schema Helper Functions
 function parseMultipleSchemas(rawInput) {
     if (!rawInput || !String(rawInput).trim()) return [];
     let cleaned = String(rawInput).trim();
-
-    // 1. If wrapped in <script> tags, extract contents of all script tags
     if (cleaned.includes('<script')) {
         const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
         if (scriptMatches && scriptMatches.length > 0) {
@@ -215,8 +165,6 @@ function parseMultipleSchemas(rawInput) {
             cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
         }
     }
-
-    // 2. Direct JSON.parse (Handles single object, JSON Array [...], or @graph)
     try {
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed)) {
@@ -226,16 +174,12 @@ function parseMultipleSchemas(rawInput) {
             return [parsed];
         }
     } catch (e) {
-        // Concatenated JSON objects `{...} {...}` fallback
     }
-
-    // 3. Fallback: Parse multiple concatenated JSON objects `{...}\n{...}`
     const schemas = [];
     let depth = 0;
     let startIndex = -1;
     let inString = false;
     let isEscaped = false;
-
     for (let i = 0; i < cleaned.length; i++) {
         const char = cleaned[i];
         if (isEscaped) {
@@ -275,16 +219,11 @@ function parseMultipleSchemas(rawInput) {
     }
     return schemas;
 }
-
 function injectMultipleSchemasToDOM(rawSchemaInput) {
     document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
-
     if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
-
     let schemasToInject = parseMultipleSchemas(rawSchemaInput);
-
     if (!schemasToInject || schemasToInject.length === 0) return;
-
     if (schemasToInject.length === 1) {
         const script = document.createElement('script');
         script.id = 'dynamic-json-ld';
@@ -293,12 +232,10 @@ function injectMultipleSchemasToDOM(rawSchemaInput) {
         script.textContent = JSON.stringify(schemasToInject[0], null, 2);
         document.head.appendChild(script);
     } else {
-        // Multiple schemas: Inject combined Google-compliant @graph schema
         const script = document.createElement('script');
         script.id = 'dynamic-json-ld';
         script.type = 'application/ld+json';
         script.className = 'dynamic-schema-injected';
-
         const combinedSchema = {
             "@context": "https://schema.org",
             "@graph": schemasToInject.map(s => {
@@ -307,7 +244,6 @@ function injectMultipleSchemasToDOM(rawSchemaInput) {
                 return copy;
             })
         };
-
         script.textContent = JSON.stringify(combinedSchema, null, 2);
         document.head.appendChild(script);
     }
@@ -323,7 +259,6 @@ function showError(msg) {
         `;
     }
 }
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchPostDetails);
 } else {

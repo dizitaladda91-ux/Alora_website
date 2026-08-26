@@ -1,14 +1,10 @@
 import BASE_URL, { getAuthHeaders } from './config.js';
-
 const blogTableBody = document.getElementById('blog-table-body');
-
 async function fetchAllBlogs() {
     try {
         const response = await fetch(`${BASE_URL}/api/blogs/all`);
         const data = await response.json();
-
         const blogs = data.blogs || data.data || data;
-
         if (!response.ok || !blogs || blogs.length === 0) {
             blogTableBody.innerHTML = `
                 <tr>
@@ -19,9 +15,7 @@ async function fetchAllBlogs() {
                 </tr>`;
             return;
         }
-
         renderBlogTable(blogs);
-
     } catch (error) {
         console.error("Fetch error:", error);
         blogTableBody.innerHTML = `
@@ -32,17 +26,13 @@ async function fetchAllBlogs() {
             </tr>`;
     }
 }
-
 function renderBlogTable(blogs) {
     blogTableBody.innerHTML = '';
-
     blogs.forEach(blog => {
         const imageSrc = blog.coverImage 
             ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`) 
             : './static/alora5.webp';
-
         const blogId = blog._id || blog.id;
-
         const tr = document.createElement('tr');
         tr.className = "hover:bg-amber-50/40 transition-colors duration-200";
         tr.innerHTML = `
@@ -69,20 +59,15 @@ function renderBlogTable(blogs) {
         `;
         blogTableBody.appendChild(tr);
     });
-
     attachActionListeners();
 }
-
 function attachActionListeners() {
-    // Edit Action Trigger
     document.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const blogId = btn.getAttribute('data-id');
             window.location.href = `./seoadminupdate.html?id=${blogId}`;
         });
     });
-
-    // Delete Action Trigger
     document.querySelectorAll('.delete-btn').forEach(btn => {
         btn.addEventListener('click', async () => {
             const blogId = btn.getAttribute('data-id');
@@ -90,15 +75,12 @@ function attachActionListeners() {
                 try {
                     btn.innerText = "Deleting...";
                     btn.disabled = true;
-
                     const response = await fetch(`${BASE_URL}/api/blogs/delete/${blogId}`, {
                         method: 'DELETE',
                         headers: getAuthHeaders(),
                         credentials: 'include'
                     });
-
                     const resData = await response.json();
-
                     if (response.ok || resData.success) {
                         alert("🗑️ Article successfully deleted.");
                         fetchAllBlogs();
@@ -117,5 +99,4 @@ function attachActionListeners() {
         });
     });
 }
-
 document.addEventListener('DOMContentLoaded', fetchAllBlogs);

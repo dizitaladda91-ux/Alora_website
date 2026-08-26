@@ -1,9 +1,4 @@
 import BASE_URL, { getAuthHeaders } from "./config.js";
-
-/**
- * 1. Reusable template helper for dynamic variant markup rows.
- * Added Combo Options ('Combo', 'Pack of 2', 'Pack of 3', 'Kit') to the volume selection.
- */
 function getVariantRowHTML(isFirstRow = false) {
     return `
         <div>
@@ -40,23 +35,13 @@ function getVariantRowHTML(isFirstRow = false) {
         </div>
     `;
 }
-
-/**
- * 2. Injects a clean variant layout template into the container.
- */
 function addVariantRow() {
     const container = document.getElementById("variantsContainer");
     const newRow = document.createElement("div");
-    
     newRow.className = "variant-row grid grid-cols-4 gap-3 items-end bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative animate__animated animate__fadeInUp animate__faster";
     newRow.innerHTML = getVariantRowHTML(false);
-    
     container.appendChild(newRow);
 }
-
-/**
- * 3. Removes the target variation element block.
- */
 function removeVariantRow(button) {
     const rows = document.querySelectorAll('.variant-row');
     if (rows.length > 1) {
@@ -68,35 +53,24 @@ function removeVariantRow(button) {
         alert("At least one variant is required!");
     }
 }
-
-// Expose handlers globally
 window.addVariantRow = addVariantRow;
 window.removeVariantRow = removeVariantRow;
-
-/**
- * 4. Intercepts submission lifecycle and handles network safely.
- */
 document.getElementById('productForm').addEventListener('submit', async (e) => {
     e.preventDefault(); 
-
     const formElement = e.target;
     const submitButton = formElement.querySelector('button[type="submit"]');
-
     if (submitButton) {
         submitButton.disabled = true;
         submitButton.innerText = "Saving Product...";
     }
-
     const formData = new FormData(formElement);
     const variantRows = document.querySelectorAll('.variant-row');
     const variantsArray = [];
-
     variantRows.forEach(row => {
         const volume = row.querySelector('.v-volume').value;
         const price = row.querySelector('.v-price').value;
         const comparePrice = row.querySelector('.v-comparePrice').value;
         const stock = row.querySelector('.v-stock').value;
-
         if (volume && price) {
             variantsArray.push({
                 volume: volume,
@@ -106,9 +80,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
             });
         }
     });
-
     formData.append('variants', JSON.stringify(variantsArray));
-
     try {
         const response = await fetch(`${BASE_URL}/api/product/add`, {
             method: 'POST',
@@ -116,28 +88,21 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
             credentials: 'include',
             body: formData 
         });
-
         const data = await response.json();
-
         if (response.ok) {
             alert('Product successfully added!');
             formElement.reset();
-            
-            // Variants container ko reset karke single default row set karna
             const container = document.getElementById("variantsContainer");
             container.innerHTML = "";
-            
             const initialRow = document.createElement("div");
             initialRow.className = "variant-row grid grid-cols-4 gap-3 items-end bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative";
             initialRow.innerHTML = getVariantRowHTML(true);
             container.appendChild(initialRow);
-
             if (typeof window.loadProducts === 'function') {
                 window.loadProducts();
             } else if (typeof loadProducts === 'function') {
                 loadProducts();
             }
-
         } else {
             alert('Error: ' + (data.error || 'Failed to add the product.'));
         }

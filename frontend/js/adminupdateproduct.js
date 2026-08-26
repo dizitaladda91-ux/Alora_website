@@ -1,25 +1,16 @@
 import BASE_URL, { getImageUrl, getAuthHeaders } from "./config.js";
-
 const urlParams = new URLSearchParams(window.location.search);
 const productId = urlParams.get('id');
-
 if (!productId) {
     alert("Error: Product ID missing in URL!");
     window.location.href = "./adminproduct.html";
 }
-
-// 1. Helper to generate variant row markup dynamically
 function createVariantRowHTML(volume = '', price = '', comparePrice = '', stock = '10', canDelete = true) {
-    // Complete volumes & packs list
     const volumes = ['50g', '100g', '30ml', '100ml', '200ml', '500ml', 'Combo Offer', 'Pack of 2', 'Pack of 3'];
-    
-    // Fallback in case volume is customized/different
     if (volume && !volumes.includes(volume)) {
         volumes.push(volume);
     }
-
     let optionsHTML = volumes.map(v => `<option value="${v}" ${v === volume ? 'selected' : ''}>${v}</option>`).join('');
-
     return `
         <div class="variant-row grid grid-cols-4 gap-3 items-end bg-white p-3 rounded-xl border border-gray-100 shadow-sm relative animate__animated animate__fadeInUp animate__faster">
             <div>
@@ -45,36 +36,25 @@ function createVariantRowHTML(volume = '', price = '', comparePrice = '', stock 
             </div>
         </div>`;
 }
-
-// 2. Function to dynamically add a new Variant row 
 function addVariantRow() {
     const container = document.getElementById("variantsContainer");
     const div = document.createElement('div');
     div.innerHTML = createVariantRowHTML('200ml', '', '', '10', true);
     container.appendChild(div.firstElementChild);
 }
-
-// 3. Function to delete an added variant row
 function removeVariantRow(button) {
     const row = button.closest('.variant-row');
     if (row) {
         row.remove();
     }
 }
-
-// --- EXPOSE TO WINDOW ---
 window.addVariantRow = addVariantRow;
 window.removeVariantRow = removeVariantRow;
-
-// 4. Page Load logic: Fetch product data and populate fields + category logic
 async function fetchProductDetails() {
     try {
         const response = await fetch(`${BASE_URL}/api/product/${productId}`);
         const product = await response.json();
-
         if (!response.ok) throw new Error(product.error || "Data load nahi ho saka");
-
-        // Autofill regular inputs
         document.querySelector('input[name="name"]').value = product.name || '';
         document.querySelector('textarea[name="description"]').value = product.description || '';
         document.querySelector('input[name="rating"]').value = product.rating || 4.5;
@@ -88,14 +68,10 @@ async function fetchProductDetails() {
         document.querySelector('input[name="metaDescription"]').value = product.metaDescription || '';
         document.querySelector('input[name="isBestseller"]').checked = Boolean(product.isBestseller);
         document.querySelector('input[name="isFeatured"]').checked = Boolean(product.isFeatured);
-
-        // Category select update
         if (product.category) {
             const categorySelect = document.querySelector('select[name="category"]');
             if (categorySelect) categorySelect.value = product.category;
         }
-
-        // Preview image block
         if (product.imagepath) {
             const imgPreview = document.getElementById('currentProductImg');
             if (imgPreview) {
@@ -105,12 +81,9 @@ async function fetchProductDetails() {
             const noImgText = document.getElementById('noImgText');
             if (noImgText) noImgText.classList.add('hidden');
         }
-
-        // Setup loaded variants layout UI
         const container = document.getElementById("variantsContainer");
         if (container) {
             container.innerHTML = ''; 
-            
             if (product.variants && product.variants.length > 0) {
                 product.variants.forEach((v, index) => {
                     container.innerHTML += createVariantRowHTML(v.volume, v.price, v.comparePrice || '', v.stock, index !== 0);
@@ -119,14 +92,11 @@ async function fetchProductDetails() {
                 container.innerHTML = createVariantRowHTML('Combo Offer', '', '', '10', false);
             }
         }
-
     } catch (err) {
         console.error(err);
         alert("Data fetch fail: " + err.message);
     }
 }
-
-// 5. Save changes logic
 const form = document.getElementById('updateProductForm');
 if (form) {
     form.addEventListener('submit', async (e) => {
@@ -134,16 +104,13 @@ if (form) {
         const formData = new FormData(e.target);
         formData.set('isBestseller', String(e.target.querySelector('input[name="isBestseller"]').checked));
         formData.set('isFeatured', String(e.target.querySelector('input[name="isFeatured"]').checked));
-
         const variantRows = document.querySelectorAll('.variant-row');
         const variantsArray = [];
-
         variantRows.forEach(row => {
             const volume = row.querySelector('.v-volume').value;
             const price = row.querySelector('.v-price').value;
             const comparePrice = row.querySelector('.v-comparePrice').value;
             const stock = row.querySelector('.v-stock').value;
-
             if (volume && price) {
                 variantsArray.push({
                     volume: volume,
@@ -153,9 +120,7 @@ if (form) {
                 });
             }
         });
-
         formData.append('variants', JSON.stringify(variantsArray));
-
         try {
             const response = await fetch(`${BASE_URL}/api/product/update/${productId}`, {
             method: 'PUT',
@@ -163,7 +128,6 @@ if (form) {
             credentials: 'include',
             body: formData
             });
-
             const data = await response.json();
             if (response.ok) {
                 alert('Product updated successfully!');
@@ -177,5 +141,4 @@ if (form) {
         }
     });
 }
-
 document.addEventListener('DOMContentLoaded', fetchProductDetails);

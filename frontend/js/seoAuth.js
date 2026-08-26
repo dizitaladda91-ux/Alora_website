@@ -1,5 +1,4 @@
 import BASE_URL, { getAuthHeaders } from "./config.js";
-
 async function getCurrentSession() {
     try {
         const response = await fetch(`${BASE_URL}/api/auth/session`, { 
@@ -7,32 +6,25 @@ async function getCurrentSession() {
             credentials: "include" 
         });
         if (!response.ok) return null;
-
         const data = await response.json();
         return data.success ? data.user : null;
     } catch {
         return null;
     }
 }
-
 async function protectSeoPage() {
     const isTabActive = sessionStorage.getItem("tabAuthActive");
     const role = sessionStorage.getItem("userRole");
     const storedUserStr = sessionStorage.getItem("user");
-
     let storedUser = null;
     try {
         if (storedUserStr) storedUser = JSON.parse(storedUserStr);
     } catch (e) {}
-
     const isRoleValid = role === "seoadmin" || role === "admin" || (storedUser && (storedUser.role === "seoadmin" || storedUser.role === "admin"));
-
     if (!isTabActive || !isRoleValid) {
         clearAllAuthStorageAndRedirect();
         return;
     }
-
-    // Portal access is fail-closed: browser storage alone must never grant it.
     const freshUser = await getCurrentSession();
     if (freshUser && (freshUser.role === "seoadmin" || freshUser.role === "admin")) {
         sessionStorage.setItem("user", JSON.stringify(freshUser));
@@ -43,7 +35,6 @@ async function protectSeoPage() {
         return;
     }
 }
-
 function clearAllAuthStorageAndRedirect() {
     sessionStorage.clear();
     localStorage.removeItem("user");
@@ -55,7 +46,6 @@ function clearAllAuthStorageAndRedirect() {
     localStorage.removeItem("seo_token");
     window.location.replace("./login.html");
 }
-
 async function handleSeoLogout(event) {
     if (event) {
         event.preventDefault();
@@ -73,11 +63,9 @@ async function handleSeoLogout(event) {
         clearAllAuthStorageAndRedirect();
     }
 }
-
 document.addEventListener("DOMContentLoaded", () => {
     protectSeoPage();
 });
-
 document.addEventListener("click", (event) => {
     const logoutBtn = event.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
     if (logoutBtn) {
