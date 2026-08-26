@@ -342,4 +342,8 @@ window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
 initGoogleTagManager();
 trackReferralFromUrl();
-document.addEventListener("DOMContentLoaded", loadAllPartials);
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", loadAllPartials);
+} else {
+    loadAllPartials();
+}
