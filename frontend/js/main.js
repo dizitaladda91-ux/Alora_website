@@ -573,22 +573,23 @@ function slideProducts(direction) {
     }
 }
 
-// Dynamically match hero slider banners to DB product links
+// Dynamically verify hero slider banners to DB product links
 function updateHeroBannerProductLinks(productList) {
     if (!Array.isArray(productList) || productList.length === 0) return;
 
     const heroLinks = document.querySelectorAll('.hero-slide-link');
     heroLinks.forEach((linkEl) => {
-        const keywordsAttr = linkEl.getAttribute('data-banner-keyword');
-        if (!keywordsAttr) return;
+        const currentHref = linkEl.getAttribute('href') || '';
+        const pathMatch = currentHref.match(/\/product\/([^/?#]+)/i);
+        if (!pathMatch) return;
 
-        const keywords = keywordsAttr.split(',').map((k) => k.trim().toLowerCase()).filter(Boolean);
+        const targetSlug = decodeURIComponent(pathMatch[1]).toLowerCase();
 
+        // Match exact slug or name in DB
         const matchedProd = productList.find((p) => {
-            const pName = (p.name || '').toLowerCase();
-            const pCat = (p.category || '').toLowerCase();
             const pSlug = (p.slug || '').toLowerCase();
-            return keywords.some((kw) => pName.includes(kw) || pCat.includes(kw) || pSlug.includes(kw));
+            const pNameSlug = (p.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            return pSlug === targetSlug || pNameSlug === targetSlug || pSlug.includes(targetSlug) || targetSlug.includes(pSlug);
         });
 
         if (matchedProd) {
