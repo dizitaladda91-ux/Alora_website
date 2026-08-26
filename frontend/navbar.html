@@ -1,7 +1,7 @@
 <!-- navbar.html -->
 <header class="sticky top-0 z-50 shadow-sm">
     <!-- 🎁 TOP RAKHI LIVE COUNTDOWN ANNOUNCEMENT BAR -->
-    <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-1.5 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30 min-h-[44px]">
+    <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30 min-h-[44px]">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 text-center sm:text-left">
             
             <!-- Left Text Banner -->
@@ -27,21 +27,21 @@
 
                 <!-- Hours -->
                 <div class="flex flex-col items-center">
-                    <span id="rakhi-hours" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
+                    <span id="rakhi-hours" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">01</span>
                     <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Hours</span>
                 </div>
                 <span class="text-white font-bold text-xs -mt-2">:</span>
 
                 <!-- Minutes -->
                 <div class="flex flex-col items-center">
-                    <span id="rakhi-minutes" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">03</span>
+                    <span id="rakhi-minutes" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">56</span>
                     <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Mins</span>
                 </div>
                 <span class="text-white font-bold text-xs -mt-2">:</span>
 
                 <!-- Seconds -->
                 <div class="flex flex-col items-center">
-                    <span id="rakhi-seconds" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">55</span>
+                    <span id="rakhi-seconds" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
                     <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Secs</span>
                 </div>
 
@@ -55,7 +55,7 @@
 
     <!-- MAIN NAVBAR -->
     <nav class="bg-white text-parchment border-b border-gold/20">
-        <div class="max-w-7xl mx-auto px-4 py-2 sm:py-3 grid grid-cols-3 items-center relative">
+        <div class="max-w-7xl mx-auto px-4 py-2 sm:py-2.5 grid grid-cols-3 items-center relative min-h-[70px] sm:min-h-[85px] md:min-h-[95px]">
             <!-- Left: Menu Links -->
             <div class="flex items-center">
                 <!-- Mobile Hamburger Button -->
@@ -64,8 +64,8 @@
                 </button>
 
                 <!-- Desktop Menu Links -->
-                <div class="hidden md:flex items-center gap-7 text-[13px] font-medium tracking-wide uppercase text-black/85">
-                    <ul class="flex gap-6">
+                <div class="hidden md:flex items-center gap-7 text-[13px] font-semibold tracking-wider uppercase text-black/90">
+                    <ul class="flex gap-6 sm:gap-8">
                         <li><a href="/" class="hover:text-gold transition">Home</a></li>
                         <li><a href="/products" class="hover:text-gold transition">Shop</a></li>
                         <li><a href="/blog" class="hover:text-gold transition">Blogs</a></li>
@@ -74,16 +74,16 @@
                 </div>
             </div>
 
-            <!-- Center: Large Bold Brand Logo (Matching Image 2) -->
-            <div class="flex justify-center items-center py-1 px-2">
-                <a href="/" class="flex items-center justify-center" aria-label="Alora Radiance Home">
-                    <img src="/static/logo2.png" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='./static/logo2.png';}" alt="Alora Radiance Logo" width="245" height="75" class="w-[160px] sm:w-[190px] md:w-[220px] lg:w-[245px] h-[48px] sm:h-[58px] md:h-[68px] lg:h-[75px] object-contain transition-transform duration-300 hover:scale-105" style="image-rendering: -webkit-optimize-contrast;" loading="eager" fetchpriority="high">
+            <!-- Center: Large Bold Brand Logo (Exact Image 2 Proportion) -->
+            <div class="flex justify-center items-center py-1">
+                <a href="/" class="flex items-center justify-center py-0.5" aria-label="Alora Radiance Home">
+                    <img src="/static/logo2.png" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='./static/logo2.png';}" alt="Alora Radiance Logo" class="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-transform duration-300 hover:scale-105" style="image-rendering: -webkit-optimize-contrast; max-height: 86px;" loading="eager" fetchpriority="high">
                 </a>
             </div>
 
             <!-- Right: Actions Container -->
-            <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
-                <button id="search-open-btn" type="button" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
+            <div id="nav-auth-container" class="flex items-center justify-end gap-5 sm:gap-6 normal-case">
+                <button id="search-open-btn" type="button" class="transition p-1 text-lg text-black focus:outline-none hover:text-gold cursor-pointer">
                     <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
                 </button>
 
@@ -97,14 +97,14 @@
                 </div>
 
                 <!-- Cart Section -->
-                <a href="./cart.html" class="relative text-base text-black hover:text-gold transition">
+                <a href="./cart.html" class="relative text-lg text-black hover:text-gold transition">
                     <i class="fa-solid fa-shopping-cart"></i>
-                    <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
+                    <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white font-bold">0</span>
                 </a>
 
                 <!-- Dynamic Auth Section -->
                 <div id="auth-actions" class="flex items-center gap-4">
-                    <a href="/account" class="text-base text-black hover:text-gold transition" title="My Account & Orders">
+                    <a href="/account" class="text-lg text-black hover:text-gold transition" title="My Account & Orders">
                         <i class="fa-solid fa-user"></i>
                     </a>
                 </div>
