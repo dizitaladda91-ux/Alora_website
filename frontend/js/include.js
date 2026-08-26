@@ -74,7 +74,13 @@ async function loadPartial(selector, url) {
     try {
         const res = await fetch(url);
         if (!res.ok) throw new Error(`${url} not found (status ${res.status})`);
-        el.innerHTML = await res.text();
+        const html = await res.text();
+        el.innerHTML = html;
+        if (location.protocol !== "file:") {
+            el.querySelectorAll('img[src^="./static/"]').forEach(img => {
+                img.src = img.getAttribute('src').replace(/^\.\/static\//, '/static/');
+            });
+        }
     } catch (err) {
         console.error("Partial load failed:", url, err);
     }
