@@ -1,142 +1,87 @@
 <!-- navbar.html -->
-<header class="sticky top-0 z-50 shadow-sm">
-    <!-- 🎁 TOP RAKHI LIVE COUNTDOWN ANNOUNCEMENT BAR -->
-    <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30 min-h-[44px]">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-4 text-center sm:text-left">
-            
-            <!-- Left Text Banner -->
-            <div class="flex items-center gap-2 text-xs sm:text-sm font-bold tracking-wide">
-                <span class="text-base sm:text-lg animate-bounce">🎁</span>
-                <span>
-                    <strong class="font-extrabold uppercase tracking-wider text-amber-200">Rakhi Special Sale:</strong>
-                    Flat 30% OFF + Free Gift! Use Code: 
-                    <span class="bg-amber-300 text-slate-950 px-2 py-0.5 rounded font-mono font-extrabold shadow-xs ml-1">RAKHI30</span>
-                </span>
+<nav class="bg-white text-parchment sticky top-0 z-50 border-b border-gold/20">
+    <div class="max-w-7xl mx-auto px-4 py-3 grid grid-cols-3 items-center relative">
+        <!-- Left: Menu Links -->
+        <div class="flex items-center">
+            <!-- Mobile Hamburger Button -->
+            <button id="menu-btn" type="button" class="md:hidden text-xl text-[#2A2A24] focus:outline-none p-2 cursor-pointer relative z-10" aria-label="Open Menu">
+                <i class="fa-solid fa-bars pointer-events-none"></i>
+            </button>
+
+            <!-- Desktop Menu Links -->
+            <div class="hidden md:flex items-center gap-7 text-[13px] font-medium tracking-wide uppercase text-black/85">
+                <ul class="flex gap-6">
+                    <li><a href="/" class="hover:text-gold transition">Home</a></li>
+                    <li><a href="/products" class="hover:text-gold transition">Shop</a></li>
+                    <li><a href="/blog" class="hover:text-gold transition">Blogs</a></li>
+                    <li><a href="/about" class="hover:text-gold transition">About Us</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Center: Brand Logo -->
+        <div class="flex justify-center items-center p-2">
+            <span class="h-[40px] md:h-[50px] flex items-center">
+                <a href="/">
+                    <img src="./static/logo2.png" alt="logo" class="w-[140px] md:w-[170px] h-fit object-contain">
+                </a>
+            </span>
+        </div>
+
+        <!-- Right: Actions Container -->
+        <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
+            <button id="search-open-btn" type="button" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
+                <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
+            </button>
+
+            <!-- Floating Overlay Search Bar (Fixed layout overlapping issue) -->
+            <div id="search-container" class="hidden absolute top-full left-0 right-0 w-full bg-white p-3 shadow-md border-t border-gray-100 z-50 flex items-center justify-between gap-3 px-4 md:px-8">
+                <div class="relative w-full max-w-2xl mx-auto flex items-center">
+                    <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold" autocomplete="off">
+                    <button id="search-close-btn" type="button" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
+                    <div id="search-suggestions" class="absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1"></div>
+                </div>
             </div>
 
-            <!-- Right Live Countdown Timer Widget -->
-            <div class="flex items-center gap-1.5 shrink-0">
-                <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-200/90 font-mono mr-1">Ends In:</span>
-                
-                <!-- Days -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-days" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Days</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
+            <!-- Cart Section -->
+            <a href="./cart.html" class="relative text-base text-black hover:text-gold transition">
+                <i class="fa-solid fa-shopping-cart"></i>
+                <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
+            </a>
 
-                <!-- Hours -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-hours" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">01</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Hours</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
-
-                <!-- Minutes -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-minutes" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">56</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Mins</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
-
-                <!-- Seconds -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-seconds" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Secs</span>
-                </div>
-
-                <a href="/products" class="ml-2 bg-amber-300 hover:bg-amber-400 text-slate-950 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition shadow-xs active:scale-95" title="Shop Now">
-                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
+            <!-- Dynamic Auth Section -->
+            <div id="auth-actions" class="flex items-center gap-4">
+                <a href="./login.html" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user"></i>
                 </a>
             </div>
-
         </div>
     </div>
 
-    <!-- MAIN NAVBAR -->
-    <nav class="bg-white text-parchment border-b border-gold/20">
-        <div class="max-w-7xl mx-auto px-4 py-2 sm:py-2.5 grid grid-cols-3 items-center relative min-h-[70px] sm:min-h-[85px] md:min-h-[95px]">
-            <!-- Left: Menu Links -->
-            <div class="flex items-center">
-                <!-- Mobile Hamburger Button -->
-                <button id="menu-btn" type="button" class="md:hidden text-xl text-[#2A2A24] focus:outline-none p-2 cursor-pointer relative z-10" aria-label="Open Menu">
-                    <i class="fa-solid fa-bars pointer-events-none"></i>
-                </button>
-
-                <!-- Desktop Menu Links -->
-                <div class="hidden md:flex items-center gap-7 text-[13px] font-semibold tracking-wider uppercase text-black/90">
-                    <ul class="flex gap-6 sm:gap-8">
-                        <li><a href="/" class="hover:text-gold transition">Home</a></li>
-                        <li><a href="/products" class="hover:text-gold transition">Shop</a></li>
-                        <li><a href="/blog" class="hover:text-gold transition">Blogs</a></li>
-                        <li><a href="/about" class="hover:text-gold transition">About Us</a></li>
-                    </ul>
+    <!-- 📱 MOBILE MENU SLIDE-OVER DRAWER -->
+    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-[9999] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div id="mobile-menu-drawer" class="fixed top-0 left-0 w-64 bg-white h-full shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000]">
+            <div>
+                <div class="flex justify-between items-center pb-4 border-b border-gray-200">
+                    <img src="./static/logo2.png" alt="logo" class="w-28">
+                    <button id="menu-close-btn" type="button" class="text-2xl text-black focus:outline-none p-1 cursor-pointer">
+                        <i class="fa-solid fa-xmark pointer-events-none"></i>
+                    </button>
                 </div>
+
+                <ul class="mt-6 space-y-4 text-sm font-semibold uppercase tracking-wider text-black/80">
+                    <li><a href="/" class="block py-2 hover:text-gold border-b border-gray-100">Home</a></li>
+                    <li><a href="/products" class="block py-2 hover:text-gold border-b border-gray-100">Shop</a></li>
+                    <li><a href="/blog" class="block py-2 hover:text-gold border-b border-gray-100">Blogs</a></li>
+                    <li><a href="/about" class="block py-2 hover:text-gold border-b border-gray-100">About Us</a></li>
+                </ul>
             </div>
 
-            <!-- Center: Large Bold Brand Logo (Exact Image 2 Proportion) -->
-            <div class="flex justify-center items-center py-1">
-                <a href="/" class="flex items-center justify-center py-0.5" aria-label="Alora Radiance Home">
-                    <img src="/static/logo2.png" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='./static/logo2.png';}" alt="Alora Radiance Logo" class="h-12 sm:h-16 md:h-20 lg:h-24 w-auto object-contain transition-transform duration-300 hover:scale-105" style="image-rendering: -webkit-optimize-contrast; max-height: 86px;" loading="eager" fetchpriority="high">
+            <div class="pt-6 border-t border-gray-200">
+                <a href="./login.html" class="flex items-center gap-3 text-sm font-semibold text-black hover:text-gold">
+                    <i class="fa-solid fa-user"></i> My Account / Login
                 </a>
             </div>
-
-            <!-- Right: Actions Container -->
-            <div id="nav-auth-container" class="flex items-center justify-end gap-5 sm:gap-6 normal-case">
-                <button id="search-open-btn" type="button" class="transition p-1 text-lg text-black focus:outline-none hover:text-gold cursor-pointer">
-                    <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
-                </button>
-
-                <!-- Floating Overlay Search Bar -->
-                <div id="search-container" class="hidden absolute top-full left-0 right-0 w-full bg-white p-3 shadow-md border-t border-gray-100 z-50 flex items-center justify-between gap-3 px-4 md:px-8">
-                    <div class="relative w-full max-w-2xl mx-auto flex items-center">
-                        <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold" autocomplete="off">
-                        <button id="search-close-btn" type="button" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
-                        <div id="search-suggestions" class="absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1"></div>
-                    </div>
-                </div>
-
-                <!-- Cart Section -->
-                <a href="./cart.html" class="relative text-lg text-black hover:text-gold transition">
-                    <i class="fa-solid fa-shopping-cart"></i>
-                    <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white font-bold">0</span>
-                </a>
-
-                <!-- Dynamic Auth Section -->
-                <div id="auth-actions" class="flex items-center gap-4">
-                    <a href="/account" class="text-lg text-black hover:text-gold transition" title="My Account & Orders">
-                        <i class="fa-solid fa-user"></i>
-                    </a>
-                </div>
-            </div>
         </div>
-
-        <!-- 📱 MOBILE MENU SLIDE-OVER DRAWER -->
-        <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-[9999] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
-            <div id="mobile-menu-drawer" class="fixed top-0 left-0 w-64 bg-white h-full shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000]">
-                <div>
-                    <div class="flex justify-between items-center pb-4 border-b border-gray-200">
-                        <img src="/static/logo2.png" onerror="if(!this.dataset.fb){this.dataset.fb=1;this.src='./static/logo2.png';}" alt="Alora Radiance Logo" class="w-36 h-auto object-contain">
-                        <button id="menu-close-btn" type="button" class="text-2xl text-black focus:outline-none p-1 cursor-pointer">
-                            <i class="fa-solid fa-xmark pointer-events-none"></i>
-                        </button>
-                    </div>
-
-                    <ul class="mt-6 space-y-4 text-sm font-semibold uppercase tracking-wider text-black/80">
-                        <li><a href="/" class="block py-2 hover:text-gold border-b border-gray-100">Home</a></li>
-                        <li><a href="/products" class="block py-2 hover:text-gold border-b border-gray-100">Shop</a></li>
-                        <li><a href="/blog" class="block py-2 hover:text-gold border-b border-gray-100">Blogs</a></li>
-                        <li><a href="/about" class="block py-2 hover:text-gold border-b border-gray-100">About Us</a></li>
-                        <li><a href="/track-order" class="block py-2 hover:text-gold border-b border-gray-100"><i class="fa-solid fa-truck-fast text-clay mr-2"></i>Track Order</a></li>
-                    </ul>
-                </div>
-
-                <div class="pt-6 border-t border-gray-200">
-                    <a href="/account" class="flex items-center gap-3 text-sm font-semibold text-black hover:text-gold">
-                        <i class="fa-solid fa-user"></i> My Account / Orders
-                    </a>
-                </div>
-            </div>
-        </div>
-    </nav>
-</header>
+    </div>
+</nav>
