@@ -160,13 +160,18 @@ async function renderRelatedProducts(blog) {
 
     try {
         const apiPath = BASE_URL ? `${BASE_URL}/api/product/all` : `/api/product/all`;
-        const result = await safeFetchJson(apiPath);
-        
-        if (!result || !result.success || !Array.isArray(result.products) || result.products.length === 0) {
-            return;
+        let result = await safeFetchJson(apiPath);
+
+        if (!result) {
+            const res = await fetch(apiPath);
+            if (res.ok) result = await res.json();
         }
 
-        const allProducts = result.products;
+        const allProducts = Array.isArray(result) 
+            ? result 
+            : (result?.products || result?.data || []);
+
+        if (!allProducts || allProducts.length === 0) return;
 
         const category = (blog.category || '').toLowerCase().trim();
         const blogTitle = (blog.title || '').toLowerCase().trim();
@@ -180,7 +185,7 @@ async function renderRelatedProducts(blog) {
             const pName = (p.name || p.title || '').toLowerCase();
             const pDesc = (p.description || '').toLowerCase();
 
-            if (category && pCat.includes(category)) return true;
+            if (category && (pCat.includes(category) || pName.includes(category))) return true;
             if (matchedCategoryKey && (pCat.includes(matchedCategoryKey) || pName.includes(matchedCategoryKey) || pDesc.includes(matchedCategoryKey))) return true;
             return false;
         });
@@ -201,13 +206,12 @@ async function renderRelatedProducts(blog) {
         gridEl.innerHTML = '';
 
         matchedProducts.forEach(product => {
-            const prodName = product.name || product.title || 'Product';
-            const prodSlug = product.slug || '';
-            const prodPrice = product.price || (product.sizes && product.sizes[0]?.price) || 0;
-            const prodMrp = product.mrp || (product.sizes && product.sizes[0]?.mrp) || 0;
-            const imgRaw = (product.images && product.images[0]) || product.image || '';
+            const prodName = product.name || product.title || 'Alora Skincare Product';
+            const prodPrice = product.variants?.[0]?.price || product.price || (product.sizes && product.sizes[0]?.price) || 0;
+            const prodMrp = product.variants?.[0]?.comparePrice || product.mrp || product.comparePrice || (product.sizes && product.sizes[0]?.mrp) || 0;
+            const imgRaw = product.imagepath || (product.galleryImages && product.galleryImages[0]) || (product.images && product.images[0]) || product.image || '';
             const prodImg = getImageUrl(imgRaw) || './static/logo2.png';
-            const prodUrl = getProductUrl(prodSlug);
+            const prodUrl = getProductUrl(product);
 
             const cardHtml = `
                 <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
