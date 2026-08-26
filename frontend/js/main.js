@@ -482,7 +482,7 @@ async function loadSliderProducts() {
                 <!-- Product Image Area (Seamless Blend) -->
                 <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2">
                     <a href="${getProductUrl(product)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-108 filter drop-shadow-sm">
+                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-108 filter drop-shadow-sm">
                     </a>
                 </div>
 
