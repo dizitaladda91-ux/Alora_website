@@ -189,6 +189,20 @@ app.get('/track-order', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'trackorder.html'));
 });
 
+app.get('/sitemap.xml', (req, res) => {
+  res.setHeader('Content-Type', 'application/xml');
+  res.sendFile(path.join(frontendRoot, 'sitemap.xml'));
+});
+
+app.get(['/sitemap', '/sitemap.html'], (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'sitemap.html'));
+});
+
+app.get('/robots.txt', (req, res) => {
+  res.setHeader('Content-Type', 'text/plain');
+  res.sendFile(path.join(frontendRoot, 'robots.txt'));
+});
+
 app.get(['/affiliate', '/affiliate-register'], (req, res) => {
   res.redirect(301, 'https://affiliation.aloraradiance.com/register');
 });

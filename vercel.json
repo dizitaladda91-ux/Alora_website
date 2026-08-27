@@ -73,6 +73,18 @@
       "dest": "/frontend/trackorder"
     },
     {
+      "src": "/sitemap\\.xml",
+      "dest": "/frontend/sitemap.xml"
+    },
+    {
+      "src": "/robots\\.txt",
+      "dest": "/frontend/robots.txt"
+    },
+    {
+      "src": "/sitemap/?",
+      "dest": "/frontend/sitemap"
+    },
+    {
       "src": "/(affiliate|affiliate-register)(/.*)?",
       "status": 301,
       "headers": { "Location": "https://affiliation.aloraradiance.com/register" }

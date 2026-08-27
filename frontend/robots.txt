@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /seoadmin
+Disallow: /api/
+
+Sitemap: https://aloraradiance.com/sitemap.xml
