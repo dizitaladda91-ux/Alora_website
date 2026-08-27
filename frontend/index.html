@@ -600,6 +600,326 @@
         </div>
     </section>
 
+    <!-- ============ WATCH IT. LOVE IT. VIDEO REELS CAROUSEL SECTION ============ -->
+    <!-- NOTE: You can change the 'data-video-url' attribute on any card below to your desired video link (YouTube embed, Instagram Reel URL, or MP4 file) -->
+    <section id="watch-it-love-it-section" class="max-w-7xl mx-auto px-4 py-6 sm:py-10">
+        <div class="bg-gradient-to-b from-slate-50 via-white to-amber-50/20 rounded-3xl p-5 sm:p-8 border border-amber-900/10 shadow-lg relative overflow-hidden">
+            
+            <!-- Section Header Bar -->
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 text-center sm:text-left">
+                <div>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase font-roboto border border-pink-200 mb-2">
+                        <i class="fa-solid fa-circle-play text-pink-500"></i> Video Spotlight
+                    </span>
+                    <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">Watch It. Love It.</h2>
+                    <p class="text-xs sm:text-sm text-slate-600 mt-1">Real skincare routines &amp; results in action. Click any card to watch.</p>
+                </div>
+
+                <!-- Carousel Slide Arrows -->
+                <div class="flex items-center gap-2 shrink-0">
+                    <button type="button" aria-label="Scroll Left" onclick="scrollWatchItCarousel('left')" class="w-10 h-10 rounded-full bg-white text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-md transition-all active:scale-95">
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
+                    </button>
+                    <button type="button" aria-label="Scroll Right" onclick="scrollWatchItCarousel('right')" class="w-10 h-10 rounded-full bg-white text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-md transition-all active:scale-95">
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Video Reel Cards Carousel Container -->
+            <div id="watchItCarousel" class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-3 px-1 no-scrollbar snap-x snap-mandatory items-stretch">
+                
+                <!-- CARD 1 -->
+                <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
+                    <!-- Top: Video Screen Template -->
+                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Strawberry Dew Tinted Sunscreen SPF 50+ Guide">
+                        <img src="./static/faceskin2.webp" alt="Video Screen 1" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <!-- Play Button -->
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
+                                <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                            </div>
+                        </div>
+                        <!-- Video Caption Text Overlay -->
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2">"If you don't like wearing foundation, just GET THIS!"</p>
+                        </div>
+                    </div>
+                    <!-- Bottom: Product Card Template -->
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
+                        <img src="./static/combo1.webp" alt="Product 1" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Strawberry Dew Tinted Sunscreen SPF 50+</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">Peony</span>
+                                <span class="text-xs font-extrabold text-slate-900">₹549</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 2 -->
+                <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Watermelon Cooling Sunscreen Review">
+                        <img src="./static/faceskin3.webp" alt="Video Screen 2" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
+                                <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2">"Instant cooling hydration with zero white cast 🍉"</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
+                        <img src="./static/combo2.webp" alt="Product 2" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Watermelon Cooling Sunscreen SPF 50+</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">80g</span>
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">50g</span>
+                                <span class="text-xs font-extrabold text-slate-900">₹595</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 3 (FEATURED HIGHLIGHT CARD) -->
+                <div class="reel-card-item w-60 sm:w-68 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-2">
+                    <div class="relative w-full h-[340px] sm:h-[380px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-xl border-2 border-pink-400/60 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Strawberry Bright 10% Niacinamide Serum Tutorial">
+                        
+                        <!-- Top Tag Badge -->
+                        <div class="absolute top-3 left-3 z-10">
+                            <span class="px-2.5 py-1 rounded-full bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow">Bestseller</span>
+                        </div>
+
+                        <img src="./static/Founder2.webp" alt="Video Screen 3" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-95">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-14 h-14 rounded-full bg-pink-500/80 backdrop-blur-md border-2 border-white text-white flex items-center justify-center shadow-2xl group-hover:scale-110 group-hover:bg-pink-600 transition-all duration-300">
+                                <i class="fa-solid fa-play text-base ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2 font-semibold">"Fades dark spots and gives clear glass skin radiance ✨"</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3.5 border-2 border-pink-100 shadow-md flex items-center justify-between gap-2.5">
+                        <img src="./static/products.png" alt="Product 3" class="w-11 h-11 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-extrabold text-slate-900 truncate leading-tight">Strawberry Bright 10% Niacinamide...</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-pink-400 text-[9px] font-bold text-pink-700 bg-pink-50">30ml</span>
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-medium text-slate-600">20ml</span>
+                                <span class="text-xs font-black text-pink-600 ml-auto">₹599</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-8 h-8 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold flex items-center justify-center text-sm shadow-md transition-all active:scale-95 shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 4 -->
+                <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Vitamin C + E Sunscreen Routine">
+                        <img src="./static/faceskin4.webp" alt="Video Screen 4" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
+                                <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2">"This is my absolute holy grail sunscreen for daily wear ☀️"</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
+                        <img src="./static/combo3.webp" alt="Product 4" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Vitamin C + E Sunscreen SPF 50+</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">80g</span>
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">50g</span>
+                                <span class="text-xs font-extrabold text-slate-900">₹595</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 5 -->
+                <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Vitamin C Gel Moisturizer Demo">
+                        <img src="./static/faceskin5.webp" alt="Video Screen 5" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
+                                <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2">"Gel texture that melts into your skin instantly!"</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
+                        <img src="./static/combo4.webp" alt="Product 5" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Vitamin C + E Super Bright Gel Moisturizer</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">60ml</span>
+                                <span class="text-xs font-extrabold text-slate-900">₹495</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+                <!-- CARD 6 -->
+                <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
+                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-title="Alora Cleanser Routine">
+                        <img src="./static/faceSkin.avif" alt="Video Screen 6" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
+                                <i class="fa-solid fa-play text-sm ml-0.5"></i>
+                            </div>
+                        </div>
+                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                            <p class="line-clamp-2">"Gentle cleansing without stripping natural moisture ✨"</p>
+                        </div>
+                    </div>
+                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
+                        <img src="./static/product2.png" alt="Product 6" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
+                        <div class="flex-grow min-w-0">
+                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Alora Hydrating Glow Cleanser</h4>
+                            <div class="flex items-center gap-1.5 mt-1">
+                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">100ml</span>
+                                <span class="text-xs font-extrabold text-slate-900">₹399</span>
+                            </div>
+                        </div>
+                        <a href="/products" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
+                            +
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </section>
+
+    <!-- VIDEO REEL POPUP MODAL -->
+    <div id="watchItVideoModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md items-center justify-center p-4 transition-all">
+        <div class="relative w-full max-w-lg bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/20">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900/90 border-b border-white/10 text-white">
+                <h3 id="watchItVideoModalTitle" class="text-sm font-bold truncate font-fraunces">Watch Video</h3>
+                <button type="button" onclick="closeReelVideoModal()" aria-label="Close Video" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <!-- Video Player Slot -->
+            <div class="relative w-full aspect-[9/16] max-h-[75vh] bg-black">
+                <iframe id="watchItVideoIframe" class="w-full h-full" src="" title="Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Carousel scroll function
+        function scrollWatchItCarousel(direction) {
+            const container = document.getElementById('watchItCarousel');
+            if (!container) return;
+            const scrollAmount = 300;
+            if (direction === 'left') {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
+        }
+
+        // Open video modal or redirect
+        function openReelVideoModal(url, title) {
+            if (!url) return;
+            // If external reel link (like Instagram/TikTok/YouTube app link), open in new tab
+            if (url.includes('instagram.com') || url.includes('tiktok.com') || url.includes('reel')) {
+                window.open(url, '_blank');
+                return;
+            }
+            const modal = document.getElementById('watchItVideoModal');
+            const iframe = document.getElementById('watchItVideoIframe');
+            const modalTitle = document.getElementById('watchItVideoModalTitle');
+            if (modal && iframe) {
+                let embedUrl = url;
+                if (url.includes('youtube.com/watch?v=')) {
+                    embedUrl = url.replace('watch?v=', 'embed/');
+                } else if (url.includes('youtu.be/')) {
+                    embedUrl = url.replace('youtu.be/', 'youtube.com/embed/');
+                }
+                iframe.src = embedUrl;
+                if (modalTitle) modalTitle.innerText = title || 'Watch Video';
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeReelVideoModal() {
+            const modal = document.getElementById('watchItVideoModal');
+            const iframe = document.getElementById('watchItVideoIframe');
+            if (modal && iframe) {
+                iframe.src = '';
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        // Bind event listeners on load
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll('.reel-video-trigger').forEach(function(card) {
+                card.addEventListener('click', function() {
+                    const videoUrl = this.getAttribute('data-video-url');
+                    const videoTitle = this.getAttribute('data-video-title');
+                    openReelVideoModal(videoUrl, videoTitle);
+                });
+            });
+
+            // Close modal when clicking outside modal box
+            const videoModal = document.getElementById('watchItVideoModal');
+            if (videoModal) {
+                videoModal.addEventListener('click', function(e) {
+                    if (e.target === videoModal) {
+                        closeReelVideoModal();
+                    }
+                });
+            }
+        });
+    </script>
+
     <!-- ============ RAKHI SPECIAL PROMO BANNER ============ -->
     <section class="max-w-7xl mx-auto px-4 py-2 sm:py-4">
         <a href="/products" class="block rounded-3xl overflow-hidden shadow-2xl border border-amber-900/15 group hover:shadow-amber-500/25 transition-all duration-500 relative">
