@@ -562,7 +562,7 @@
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <!-- Top: Video Screen Template -->
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
-                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-url="https://www.instagram.com/reel/DbINEv7R-oj/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==" 
                          data-video-title="Strawberry Dew Tinted Sunscreen SPF 50+ Guide">
                         <img src="./static/faceskin2.webp" alt="Video Screen 1" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
@@ -596,7 +596,7 @@
                 <!-- CARD 2 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
-                         data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+                         data-video-url="https://www.instagram.com/reel/Db003y_vnCo/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==" 
                          data-video-title="Watermelon Cooling Sunscreen Review">
                         <img src="./static/faceskin3.webp" alt="Video Screen 2" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
@@ -827,8 +827,41 @@
             }
         }
 
+        // Auto-fetch thumbnail image directly from video URL (e.g., YouTube)
+        function autoSetVideoCardThumbnails() {
+            document.querySelectorAll('.reel-video-trigger').forEach(function(card) {
+                const videoUrl = card.getAttribute('data-video-url');
+                const customPoster = card.getAttribute('data-poster');
+                const img = card.querySelector('img');
+                if (!img) return;
+
+                if (customPoster) {
+                    img.src = customPoster;
+                    return;
+                }
+
+                if (videoUrl) {
+                    let videoId = null;
+                    if (videoUrl.includes('youtube.com/watch?v=')) {
+                        videoId = videoUrl.split('v=')[1]?.split('&')[0];
+                    } else if (videoUrl.includes('youtu.be/')) {
+                        videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0];
+                    } else if (videoUrl.includes('youtube.com/embed/')) {
+                        videoId = videoUrl.split('embed/')[1]?.split('?')[0];
+                    }
+
+                    if (videoId) {
+                        // High quality YouTube thumbnail image
+                        img.src = `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+                    }
+                }
+            });
+        }
+
         // Bind event listeners on load
         document.addEventListener("DOMContentLoaded", function() {
+            autoSetVideoCardThumbnails();
+
             document.querySelectorAll('.reel-video-trigger').forEach(function(card) {
                 card.addEventListener('click', function() {
                     const videoUrl = this.getAttribute('data-video-url');
