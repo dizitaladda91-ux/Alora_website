@@ -6,13 +6,29 @@ let activeStatusFilter = "";
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
 const formatMoney = (value) => `₹${Number(value || 0).toLocaleString("en-IN", { minimumFractionDigits: 2 })}`;
 function renderOrderRow(order) {
+    const itemsList = Array.isArray(order.items) && order.items.length > 0
+        ? order.items.map((item) => `
+            <div class="flex items-center gap-1.5 bg-amber-50/80 text-amber-950 text-[11px] px-2 py-1 rounded-lg border border-amber-200/80 font-medium">
+                <i class="fa-solid fa-box text-[10px] text-amber-600 shrink-0"></i>
+                <span class="font-bold truncate max-w-[150px]" title="${escapeHtml(item.name)}">${escapeHtml(item.name)}</span>
+                ${item.variant ? `<span class="bg-white border border-amber-300 text-amber-800 px-1 py-0.2 rounded text-[9px] font-bold shrink-0">${escapeHtml(item.variant)}</span>` : ""}
+                <span class="font-extrabold text-amber-900 ml-auto shrink-0">×${item.quantity}</span>
+            </div>
+          `).join("")
+        : `<span class="text-xs text-gray-400 italic">No products listed</span>`;
+
     return `
         <tr class="hover:bg-gray-50 border-b">
             <td class="p-4 font-mono text-xs font-bold text-gray-700">${escapeHtml(order.razorpayOrderId)}</td>
             <td class="p-4">
                 <div class="font-bold text-gray-800">${escapeHtml(order.customer?.name)}</div>
                 <div class="text-xs text-gray-500">${escapeHtml(order.customer?.phone)}</div>
-                <div class="text-[11px] text-gray-400 max-w-[200px] truncate" title="${escapeHtml(order.customer?.address)}">${escapeHtml(order.customer?.address)}</div>
+                <div class="text-[11px] text-gray-400 max-w-[180px] truncate" title="${escapeHtml(order.customer?.address)}">${escapeHtml(order.customer?.address)}</div>
+            </td>
+            <td class="p-4 min-w-[210px] max-w-[260px]">
+                <div class="space-y-1">
+                    ${itemsList}
+                </div>
             </td>
             <td class="p-4 font-bold text-gray-900">${formatMoney(order.totalAmount)}</td>
             <td class="p-4"><span class="bg-green-100 text-green-700 px-2.5 py-1 rounded-full text-xs font-semibold uppercase">${escapeHtml(order.paymentStatus)}</span></td>
@@ -37,9 +53,9 @@ async function loadOrders() {
     const activeCountEl = document.getElementById("activeOrderCount");
     const deliveredCountEl = document.getElementById("deliveredOrderCount");
     if (!activeTableBody) return;
-    activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading orders...</td></tr>`;
+    activeTableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading orders...</td></tr>`;
     if (deliveredTableBody) {
-        deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading delivered orders...</td></tr>`;
+        deliveredTableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-gray-500"><i class="fa-solid fa-spinner fa-spin mr-2"></i> Loading delivered orders...</td></tr>`;
     }
     try {
         const statusQuery = activeStatusFilter ? `&status=${encodeURIComponent(activeStatusFilter)}` : "";
@@ -52,19 +68,19 @@ async function loadOrders() {
         if (activeCountEl) activeCountEl.innerText = activeOrders.length;
         if (deliveredCountEl) deliveredCountEl.innerText = deliveredOrders.length;
         if (!activeOrders.length) {
-            activeTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-boxes-packing text-2xl mb-2 block"></i> No new or active orders currently.</td></tr>`;
+            activeTableBody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-boxes-packing text-2xl mb-2 block"></i> No new or active orders currently.</td></tr>`;
         } else {
             activeTableBody.innerHTML = activeOrders.map(renderOrderRow).join("");
         }
         if (deliveredTableBody) {
             if (!deliveredOrders.length) {
-                deliveredTableBody.innerHTML = `<tr><td colspan="8" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-circle-check text-2xl mb-2 block"></i> No delivered orders yet.</td></tr>`;
+                deliveredTableBody.innerHTML = `<tr><td colspan="9" class="p-8 text-center text-gray-400 font-medium"><i class="fa-solid fa-circle-check text-2xl mb-2 block"></i> No delivered orders yet.</td></tr>`;
             } else {
                 deliveredTableBody.innerHTML = deliveredOrders.map(renderOrderRow).join("");
             }
         }
     } catch (error) {
-        activeTableBody.innerHTML = `<tr><td colspan="8" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
+        activeTableBody.innerHTML = `<tr><td colspan="9" class="p-4 text-center text-red-500">${escapeHtml(error.message)}</td></tr>`;
     }
 }
 async function patchOrder(orderId, body) {

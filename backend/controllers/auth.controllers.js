@@ -250,6 +250,59 @@ export const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, message: "Account not found." });
     }
+  } catch (error) {
+    console.error("LOGIN_ERROR:", error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// ==========================================
+// LOGOUT USER
+// ==========================================
+export const logout = (req, res) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: authCookieOptions.secure,
+    sameSite: authCookieOptions.sameSite,
+    path: authCookieOptions.path
+  });
+  res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+// Returns the currently authenticated user without exposing the JWT to browser JavaScript.
+export const getSession = async (req, res) => {
+  try {
+    const { id } = req.user;
+
+    const user = await User.findById(id).select("name email phone address role").lean();
+    if (!user) {
+      return res.status(401).json({ success: false, message: "Session user no longer exists." });
+    }
+
+    return res.status(200).json({ success: true, user });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: "Could not load session." });
+  }
+};
+
+// Lets an authenticated customer add their address from checkout when their
+// account was created earlier from the normal registration page.
+export const updateProfile = async (req, res) => {
+  try {
+    const address = String(req.body?.address || '').trim();
+    if (!address) {
+      return res.status(400).json({ success: false, message: "Delivery address is required." });
+    }
+
+    const user = await User.findByIdAndUpdate(
+      req.user.id,
+      { $set: { address } },
+      { new: true, runValidators: true }
+    ).select("name email phone address role").lean();
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Account not found." });
+    }
 
     return res.status(200).json({ success: true, user });
   } catch (error) {
@@ -262,14 +315,17 @@ export const updateProfile = async (req, res) => {
 // ==========================================
 export const forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ message: "Email enter karein!" });
+    const { email, deliveryEmail } = req.body;
+    const accountEmail = String(email || req.body.accountEmail || "").trim().toLowerCase();
+    const targetEmail = deliveryEmail && String(deliveryEmail).trim() ? String(deliveryEmail).trim().toLowerCase() : accountEmail;
+
+    if (!accountEmail) return res.status(400).json({ message: "Account Email enter karein!" });
 
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
       return res.status(500).json({ message: ".env file me EMAIL_USER ya EMAIL_PASS missing hai!" });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase().trim() });
+    const user = await User.findOne({ email: accountEmail });
     if (!user) {
       return res.status(200).json({ message: "Agar yeh email registered hai, toh reset link bhej diya gaya hai." });
     }
@@ -286,12 +342,13 @@ export const forgotPassword = async (req, res) => {
 
     const mailOptions = {
       from: `"Alora Radiance" <${process.env.EMAIL_USER}>`,
-      to: user.email,
-      subject: "Password Reset Request - Alora Radiance",
+      to: targetEmail,
+      subject: `Password Reset Request for Account (${accountEmail}) - Alora Radiance`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
           <h2 style="color: #2A2A24;">Password Reset Request</h2>
-          <p>Aapne password reset karne ki request ki hai. Niche diye gaye link par click karke naya password banayein:</p>
+          <p>Account Email: <strong>${accountEmail}</strong> ke liye password reset link request kiya gaya hai.</p>
+          <p>Niche diye gaye link par click karke naya password banayein:</p>
           <a href="${resetUrl}" style="background-color: #2A2A24; color: #ffffff; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; margin: 15px 0;">Reset Password</a>
           <p style="font-size: 12px; color: #777;">Yeh link sirf 15 minutes ke liye valid hai.</p>
         </div>
@@ -300,7 +357,10 @@ export const forgotPassword = async (req, res) => {
 
     const transporter = getTransporter();
     await transporter.sendMail(mailOptions);
-    res.status(200).json({ success: true, message: "Password reset link aapki email par bhej diya gaya hai!" });
+    res.status(200).json({ 
+      success: true, 
+      message: `Password reset link (${targetEmail}) par bhej diya gaya hai!` 
+    });
 
   } catch (error) {
     console.error("FORGOT_PASSWORD_ERROR:", error);

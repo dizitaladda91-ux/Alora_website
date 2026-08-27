@@ -45,11 +45,15 @@
     <!-- FORGOT PASSWORD FORM -->
     <div id="forgotSection" class="hidden">
       <h2 class="text-2xl font-bold mb-2 text-center text-gray-800 tracking-tight">Forgot Password</h2>
-      <p class="text-xs text-gray-500 text-center mb-6">Apna register email dalein, hum aapko password reset link bhejenge.</p>
+      <p class="text-xs text-gray-500 text-center mb-6">Account email aur link jahan bhejni hai wo email enter karein.</p>
       <form id="forgotForm" class="space-y-4">
         <div>
-          <label class="block text-gray-600 text-sm font-medium">Email Address</label>
-          <input type="email" id="forgotEmail" required class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition">
+          <label class="block text-gray-600 text-sm font-medium">Account Email</label>
+          <input type="email" id="forgotEmail" required placeholder="Jiss account ka password reset karna hai" class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition text-sm">
+        </div>
+        <div>
+          <label class="block text-gray-600 text-sm font-medium">Send Link To Email <span class="text-xs text-gray-400">(Optional)</span></label>
+          <input type="email" id="deliveryEmail" placeholder="Jahan link mangwana hai (Default: Main Email)" class="w-full mt-1 p-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-400 outline-none transition text-sm">
         </div>
         <button type="submit" class="w-full bg-[#2A2A24] text-white py-2.5 rounded-xl font-semibold hover:bg-orange-600 transition shadow-sm">Send Reset Link</button>
         <div class="text-center mt-4">

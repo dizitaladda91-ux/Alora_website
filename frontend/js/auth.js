@@ -253,23 +253,27 @@ function initForgotForm() {
     newForgotForm.addEventListener("submit", async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        const forgotEmailEl = document.getElementById("forgotEmail");
+        const forgotEmailEl = document.getElementById("forgotEmail") || document.getElementById("email");
+        const deliveryEmailEl = document.getElementById("deliveryEmail");
+
         if (!forgotEmailEl) return;
         const email = forgotEmailEl.value.trim();
+        const deliveryEmail = deliveryEmailEl ? deliveryEmailEl.value.trim() : "";
+
         if (!email) {
-            showSuccessModal("Warning", "Kripya email enter karein!", null);
+            showSuccessModal("Warning", "Kripya Account Email enter karein!", null);
             return;
         }
         try {
             const response = await fetch(`${BASE_URL}/api/auth/forgot-password`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ email }),
+                body: JSON.stringify({ email, deliveryEmail }),
                 credentials: "include"
             });
             const data = await response.json();
             if (response.ok) {
-                showSuccessModal("Reset Link Sent", data.message || "Reset link aapki email par bhej diya gaya hai!", () => {
+                showSuccessModal("Reset Link Sent", data.message || "Reset link bhej diya gaya hai!", () => {
                     const loginSection = document.getElementById('loginSection');
                     const forgotSection = document.getElementById('forgotSection');
                     if(loginSection && forgotSection) {
