@@ -1,5 +1,6 @@
 import SimpleProduct from "../models/product.models.js";
 import fs from "fs";
+import db from "../config/db.js";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 
 const toProductSlug = (value = "") => String(value)
@@ -72,9 +73,11 @@ export const addnewproduct = async (req, res) => {
 // 2. READ (Saare Products Get Karna - Ultra Fast Lean Query)
 export const readproduct = async (req, res) => {
     try {
+        await db();
         const products = await SimpleProduct.find().lean();
         res.status(200).json(products);
     } catch (err) {
+        console.error("readproduct error:", err);
         res.status(500).json({ error: err.message });
     }
 };

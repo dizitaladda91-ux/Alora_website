@@ -24,7 +24,13 @@ import User from "./models/userAuth.models.js";
 
 import { setSecurityHeaders, sanitizeNoSql, createRateLimiter } from "./middlewares/security.middleware.js";
 
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+if (!process.env.VERCEL) {
+    try {
+        dns.setServers(["1.1.1.1", "8.8.8.8"]);
+    } catch (e) {
+        console.warn("DNS server setup warning:", e.message);
+    }
+}
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
