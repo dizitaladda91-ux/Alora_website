@@ -25,54 +25,71 @@ export function showSuccessModal(title, message, callback) {
     });
 }
 export function renderNavbarState() {
-    const authActions = document.getElementById("auth-actions");
-    const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("userToken") || localStorage.getItem("token");
+    let authActions = document.getElementById("auth-actions");
     if (!authActions) {
-        return;
-    }
-    if (storedUser || token) {
-        try {
-            const user = storedUser ? JSON.parse(storedUser) : {};
-            const role = user.role || sessionStorage.getItem("userRole");
-            if (role === "admin" || role === "seoadmin") {
-                authActions.innerHTML = `
-                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
-                        <i class="fa-solid fa-user"></i>
-                    </a>
-                `;
-            } else {
-                const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
-                authActions.innerHTML = `
-                    <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
-                        <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
-                            <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
-                        </a>
-                        <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
-                            <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
-                        </a>
-                        <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
-                            Logout
-                        </button>
-                    </div>
-                `;
-                document.getElementById("logout-btn")?.addEventListener("click", () => {
-                    sessionStorage.clear();
-                    localStorage.removeItem("token");
-                    localStorage.removeItem("userToken");
-                    localStorage.removeItem("user");
-                    window.location.href = "./index.html";
-                });
+        const navAuthContainer = document.getElementById("nav-auth-container");
+        if (navAuthContainer) {
+            authActions = navAuthContainer.querySelector('#auth-actions');
+            if (!authActions) {
+                authActions = document.createElement('div');
+                authActions.id = 'auth-actions';
+                authActions.className = 'flex items-center gap-4';
+                navAuthContainer.appendChild(authActions);
             }
-        } catch (err) {
-            console.error("Localstorage data read error:", err);
         }
-    } else {
+    }
+    if (!authActions) return;
+
+    const storedUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+    const token = localStorage.getItem("userToken") || localStorage.getItem("token") || sessionStorage.getItem("token");
+    
+    if (!storedUserStr && !token) {
         authActions.innerHTML = `
             <a href="./login.html" class="text-base text-black hover:text-gold transition">
                 <i class="fa-solid fa-user"></i>
             </a>
         `;
+        return;
+    }
+    try {
+        const user = storedUserStr ? JSON.parse(storedUserStr) : {};
+        const role = user.role || sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+        if (role === "admin" || role === "seoadmin") {
+            authActions.innerHTML = `
+                <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Admin Portal">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            `;
+        } else {
+            const displayName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
+            authActions.innerHTML = `
+                <div class="flex items-center gap-2.5 text-sm font-medium text-black normal-case">
+                    <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
+                        <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${displayName}</b></span>
+                    </a>
+                    <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
+                        <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
+                    </a>
+                    <button id="logout-btn" type="button" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                        Logout
+                    </button>
+                </div>
+            `;
+            const logoutBtn = authActions.querySelector('#logout-btn') || document.getElementById('logout-btn');
+            if (logoutBtn && !logoutBtn.dataset.bound) {
+                logoutBtn.dataset.bound = "true";
+                logoutBtn.addEventListener("click", () => {
+                    sessionStorage.clear();
+                    localStorage.removeItem("token");
+                    localStorage.removeItem("userToken");
+                    localStorage.removeItem("user");
+                    localStorage.removeItem("userRole");
+                    window.location.href = "./index.html";
+                });
+            }
+        }
+    } catch (e) {
+        console.error("User storage parse error:", e);
     }
 }
 function initSearchFunctionality() {

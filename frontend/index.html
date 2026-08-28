@@ -368,10 +368,13 @@
             <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
                 <a href="./cart.html" class="relative text-base text-black hover:text-amber-600 transition">
                     <i class="fa-solid fa-shopping-cart"></i>
+                    <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
                 </a>
-                <a href="./login.html" class="text-base text-black hover:text-amber-600 transition">
-                    <i class="fa-solid fa-user"></i>
-                </a>
+                <div id="auth-actions" class="flex items-center gap-4">
+                    <a href="./login.html" class="text-base text-black hover:text-amber-600 transition">
+                        <i class="fa-solid fa-user"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>

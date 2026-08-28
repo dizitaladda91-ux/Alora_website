@@ -301,9 +301,9 @@ if (document.readyState === "complete" || document.readyState === "interactive")
     document.addEventListener("DOMContentLoaded", initAuthForms);
 }
 export function renderNavbarState() {
-    const storedUser = localStorage.getItem("user");
+    const storedUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
     const updateUI = (authContainer) => {
-        if (!storedUser) {
+        if (!storedUserStr) {
             authContainer.innerHTML = `
                 <a href="./login.html" class="text-base text-black hover:text-gold transition">
                     <i class="fa-solid fa-user"></i>
@@ -312,11 +312,11 @@ export function renderNavbarState() {
             return;
         }
         try {
-            const user = JSON.parse(storedUser);
-            const role = user.role || sessionStorage.getItem("userRole");
+            const user = JSON.parse(storedUserStr);
+            const role = user.role || sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
             if (role === "admin" || role === "seoadmin") {
                 authContainer.innerHTML = `
-                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Account Login">
+                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Admin Portal">
                         <i class="fa-solid fa-user"></i>
                     </a>
                 `;
@@ -330,19 +330,43 @@ export function renderNavbarState() {
                         <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
                             <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
                         </a>
-                        <button id="logout-btn" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                        <button id="logout-btn" type="button" class="bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                             Logout
                         </button>
                     </div>
                 `;
+                const logoutBtn = authContainer.querySelector('#logout-btn') || document.getElementById('logout-btn');
+                if (logoutBtn && !logoutBtn.dataset.bound) {
+                    logoutBtn.dataset.bound = "true";
+                    logoutBtn.addEventListener('click', () => {
+                        sessionStorage.clear();
+                        localStorage.removeItem('user');
+                        localStorage.removeItem('userToken');
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('userRole');
+                        window.location.href = './login.html';
+                    });
+                }
             }
         } catch (err) {
-            console.error("Error parsing user from localStorage:", err);
+            console.error("Error parsing user from storage:", err);
             localStorage.removeItem("user");
         }
     };
     const checkAndRender = () => {
-        const authActions = document.getElementById("auth-actions");
+        let authActions = document.getElementById("auth-actions");
+        if (!authActions) {
+            const navAuthContainer = document.getElementById("nav-auth-container");
+            if (navAuthContainer) {
+                authActions = navAuthContainer.querySelector('#auth-actions');
+                if (!authActions) {
+                    authActions = document.createElement('div');
+                    authActions.id = 'auth-actions';
+                    authActions.className = 'flex items-center gap-4';
+                    navAuthContainer.appendChild(authActions);
+                }
+            }
+        }
         if (authActions) {
             updateUI(authActions);
             return true;
