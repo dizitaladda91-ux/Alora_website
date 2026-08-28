@@ -475,20 +475,26 @@
             <!-- Product Slider Container -->
             <div id="productSliderContainer" class="overflow-x-auto lg:overflow-hidden w-full py-2 min-h-[380px] sm:min-h-[420px] scroll-smooth snap-x snap-mandatory no-scrollbar">
                 <div id="productSliderWrapper" class="flex gap-4 sm:gap-6 transition-transform duration-500 ease-out min-h-[380px]" style="transform: translateX(0px);">
-                    <!-- Skeleton Product Card Placeholders (Prevents CLS before API response) -->
-                    <div class="w-64 shrink-0 rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] animate-pulse flex flex-col justify-between">
+                    <!-- Skeleton Product Card Placeholders (Exact width match eliminates CLS layout shift) -->
+                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] sm:h-[420px] animate-pulse flex flex-col justify-between">
                         <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
                         <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
                         <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
                         <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
                     </div>
-                    <div class="w-64 shrink-0 rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] animate-pulse flex flex-col justify-between">
+                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] sm:h-[420px] animate-pulse flex flex-col justify-between">
                         <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
                         <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
                         <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
                         <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
                     </div>
-                    <div class="w-64 shrink-0 rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] animate-pulse flex flex-col justify-between">
+                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] sm:h-[420px] animate-pulse flex flex-col justify-between">
+                        <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
+                        <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
+                        <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
+                        <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+                    </div>
+                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl bg-white/60 border border-slate-200/80 p-4 h-[380px] sm:h-[420px] animate-pulse flex flex-col justify-between hidden md:flex">
                         <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
                         <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
                         <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
