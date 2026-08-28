@@ -52,10 +52,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const showPopup = () => {
         if (popupShown) return;
         popupShown = true;
-        popup.style.display = 'flex';
-        popup.classList.remove('opacity-0', 'pointer-events-none');
+        popup.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        popup.classList.add('flex', 'opacity-100', 'pointer-events-auto');
         popupBox.classList.remove('scale-95');
-        popup.classList.add('opacity-100', 'pointer-events-auto');
         popupBox.classList.add('scale-100');
     };
 
@@ -64,13 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
     window.addEventListener('touchstart', showPopup, { passive: true, once: true });
     setTimeout(showPopup, 3500);
     function hidePopup() {
-        popup.classList.remove('opacity-100', 'pointer-events-auto');
+        popup.classList.remove('opacity-100', 'pointer-events-auto', 'flex');
         popupBox.classList.remove('scale-100');
-        popup.classList.add('opacity-0', 'pointer-events-none');
+        popup.classList.add('opacity-0', 'pointer-events-none', 'hidden');
         popupBox.classList.add('scale-95');
-        setTimeout(() => {
-            popup.style.display = 'none';
-        }, 300);
         setSeen(); 
     }
     if (closePopupBtn) closePopupBtn.addEventListener('click', hidePopup);
@@ -116,16 +112,11 @@ window.addEventListener("load", () => {
                 if (entry.isIntersecting) {
                     sectionElement.classList.remove("opacity-0", "translate-y-10");
                     sectionElement.classList.add("opacity-100", "translate-y-0");
-                    cancelAnimationFrame(animationFrameId);
-                    setTimeout(() => startCounting(), 300);
-                } else {
-                    sectionElement.classList.remove("opacity-100", "translate-y-0");
-                    sectionElement.classList.add("opacity-0", "translate-y-10");
-                    cancelAnimationFrame(animationFrameId);
-                    counterElement.innerText = "0+";
+                    startCounting();
+                    observer.disconnect();
                 }
             });
-        }, { threshold: 0.2 });
+        }, { threshold: 0.1 });
         observer.observe(sectionElement);
     };
     if ('requestIdleCallback' in window) {
