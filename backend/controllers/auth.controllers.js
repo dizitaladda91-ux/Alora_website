@@ -257,60 +257,6 @@ export const updateProfile = async (req, res) => {
 };
 
 // ==========================================
-// LOGOUT USER
-// ==========================================
-export const logout = (req, res) => {
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: authCookieOptions.secure,
-    sameSite: authCookieOptions.sameSite,
-    path: authCookieOptions.path
-  });
-  res.status(200).json({ success: true, message: "Logged out successfully" });
-};
-
-// Returns the currently authenticated user without exposing the JWT to browser JavaScript.
-export const getSession = async (req, res) => {
-  try {
-    const { id } = req.user;
-
-    const user = await User.findById(id).select("name email phone address role").lean();
-    if (!user) {
-      return res.status(401).json({ success: false, message: "Session user no longer exists." });
-    }
-
-    return res.status(200).json({ success: true, user });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Could not load session." });
-  }
-};
-
-// Lets an authenticated customer add their address from checkout when their
-// account was created earlier from the normal registration page.
-export const updateProfile = async (req, res) => {
-  try {
-    const address = String(req.body?.address || '').trim();
-    if (!address) {
-      return res.status(400).json({ success: false, message: "Delivery address is required." });
-    }
-
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { $set: { address } },
-      { new: true, runValidators: true }
-    ).select("name email phone address role").lean();
-
-    if (!user) {
-      return res.status(404).json({ success: false, message: "Account not found." });
-    }
-
-    return res.status(200).json({ success: true, user });
-  } catch (error) {
-    return res.status(500).json({ success: false, message: "Could not save the delivery address." });
-  }
-};
-
-// ==========================================
 // FORGOT PASSWORD
 // ==========================================
 export const forgotPassword = async (req, res) => {
