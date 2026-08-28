@@ -577,10 +577,10 @@
 
     <!-- ============ WATCH IT. LOVE IT. VIDEO REELS CAROUSEL SECTION ============ -->
     <!-- NOTE: You can change the 'data-video-url' attribute on any card below to your desired video link (YouTube embed, Instagram Reel URL, or MP4 file) -->
+    <!--
     <section id="watch-it-love-it-section" class="max-w-7xl mx-auto px-4 py-6 sm:py-10">
         <div class="bg-gradient-to-b from-slate-50 via-white to-amber-50/20 rounded-3xl p-5 sm:p-8 border border-amber-900/10 shadow-lg relative overflow-hidden">
             
-            <!-- Section Header Bar -->
             <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 text-center sm:text-left">
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase font-roboto border border-pink-200 mb-2">
@@ -590,7 +590,6 @@
                     <p class="text-xs sm:text-sm text-slate-600 mt-1">Real skincare routines &amp; results in action. Click any card to watch.</p>
                 </div>
 
-                <!-- Carousel Slide Arrows -->
                 <div class="flex items-center gap-2 shrink-0">
                     <button type="button" aria-label="Scroll Left" onclick="scrollWatchItCarousel('left')" class="w-10 h-10 rounded-full bg-white text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-md transition-all active:scale-95">
                         <i class="fa-solid fa-chevron-left text-xs"></i>
@@ -601,29 +600,23 @@
                 </div>
             </div>
 
-            <!-- Video Reel Cards Carousel Container -->
             <div id="watchItCarousel" class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-3 px-1 no-scrollbar snap-x snap-mandatory items-stretch">
                 
-                <!-- CARD 1 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <!-- Top: Video Screen Template -->
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/DbINEv7R-oj/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==" 
                          data-video-title="Strawberry Dew Tinted Sunscreen SPF 50+ Guide">
                         <img src="./static/faceskin2.webp" alt="Video Screen 1" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
-                        <!-- Play Button -->
                         <div class="absolute inset-0 flex items-center justify-center">
                             <div class="w-12 h-12 rounded-full bg-black/40 backdrop-blur-md border border-white/60 text-white flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-amber-400 group-hover:text-slate-950 group-hover:border-amber-400 transition-all duration-300">
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <!-- Video Caption Text Overlay -->
                         <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
                             <p class="line-clamp-2">"If you don't like wearing foundation, just GET THIS!"</p>
                         </div>
                     </div>
-                    <!-- Bottom: Product Card Template -->
                     <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
                         <img src="./static/combo1.webp" alt="Product 1" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
                         <div class="flex-grow min-w-0">
@@ -639,7 +632,6 @@
                     </div>
                 </div>
 
-                <!-- CARD 2 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/Db003y_vnCo/?utm_source=ig_web_copy_link&igsi=MzRlODBiNWFlZA==" 
@@ -671,13 +663,11 @@
                     </div>
                 </div>
 
-                <!-- CARD 3 (FEATURED HIGHLIGHT CARD) -->
                 <div class="reel-card-item w-60 sm:w-68 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-2">
                     <div class="relative w-full h-[340px] sm:h-[380px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-xl border-2 border-pink-400/60 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
                          data-video-title="Strawberry Bright 10% Niacinamide Serum Tutorial">
                         
-                        <!-- Top Tag Badge -->
                         <div class="absolute top-3 left-3 z-10">
                             <span class="px-2.5 py-1 rounded-full bg-pink-600 text-white text-[10px] font-bold uppercase tracking-wider shadow">Bestseller</span>
                         </div>
@@ -709,7 +699,6 @@
                     </div>
                 </div>
 
-                <!-- CARD 4 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
@@ -741,7 +730,6 @@
                     </div>
                 </div>
 
-                <!-- CARD 5 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
@@ -772,7 +760,6 @@
                     </div>
                 </div>
 
-                <!-- CARD 6 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
                     <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.youtube.com/embed/dQw4w9WgXcQ" 
@@ -808,22 +795,20 @@
         </div>
     </section>
 
-    <!-- VIDEO REEL POPUP MODAL -->
     <div id="watchItVideoModal" class="fixed inset-0 z-50 hidden bg-slate-950/80 backdrop-blur-md items-center justify-center p-4 transition-all">
         <div class="relative w-full max-w-lg bg-slate-900 rounded-3xl overflow-hidden shadow-2xl border border-white/20">
-            <!-- Modal Header -->
             <div class="flex items-center justify-between px-5 py-3.5 bg-slate-900/90 border-b border-white/10 text-white">
                 <h3 id="watchItVideoModalTitle" class="text-sm font-bold truncate font-fraunces">Watch Video</h3>
                 <button type="button" onclick="closeReelVideoModal()" aria-label="Close Video" class="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-all">
                     <i class="fa-solid fa-xmark text-sm"></i>
                 </button>
             </div>
-            <!-- Video Player Slot -->
             <div class="relative w-full aspect-[9/16] max-h-[75vh] bg-black">
                 <iframe id="watchItVideoIframe" class="w-full h-full" src="" title="Video Player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
     </div>
+    -->
 
     <script>
         // Carousel scroll function

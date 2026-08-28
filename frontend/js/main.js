@@ -35,29 +35,27 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!popup || !popupBox) return;
     function setSeen() {
         try {
-            localStorage.setItem('hasSeenDiscountPopup', 'true');
-            console.log("Saved to localStorage successfully!");
+            sessionStorage.setItem('hasSeenDiscountPopup', 'true');
         } catch (e) {
-            console.error("LocalStorage write error:", e);
+            console.error("SessionStorage write error:", e);
         }
     }
     let hasSeenPopup = false;
     try {
-        hasSeenPopup = localStorage.getItem('hasSeenDiscountPopup') === 'true';
+        hasSeenPopup = sessionStorage.getItem('hasSeenDiscountPopup') === 'true';
     } catch (e) {
-        console.error("LocalStorage read error:", e);
+        console.error("SessionStorage read error:", e);
     }
     if (hasSeenPopup) {
         return;
     }
-    setSeen();
     setTimeout(() => {
         popup.style.display = 'flex';
         popup.classList.remove('opacity-0', 'pointer-events-none');
         popupBox.classList.remove('scale-95');
         popup.classList.add('opacity-100', 'pointer-events-auto');
         popupBox.classList.add('scale-100');
-    }, 4500);
+    }, 1000);
     function hidePopup() {
         popup.classList.remove('opacity-100', 'pointer-events-auto');
         popupBox.classList.remove('scale-100');
