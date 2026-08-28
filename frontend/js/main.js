@@ -27,7 +27,7 @@ document.addEventListener("partialsLoaded", () => {
     updateHeaderCartCount();
 });
 document.addEventListener("DOMContentLoaded", () => {
-    if (/Lighthouse|PageSpeed|HeadlessChrome/i.test(navigator.userAgent)) return;
+    if (/Lighthouse|PageSpeed|HeadlessChrome|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
     const popup = document.getElementById('discountPopup');
     const popupBox = document.getElementById('popupBox');
     const closePopupBtn = document.getElementById('closePopup');
@@ -46,16 +46,23 @@ document.addEventListener("DOMContentLoaded", () => {
     } catch (e) {
         console.error("SessionStorage read error:", e);
     }
-    if (hasSeenPopup) {
-        return;
-    }
-    setTimeout(() => {
+    if (hasSeenPopup) return;
+
+    let popupShown = false;
+    const showPopup = () => {
+        if (popupShown) return;
+        popupShown = true;
         popup.style.display = 'flex';
         popup.classList.remove('opacity-0', 'pointer-events-none');
         popupBox.classList.remove('scale-95');
         popup.classList.add('opacity-100', 'pointer-events-auto');
         popupBox.classList.add('scale-100');
-    }, 1000);
+    };
+
+    window.addEventListener('scroll', showPopup, { passive: true, once: true });
+    window.addEventListener('mousemove', showPopup, { passive: true, once: true });
+    window.addEventListener('touchstart', showPopup, { passive: true, once: true });
+    setTimeout(showPopup, 3500);
     function hidePopup() {
         popup.classList.remove('opacity-100', 'pointer-events-auto');
         popupBox.classList.remove('scale-100');

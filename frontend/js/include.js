@@ -91,18 +91,29 @@ async function loadAllPartials() {
     const footerUrl = isFile ? "./footer.html" : "/footer.html";
     const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
-    await Promise.all([
-        loadPartial("#navbar-placeholder", navUrl),
-        loadPartial("#footer-placeholder", footerUrl),
-    ]);
-    await loadPartial("#chatbot-placeholder", chatbotUrl);
-    if (!document.getElementById("alora-chatbot-js")) {
-        const script = document.createElement("script");
-        script.id = "alora-chatbot-js";
-        script.src = chatbotJsUrl;
-        document.body.appendChild(script);
+
+    const navPlaceholder = document.getElementById('navbar-placeholder');
+    if (!navPlaceholder || !navPlaceholder.querySelector('nav')) {
+        await loadPartial("#navbar-placeholder", navUrl);
     }
-    document.dispatchEvent(new Event("partialsLoaded"));
+
+    const loadDeferredPartials = async () => {
+        await loadPartial("#footer-placeholder", footerUrl);
+        await loadPartial("#chatbot-placeholder", chatbotUrl);
+        if (!document.getElementById("alora-chatbot-js")) {
+            const script = document.createElement("script");
+            script.id = "alora-chatbot-js";
+            script.src = chatbotJsUrl;
+            document.body.appendChild(script);
+        }
+        document.dispatchEvent(new Event("partialsLoaded"));
+    };
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadDeferredPartials);
+    } else {
+        setTimeout(loadDeferredPartials, 1200);
+    }
 }
 function loadGtmScript(gtmId) {
     if (!gtmId || !/^GTM-[A-Z0-9]+$/i.test(gtmId.trim())) return;
