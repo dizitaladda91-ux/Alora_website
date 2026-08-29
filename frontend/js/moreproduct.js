@@ -109,6 +109,13 @@ function renderProductCatalog(products) {
     if (countEl) countEl.innerText = `Showing ${products.length} products`;
     gridContainer.innerHTML = products.map(product => {
         const initialSize = product.sizes[0];
+        let discountBadgeHTML = '';
+        if (initialSize && initialSize.mrp && Number(initialSize.mrp) > Number(initialSize.price)) {
+            const pct = Math.round(((Number(initialSize.mrp) - Number(initialSize.price)) / Number(initialSize.mrp)) * 100);
+            if (pct > 0) {
+                discountBadgeHTML = `<span class="discount-badge text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">${pct}% OFF</span>`;
+            }
+        }
         const starsHTML = generateStarsHTML(product.rating);
         const allImages = [product.baseImg, ...(product.galleryImages || [])].filter(Boolean);
         const hasMultipleImages = allImages.length > 1;
@@ -152,13 +159,11 @@ function renderProductCatalog(products) {
         return `
         <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
             <!-- Top Badges Bar -->
-            <div class="flex items-center justify-between z-10 mb-1.5">
+            <div class="flex items-center justify-between z-10 mb-1.5 min-h-[22px]">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                     ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                 </span>
-                <span class="text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">
-                    30% OFF
-                </span>
+                ${discountBadgeHTML}
             </div>
             <!-- Image Area (Seamless Blend) -->
             <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2">
@@ -217,6 +222,20 @@ function changeCardSize(sizeLabel, exactPrice, exactMrp, element) {
     currentCard.querySelector('.product-price').innerText = `₹${exactPrice}`;
     const mrpEl = currentCard.querySelector('.product-mrp');
     if (mrpEl) mrpEl.innerText = exactMrp ? `₹${exactMrp}` : '';
+    const discountBadgeEl = currentCard.querySelector('.discount-badge');
+    if (discountBadgeEl) {
+        if (exactMrp && Number(exactMrp) > Number(exactPrice)) {
+            const pct = Math.round(((Number(exactMrp) - Number(exactPrice)) / Number(exactMrp)) * 100);
+            if (pct > 0) {
+                discountBadgeEl.innerText = `${pct}% OFF`;
+                discountBadgeEl.style.display = 'inline-block';
+            } else {
+                discountBadgeEl.style.display = 'none';
+            }
+        } else {
+            discountBadgeEl.style.display = 'none';
+        }
+    }
     currentCard.querySelectorAll('.size-btn').forEach(btn => {
         btn.className = "size-btn text-[11px] px-2.5 py-1 rounded-full border border-[#DCD3BA] text-ash hover:border-ink transition";
     });

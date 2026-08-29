@@ -142,22 +142,31 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         details summary::-webkit-details-marker { display: none; }
 
+        @keyframes topBarMarquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .animate-top-ticker {
+            display: flex;
+            width: max-content;
+            animation: topBarMarquee 22s linear infinite;
+            will-change: transform;
+        }
+        .animate-top-ticker:hover {
+            animation-play-state: paused;
+        }
+
         .animate-marquee {
           display: inline-block;
-          padding-left: 100%; /* Text screen ke right side (bahar) se start hoga */
+          padding-left: 100%;
           animation: marquee 40s linear infinite;
         }
 
         @keyframes marquee {
-          0% {
-            transform: translate3d(0, 0, 0);
-          }
-          100% {
-            transform: translate3d(-100%, 0, 0); /* Puri screen ke left me end tak jayega */
-          }
+          0% { transform: translate3d(0, 0, 0); }
+          100% { transform: translate3d(-100%, 0, 0); }
         }
 
-        /* Hover karne par pause hoga */
         .animate-marquee:hover {
           animation-play-state: paused;
         }
@@ -290,55 +299,50 @@
 
 </div>
 
-   <!-- ============ TOP ANNOUNCEMENT & COMBO DEALS BAR ============ -->
-   <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-3 sm:px-6 shadow-md border-b border-amber-500/20 relative z-30 min-h-[60px] sm:min-h-[44px]">
-        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 text-center sm:text-left">
+   <!-- ============ TOP INFINITE MOVING TICKER ANNOUNCEMENT BAR ============ -->
+   <div class="bg-gradient-to-r from-[#D94E1F] via-[#EF5D22] to-[#D94E1F] text-white py-2 px-0 shadow-md border-b border-amber-500/20 relative z-30 overflow-hidden min-h-[38px] flex items-center">
+        <div class="animate-top-ticker flex items-center whitespace-nowrap">
             
-            <!-- Left Text Banner -->
-            <div class="flex items-center gap-2 text-xs sm:text-sm font-bold tracking-wide">
-                <span class="text-base sm:text-lg animate-bounce">🎁</span>
-                <span>
-                    <strong class="font-extrabold uppercase tracking-wider text-amber-200">Special Offer:</strong>
-                    Get Flat 10% OFF! Use Code: 
+            <!-- Loop Item Group 1 -->
+            <div class="flex items-center gap-8 px-4 text-xs sm:text-sm font-bold tracking-wide">
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">WELCOME OFFER:</span> Get Flat 10% OFF! Use Code: 
                     <span class="bg-amber-300 text-slate-950 px-2 py-0.5 rounded font-mono font-extrabold shadow-xs ml-1">GLOW10</span>
-                    <span class="hidden md:inline-block ml-2 text-amber-100 font-semibold">• 🛍️ Save Extra on Skincare Combo Bundles!</span>
                 </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">SPECIAL COMBOS SALE:</span> Save Extra on Skincare Bundles &amp; Value Kits!
+                </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">FREE SHIPPING:</span> On All Orders Above ₹499 Across India!
+                </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">DERMATOLOGIST TESTED:</span> 100% Toxin-Free &amp; Cruelty-Free Formulations!
+                </span>
+                <span class="text-amber-300/80">•</span>
             </div>
 
-            <!-- Right Live Countdown Timer Widget -->
-            <div class="flex items-center gap-1.5 shrink-0">
-                <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-amber-200/90 font-mono mr-1">Offer Ends In:</span>
-                
-                <!-- Days -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-days" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Days</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
-
-                <!-- Hours -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-hours" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">01</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Hours</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
-
-                <!-- Minutes -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-minutes" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">56</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Mins</span>
-                </div>
-                <span class="text-white font-bold text-xs -mt-2">:</span>
-
-                <!-- Seconds -->
-                <div class="flex flex-col items-center">
-                    <span id="rakhi-seconds" class="bg-white text-slate-950 font-mono font-extrabold text-xs sm:text-sm px-2 py-0.5 rounded-md shadow-xs min-w-[28px] text-center">02</span>
-                    <span class="text-[8px] uppercase tracking-widest text-amber-100 font-mono mt-0.5">Secs</span>
-                </div>
-
-                <a href="/products" class="ml-2 bg-amber-300 hover:bg-amber-400 text-slate-950 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold transition shadow-xs active:scale-95" title="Shop Combos">
-                    <i class="fa-solid fa-chevron-right text-[10px]"></i>
-                </a>
+            <!-- Loop Item Group 2 (Duplicate for Seamless Infinite Scroll) -->
+            <div class="flex items-center gap-8 px-4 text-xs sm:text-sm font-bold tracking-wide">
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">WELCOME OFFER:</span> Get Flat 10% OFF! Use Code: 
+                    <span class="bg-amber-300 text-slate-950 px-2 py-0.5 rounded font-mono font-extrabold shadow-xs ml-1">GLOW10</span>
+                </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">SPECIAL COMBOS SALE:</span> Save Extra on Skincare Bundles &amp; Value Kits!
+                </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">FREE SHIPPING:</span> On All Orders Above ₹499 Across India!
+                </span>
+                <span class="text-amber-300/80">•</span>
+                <span class="inline-flex items-center gap-1.5">
+                    <span class="text-amber-200 uppercase tracking-wider font-extrabold">DERMATOLOGIST TESTED:</span> 100% Toxin-Free &amp; Cruelty-Free Formulations!
+                </span>
+                <span class="text-amber-300/80">•</span>
             </div>
 
         </div>
@@ -406,12 +410,6 @@
     <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
         <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="2400" height="900" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
         <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
-    </a>
-
-    <!-- Slide 2 (Face Wash) -->
-    <a href="/product/purifying-glow-face-wash" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_2_desk.webp" alt="Purifying Glow Face Wash Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_2_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 3 (Face Serum) -->
