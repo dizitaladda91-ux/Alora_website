@@ -334,10 +334,15 @@ window.injectMultipleSchemasToDOM = function(rawSchemaInput) {
 
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
-initGoogleTagManager();
-trackReferralFromUrl();
-if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", loadAllPartials);
-} else {
+
+const initNonCriticalServices = () => {
+    initGoogleTagManager();
+    trackReferralFromUrl();
     loadAllPartials();
+};
+
+if ('requestIdleCallback' in window) {
+    requestIdleCallback(initNonCriticalServices);
+} else {
+    window.addEventListener('load', initNonCriticalServices);
 }

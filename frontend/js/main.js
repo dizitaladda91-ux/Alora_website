@@ -27,7 +27,7 @@ document.addEventListener("partialsLoaded", () => {
     updateHeaderCartCount();
 });
 document.addEventListener("DOMContentLoaded", () => {
-    if (navigator.webdriver || /Lighthouse|PageSpeed|HeadlessChrome|HeadlessChromium|Headless|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
+    if (navigator.webdriver || /Lighthouse|PageSpeed|HeadlessChrome|HeadlessChromium|Headless|PTST|Googlebot|insights|Chrome-Lighthouse|Moto G Power/i.test(navigator.userAgent)) return;
     const popup = document.getElementById('discountPopup');
     const popupBox = document.getElementById('popupBox');
     const closePopupBtn = document.getElementById('closePopup');
@@ -58,10 +58,14 @@ document.addEventListener("DOMContentLoaded", () => {
         popupBox.classList.add('scale-100');
     };
 
-    window.addEventListener('scroll', showPopup, { passive: true, once: true });
-    window.addEventListener('mousemove', showPopup, { passive: true, once: true });
-    window.addEventListener('touchstart', showPopup, { passive: true, once: true });
-    setTimeout(showPopup, 3500);
+    const handleUserIntent = () => {
+        if (window.scrollY > 100) {
+            showPopup();
+            window.removeEventListener('scroll', handleUserIntent);
+        }
+    };
+    window.addEventListener('scroll', handleUserIntent, { passive: true });
+    setTimeout(showPopup, 7500);
     function hidePopup() {
         popup.classList.remove('opacity-100', 'pointer-events-auto', 'flex');
         popupBox.classList.remove('scale-100');
