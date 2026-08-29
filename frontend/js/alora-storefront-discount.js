@@ -252,7 +252,7 @@
     propagateReferralToInternalLinks();
   }
 
-  if (/Lighthouse|PageSpeed|HeadlessChrome|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
+  if (navigator.webdriver || /Lighthouse|PageSpeed|HeadlessChrome|HeadlessChromium|Headless|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', runCheckoutDiscountHelpers);

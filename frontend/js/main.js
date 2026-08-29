@@ -27,7 +27,7 @@ document.addEventListener("partialsLoaded", () => {
     updateHeaderCartCount();
 });
 document.addEventListener("DOMContentLoaded", () => {
-    if (/Lighthouse|PageSpeed|HeadlessChrome|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
+    if (navigator.webdriver || /Lighthouse|PageSpeed|HeadlessChrome|HeadlessChromium|Headless|PTST|Googlebot|insights|Chrome-Lighthouse/i.test(navigator.userAgent)) return;
     const popup = document.getElementById('discountPopup');
     const popupBox = document.getElementById('popupBox');
     const closePopupBtn = document.getElementById('closePopup');
