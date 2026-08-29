@@ -78,20 +78,16 @@ const findConfiguredStaffUser = async (email, password) => {
   return user;
 };
 
-// Transporter Function (Dynamic Check)
 const getTransporter = () => {
+  const user = String(process.env.EMAIL_USER || "").trim();
+  const pass = String(process.env.EMAIL_PASS || "").replace(/\s+/g, "").trim();
+  if (!user || !pass) return null;
   return nodemailer.createTransport({
     service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    }
+    auth: { user, pass }
   });
 };
 
-// ==========================================
-// REGISTER USER
-// ==========================================
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, address, source } = req.body;

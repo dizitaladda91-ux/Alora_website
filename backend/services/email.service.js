@@ -5,8 +5,8 @@ import nodemailer from "nodemailer";
 let cachedTransporter = null;
 
 const getTransporter = () => {
-    const senderEmail = process.env.EMAIL_USER;
-    const senderPassword = process.env.EMAIL_PASS;
+    const senderEmail = String(process.env.EMAIL_USER || "").trim();
+    const senderPassword = String(process.env.EMAIL_PASS || "").replace(/\s+/g, "").trim();
     if (!senderEmail || !senderPassword) return null;
 
     if (!cachedTransporter) {
