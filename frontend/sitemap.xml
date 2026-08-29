@@ -3,7 +3,7 @@
   <!-- Homepage -->
   <url>
     <loc>https://aloraradiance.com/</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -11,7 +11,7 @@
   <!-- Products / Storefront -->
   <url>
     <loc>https://aloraradiance.com/products</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
@@ -19,7 +19,7 @@
   <!-- About Our Brand -->
   <url>
     <loc>https://aloraradiance.com/about</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -27,7 +27,7 @@
   <!-- Blog & Insights -->
   <url>
     <loc>https://aloraradiance.com/blog</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
@@ -35,7 +35,7 @@
   <!-- Quality & Certifications -->
   <url>
     <loc>https://aloraradiance.com/certificates</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -43,7 +43,7 @@
   <!-- Knowledge Base FAQs -->
   <url>
     <loc>https://aloraradiance.com/faq</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -51,7 +51,7 @@
   <!-- Track Order -->
   <url>
     <loc>https://aloraradiance.com/track-order</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
@@ -59,7 +59,7 @@
   <!-- User Account -->
   <url>
     <loc>https://aloraradiance.com/account</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -67,7 +67,7 @@
   <!-- Privacy Policy -->
   <url>
     <loc>https://aloraradiance.com/privacy-policy</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -75,7 +75,7 @@
   <!-- Terms & Conditions -->
   <url>
     <loc>https://aloraradiance.com/terms-and-conditions</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -83,7 +83,7 @@
   <!-- Return & Refund Policy -->
   <url>
     <loc>https://aloraradiance.com/return-refund</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -91,7 +91,7 @@
   <!-- Corporate Governance -->
   <url>
     <loc>https://aloraradiance.com/corporate-governance</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
@@ -99,8 +99,52 @@
   <!-- HTML Sitemap for Users -->
   <url>
     <loc>https://aloraradiance.com/sitemap</loc>
-    <lastmod>2026-08-27</lastmod>
+    <lastmod>2026-08-29</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.5</priority>
+  </url>
+
+  <!-- Product Pages -->
+  <url>
+    <loc>https://aloraradiance.com/product/alora-radiance-travel-essentials-kit</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/brightening-hydrating-face-serum</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/face-cream-sunscreen-spf-30</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/purifying-glow-face-wash</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/radiance-ritual-trio</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/soothing-body-lotion</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aloraradiance.com/product/soothing-face-scrub</loc>
+    <lastmod>2026-08-29</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
