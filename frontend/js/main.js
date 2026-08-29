@@ -361,6 +361,8 @@ async function loadSliderProducts() {
             } else {
                 initialPrice = product.price || 0;
                 initialComparePrice = product.comparePrice || product.mrp || '';
+            }
+
             let discountBadgeHTML = '';
             if (initialComparePrice && Number(initialComparePrice) > Number(initialPrice)) {
                 const pct = Math.round(((Number(initialComparePrice) - Number(initialPrice)) / Number(initialComparePrice)) * 100);
