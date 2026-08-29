@@ -10,13 +10,18 @@ function computeBaseUrl() {
     return "";
 }
 const BASE_URL = computeBaseUrl();
-export function getImageUrl(imagePath, fallback = "./static/placeholder.png") {
+export function getImageUrl(imagePath, fallback = "./static/placeholder.png", width = 400) {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
     if (trimmed.includes('res.cloudinary.com')) {
-        if (trimmed.includes('/upload/') && !trimmed.includes('f_auto') && !trimmed.includes('q_auto')) {
-            return trimmed.replace('/upload/', '/upload/f_auto,q_auto,w_800,c_limit/');
+        if (trimmed.includes('/upload/')) {
+            // Replace any existing w_XXX or add optimal w_400 limit
+            const optTransforms = `f_auto,q_auto,w_${width},c_limit`;
+            if (trimmed.includes('f_auto') || trimmed.includes('q_auto')) {
+                return trimmed.replace(/\/upload\/(?:[^\/]+\/)?/, `/upload/${optTransforms}/`);
+            }
+            return trimmed.replace('/upload/', `/upload/${optTransforms}/`);
         }
         return trimmed;
     }

@@ -42,6 +42,8 @@
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- 🚀 PRELOAD EXACT CRITICAL LCP HERO IMAGE FOR MOBILE & DESKTOP -->
     <link rel="preload" as="image" href="./static/hero_banner_1_mob.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
@@ -96,9 +98,20 @@
         @font-face { font-family: 'PT Sans'; src: local('Arial'); font-display: swap; }
         @font-face { font-family: 'Manrope'; src: local('Helvetica'); font-display: swap; }
         @font-face { font-family: 'Roboto Mono'; src: local('Courier New'); font-display: swap; }
-        @font-face { font-family: 'Font Awesome 6 Free'; src: local('Font Awesome 6 Free'); font-display: swap; }
-        @font-face { font-family: 'Font Awesome 6 Brands'; src: local('Font Awesome 6 Brands'); font-display: swap; }
-        @font-face { font-family: 'FontAwesome'; src: local('FontAwesome'); font-display: swap; }
+        @font-face {
+            font-family: 'Font Awesome 6 Free';
+            font-style: normal;
+            font-weight: 900;
+            font-display: swap !important;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
+        }
+        @font-face {
+            font-family: 'Font Awesome 6 Brands';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap !important;
+            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');
+        }
 
         @font-face {
             font-family: 'Fraunces-Fallback';
@@ -412,8 +425,8 @@
 
     <!-- Slide 1 (Travel Ready Kit / Sachets) -->
     <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="2400" height="900" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="1600" height="600" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
+        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="800" height="450" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
     </a>
 
     <!-- Slide 3 (Face Serum) -->
@@ -572,16 +585,16 @@
                     <div id="auto-slider" class="bg-white/5 rounded-2xl p-2 sm:p-4 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 no-scrollbar">
                         
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
-                            <img src="./static/combo1.webp" alt="Alora Combo" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
+                            <img src="./static/combo1.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
                         </a>
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
-                            <img src="./static/combo2.webp" alt="Alora Combo" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
+                            <img src="./static/combo2.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover transform group-hover:scale-105 transition-transform duration-500">
                         </a>
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
-                            <img src="./static/combo3.webp" alt="Alora Combo" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                            <img src="./static/combo3.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
                         </a>
                         <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
-                            <img src="./static/combo4.webp" alt="Alora Combo" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
+                            <img src="./static/combo4.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md transform hover:scale-105 transition duration-500">
                         </a>
                         
                     </div>
@@ -1381,7 +1394,7 @@
                 <!-- Card 1: Uneven Tone -->
                 <a href="/products" class="group bg-white p-3 sm:p-4 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-1.5 transition-all duration-300 block text-center relative overflow-hidden">
                     <div class="overflow-hidden rounded-2xl mb-3 bg-amber-50 aspect-square w-full border border-amber-900/10">
-                        <img src="./static/before and after image.webp" alt="Uneven Tone" class="w-full h-full object-cover transform group-hover:scale-108 transition-all duration-500">
+                        <img src="./static/before and after image.webp" alt="Uneven Tone" width="300" height="300" loading="lazy" decoding="async" class="w-full h-full object-cover transform group-hover:scale-108 transition-all duration-500">
                     </div>
                     <span class="font-fraunces font-bold text-sm sm:text-base text-slate-900 group-hover:text-[#8B4513] transition-colors block">Uneven Tone</span>
                     <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-md mt-1.5 inline-block font-mono">
