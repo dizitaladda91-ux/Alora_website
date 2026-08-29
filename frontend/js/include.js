@@ -331,26 +331,7 @@ window.injectMultipleSchemasToDOM = function(rawSchemaInput) {
         document.head.appendChild(script);
     }
 };
-(function initRakhiCountdown() {
-    function updateRakhiTimer() {
-        const rakhiTarget = new Date('2026-08-28T23:59:59+05:30');
-        const now = new Date();
-        let diff = Math.max(0, Math.floor((rakhiTarget - now) / 1000));
-        const days = String(Math.floor(diff / (3600 * 24))).padStart(2, '0');
-        const hours = String(Math.floor((diff % (3600 * 24)) / 3600)).padStart(2, '0');
-        const minutes = String(Math.floor((diff % 3600) / 60)).padStart(2, '0');
-        const seconds = String(diff % 60).padStart(2, '0');
 
-        document.querySelectorAll('#rakhi-days, .rakhi-days').forEach(el => el.textContent = days);
-        document.querySelectorAll('#rakhi-hours, .rakhi-hours').forEach(el => el.textContent = hours);
-        document.querySelectorAll('#rakhi-minutes, .rakhi-minutes').forEach(el => el.textContent = minutes);
-        document.querySelectorAll('#rakhi-seconds, .rakhi-seconds').forEach(el => el.textContent = seconds);
-    }
-    setInterval(updateRakhiTimer, 1000);
-    document.addEventListener('DOMContentLoaded', updateRakhiTimer);
-    document.addEventListener('partialsLoaded', updateRakhiTimer);
-    updateRakhiTimer();
-})();
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
 initGoogleTagManager();

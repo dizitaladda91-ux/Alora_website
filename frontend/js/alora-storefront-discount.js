@@ -260,17 +260,25 @@
     runCheckoutDiscountHelpers();
   }
 
-  let debounceTimer = null;
-  new MutationObserver(() => {
-    if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => {
-      if ('requestIdleCallback' in window) {
-        requestIdleCallback(runCheckoutDiscountHelpers);
-      } else {
-        runCheckoutDiscountHelpers();
-      }
-    }, 600);
-  }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+  const initObserver = () => {
+    let debounceTimer = null;
+    new MutationObserver(() => {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        if ('requestIdleCallback' in window) {
+          requestIdleCallback(runCheckoutDiscountHelpers);
+        } else {
+          runCheckoutDiscountHelpers();
+        }
+      }, 600);
+    }).observe(document.body || document.documentElement, { childList: true, subtree: true });
+  };
+
+  if ('requestIdleCallback' in window) {
+    requestIdleCallback(initObserver);
+  } else {
+    window.addEventListener('load', initObserver);
+  }
 
   const rerunAfterNavigation = () => {
     if ('requestIdleCallback' in window) {
