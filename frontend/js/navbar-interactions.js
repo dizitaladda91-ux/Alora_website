@@ -115,6 +115,46 @@ function initSearchFeature() {
                                     const desc = (p.description || '').toLowerCase();
                                     return name.includes(qLower) || cat.includes(qLower) || desc.includes(qLower);
                                 });
+            }
+        }
+    });
+    let debounceTimer;
+    searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.trim();
+        clearTimeout(debounceTimer);
+        if (query.length < 2) {
+            if (suggestionsBox) suggestionsBox.classList.add('hidden');
+            return;
+        }
+        debounceTimer = setTimeout(async () => {
+            try {
+                let products = [];
+                try {
+                    const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success && Array.isArray(data.products)) {
+                            products = data.products;
+                        } else if (Array.isArray(data)) {
+                            products = data;
+                        }
+                    }
+                } catch (apiErr) {
+                    console.warn("Backend search endpoint failed, falling back to all products:", apiErr);
+                }
+                if (products.length === 0) {
+                    try {
+                        const allRes = await fetch(`${BASE_URL}/api/product/all`);
+                        if (allRes.ok) {
+                            const allData = await allRes.json();
+                            if (Array.isArray(allData)) {
+                                const qLower = query.toLowerCase();
+                                products = allData.filter(p => {
+                                    const name = (p.name || p.title || '').toLowerCase();
+                                    const cat = (p.category || '').toLowerCase();
+                                    const desc = (p.description || '').toLowerCase();
+                                    return name.includes(qLower) || cat.includes(qLower) || desc.includes(qLower);
+                                });
                             }
                         }
                     } catch (allErr) {
@@ -123,7 +163,7 @@ function initSearchFeature() {
                 }
 if (products.length > 0 && suggestionsBox) {
     suggestionsBox.innerHTML = products.map(product => {
-        const imageSrc = getImageUrl(product.imagepath, './static/placeholder.png');
+        const imageSrc = getImageUrl(product.imagepath, '/static/placeholder.png');
         const rawPrice = (product.variants && product.variants.length > 0 && product.variants[0] && product.variants[0].price != null)
             ? product.variants[0].price
             : (product.price ?? product.discountprice ?? product.productPrice ?? 'N/A');
@@ -131,7 +171,7 @@ if (products.length > 0 && suggestionsBox) {
         const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
         return `
             <div onclick="window.location.href='${getProductUrl(product)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
-                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
+                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='/static/placeholder.png'">
                 <div class="flex-1 min-w-0">
                     <p class="text-xs font-semibold text-black truncate text-left">${product.name || product.title || ''}</p>
                     ${displayPrice ? `<p class="text-[11px] text-[#A0522D] font-bold text-left" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}

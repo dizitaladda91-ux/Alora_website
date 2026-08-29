@@ -333,7 +333,7 @@ async function loadSliderProducts() {
         }
         requestAnimationFrame(() => {
             wrapper.innerHTML = top5Products.map((product) => {
-            const fullImgUrl = getImageUrl(product.imagepath, './static/placeholder.png');
+            const fullImgUrl = getImageUrl(product.imagepath, '/static/placeholder.png');
             const ratingCount = Math.round(product.rating || 4);
             let starsHTML = '';
             for (let i = 1; i <= 5; i++) {
@@ -471,13 +471,14 @@ function slideProducts(direction) {
     const wrapper = document.getElementById('productSliderWrapper');
     if (!container || !wrapper) return;
     const firstCard = wrapper.querySelector('.product-card');
-    if (!firstCard) return;
-    const scrollAmount = firstCard.offsetWidth + 16;
-    if (direction === 'right') {
-        container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    } else {
-        container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-    }
+    const scrollAmount = firstCard ? (firstCard.offsetWidth + 16) : 300;
+    requestAnimationFrame(() => {
+        if (direction === 'right') {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    });
 }
 function updateHeroBannerProductLinks(productList) {
     if (!Array.isArray(productList) || productList.length === 0) return;
@@ -515,12 +516,15 @@ document.addEventListener("DOMContentLoaded", () => {
     let scrollInterval;
     function startAutoSlide() {
         scrollInterval = setInterval(() => {
-            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 5) {
-                slider.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
-            }
-        }, 3000);
+            requestAnimationFrame(() => {
+                const step = slider.firstElementChild ? slider.firstElementChild.offsetWidth : 320;
+                if (slider.scrollLeft + step >= slider.scrollWidth - step) {
+                    slider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: step, behavior: 'smooth' });
+                }
+            });
+        }, 3500);
     }
     slider.addEventListener('mouseenter', () => clearInterval(scrollInterval));
     slider.addEventListener('mouseleave', startAutoSlide);

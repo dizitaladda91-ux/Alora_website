@@ -144,7 +144,7 @@ async function fetchSearchSuggestions(query, suggestionsBox) {
             return;
         }
         suggestionsBox.innerHTML = productsList.map(prod => {
-            const imageSrc = getImageUrl(prod.imagepath, './static/placeholder.png');
+            const imageSrc = getImageUrl(prod.imagepath, '/static/placeholder.png');
             const rawPrice = (prod.variants && prod.variants.length > 0 && prod.variants[0] && prod.variants[0].price != null)
                 ? prod.variants[0].price
                 : (prod.price ?? prod.discountprice ?? prod.productPrice ?? 'N/A');
@@ -152,7 +152,7 @@ async function fetchSearchSuggestions(query, suggestionsBox) {
             const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
             return `
                 <div onclick="window.location.href='${getProductUrl(prod)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
-                    <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='./static/placeholder.png'">
+                    <img src="${imageSrc}" alt="${prod.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='/static/placeholder.png'">
                     <div class="flex-1 min-w-0">
                         <p class="text-xs font-semibold text-black truncate text-left">${prod.name || prod.title || ''}</p>
                         ${displayPrice ? `<p class="text-[11px] text-[#A0522D] font-bold text-left" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}

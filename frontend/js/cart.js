@@ -83,7 +83,7 @@ function getCart() {
             const price = Number(item.price || item.unitPriceItemConfig || 0);
             const mrp = Number(item.mrp || item.comparePrice || item.unitPriceItemConfig || price) || price;
             const qty = Math.max(1, Number(item.qty || item.qtyCountOrderMetric || item.quantity || 1));
-            const img = String(item.img || item.baseImg || item.image || item.imageUrl || './static/placeholder.png');
+            const img = String(item.img || item.baseImg || item.image || item.imageUrl || '/static/placeholder.png');
             return {
                 id,
                 uniqueCartItemKeyId: id,
@@ -264,7 +264,7 @@ function addToCart(firstArg, nameArg, priceArg, imgArg, qtyArg = 1, sizeArg = "S
     const price = Number(itemObj.price || itemObj.unitPriceItemConfig || 0);
     const mrp = Number(itemObj.mrp || itemObj.comparePrice || price) || price;
     const qty = Math.max(1, Number(itemObj.qty || itemObj.qtyCountOrderMetric || 1));
-    const img = String(itemObj.img || itemObj.baseImg || itemObj.image || itemObj.imageUrl || './static/placeholder.png');
+    const img = String(itemObj.img || itemObj.baseImg || itemObj.image || itemObj.imageUrl || '/static/placeholder.png');
     let cart = getCart();
     let existing = cart.find(item => item.id === productId || item.uniqueCartItemKeyId === productId);
     if (existing) {
@@ -552,10 +552,10 @@ async function loadCartMoreProducts() {
             if (sectionEl) sectionEl.classList.remove("hidden");
         }
         const resolveImgUrl = (path) => {
-            if (!path) return "./static/placeholder.png";
+            if (!path) return "/static/placeholder.png";
             if (path.startsWith("http://") || path.startsWith("https://")) return path;
             const cleaned = path.replace(/\\/g, "/").replace(/^\/+/, "");
-            return baseUrl ? `${baseUrl}/${cleaned}` : `./${cleaned}`;
+            return baseUrl ? `${baseUrl}/${cleaned}` : `/${cleaned}`;
         };
         sliderTrack.innerHTML = displayProducts.map(product => {
             const variants = Array.isArray(product.variants) && product.variants.length > 0
@@ -600,8 +600,9 @@ async function loadCartMoreProducts() {
                 </div>` : ''}
                 <div class="w-full flex justify-center items-center h-[130px] sm:h-[160px] overflow-hidden relative my-1">
                     <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm" onerror="this.onerror=null; this.src='./static/placeholder.png'">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </a>
+                </div>`/a>
                 </div>
                 <div class="flex-1 flex flex-col justify-between space-y-1 mb-2">
                     <div>

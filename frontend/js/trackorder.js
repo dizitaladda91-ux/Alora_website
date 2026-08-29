@@ -80,7 +80,7 @@ function renderTrackingDetails(order) {
         return `
             <div class="flex items-center justify-between gap-4 py-3 border-b border-gray-100 last:border-0">
                 <div class="flex items-center gap-3">
-                    <img src="${getImageUrl(itemImg, './static/placeholder.png')}" alt="${item.name}" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-parchment/50 p-1">
+                    <img src="${getImageUrl(itemImg, '/static/placeholder.png')}" alt="${item.name}" class="w-12 h-12 object-contain rounded-lg border border-gray-200 bg-parchment/50 p-1">
                     <div>
                         <h4 class="font-semibold text-ink text-sm leading-snug">${item.name}</h4>
                         <p class="text-xs text-ash">Qty: ${itemQty} &bull; Size: ${itemVariant}</p>

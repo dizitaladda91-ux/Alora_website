@@ -10,7 +10,7 @@ function computeBaseUrl() {
     return "";
 }
 const BASE_URL = computeBaseUrl();
-export function getImageUrl(imagePath, fallback = "./static/placeholder.png", width = 400) {
+export function getImageUrl(imagePath, fallback = "/static/placeholder.png", width = 400) {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
