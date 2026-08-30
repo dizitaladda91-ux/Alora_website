@@ -164,7 +164,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalSlides = slides.length;
     const sliderContainer = track.parentElement;
     let currentIndex = 0;
-    let autoInterval;
     const updateSlider = () => {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
     };
@@ -176,13 +175,9 @@ document.addEventListener("DOMContentLoaded", () => {
         currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
         updateSlider();
     });
-    const startAutoSlide = () => {
-        autoInterval = setInterval(() => { if (nextBtn) nextBtn.click(); }, 5000);
-    };
-    const stopAutoSlide = () => clearInterval(autoInterval);
-    sliderContainer.addEventListener("mouseenter", stopAutoSlide);
-    sliderContainer.addEventListener("mouseleave", startAutoSlide);
-    startAutoSlide();
+    // Keep the LCP hero stable. Automatic carousel movement can replace the
+    // largest element during the Lighthouse measurement window and inflate LCP.
+    // The next/previous controls remain available for intentional navigation.
 });
 function toggleCartState(button) {
     const card = button.closest('.product-card');

@@ -41,17 +41,10 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
-    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
 
     <!-- 🚀 PRELOAD EXACT CRITICAL LCP HERO IMAGE FOR MOBILE & DESKTOP -->
     <link rel="preload" as="image" href="./static/hero_banner_1_mob.webp" type="image/webp" media="(max-width: 767px)" fetchpriority="high">
     <link rel="preload" as="image" href="./static/hero_banner_1_desk.webp" type="image/webp" media="(min-width: 768px)" fetchpriority="high">
-
-    <!-- 🚀 BREAK MODULE WATERFALL: MODULEPRELOAD CRITICAL ES MODULES AT 0ms -->
-    <link rel="modulepreload" href="./js/config.js">
-    <link rel="modulepreload" href="./js/navbar-interactions.js">
-    <link rel="modulepreload" href="./js/main.js">
 
     <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES 480ms RENDER-BLOCKING DELAY) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
@@ -430,8 +423,10 @@
 
     <!-- Slide 1 (Travel Ready Kit / Sachets) -->
     <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="1600" height="600" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="800" height="450" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <picture>
+            <source media="(min-width: 768px)" srcset="./static/hero_banner_1_desk.webp" width="1600" height="600">
+            <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit" width="800" height="450" fetchpriority="high" loading="eager" decoding="async" class="block w-full h-full object-cover object-center">
+        </picture>
     </a>
 
     <!-- Slide 3 (Face Serum) -->
