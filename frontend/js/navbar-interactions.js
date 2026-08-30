@@ -1,15 +1,33 @@
 import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
 const RUPEE_SYMBOL = '\u20B9';
 
-function closeMobileDrawer(mobileMenu, drawer) {
+window.openMobileDrawer = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    const mobileMenu = document.getElementById('mobile-menu');
+    const drawer = document.getElementById('mobile-menu-drawer');
+    if (!mobileMenu || !drawer) return;
+    mobileMenu.classList.remove('hidden', 'pointer-events-none');
+    requestAnimationFrame(() => {
+        mobileMenu.classList.remove('opacity-0');
+        drawer.classList.remove('-translate-x-full');
+    });
+    document.body.style.overflow = 'hidden';
+};
+
+window.closeMobileDrawer = function(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    if (e && e.stopPropagation) e.stopPropagation();
+    const mobileMenu = document.getElementById('mobile-menu');
+    const drawer = document.getElementById('mobile-menu-drawer');
     if (!mobileMenu || !drawer) return;
     drawer.classList.add('-translate-x-full');
     mobileMenu.classList.add('opacity-0', 'pointer-events-none');
     setTimeout(() => {
         mobileMenu.classList.add('hidden');
-        document.body.style.overflow = 'auto';
+        document.body.style.overflow = '';
     }, 300);
-}
+};
 
 document.addEventListener('click', (e) => {
     const menuBtn = e.target.closest('#menu-btn') || e.target.closest('.mobile-menu-toggle');
@@ -17,22 +35,13 @@ document.addEventListener('click', (e) => {
     const drawer = document.getElementById('mobile-menu-drawer');
 
     if (menuBtn) {
-        e.preventDefault();
-        if (mobileMenu && drawer) {
-            mobileMenu.classList.remove('hidden', 'pointer-events-none');
-            requestAnimationFrame(() => {
-                mobileMenu.classList.remove('opacity-0');
-                drawer.classList.remove('-translate-x-full');
-            });
-            document.body.style.overflow = 'hidden';
-        }
+        window.openMobileDrawer(e);
         return;
     }
 
     const menuCloseBtn = e.target.closest('#menu-close-btn');
     if ((menuCloseBtn || e.target === mobileMenu) && mobileMenu && drawer) {
-        e.preventDefault();
-        closeMobileDrawer(mobileMenu, drawer);
+        window.closeMobileDrawer(e);
         return;
     }
 });
