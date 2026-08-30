@@ -100,6 +100,18 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
         }
     });
 
+    // 4. Sanitize inline TOC elements so they never float or overlap on mobile
+    const inlineTocNodes = tempDiv.querySelectorAll('.toc, #toc, .table-of-contents, .ez-toc-container, [class*="toc"]');
+    inlineTocNodes.forEach((toc) => {
+        toc.style.position = 'static';
+        toc.style.float = 'none';
+        toc.style.width = '100%';
+        toc.style.maxWidth = '100%';
+        toc.style.marginLeft = '0';
+        toc.style.marginRight = '0';
+        toc.style.boxSizing = 'border-box';
+    });
+
     return tempDiv.innerHTML;
 }
 function decodeEntities(str) {
