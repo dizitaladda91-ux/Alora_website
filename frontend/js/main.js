@@ -1,20 +1,5 @@
 import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
 document.addEventListener("partialsLoaded", () => {
-    const menuBtn = document.getElementById("menu-btn");
-    const mobileMenu = document.getElementById("mobile-menu");
-    if (menuBtn && mobileMenu) {
-        const menuIcon = menuBtn.querySelector("i");
-        menuBtn.addEventListener("click", () => {
-            mobileMenu.classList.toggle("hidden");
-            if (menuIcon) {
-                if (mobileMenu.classList.contains("hidden")) {
-                    menuIcon.classList.replace("fa-xmark", "fa-bars");
-                } else {
-                    menuIcon.classList.replace("fa-bars", "fa-xmark");
-                }
-            }
-        });
-    }
     const mobileDropdownBtn = document.getElementById("mobile-dropdown-btn");
     const mobileDropdownMenu = document.getElementById("mobile-dropdown-menu");
     if (mobileDropdownBtn && mobileDropdownMenu) {

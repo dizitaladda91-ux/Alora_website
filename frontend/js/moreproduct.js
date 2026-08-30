@@ -480,29 +480,6 @@ document.addEventListener('cartUpdated', () => {
 });
 function setupMobileMenu() {
     document.addEventListener("click", (e) => {
-        const menuBtn = e.target.closest("#menu-btn") || e.target.closest(".mobile-menu-toggle");
-        const closeBtn = e.target.closest("#menu-close-btn");
-        const mobileMenu = document.getElementById("mobile-menu");
-        const mobileDrawer = document.getElementById("mobile-menu-drawer");
-        if (menuBtn && mobileMenu) {
-            e.preventDefault();
-            mobileMenu.classList.remove("hidden", "pointer-events-none", "opacity-0");
-            if (mobileDrawer) {
-                mobileDrawer.classList.remove("-translate-x-full");
-            }
-            return;
-        }
-        if ((closeBtn || e.target === mobileMenu) && mobileMenu) {
-            e.preventDefault();
-            if (mobileDrawer) {
-                mobileDrawer.classList.add("-translate-x-full");
-            }
-            mobileMenu.classList.add("opacity-0");
-            setTimeout(() => {
-                mobileMenu.classList.add("hidden", "pointer-events-none");
-            }, 300);
-            return;
-        }
         const toggleFilterBtn = e.target.closest("#toggle-filter-btn");
         const closeFilterBtn = e.target.closest("#close-filter-btn");
         const backdrop = document.getElementById("filter-backdrop");

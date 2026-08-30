@@ -1,10 +1,23 @@
 import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
 const RUPEE_SYMBOL = '\u20B9';
+
+function closeMobileDrawer(mobileMenu, drawer) {
+    if (!mobileMenu || !drawer) return;
+    drawer.classList.add('-translate-x-full');
+    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
+    setTimeout(() => {
+        mobileMenu.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }, 300);
+}
+
 document.addEventListener('click', (e) => {
-    const menuBtn = e.target.closest('#menu-btn');
+    const menuBtn = e.target.closest('#menu-btn') || e.target.closest('.mobile-menu-toggle');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const drawer = document.getElementById('mobile-menu-drawer');
+
     if (menuBtn) {
-        const mobileMenu = document.getElementById('mobile-menu');
-        const drawer = document.getElementById('mobile-menu-drawer');
+        e.preventDefault();
         if (mobileMenu && drawer) {
             mobileMenu.classList.remove('hidden', 'pointer-events-none');
             requestAnimationFrame(() => {
@@ -15,26 +28,15 @@ document.addEventListener('click', (e) => {
         }
         return;
     }
+
     const menuCloseBtn = e.target.closest('#menu-close-btn');
-    const mobileMenu = document.getElementById('mobile-menu');
-    const drawer = document.getElementById('mobile-menu-drawer');
-    if (menuCloseBtn && mobileMenu && drawer) {
+    if ((menuCloseBtn || e.target === mobileMenu) && mobileMenu && drawer) {
+        e.preventDefault();
         closeMobileDrawer(mobileMenu, drawer);
         return;
     }
-    if (e.target === mobileMenu && drawer) {
-        closeMobileDrawer(mobileMenu, drawer);
-    }
 });
-function closeMobileDrawer(mobileMenu, drawer) {
-    drawer.classList.add('-translate-x-full');
-    mobileMenu.classList.add('opacity-0');
-    mobileMenu.classList.add('pointer-events-none');
-    setTimeout(() => {
-        mobileMenu.classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }, 300);
-}
+
 document.addEventListener("partialsLoaded", () => {
     initSearchFeature();
     updateCartAndAuthStatus();
@@ -42,6 +44,7 @@ document.addEventListener("partialsLoaded", () => {
 document.addEventListener("cartUpdated", () => {
     updateCartAndAuthStatus();
 });
+
 function initSearchFeature() {
     const searchOpenBtn = document.getElementById('search-open-btn');
     const searchCloseBtn = document.getElementById('search-close-btn');
