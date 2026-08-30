@@ -93,6 +93,40 @@
     </script>
     <script src="https://cdn.tailwindcss.com" defer></script>
     <style>
+        /* 🚀 0ms Instant Critical Paint (Eliminates Initial White Screen / Flash) */
+        html, body {
+            background-color: #F7F2E7 !important;
+            color: #152219;
+            margin: 0;
+            padding: 0;
+        }
+        #navbar-placeholder {
+            min-height: 64px;
+            background-color: #FFFFFF;
+        }
+
+        /* 🚀 WCAG Touch Target Compliance: Expands interactive touch target of .dot buttons to 28px x 28px */
+        button.dot {
+            position: relative !important;
+            min-height: 28px !important;
+            min-width: 28px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            padding: 0 !important;
+            cursor: pointer !important;
+        }
+
+        button.dot::before {
+            content: '' !important;
+            position: absolute !important;
+            top: -9px !important;
+            bottom: -9px !important;
+            left: -9px !important;
+            right: -9px !important;
+            border-radius: 9999px !important;
+        }
+
         /* 🚀 Font Display Swap & Font Metric Overrides (Zero Layout Shift on Font Load) */
         @font-face { font-family: 'Fraunces'; src: local('Georgia'); font-display: swap; }
         @font-face { font-family: 'PT Sans'; src: local('Arial'); font-display: swap; }
@@ -268,7 +302,7 @@
     </script>
 
 </head>
-<body class="bg-parchment font-sans text-[#2A2A24] antialiased">
+<body style="background-color: #F7F2E7;" class="bg-parchment font-sans text-[#2A2A24] antialiased">
 
   <!-- ============Pop Up ==================== -->
   

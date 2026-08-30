@@ -305,8 +305,9 @@ export function renderNavbarState() {
     const updateUI = (authContainer) => {
         if (!storedUserStr) {
             authContainer.innerHTML = `
-                <a href="./login.html" class="text-base text-black hover:text-gold transition">
-                    <i class="fa-solid fa-user"></i>
+                <a href="./login.html" aria-label="User Account Login" title="User Account Login" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    <span class="sr-only">User Account Login</span>
                 </a>
             `;
             return;
@@ -316,8 +317,9 @@ export function renderNavbarState() {
             const role = user.role || sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
             if (role === "admin" || role === "seoadmin") {
                 authContainer.innerHTML = `
-                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" class="text-base text-black hover:text-gold transition" title="Admin Portal">
-                        <i class="fa-solid fa-user"></i>
+                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" aria-label="Admin Portal" title="Admin Portal" class="text-base text-black hover:text-gold transition">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                        <span class="sr-only">Admin Portal</span>
                     </a>
                 `;
             } else {

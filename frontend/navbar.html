@@ -30,29 +30,30 @@
 
         <!-- Right: Actions Container -->
         <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
-            <button id="search-open-btn" type="button" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
-                <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
+            <button id="search-open-btn" type="button" aria-label="Search products" title="Search products" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
+                <i class="fa-solid fa-magnifying-glass pointer-events-none" aria-hidden="true"></i>
             </button>
 
             <!-- Floating Overlay Search Bar (Fixed layout overlapping issue) -->
             <div id="search-container" class="hidden absolute top-full left-0 right-0 w-full bg-white p-3 shadow-md border-t border-gray-100 z-50 flex items-center justify-between gap-3 px-4 md:px-8">
                 <div class="relative w-full max-w-2xl mx-auto flex items-center">
                     <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold" autocomplete="off">
-                    <button id="search-close-btn" type="button" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
+                    <button id="search-close-btn" type="button" aria-label="Close search" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
                     <div id="search-suggestions" class="absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1"></div>
                 </div>
             </div>
 
             <!-- Cart Section -->
-            <a href="./cart.html" class="relative text-base text-black hover:text-gold transition">
-                <i class="fa-solid fa-shopping-cart"></i>
+            <a href="./cart.html" aria-label="Shopping Cart" title="Shopping Cart" class="relative text-base text-black hover:text-gold transition">
+                <i class="fa-solid fa-shopping-cart" aria-hidden="true"></i>
                 <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
             </a>
 
             <!-- Dynamic Auth Section -->
             <div id="auth-actions" class="flex items-center gap-4">
-                <a href="./login.html" class="text-base text-black hover:text-gold transition">
-                    <i class="fa-solid fa-user"></i>
+                <a href="./login.html" aria-label="User Account Login" title="User Account Login" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    <span class="sr-only">User Account Login</span>
                 </a>
             </div>
         </div>
