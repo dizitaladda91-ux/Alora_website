@@ -40,7 +40,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2" as="font" type="font/woff2" crossorigin>
@@ -63,35 +62,7 @@
 
 
 
-    <script>
-    window.tailwind = window.tailwind || {};
-    window.tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    ink: '#152219',
-                    'ink-light': '#1F3327',
-                    'ink-soft': '#28402F',
-                    parchment: '#F7F2E7',
-                    card: '#FFFFFF',
-                    clay: '#A24C3D',
-                    'clay-light': '#C97E63',
-                    'clay-dark': '#7E3A2F',
-                    sage: '#6C8763',
-                    'sage-light': '#E7ECDF',
-                    gold: '#BB9556',
-                    ash: '#6B685F',
-                },
-                fontFamily: {
-                    serif: ['"Fraunces"', '"Fraunces-Fallback"', 'Georgia', 'serif'],
-                    sans: ['"PT Sans"', '"PTSans-Fallback"', '"Manrope"', '"Manrope-Fallback"', 'Arial', 'sans-serif'],
-                    roboto: ['"Roboto Mono"', 'monospace'],
-                },
-            }
-        }
-    };
-    </script>
-    <script src="https://cdn.tailwindcss.com" defer></script>
+    <link rel="stylesheet" href="./styles/tailwind.min.css">
     <style>
         /* 🚀 0ms Instant Critical Paint (Eliminates Initial White Screen / Flash) */
         html, body {
