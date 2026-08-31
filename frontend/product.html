@@ -41,6 +41,15 @@
         .star-rating input[type="radio"]:checked ~ label,
         .star-rating label:hover,
         .star-rating label:hover ~ label { color: #C5A059; }
+
+        /* On phones the gallery must scroll normally; otherwise the product
+           details pass underneath the frozen image. */
+        @media (min-width: 768px) {
+            .product-media-gallery {
+                position: sticky;
+                top: 6rem;
+            }
+        }
     </style>
 </head>
 <body class="bg-parchment font-sans text-ink flex flex-col min-h-screen">
@@ -55,7 +64,7 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start">
                 
                 <!-- LEFT SIDE: IMAGES & GALLERY -->
-                <div class="space-y-4 md:sticky md:top-24 relative z-0">
+                <div class="product-media-gallery space-y-4 relative z-0">
                     <div id="main-media-container" class="imagesection bg-white rounded-2xl border border-[#E7DFC7] aspect-square flex items-center justify-center p-6 shadow-sm relative overflow-hidden">
                         <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </div>

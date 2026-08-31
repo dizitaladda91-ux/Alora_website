@@ -1,246 +1,156 @@
 import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
+
 const RUPEE_SYMBOL = '\u20B9';
 
-window.openMobileDrawer = function(e) {
-    if (e && e.preventDefault) e.preventDefault();
-    if (e && e.stopPropagation) e.stopPropagation();
-    const mobileMenu = document.getElementById('mobile-menu');
+window.openMobileDrawer = function (event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const menu = document.getElementById('mobile-menu');
     const drawer = document.getElementById('mobile-menu-drawer');
-    if (!mobileMenu || !drawer) return;
-    mobileMenu.classList.remove('hidden', 'pointer-events-none');
+    if (!menu || !drawer) return;
+    menu.classList.remove('hidden', 'pointer-events-none');
     requestAnimationFrame(() => {
-        mobileMenu.classList.remove('opacity-0');
+        menu.classList.remove('opacity-0');
         drawer.classList.remove('-translate-x-full');
     });
     document.body.style.overflow = 'hidden';
 };
 
-window.closeMobileDrawer = function(e) {
-    if (e && e.preventDefault) e.preventDefault();
-    if (e && e.stopPropagation) e.stopPropagation();
-    const mobileMenu = document.getElementById('mobile-menu');
+window.closeMobileDrawer = function (event) {
+    event?.preventDefault();
+    event?.stopPropagation();
+    const menu = document.getElementById('mobile-menu');
     const drawer = document.getElementById('mobile-menu-drawer');
-    if (!mobileMenu || !drawer) return;
+    if (!menu || !drawer) return;
     drawer.classList.add('-translate-x-full');
-    mobileMenu.classList.add('opacity-0', 'pointer-events-none');
-    setTimeout(() => {
-        mobileMenu.classList.add('hidden');
+    menu.classList.add('opacity-0', 'pointer-events-none');
+    window.setTimeout(() => {
+        menu.classList.add('hidden');
         document.body.style.overflow = '';
     }, 300);
 };
 
-document.addEventListener('click', (e) => {
-    const menuBtn = e.target.closest('#menu-btn') || e.target.closest('.mobile-menu-toggle');
+document.addEventListener('click', (event) => {
     const mobileMenu = document.getElementById('mobile-menu');
-    const drawer = document.getElementById('mobile-menu-drawer');
-
-    if (menuBtn) {
-        window.openMobileDrawer(e);
+    if (event.target.closest('#menu-btn, .mobile-menu-toggle')) {
+        window.openMobileDrawer(event);
+        return;
+    }
+    if (event.target.closest('#menu-close-btn') || event.target === mobileMenu) {
+        window.closeMobileDrawer(event);
         return;
     }
 
-    const menuCloseBtn = e.target.closest('#menu-close-btn');
-    if ((menuCloseBtn || e.target === mobileMenu) && mobileMenu && drawer) {
-        window.closeMobileDrawer(e);
+    const searchContainer = document.getElementById('search-container');
+    if (event.target.closest('#search-open-btn')) {
+        event.preventDefault();
+        searchContainer?.classList.remove('hidden');
+        initSearchFeature();
+        document.getElementById('search-input')?.focus();
         return;
+    }
+    if (event.target.closest('#search-close-btn')) {
+        event.preventDefault();
+        searchContainer?.classList.add('hidden');
+        document.getElementById('search-suggestions')?.classList.add('hidden');
+        return;
+    }
+    const result = event.target.closest('.search-result');
+    if (result?.dataset.productUrl) {
+        window.location.href = result.dataset.productUrl;
+        return;
+    }
+    if (searchContainer && !searchContainer.contains(event.target)) {
+        searchContainer.classList.add('hidden');
+        document.getElementById('search-suggestions')?.classList.add('hidden');
     }
 });
 
-document.addEventListener("partialsLoaded", () => {
+document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+        window.closeMobileDrawer(event);
+        document.getElementById('search-container')?.classList.add('hidden');
+    }
+});
+
+document.addEventListener('partialsLoaded', () => {
     initSearchFeature();
     updateCartAndAuthStatus();
 });
-document.addEventListener("cartUpdated", () => {
-    updateCartAndAuthStatus();
-});
+document.addEventListener('cartUpdated', updateCartAndAuthStatus);
 
 function initSearchFeature() {
-    const searchOpenBtn = document.getElementById('search-open-btn');
-    const searchCloseBtn = document.getElementById('search-close-btn');
-    const searchContainer = document.getElementById('search-container');
-    const searchInput = document.getElementById('search-input');
-    const isMoreProductPage = window.location.pathname.includes('moreproduct.html') || window.location.pathname === '/products';
-    if (!searchContainer || !searchInput) return;
-    let suggestionsBox = document.getElementById('search-suggestions');
-    if (!suggestionsBox && searchInput.parentElement && !isMoreProductPage) {
-        suggestionsBox = document.createElement('div');
-        suggestionsBox.id = 'search-suggestions';
-        searchInput.parentElement.appendChild(suggestionsBox);
-    }
-    if (suggestionsBox) {
-        suggestionsBox.className = 'absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1';
-    }
-    searchOpenBtn?.addEventListener('click', (e) => {
-        e.stopPropagation();
-        searchContainer.classList.toggle('hidden');
-        if (!searchContainer.classList.contains('hidden')) {
-            searchInput.focus();
-        }
-    });
-    searchCloseBtn?.addEventListener('click', () => {
-        searchContainer.classList.add('hidden');
-        if (suggestionsBox) suggestionsBox.classList.add('hidden');
-        searchInput.value = '';
-    });
-    searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            const query = searchInput.value.trim();
-            if (query) {
-                window.location.href = `/products?search=${encodeURIComponent(query)}`;
-            }
-        }
-    });
+    const input = document.getElementById('search-input');
+    const suggestions = document.getElementById('search-suggestions');
+    if (!input || !suggestions || input.dataset.searchInitialized === 'true') return;
+    input.dataset.searchInitialized = 'true';
+
     let debounceTimer;
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim();
-        clearTimeout(debounceTimer);
+    input.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' && input.value.trim()) {
+            window.location.href = `/products?search=${encodeURIComponent(input.value.trim())}`;
+        }
+    });
+    input.addEventListener('input', () => {
+        const query = input.value.trim();
+        window.clearTimeout(debounceTimer);
         if (query.length < 2) {
-            if (suggestionsBox) suggestionsBox.classList.add('hidden');
+            suggestions.classList.add('hidden');
             return;
         }
-        debounceTimer = setTimeout(async () => {
-            try {
-                let products = [];
-                try {
-                    const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.success && Array.isArray(data.products)) {
-                            products = data.products;
-                        } else if (Array.isArray(data)) {
-                            products = data;
-                        }
-                    }
-                } catch (apiErr) {
-                    console.warn("Backend search endpoint failed, falling back to all products:", apiErr);
-                }
-                if (products.length === 0) {
-                    try {
-                        const allRes = await fetch(`${BASE_URL}/api/product/all`);
-                        if (allRes.ok) {
-                            const allData = await allRes.json();
-                            if (Array.isArray(allData)) {
-                                const qLower = query.toLowerCase();
-                                products = allData.filter(p => {
-                                    const name = (p.name || p.title || '').toLowerCase();
-                                    const cat = (p.category || '').toLowerCase();
-                                    const desc = (p.description || '').toLowerCase();
-                                    return name.includes(qLower) || cat.includes(qLower) || desc.includes(qLower);
-                                });
-            }
-        }
-    });
-    let debounceTimer;
-    searchInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim();
-        clearTimeout(debounceTimer);
-        if (query.length < 2) {
-            if (suggestionsBox) suggestionsBox.classList.add('hidden');
-            return;
-        }
-        debounceTimer = setTimeout(async () => {
-            try {
-                let products = [];
-                try {
-                    const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
-                    if (response.ok) {
-                        const data = await response.json();
-                        if (data.success && Array.isArray(data.products)) {
-                            products = data.products;
-                        } else if (Array.isArray(data)) {
-                            products = data;
-                        }
-                    }
-                } catch (apiErr) {
-                    console.warn("Backend search endpoint failed, falling back to all products:", apiErr);
-                }
-                if (products.length === 0) {
-                    try {
-                        const allRes = await fetch(`${BASE_URL}/api/product/all`);
-                        if (allRes.ok) {
-                            const allData = await allRes.json();
-                            if (Array.isArray(allData)) {
-                                const qLower = query.toLowerCase();
-                                products = allData.filter(p => {
-                                    const name = (p.name || p.title || '').toLowerCase();
-                                    const cat = (p.category || '').toLowerCase();
-                                    const desc = (p.description || '').toLowerCase();
-                                    return name.includes(qLower) || cat.includes(qLower) || desc.includes(qLower);
-                                });
-                            }
-                        }
-                    } catch (allErr) {
-                        console.error("Fallback product fetch error:", allErr);
-                    }
-                }
-if (products.length > 0 && suggestionsBox) {
-    suggestionsBox.innerHTML = products.map(product => {
-        const imageSrc = getImageUrl(product.imagepath, '/static/placeholder.png');
-        const rawPrice = (product.variants && product.variants.length > 0 && product.variants[0] && product.variants[0].price != null)
-            ? product.variants[0].price
-            : (product.price ?? product.discountprice ?? product.productPrice ?? 'N/A');
-        const cleanedPrice = (rawPrice === 'N/A' || rawPrice == null) ? '' : String(rawPrice).replace(/[^\d.]/g, '').trim();
-        const displayPrice = cleanedPrice ? `${RUPEE_SYMBOL} ${cleanedPrice}` : '';
-        return `
-            <div onclick="window.location.href='${getProductUrl(product)}'" class="flex items-center gap-3 p-3 hover:bg-stone-50 cursor-pointer border-b border-stone-100 last:border-b-0 transition text-left">
-                <img src="${imageSrc}" alt="${product.name || 'Product'}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200" onerror="this.src='/static/placeholder.png'">
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-semibold text-black truncate text-left">${product.name || product.title || ''}</p>
-                    ${displayPrice ? `<p class="text-[11px] text-[#A0522D] font-bold text-left" style="font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Segoe UI Symbol', sans-serif;">${displayPrice}</p>` : ''}
-                </div>
-                <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
-            </div>
-        `;
-    }).join('');
-    suggestionsBox.classList.remove('hidden');
-}else if (suggestionsBox) {
-                    suggestionsBox.innerHTML = `<p class="p-4 text-xs text-stone-500 text-center font-medium">No products found for "<i>${query}</i>"</p>`;
-                    suggestionsBox.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Frontend Search error:", error);
-            }
-        }, 300);
-    });
-    document.addEventListener('click', (e) => {
-        if (!searchContainer.contains(e.target) && !searchOpenBtn?.contains(e.target)) {
-            searchContainer.classList.add('hidden');
-            if (suggestionsBox) suggestionsBox.classList.add('hidden');
-        }
+        debounceTimer = window.setTimeout(() => searchProducts(query, suggestions), 300);
     });
 }
-function updateCartAndAuthStatus() {
-    const cartBadge = document.getElementById('global-cart-badge');
-    const authActions = document.getElementById('auth-actions');
-    let cartCount = 0;
+
+async function searchProducts(query, suggestions) {
     try {
-        const primary = JSON.parse(localStorage.getItem('glowCart') || '[]');
-        if (Array.isArray(primary) && primary.length > 0) {
-            cartCount = primary.reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
-        } else {
-            const legacy = JSON.parse(localStorage.getItem('glowRitualCartData') || '[]');
-            if (Array.isArray(legacy) && legacy.length > 0) {
-                cartCount = legacy.reduce((t, it) => t + (parseInt(it.qty || it.qtyCountOrderMetric || 0) || 0), 0);
+        let products = [];
+        const response = await fetch(`${BASE_URL}/api/product/search?q=${encodeURIComponent(query)}`);
+        if (response.ok) {
+            const data = await response.json();
+            products = Array.isArray(data?.products) ? data.products : (Array.isArray(data) ? data : []);
+        }
+        if (!products.length) {
+            const allResponse = await fetch(`${BASE_URL}/api/product/all`);
+            if (allResponse.ok) {
+                const allProducts = await allResponse.json();
+                const normalizedQuery = query.toLowerCase();
+                products = (Array.isArray(allProducts) ? allProducts : []).filter((product) =>
+                    [product.name, product.title, product.category, product.description]
+                        .some((value) => String(value || '').toLowerCase().includes(normalizedQuery))
+                );
             }
         }
-    } catch (err) {
-        console.warn('Error computing cart count for navbar:', err);
+        suggestions.innerHTML = products.length
+            ? products.map(renderSearchResult).join('')
+            : '<p class="p-4 text-xs text-stone-500 text-center font-medium">No products found.</p>';
+        suggestions.classList.remove('hidden');
+    } catch (error) {
+        console.error('Product search failed:', error);
     }
-    const token = localStorage.getItem('token');
-    document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach(b => { if (b) b.innerText = String(cartCount); });
-    localStorage.setItem('cartCount', String(cartCount));
-    if (authActions && token) {
-        authActions.innerHTML = `
-            <a href="./profile.html" class="text-base text-black hover:text-gold transition">
-                <i class="fa-solid fa-user-check text-green-700"></i>
-            </a>
-            <button id="logout-btn" class="text-xs font-semibold text-red-600 hover:underline uppercase ml-2">Logout</button>
-        `;
-        document.getElementById('logout-btn')?.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            alert("Logged out successfully");
-            window.location.reload();
-        });
+}
+
+function renderSearchResult(product) {
+    const name = product.name || product.title || 'Product';
+    const image = getImageUrl(product.imagepath, '/static/placeholder.png');
+    const price = product.variants?.[0]?.price ?? product.price ?? product.discountprice ?? product.productPrice;
+    const displayPrice = price == null ? '' : `<span class="block text-[11px] text-[#A0522D] font-bold">${RUPEE_SYMBOL} ${String(price).replace(/[^\d.]/g, '')}</span>`;
+    return `<button type="button" data-product-url="${getProductUrl(product)}" class="search-result flex w-full items-center gap-3 p-3 hover:bg-stone-50 border-b border-stone-100 last:border-b-0 transition text-left">
+        <img src="${image}" alt="${name}" class="w-10 h-10 object-contain rounded bg-stone-50 border border-stone-200">
+        <span class="flex-1 min-w-0"><span class="block text-xs font-semibold text-black truncate">${name}</span>${displayPrice}</span>
+        <i class="fa-solid fa-chevron-right text-[10px] text-stone-400 pr-1"></i>
+    </button>`;
+}
+
+function updateCartAndAuthStatus() {
+    let cartCount = 0;
+    try {
+        const cart = JSON.parse(localStorage.getItem('glowCart') || localStorage.getItem('glowRitualCartData') || '[]');
+        if (Array.isArray(cart)) cartCount = cart.reduce((total, item) => total + (Number(item.qty || item.qtyCountOrderMetric) || 0), 0);
+    } catch (error) {
+        console.warn('Error computing cart count for navbar:', error);
     }
+    document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach((badge) => {
+        badge.textContent = String(cartCount);
+    });
 }
