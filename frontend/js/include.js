@@ -16,100 +16,7 @@ window.togglePasswordVisibility = function(inputId, btn) {
         }
     }
 };
-window.appendSchemaTemplate = function(type) {
-    const textarea = document.getElementById('schema');
-    if (!textarea) return;
-    const templates = {
-        article: {
-            "@context": "https://schema.org",
-            "@type": "BlogPosting",
-            "headline": "Blog Title Here",
-            "description": "Short summary of the blog post.",
-            "author": { "@type": "Organization", "name": "Alora Radiance" }
-        },
-        faq: {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-                {
-                    "@type": "Question",
-                    "name": "What are the benefits of this product?",
-                    "acceptedAnswer": { "@type": "Answer", "text": "Detailed answer explaining the benefits." }
-                }
-            ]
-        },
-        howto: {
-            "@context": "https://schema.org",
-            "@type": "HowTo",
-            "name": "How to apply product effectively",
-            "step": [
-                { "@type": "HowToStep", "text": "Cleanse face gently with lukewarm water." },
-                { "@type": "HowToStep", "text": "Apply 3 drops of serum and massage evenly." }
-            ]
-        }
-    };
-    const newObj = templates[type] || templates.article;
-    const currentVal = textarea.value.trim();
-    if (!currentVal) {
-        textarea.value = JSON.stringify([newObj], null, 2);
-    } else {
-        try {
-            let parsed = JSON.parse(currentVal);
-            if (Array.isArray(parsed)) {
-                parsed.push(newObj);
-            } else if (typeof parsed === 'object' && parsed !== null) {
-                parsed = [parsed, newObj];
-            } else {
-                parsed = [newObj];
-            }
-            textarea.value = JSON.stringify(parsed, null, 2);
-        } catch (e) {
-            textarea.value = JSON.stringify([newObj], null, 2);
-        }
-    }
-};
-async function loadPartial(selector, url) {
-    const el = document.querySelector(selector);
-    if (!el) return; 
-    try {
-        const res = await fetch(url);
-        if (!res.ok) throw new Error(`${url} not found (status ${res.status})`);
-        const html = await res.text();
-        el.innerHTML = html;
-        if (location.protocol !== "file:") {
-            el.querySelectorAll('img[src^="./static/"]').forEach(img => {
-                img.src = img.getAttribute('src').replace(/^\.\/static\//, '/static/');
-            });
-        }
-    } catch (err) {
-        console.error("Partial load failed:", url, err);
-    }
-}
-async function loadAllPartials() {
-    const isFile = location.protocol === "file:";
-    const navUrl = isFile ? "./navbar.html" : "/navbar.html";
-    const footerUrl = isFile ? "./footer.html" : "/footer.html";
-    const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
-    const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
-window.togglePasswordVisibility = function(inputId, btn) {
-    const input = document.getElementById(inputId);
-    if (!input) return;
-    const icon = btn ? btn.querySelector('i') : null;
-    if (input.type === 'password') {
-        input.type = 'text';
-        if (icon) {
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        }
-    } else {
-        input.type = 'password';
-        if (icon) {
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
-};
 window.appendSchemaTemplate = function(type) {
     const textarea = document.getElementById('schema');
     if (!textarea) return;
@@ -162,6 +69,7 @@ window.appendSchemaTemplate = function(type) {
         }
     }
 };
+
 async function loadPartial(selector, url) {
     const el = document.querySelector(selector);
     if (!el) return; 
@@ -179,6 +87,7 @@ async function loadPartial(selector, url) {
         console.error("Partial load failed:", url, err);
     }
 }
+
 async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
@@ -187,11 +96,10 @@ async function loadAllPartials() {
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
     const navPlaceholder = document.getElementById('navbar-placeholder');
-    // Some pages ship a lightweight navbar fallback. Always replace it with the
-    // shared navbar so the mobile drawer markup is present alongside its button.
     if (navPlaceholder) {
         await loadPartial("#navbar-placeholder", navUrl);
     }
+
     const loadDeferredPartials = async () => {
         await loadPartial("#footer-placeholder", footerUrl);
         await loadPartial("#chatbot-placeholder", chatbotUrl);
