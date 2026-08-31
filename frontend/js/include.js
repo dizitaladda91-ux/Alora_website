@@ -93,7 +93,9 @@ async function loadAllPartials() {
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
     const navPlaceholder = document.getElementById('navbar-placeholder');
-    if (!navPlaceholder || !navPlaceholder.querySelector('nav')) {
+    // Some pages ship a lightweight navbar fallback. Always replace it with the
+    // shared navbar so the mobile drawer markup is present alongside its button.
+    if (navPlaceholder) {
         await loadPartial("#navbar-placeholder", navUrl);
     }
 
@@ -338,8 +340,11 @@ window.loadGtmScript = loadGtmScript;
 const initNonCriticalServices = () => {
     initGoogleTagManager();
     trackReferralFromUrl();
-    loadAllPartials();
 };
+
+// Navigation is interactive page chrome, so do not defer it until the browser
+// is idle. Deferring it left fallback hamburger buttons without their drawer.
+loadAllPartials();
 
 if ('requestIdleCallback' in window) {
     requestIdleCallback(initNonCriticalServices);
