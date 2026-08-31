@@ -92,13 +92,106 @@ async function loadAllPartials() {
     const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
+window.togglePasswordVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn ? btn.querySelector('i') : null;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+};
+window.appendSchemaTemplate = function(type) {
+    const textarea = document.getElementById('schema');
+    if (!textarea) return;
+    const templates = {
+        article: {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "Blog Title Here",
+            "description": "Short summary of the blog post.",
+            "author": { "@type": "Organization", "name": "Alora Radiance" }
+        },
+        faq: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What are the benefits of this product?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Detailed answer explaining the benefits." }
+                }
+            ]
+        },
+        howto: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to apply product effectively",
+            "step": [
+                { "@type": "HowToStep", "text": "Cleanse face gently with lukewarm water." },
+                { "@type": "HowToStep", "text": "Apply 3 drops of serum and massage evenly." }
+            ]
+        }
+    };
+    const newObj = templates[type] || templates.article;
+    const currentVal = textarea.value.trim();
+    if (!currentVal) {
+        textarea.value = JSON.stringify([newObj], null, 2);
+    } else {
+        try {
+            let parsed = JSON.parse(currentVal);
+            if (Array.isArray(parsed)) {
+                parsed.push(newObj);
+            } else if (typeof parsed === 'object' && parsed !== null) {
+                parsed = [parsed, newObj];
+            } else {
+                parsed = [newObj];
+            }
+            textarea.value = JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            textarea.value = JSON.stringify([newObj], null, 2);
+        }
+    }
+};
+async function loadPartial(selector, url) {
+    const el = document.querySelector(selector);
+    if (!el) return; 
+    try {
+        const res = await fetch(url);
+        if (!res.ok) throw new Error(`${url} not found (status ${res.status})`);
+        const html = await res.text();
+        el.innerHTML = html;
+        if (location.protocol !== "file:") {
+            el.querySelectorAll('img[src^="./static/"]').forEach(img => {
+                img.src = img.getAttribute('src').replace(/^\.\/static\//, '/static/');
+            });
+        }
+    } catch (err) {
+        console.error("Partial load failed:", url, err);
+    }
+}
+async function loadAllPartials() {
+    const isFile = location.protocol === "file:";
+    const navUrl = isFile ? "./navbar.html" : "/navbar.html";
+    const footerUrl = isFile ? "./footer.html" : "/footer.html";
+    const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
+    const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
+
     const navPlaceholder = document.getElementById('navbar-placeholder');
     // Some pages ship a lightweight navbar fallback. Always replace it with the
     // shared navbar so the mobile drawer markup is present alongside its button.
     if (navPlaceholder) {
         await loadPartial("#navbar-placeholder", navUrl);
     }
-
     const loadDeferredPartials = async () => {
         await loadPartial("#footer-placeholder", footerUrl);
         await loadPartial("#chatbot-placeholder", chatbotUrl);
@@ -117,6 +210,7 @@ async function loadAllPartials() {
         setTimeout(loadDeferredPartials, 1200);
     }
 }
+
 function loadGtmScript(gtmId) {
     if (!gtmId || !/^GTM-[A-Z0-9]+$/i.test(gtmId.trim())) return;
     const cleanId = gtmId.trim().toUpperCase();
@@ -146,14 +240,15 @@ function loadGtmScript(gtmId) {
         });
     }
 }
+
 function initGoogleTagManager() {
     if (window.GTM_ID) {
         loadGtmScript(window.GTM_ID);
         return;
     }
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null)
-        ? window.BASE_URL
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) 
+        ? window.BASE_URL 
         : (isLocal ? "http://localhost:5000" : "");
     fetch(`${baseUrl}/api/config/gtm`)
         .then((res) => res.ok ? res.json() : null)
@@ -164,8 +259,9 @@ function initGoogleTagManager() {
         })
         .catch(() => {});
 }
+
 function showReferralBanner(code, discountPercent) {
-    if (!code) return;
+    if (!code || window.self !== window.top) return;
     let banner = document.getElementById("alora-referral-banner");
     if (!banner) {
         banner = document.createElement("div");
@@ -178,7 +274,9 @@ function showReferralBanner(code, discountPercent) {
         <button onclick="document.getElementById('alora-referral-banner').remove()" class="ml-2 text-white/80 hover:text-white text-sm focus:outline-none" title="Dismiss">&times;</button>
     `;
 }
+
 function trackReferralFromUrl() {
+    if (window.self !== window.top) return;
     const params = new URLSearchParams(window.location.search);
     const pathMatch = window.location.pathname.match(/^\/ref\/([^/?#]+)\/?$/i);
     const rawCode = pathMatch?.[1] || params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
@@ -231,108 +329,6 @@ function trackReferralFromUrl() {
         console.warn("Referral tracking network notice:", error.message);
     });
 }
-window.parseMultipleSchemas = function(rawInput) {
-    if (!rawInput || !String(rawInput).trim()) return [];
-    let cleaned = String(rawInput).trim();
-    if (cleaned.includes('<script')) {
-        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
-        if (scriptMatches && scriptMatches.length > 0) {
-            const extracted = [];
-            for (const match of scriptMatches) {
-                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
-                if (content) {
-                    const subSchemas = window.parseMultipleSchemas(content);
-                    extracted.push(...subSchemas);
-                }
-            }
-            if (extracted.length > 0) return extracted;
-        } else {
-            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
-        }
-    }
-    try {
-        const parsed = JSON.parse(cleaned);
-        if (Array.isArray(parsed)) {
-            return parsed.filter(item => item && typeof item === 'object');
-        }
-        if (parsed && typeof parsed === 'object') {
-            return [parsed];
-        }
-    } catch (e) {
-    }
-    const schemas = [];
-    let depth = 0;
-    let startIndex = -1;
-    let inString = false;
-    let isEscaped = false;
-    for (let i = 0; i < cleaned.length; i++) {
-        const char = cleaned[i];
-        if (isEscaped) {
-            isEscaped = false;
-            continue;
-        }
-        if (char === '\\') {
-            isEscaped = true;
-            continue;
-        }
-        if (char === '"') {
-            inString = !inString;
-            continue;
-        }
-        if (!inString) {
-            if (char === '{' || char === '[') {
-                if (depth === 0) startIndex = i;
-                depth++;
-            } else if (char === '}' || char === ']') {
-                depth--;
-                if (depth === 0 && startIndex !== -1) {
-                    const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
-                    try {
-                        const parsedObj = JSON.parse(jsonChunk);
-                        if (Array.isArray(parsedObj)) {
-                            schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
-                        } else if (parsedObj && typeof parsedObj === 'object') {
-                            schemas.push(parsedObj);
-                        }
-                    } catch (err) {
-                        console.warn("Failed parsing schema chunk:", err);
-                    }
-                    startIndex = -1;
-                }
-            }
-        }
-    }
-    return schemas;
-};
-window.injectMultipleSchemasToDOM = function(rawSchemaInput) {
-    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
-    if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
-    let schemasToInject = window.parseMultipleSchemas(rawSchemaInput);
-    if (!schemasToInject || schemasToInject.length === 0) return;
-    if (schemasToInject.length === 1) {
-        const script = document.createElement('script');
-        script.id = 'dynamic-json-ld';
-        script.type = 'application/ld+json';
-        script.className = 'dynamic-schema-injected';
-        script.textContent = JSON.stringify(schemasToInject[0], null, 2);
-        document.head.appendChild(script);
-    } else {
-        const script = document.createElement('script');
-        script.id = 'dynamic-json-ld';
-        script.type = 'application/ld+json';
-        script.className = 'dynamic-schema-injected';
-        const combinedSchema = {
-            "@context": "https://schema.org",
-            "@graph": schemasToInject.map(s => {
-                const copy = { ...s };
-                if (copy["@context"]) delete copy["@context"];
-                return copy;
-            })
-        };
-        script.textContent = JSON.stringify(combinedSchema, null, 2);
-        document.head.appendChild(script);
-    }
-};
 
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
@@ -342,8 +338,6 @@ const initNonCriticalServices = () => {
     trackReferralFromUrl();
 };
 
-// Navigation is interactive page chrome, so do not defer it until the browser
-// is idle. Deferring it left fallback hamburger buttons without their drawer.
 loadAllPartials();
 
 if ('requestIdleCallback' in window) {
