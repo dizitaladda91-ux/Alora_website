@@ -208,7 +208,14 @@ function toggleCartState(button) {
     }, 1200);
 }
 function addToCart(id, name, price, img, qty = 1, size = 'Standard', mrp = 0) {
-    let cart = JSON.parse(localStorage.getItem('glowCart')) || JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
+    let cart = [];
+    try {
+        const currentCart = JSON.parse(localStorage.getItem('glowCart') || 'null');
+        const legacyCart = JSON.parse(localStorage.getItem('glowRitualCartData') || 'null');
+        cart = Array.isArray(currentCart) ? currentCart : (Array.isArray(legacyCart) ? legacyCart : []);
+    } catch (error) {
+        console.warn('Invalid saved cart data was reset before adding an item.', error);
+    }
     let existingProduct = cart.find(item => item.id === id || item.uniqueCartItemKeyId === id);
     if (existingProduct) {
         existingProduct.qty = (existingProduct.qty || existingProduct.qtyCountOrderMetric || 0) + qty;
@@ -236,7 +243,13 @@ function addToCart(id, name, price, img, qty = 1, size = 'Standard', mrp = 0) {
     updateHeaderCartCount();
 }
 function updateHeaderCartCount() {
-    let cart = JSON.parse(localStorage.getItem('glowCart')) || [];
+    let cart = [];
+    try {
+        const savedCart = JSON.parse(localStorage.getItem('glowCart') || '[]');
+        cart = Array.isArray(savedCart) ? savedCart : [];
+    } catch (error) {
+        console.warn('Unable to read cart count.', error);
+    }
     let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
     const badge = document.getElementById('global-cart-badge');
     if (badge) badge.innerText = totalItems;

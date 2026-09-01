@@ -405,7 +405,14 @@ function commitProductToCart(productId, actionBtnElement) {
     const targetDescText = descriptionElement ? descriptionElement.innerText.trim() : 'No description available';
     const imgElement = cardElement.querySelector('img');
     const targetImgSrc = imgElement ? imgElement.getAttribute('src') : '';
-    let localCartArr = JSON.parse(localStorage.getItem('glowCart')) || JSON.parse(localStorage.getItem('glowRitualCartData')) || [];
+    let localCartArr = [];
+    try {
+        const currentCart = JSON.parse(localStorage.getItem('glowCart') || 'null');
+        const legacyCart = JSON.parse(localStorage.getItem('glowRitualCartData') || 'null');
+        localCartArr = Array.isArray(currentCart) ? currentCart : (Array.isArray(legacyCart) ? legacyCart : []);
+    } catch (error) {
+        console.warn('Invalid saved cart data was reset before adding an item.', error);
+    }
     const uniqueCartKey = `${productId}__${targetSizeText}`;
     let matchingItem = localCartArr.find(cartItem => cartItem.id === uniqueCartKey || cartItem.uniqueCartItemKeyId === uniqueCartKey);
     if (matchingItem) {

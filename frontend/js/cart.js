@@ -124,6 +124,7 @@ function updateHeaderCartCount() {
     const totalItems = cart.reduce((sum, item) => sum + (parseInt(item.qty) || 0), 0);
     document.querySelectorAll(".cart-badge, #cart-count, #global-cart-badge, #cart-count-badge, .cart-count-badge").forEach(badge => {
         if (!badge) return;
+        badge.innerText = String(totalItems);
         badge.classList.remove("animate-bounce", "scale-125");
         requestAnimationFrame(() => {
             badge.classList.add("scale-125", "transition-transform", "duration-300");
@@ -602,7 +603,6 @@ async function loadCartMoreProducts() {
                     <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
                         <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </a>
-                </div>`/a>
                 </div>
                 <div class="flex-1 flex flex-col justify-between space-y-1 mb-2">
                     <div>

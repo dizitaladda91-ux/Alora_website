@@ -5,7 +5,9 @@ let currentSelectedVariant = null;
 function setPurchaseAvailability() {
     const cartButton = document.getElementById('cart-toggle-btn');
     const stock = Number(currentSelectedVariant?.stock || 0);
-    const available = Boolean(currentProductData?.isAvailable) && stock > 0;
+    // Older products may not have isAvailable stored; only an explicit false
+    // should prevent a product with stock from being purchased.
+    const available = currentProductData?.isAvailable !== false && stock > 0;
     if (!cartButton) return;
     cartButton.disabled = !available;
     cartButton.classList.toggle('opacity-50', !available);
@@ -154,7 +156,8 @@ window.selectGalleryVideo = function(videoUrl) {
             currentSelectedVariant = {
                 volume: 'Standard',
                 price: product.price || 0,
-                comparePrice: product.comparePrice || 0
+                comparePrice: product.comparePrice || 0,
+                stock: product.stock ?? 999
             };
             if (priceEl) priceEl.innerText = `₹ ${product.price || 0}`;
             if (mrpEl) mrpEl.innerText = product.comparePrice ? `₹ ${product.comparePrice}` : '';
@@ -191,12 +194,19 @@ function handleCartButtonClick(btnElement) {
     }
     const qtyInput = document.getElementById('quantity');
     const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
-    if (!currentProductData.isAvailable || Number(currentSelectedVariant.stock) < quantity) {
+    if (currentProductData.isAvailable === false || Number(currentSelectedVariant.stock) < quantity) {
         window.showToast("This selected variant is out of stock or has insufficient quantity.", "error");
         setPurchaseAvailability();
         return;
     }
-    let cart = JSON.parse(localStorage.getItem("glowCart")) || JSON.parse(localStorage.getItem(PRIMARY_CART_KEY)) || [];
+    let cart = [];
+    try {
+        const currentCart = JSON.parse(localStorage.getItem("glowCart") || 'null');
+        const legacyCart = JSON.parse(localStorage.getItem(PRIMARY_CART_KEY) || 'null');
+        cart = Array.isArray(currentCart) ? currentCart : (Array.isArray(legacyCart) ? legacyCart : []);
+    } catch (error) {
+        console.warn('Invalid saved cart data was reset before adding an item.', error);
+    }
     const productId = currentProductData._id || currentProductData.id;
     const targetVolumeText = currentSelectedVariant.volume || "Standard";
     const compositeCartUniqueIdKeyString = `${productId}__${targetVolumeText}`;
@@ -242,7 +252,7 @@ function handleCartButtonClick(btnElement) {
         btnElement.innerHTML = originalText;
         btnElement.disabled = false;
         if (qtyInput) qtyInput.value = 1;
-        window.location.href = "./cart.html";
+        window.location.href = "/cart.html";
     }, 1200);
 }
 function updateQty(change) {
