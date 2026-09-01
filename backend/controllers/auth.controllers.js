@@ -88,6 +88,9 @@ const getTransporter = () => {
   });
 };
 
+// Password-reset links must always be delivered to the account owner.
+export const getPasswordResetRecipient = (user) => String(user?.email || "").trim().toLowerCase();
+
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, address, source } = req.body;
@@ -246,8 +249,14 @@ export const updateProfile = async (req, res) => {
     if (!user) {
       return res.status(404).json({ success: false, message: "Account not found." });
     }
+
+    return res.status(200).json({
+      success: true,
+      message: "Profile updated successfully.",
+      user
+    });
   } catch (error) {
-    console.error("LOGIN_ERROR:", error);
+    console.error("UPDATE_PROFILE_ERROR:", error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -257,9 +266,8 @@ export const updateProfile = async (req, res) => {
 // ==========================================
 export const forgotPassword = async (req, res) => {
   try {
-    const { email, deliveryEmail } = req.body;
+    const { email } = req.body;
     const accountEmail = String(email || req.body.accountEmail || "").trim().toLowerCase();
-    const targetEmail = deliveryEmail && String(deliveryEmail).trim() ? String(deliveryEmail).trim().toLowerCase() : accountEmail;
 
     if (!accountEmail) return res.status(400).json({ message: "Account Email enter karein!" });
 
@@ -284,7 +292,10 @@ export const forgotPassword = async (req, res) => {
 
     const mailOptions = {
       from: `"Alora Radiance" <${process.env.EMAIL_USER}>`,
-      to: targetEmail,
+      // Never accept a client-provided delivery address here. Otherwise an
+      // attacker could request a reset for another account and receive that
+      // account's reset token in their own inbox.
+      to: getPasswordResetRecipient(user),
       subject: `Password Reset Request for Account (${accountEmail}) - Alora Radiance`,
       html: `
         <div style="font-family: Arial, sans-serif; padding: 20px; color: #333;">
@@ -301,7 +312,7 @@ export const forgotPassword = async (req, res) => {
     await transporter.sendMail(mailOptions);
     res.status(200).json({ 
       success: true, 
-      message: `Password reset link (${targetEmail}) par bhej diya gaya hai!` 
+      message: "Agar yeh email registered hai, toh reset link bhej diya gaya hai."
     });
 
   } catch (error) {

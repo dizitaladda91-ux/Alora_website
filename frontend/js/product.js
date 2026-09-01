@@ -4,10 +4,9 @@ let currentProductData = null;
 let currentSelectedVariant = null;
 function setPurchaseAvailability() {
     const cartButton = document.getElementById('cart-toggle-btn');
-    const stock = Number(currentSelectedVariant?.stock || 0);
-    // Older products may not have isAvailable stored; only an explicit false
-    // should prevent a product with stock from being purchased.
-    const available = currentProductData?.isAvailable !== false && stock > 0;
+    // The catalogue is currently unlimited; availability/quantity checks are
+    // intentionally performed only when inventory tracking is introduced.
+    const available = Boolean(currentSelectedVariant);
     if (!cartButton) return;
     cartButton.disabled = !available;
     cartButton.classList.toggle('opacity-50', !available);
@@ -131,12 +130,12 @@ window.selectGalleryVideo = function(videoUrl) {
         const mrpEl = document.getElementById('product-mrp');
         const variantsContainer = document.getElementById('variants-container');
         if (product.variants && product.variants.length > 0) {
-            currentSelectedVariant = product.variants.find((variant) => Number(variant.stock) > 0) || product.variants[0];
+            currentSelectedVariant = product.variants[0];
             if (priceEl) priceEl.innerText = `₹ ${currentSelectedVariant.price}`;
             if (mrpEl) mrpEl.innerText = currentSelectedVariant.comparePrice ? `₹ ${currentSelectedVariant.comparePrice}` : '';
             if (variantsContainer) {
                 variantsContainer.innerHTML = product.variants.map((v) => {
-                    const inStock = product.isAvailable && Number(v.stock) > 0;
+                    const inStock = true;
                     const isActive = v.volume === currentSelectedVariant.volume;
                     const activeClasses = isActive 
                         ? 'border-2 border-ink bg-ink text-parchment font-semibold' 
@@ -172,7 +171,6 @@ window.selectGalleryVideo = function(videoUrl) {
 }
 window.selectSize = function(volume, price, comparePrice, stock, buttonElement) {
     if (!buttonElement) return;
-    if (Number(stock) <= 0) return;
     document.querySelectorAll('.size-btn').forEach(btn => {
         btn.className = "size-btn text-sm px-4 py-2 rounded-full transition border border-[#DCD3BA] text-ash font-semibold hover:border-ink";
     });
@@ -194,11 +192,6 @@ function handleCartButtonClick(btnElement) {
     }
     const qtyInput = document.getElementById('quantity');
     const quantity = qtyInput ? parseInt(qtyInput.value) || 1 : 1;
-    if (currentProductData.isAvailable === false || Number(currentSelectedVariant.stock) < quantity) {
-        window.showToast("This selected variant is out of stock or has insufficient quantity.", "error");
-        setPurchaseAvailability();
-        return;
-    }
     let cart = [];
     try {
         const currentCart = JSON.parse(localStorage.getItem("glowCart") || 'null');
@@ -261,8 +254,6 @@ function updateQty(change) {
     let currentQty = parseInt(qtyInput.value) || 1;
     currentQty += change;
     if (currentQty < 1) currentQty = 1;
-    const stock = Number(currentSelectedVariant?.stock || 0);
-    if (stock > 0 && currentQty > stock) currentQty = stock;
     qtyInput.value = currentQty;
 }
 function getProductIdFromURL() {

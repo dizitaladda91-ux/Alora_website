@@ -74,7 +74,7 @@
     },
     {
       "src": "/sitemap\\.xml",
-      "dest": "/frontend/sitemap.xml"
+      "dest": "/api/index.js"
     },
     {
       "src": "/robots\\.txt",
@@ -91,7 +91,7 @@
     },
     {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|seoproduct|seoproductupdate|affiliate)(\\.html)?",
-      "dest": "backend/index.js"
+      "dest": "/api/index.js"
     },
     {
       "src": "/uploads/(.*)",

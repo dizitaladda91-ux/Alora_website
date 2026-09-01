@@ -8,6 +8,7 @@ import WebhookEvent from "../models/webhookEvent.models.js";
 import { createAffiliateConversion, validateReferral } from "../services/affiliate.service.js";
 import { AffiliateReferral, AffiliateConversion } from "../models/affiliate.models.js";
 import { sendMail, escapeHtml } from "../services/email.service.js";
+import { inventoryTrackingEnabled } from "../config/inventory.js";
 
 // Checkout prices must be calculated here, never from browser-rendered totals.
 const FREE_SHIPPING_LIMIT = 499;
@@ -18,7 +19,7 @@ const MAX_COUPON_DISCOUNT_PERCENT = 50;
 
 const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
 
-const calculateCheckoutTotals = ({ subtotal, discountPercent, flatDiscount = 0, founderHandDelivery }) => {
+export const calculateCheckoutTotals = ({ subtotal, discountPercent, flatDiscount = 0, founderHandDelivery }) => {
     const percentDiscount = roundCurrency(subtotal * discountPercent / 100);
     const totalDiscount = Math.min(subtotal, roundCurrency(percentDiscount + flatDiscount));
     const deliveryCharge = subtotal >= FREE_SHIPPING_LIMIT ? 0 : STANDARD_DELIVERY_CHARGE;
@@ -28,7 +29,7 @@ const calculateCheckoutTotals = ({ subtotal, discountPercent, flatDiscount = 0, 
     return { affiliateDiscount: totalDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
 };
 
-const getRequestedCouponCodes = (body) => {
+export const getRequestedCouponCodes = (body) => {
     const rawCodes = [
         ...(Array.isArray(body.couponCodes) ? body.couponCodes : []),
         body.couponCode,
@@ -47,7 +48,7 @@ const getRequestedCouponCodes = (body) => {
     return codes;
 };
 
-const normalizeCheckoutItems = (cart) => {
+export const normalizeCheckoutItems = (cart) => {
     if (!Array.isArray(cart)) return [];
 
     return cart.map((item) => {
@@ -78,7 +79,8 @@ const resolveCatalogItems = async (cart) => {
         const product = productById.get(requested.productId);
         const variant = product?.variants?.find((entry) => entry.volume === requested.variant);
 
-        if (!product || !product.isAvailable || !variant || variant.stock < requested.quantity) {
+        const enforceInventory = inventoryTrackingEnabled();
+        if (!product || !variant || (enforceInventory && (!product.isAvailable || variant.stock < requested.quantity))) {
             throw new Error(`${product?.name || "A product"} or its selected variant is unavailable or out of stock.`);
         }
 
@@ -98,6 +100,7 @@ const resolveCatalogItems = async (cart) => {
 // Reduces every selected variant only when enough stock remains. If any item fails,
 // already-reduced variants are restored so a partial checkout never corrupts stock.
 const reservePaidOrderStock = async (items) => {
+    if (!inventoryTrackingEnabled()) return;
     const reducedItems = [];
 
     try {
@@ -326,12 +329,13 @@ const finalizeCapturedPayment = async ({ razorpayOrderId, razorpayPaymentId, cus
             appliedCoupons: paymentAttempt.appliedCoupons || [],
             referral: paymentAttempt.referral || {},
             totalAmount,
+            inventoryTracked: inventoryTrackingEnabled(),
             currency: razorpayOrder.currency || "INR",
             paymentStatus: "paid",
             orderStatus: "paid"
         });
     } catch (error) {
-        await restoreStock(paymentAttempt.items);
+        if (inventoryTrackingEnabled()) await restoreStock(paymentAttempt.items);
         if (error?.code === 11000) {
             const concurrentOrder = await Order.findOne({ razorpayPaymentId });
             if (concurrentOrder) return { order: concurrentOrder, created: false };

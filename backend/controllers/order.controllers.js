@@ -181,19 +181,19 @@ export const refundAdminOrder = async (req, res) => {
       }
     }, { new: true });
 
-    // Mark restoration before the increment so a retried maintenance action cannot add stock twice.
-    const restoreTimestamp = new Date();
-    const claimedForStockRestore = await Order.findOneAndUpdate(
-      { _id: claimedOrder._id, stockRestoredAt: null },
-      { $set: { stockRestoredAt: restoreTimestamp } },
-      { new: true }
-    );
-
-    if (claimedForStockRestore) {
-      await restoreOrderStock({ ...claimedOrder.toObject(), stockRestoredAt: null });
+    // Unlimited-catalogue orders never reserve stock, so their refunds must not
+    // add quantities. Older inventory-tracked orders retain the safe restore flow.
+    if (claimedOrder.inventoryTracked) {
+      const restoreTimestamp = new Date();
+      const claimedForStockRestore = await Order.findOneAndUpdate(
+        { _id: claimedOrder._id, stockRestoredAt: null },
+        { $set: { stockRestoredAt: restoreTimestamp } },
+        { new: true }
+      );
+      if (claimedForStockRestore) await restoreOrderStock({ ...claimedOrder.toObject(), stockRestoredAt: null });
     }
 
-    return res.status(200).json({ success: true, data: order.toObject(), message: "Razorpay refund completed and stock restored." });
+    return res.status(200).json({ success: true, data: order.toObject(), message: "Razorpay refund completed." });
   } catch (error) {
     if (claimedOrder?._id) {
       await Order.updateOne({ _id: claimedOrder._id, paymentStatus: "paid" }, { $set: { "refund.processing": false } });

@@ -25,10 +25,6 @@ function getVariantRowHTML(isFirstRow = false) {
             <input type="number" min="0" placeholder="e.g. 1598" class="v-comparePrice w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700">
         </div>
         <div class="flex items-center gap-2">
-            <div class="w-full">
-                ${isFirstRow ? `<label class="block text-[11px] font-medium text-gray-400 uppercase tracking-wider mb-1">Stock</label>` : ''}
-                <input type="number" min="0" value="10" class="v-stock w-full px-2 py-1.5 border border-gray-200 rounded-lg text-xs focus:outline-none focus:border-amber-700" required>
-            </div>
             <button type="button" onclick="removeVariantRow(this)" class="text-red-400 hover:text-red-600 p-1 transition ${isFirstRow ? 'mt-5 opacity-0 pointer-events-none' : 'mt-1.5'}">
                 <i class="fa-solid fa-trash-can"></i>
             </button>
@@ -70,13 +66,11 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
         const volume = row.querySelector('.v-volume').value;
         const price = row.querySelector('.v-price').value;
         const comparePrice = row.querySelector('.v-comparePrice').value;
-        const stock = row.querySelector('.v-stock').value;
         if (volume && price) {
             variantsArray.push({
                 volume: volume,
                 price: Number(price),
-                comparePrice: comparePrice ? Number(comparePrice) : undefined,
-                stock: stock ? Number(stock) : 10
+                comparePrice: comparePrice ? Number(comparePrice) : undefined
             });
         }
     });

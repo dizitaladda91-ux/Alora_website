@@ -18,7 +18,6 @@ async function loadAllProducts(){
             const productDataStr = btoa(encodeURIComponent(JSON.stringify(p)));
             let volumesHTML = '-';
             let startingPrice = '0';
-            let totalStock = 0;
             if(p.variants && p.variants.length > 0) {
                 volumesHTML = p.variants.map(v => `
                     <span class="bg-gray-100 text-gray-700 text-[10px] px-2 py-0.5 rounded-md font-semibold border border-gray-200/60">
@@ -27,11 +26,8 @@ async function loadAllProducts(){
                 `).join(' ');
                 const prices = p.variants.map(v => v.price);
                 startingPrice = Math.min(...prices);
-                totalStock = p.variants.reduce((acc, curr) => acc + curr.stock, 0);
             }
-            const stockBadge = p.isAvailable && totalStock > 0 
-                ? `<span class="bg-green-50 text-green-700 border border-green-200 text-[11px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>In Stock (${totalStock})</span>`
-                : `<span class="bg-red-50 text-red-700 border border-red-200 text-[11px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 bg-red-500 rounded-full"></span>Out of Stock</span>`;
+            const stockBadge = `<span class="bg-green-50 text-green-700 border border-green-200 text-[11px] px-2.5 py-1 rounded-lg font-bold flex items-center gap-1 w-max"><span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>Always available</span>`;
             return `
             <tr class="hover:bg-gray-50/75 transition duration-150">
                 <td class="px-6 py-4 flex items-center gap-3">
@@ -94,16 +90,14 @@ function viewProduct(button){
         document.getElementById('modalRating').innerText = `${product.rating || '4.5'} Stars`;
         document.getElementById('modalReviews').innerText = `Based on ${product.totalReviews || 0} customer reviews`;
         const variantsBody = document.getElementById('modalVariantsBody');
-        let totalStockLeft = 0;
         if (product.variants && product.variants.length > 0) {
             variantsBody.innerHTML = product.variants.map(v => {
-                totalStockLeft += v.stock;
                 return `
                     <tr class="hover:bg-gray-50/50 transition">
                         <td class="px-4 py-2 font-bold text-gray-700">${v.volume}</td>
                         <td class="px-4 py-2 font-extrabold text-[#a35242]">₹${v.price}</td>
                         <td class="px-4 py-2 text-gray-400 line-through">${v.comparePrice ? '₹' + v.comparePrice : '-'}</td>
-                        <td class="px-4 py-2 font-semibold ${v.stock > 0 ? 'text-green-600' : 'text-red-500'}">${v.stock} units</td>
+                        <td class="px-4 py-2 font-semibold text-green-600">Always available</td>
                     </tr>
                 `;
             }).join('');
@@ -111,13 +105,8 @@ function viewProduct(button){
             variantsBody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">No variants available</td></tr>`;
         }
         const badge = document.getElementById('modalBadge');
-        if(product.isAvailable && totalStockLeft > 0) {
-            badge.innerText = "Active";
-            badge.className = "absolute top-4 right-4 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow-sm bg-green-500 text-white";
-        } else {
-            badge.innerText = "Out of Stock";
-            badge.className = "absolute top-4 right-4 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow-sm bg-red-500 text-white";
-        }
+        badge.innerText = "Active";
+        badge.className = "absolute top-4 right-4 text-[10px] uppercase font-extrabold px-2.5 py-1 rounded-full shadow-sm bg-green-500 text-white";
         const modal = document.getElementById('productModal');
         modal.classList.remove('hidden');
         setTimeout(() => {
