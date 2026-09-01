@@ -190,8 +190,8 @@ function renderProductCatalog(products) {
                 </div>
                 <!-- Price Display -->
                 <div class="flex items-baseline justify-center gap-1.5 pt-0.5">
-                    <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg">&#8377;${initialSize.price}</span>
-                    <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialSize.mrp ? '&#8377;' + initialSize.mrp : ''}</span>
+                    <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg"><span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${initialSize.price}</span>
+                    <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialSize.mrp ? '<span style="font-family:Arial,\'Noto Sans\',sans-serif">&#8377;</span>' + initialSize.mrp : ''}</span>
                 </div>
             </div>
             <!-- Add to Cart Action Bar -->
@@ -219,9 +219,9 @@ function generateStarsHTML(rating) {
 function changeCardSize(sizeLabel, exactPrice, exactMrp, element) {
     const currentCard = element.closest('.product-card');
     if (!currentCard) return;
-    currentCard.querySelector('.product-price').innerText = `\u20B9${exactPrice}`;
+    currentCard.querySelector('.product-price').innerHTML = `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${exactPrice}`;
     const mrpEl = currentCard.querySelector('.product-mrp');
-    if (mrpEl) mrpEl.innerText = exactMrp ? `\u20B9${exactMrp}` : '';
+    if (mrpEl) mrpEl.innerHTML = exactMrp ? `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${exactMrp}` : '';
     const discountBadgeEl = currentCard.querySelector('.discount-badge');
     if (discountBadgeEl) {
         if (exactMrp && Number(exactMrp) > Number(exactPrice)) {
