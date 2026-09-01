@@ -262,8 +262,8 @@ function selectSize(size, price, mrp, element) {
     if (!currentCard) return;
     const priceElement = currentCard.querySelector('.product-price');
     const mrpElement = currentCard.querySelector('.product-mrp');
-    if (priceElement) priceElement.innerText = `₹ ${price}`;
-    if (mrpElement) mrpElement.innerText = `₹ ${mrp}`;
+    if (priceElement) priceElement.innerText = `\u20B9 ${price}`;
+    if (mrpElement) mrpElement.innerText = `\u20B9 ${mrp}`;
     currentCard.querySelectorAll('.size-btn').forEach(btn => {
         btn.className = "size-btn text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 text-gray-600 font-medium transition";
     });
@@ -402,8 +402,8 @@ async function loadSliderProducts() {
                     </div>
                     <!-- Price Display -->
                     <div class="flex items-baseline justify-center gap-1.5 pt-0.5">
-                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg">₹${initialPrice}</span>
-                        <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
+                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg">&#8377;${initialPrice}</span>
+                        <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialComparePrice ? '&#8377;' + initialComparePrice : ''}</span>
                     </div>
                 </div>
                 <!-- Add to Cart Action Bar -->
@@ -434,11 +434,11 @@ function changeCardSize(volume, price, comparePrice, buttonElement) {
     buttonElement.classList.add('bg-ink', 'text-parchment', 'border-ink');
     buttonElement.classList.remove('border-[#DCD3BA]', 'text-ash');
     const priceEl = card.querySelector('.product-price');
-    if (priceEl) priceEl.innerText = `₹ ${price}`;
+    if (priceEl) priceEl.innerText = `\u20B9 ${price}`;
     const mrpElement = card.querySelector('.product-mrp');
     if (mrpElement) {
         if (comparePrice > 0) {
-            mrpElement.innerText = `₹ ${comparePrice}`;
+            mrpElement.innerText = `\u20B9 ${comparePrice}`;
             mrpElement.style.display = 'inline';
         } else {
             mrpElement.style.display = 'none';

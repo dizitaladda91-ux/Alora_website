@@ -153,8 +153,8 @@ function selectSize(size, price, mrp, btnEl) {
     btnEl.classList.remove("border-[#DCD3BA]", "text-ash");
     const priceEl = card.querySelector(".product-price");
     const mrpEl = card.querySelector(".product-mrp");
-    if (priceEl) priceEl.innerText = `₹${price}`;
-    if (mrpEl) mrpEl.innerText = mrp ? `₹${mrp}` : '';
+    if (priceEl) priceEl.innerText = `\u20B9${price}`;
+    if (mrpEl) mrpEl.innerText = mrp ? `\u20B9${mrp}` : '';
 }
 function updateQty(amount, btnEl) {
     const card = btnEl ? btnEl.closest(".product-card") : null;
@@ -619,8 +619,8 @@ async function loadCartMoreProducts() {
                         ${sizeButtonsHTML}
                     </div>
                     <div class="flex items-baseline justify-center gap-1.5 pt-0.5">
-                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base">₹${initialPrice}</span>
-                        <span class="product-mrp text-[11px] line-through text-slate-400 font-mono">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
+                        <span class="product-price font-fraunces font-bold text-[#8B4513] text-base">&#8377;${initialPrice}</span>
+                        <span class="product-mrp text-[11px] line-through text-slate-400 font-mono">${initialComparePrice ? '&#8377;' + initialComparePrice : ''}</span>
                     </div>
                 </div>
                 <div class="pt-1">
