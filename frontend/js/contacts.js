@@ -28,12 +28,11 @@ export function showSuccessModal(title, message, callback) {
 export function renderNavbarState() {
     const authActions = document.getElementById("auth-actions");
     const storedUser = localStorage.getItem("user");
-    const token = localStorage.getItem("token");
     if (!authActions) {
         console.warn("Auth placeholder (#auth-actions) abhi DOM me nahi mila. Wait kar rahe hain...");
         return;
     }
-    if (storedUser && token) {
+    if (storedUser) {
         try {
             const user = JSON.parse(storedUser);
             const role = user.role || sessionStorage.getItem("userRole");
@@ -55,7 +54,6 @@ export function renderNavbarState() {
                 `;
                 document.getElementById("logout-btn")?.addEventListener("click", () => {
                     sessionStorage.clear();
-                    localStorage.removeItem("token");
                     localStorage.removeItem("user");
                     window.location.href = "./index.html";
                 });
@@ -63,7 +61,6 @@ export function renderNavbarState() {
         } catch (err) {
             console.error("Localstorage data read error:", err);
             localStorage.removeItem("user");
-            localStorage.removeItem("token");
         }
     } else {
         authActions.innerHTML = `

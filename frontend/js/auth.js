@@ -42,8 +42,7 @@ async function runAuthGuard() {
     } catch (error) {
         console.warn("Could not check server session:", error);
     }
-    localStorage.removeItem("token");
-    localStorage.removeItem("userToken");
+    // Auth tokens are in httpOnly cookies (cleared by logout endpoint)
     const isLoginPage = currentPath.endsWith("login.html") || 
                         currentPath.endsWith("/login") ||
                         currentPath.endsWith("register.html") || 
@@ -124,12 +123,9 @@ async function handleLogout() {
     } finally {
         sessionStorage.clear();
         localStorage.removeItem("user");
-        localStorage.removeItem("token");
-        localStorage.removeItem("userToken");
         localStorage.removeItem("userRole");
         localStorage.removeItem("tabAuthActive");
-        localStorage.removeItem("admin_token");
-        localStorage.removeItem("seo_token");
+        // Auth tokens are in httpOnly cookies and cleared by server
         window.location.replace("./login.html");
     }
 }
@@ -211,20 +207,12 @@ function initLoginForm() {
                     name: displayName
                 };
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
+                // Store only user data (not sensitive), auth tokens are in httpOnly cookies
                 sessionStorage.setItem("tabAuthActive", "true");
                 sessionStorage.setItem("userRole", role);
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));
                 localStorage.setItem("userRole", role);
                 localStorage.setItem("user", JSON.stringify(userObjToStore));
-
-                if (data.token) {
-                    sessionStorage.setItem("token", data.token);
-                    sessionStorage.setItem("userToken", data.token);
-                    localStorage.setItem("token", data.token);
-                    localStorage.setItem("userToken", data.token);
-                    if (role === "admin") localStorage.setItem("admin_token", data.token);
-                    if (role === "seoadmin") localStorage.setItem("seo_token", data.token);
-                }
                 let targetUrl = "./index.html"; 
                 if (role === "admin") {
                     targetUrl = "./admin.html";

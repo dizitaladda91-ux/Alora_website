@@ -15,7 +15,6 @@ async function getCurrentSession() {
 async function protectSeoPage() {
     const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
     const storedUserStr = sessionStorage.getItem("user") || localStorage.getItem("user");
-    const token = sessionStorage.getItem("userToken") || sessionStorage.getItem("token") || localStorage.getItem("seo_token") || localStorage.getItem("userToken") || localStorage.getItem("token");
 
     let storedUser = null;
     try {
@@ -23,11 +22,6 @@ async function protectSeoPage() {
     } catch (e) {}
 
     const isRoleValid = role === "seoadmin" || role === "admin" || (storedUser && (storedUser.role === "seoadmin" || storedUser.role === "admin"));
-
-    if (!isRoleValid && !token) {
-        clearAllAuthStorageAndRedirect();
-        return;
-    }
 
     sessionStorage.setItem("tabAuthActive", "true");
     if (role) sessionStorage.setItem("userRole", role);
@@ -47,12 +41,9 @@ async function protectSeoPage() {
 function clearAllAuthStorageAndRedirect() {
     sessionStorage.clear();
     localStorage.removeItem("user");
-    localStorage.removeItem("token");
-    localStorage.removeItem("userToken");
     localStorage.removeItem("userRole");
     localStorage.removeItem("tabAuthActive");
-    localStorage.removeItem("admin_token");
-    localStorage.removeItem("seo_token");
+    // Auth tokens are in httpOnly cookies
     window.location.replace("./login.html");
 }
 async function handleSeoLogout(event) {

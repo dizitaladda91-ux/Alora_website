@@ -130,13 +130,11 @@ function renderPaginationControls() {
 }
 async function loadLeads() {
     try {
-        const token = localStorage.getItem("token");
         const response = await fetch(`${BASE_URL}/api/lead`, {
             method: "GET",
             credentials: "include",
             headers: {
-                "Content-Type": "application/json",
-                "Authorization": token ? `Bearer ${token}` : ""
+                "Content-Type": "application/json"
             }
         });
         if (!response.ok) {

@@ -4,8 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 async function initAccountPage() {
     const userStr = localStorage.getItem('user');
-    const token = localStorage.getItem('userToken') || localStorage.getItem('token');
-    if (!userStr && !token) {
+    if (!userStr) {
         window.location.href = './login.html';
         return;
     }

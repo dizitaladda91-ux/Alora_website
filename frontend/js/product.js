@@ -16,21 +16,8 @@ function setPurchaseAvailability() {
 const PRIMARY_CART_KEY = "glowRitualCartData";
 const REVIEWS_API_URL = `${BASE_URL}/api/reviews`;
 function isUserLoggedIn() {
-    return !!getAuthToken();
-}
-function getAuthToken() {
-    let token = localStorage.getItem('userToken') || localStorage.getItem('token');
-    if (token) return token;
-    const userStr = localStorage.getItem('user');
-    if (userStr) {
-        try {
-            const userData = JSON.parse(userStr);
-            return userData.token || userData.jwt || userData._id || userData.email || 'active-session';
-        } catch (e) {
-            console.error("User data parse karne mein error:", e);
-        }
-    }
-    return '';
+    // Check if user data exists in storage (auth token is in httpOnly cookie)
+    return !!(localStorage.getItem('user') || sessionStorage.getItem('user'));
 }
 document.addEventListener('DOMContentLoaded', () => {
     loadProductDetails();

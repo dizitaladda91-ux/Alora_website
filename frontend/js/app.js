@@ -41,9 +41,8 @@ export function renderNavbarState() {
     if (!authActions) return;
 
     const storedUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
-    const token = localStorage.getItem("userToken") || localStorage.getItem("token") || sessionStorage.getItem("token");
     
-    if (!storedUserStr && !token) {
+    if (!storedUserStr) {
         authActions.innerHTML = `
             <a href="./login.html" aria-label="User Account Login" title="User Account Login" class="text-base text-black hover:text-gold transition">
                 <i class="fa-solid fa-user" aria-hidden="true"></i>
