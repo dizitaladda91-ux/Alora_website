@@ -363,6 +363,8 @@ async function loadSliderProducts() {
             let discountBadgeHTML = '';
             if (initialComparePrice && Number(initialComparePrice) > Number(initialPrice)) {
                 const pct = Math.round(((Number(initialComparePrice) - Number(initialPrice)) / Number(initialComparePrice)) * 100);
+                if (pct > 0) {
+                    discountBadgeHTML = `<span class="discount-badge text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">${pct}% OFF</span>`;
                 }
             }
 
