@@ -244,10 +244,13 @@ async function renderRelatedProducts(blog) {
             const prodUrl = getProductUrl(product);
 
             const cardHtml = `
-                <div class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group">
+                <div data-product-id="${product._id || product.id}" class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative">
                     <a href="${prodUrl}" class="block relative aspect-square rounded-xl overflow-hidden mb-3 bg-slate-50">
                         <img src="${prodImg}" alt="${prodName}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" onerror="this.onerror=null; this.src='./static/logo2.png'">
                         ${prodMrp > prodPrice ? `<span class="absolute top-2 left-2 bg-[#800000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">SALE</span>` : ''}
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id || product.id}', this, event)" class="wishlist-toggle-btn absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish z-10" title="Add to Wishlist" aria-label="Add to Wishlist">
+                            <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                        </button>
                     </a>
                     <div>
                         <a href="${prodUrl}" class="font-bold text-sm text-slate-900 hover:text-[#8B4513] transition-colors line-clamp-2 mb-1">
@@ -266,6 +269,10 @@ async function renderRelatedProducts(blog) {
 
             gridEl.innerHTML += cardHtml;
         });
+
+        if (window.syncWishlistHeartsOnPage) {
+            window.syncWishlistHeartsOnPage();
+        }
 
         sectionEl.classList.remove('hidden');
 

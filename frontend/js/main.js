@@ -363,19 +363,22 @@ async function loadSliderProducts() {
             let discountBadgeHTML = '';
             if (initialComparePrice && Number(initialComparePrice) > Number(initialPrice)) {
                 const pct = Math.round(((Number(initialComparePrice) - Number(initialPrice)) / Number(initialComparePrice)) * 100);
-                if (pct > 0) {
-                    discountBadgeHTML = `<span class="discount-badge text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">${pct}% OFF</span>`;
                 }
             }
 
             return `
             <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] h-[430px] sm:h-[450px] flex-shrink-0 snap-center product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
                 <!-- Top Badges Bar -->
-                <div class="flex items-center justify-between z-10 mb-1.5 min-h-[22px]">
+                <div class="flex items-center justify-between z-10 mb-1.5 min-h-[26px]">
                     <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                         ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                     </span>
-                    ${discountBadgeHTML}
+                    <div class="flex items-center gap-1.5">
+                        ${discountBadgeHTML}
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                            <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                        </button>
+                    </div>
                 </div>
                 <!-- Product Image Area (Seamless Blend) -->
                 <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2">
@@ -414,7 +417,10 @@ async function loadSliderProducts() {
                 </div>
             </div>
             `;
-        }).join(" ");
+            }).join(" ");
+            if (window.syncWishlistHeartsOnPage) {
+                window.syncWishlistHeartsOnPage();
+            }
         });
     } catch (err) {
         console.error("Slider loading failed:", err);

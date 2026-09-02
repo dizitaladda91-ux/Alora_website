@@ -11,7 +11,7 @@ let activeOrderFilter = "all";
 // 1. TAB NAVIGATION CONTROLLER
 // ==========================================
 export function switchAccountTab(tabName) {
-    const validTabs = ["orders", "buy-again", "wishlist", "profile"];
+    const validTabs = ["orders", "track", "buy-again", "wishlist", "profile"];
     if (!validTabs.includes(tabName)) tabName = "orders";
 
     // Update Tab Buttons (Desktop & Mobile)
@@ -40,6 +40,7 @@ export function switchAccountTab(tabName) {
 
     // Trigger tab-specific loader
     if (tabName === "orders") loadMyOrders();
+    else if (tabName === "track") initTrackOrderPanel();
     else if (tabName === "buy-again") loadBuyAgainItems();
     else if (tabName === "wishlist") loadWishlistTab();
     else if (tabName === "profile") loadProfileDetails();
@@ -200,6 +201,9 @@ function renderFilteredOrders() {
                     <span class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-[#8B4513]/10 text-[#8B4513] border border-[#8B4513]/20">
                         ${escapeHtml(status.label)}
                     </span>
+                    <button type="button" onclick="window.trackThisOrder('${escapeHtml(order.trackingNumber || order.razorpayOrderId || order._id)}')" class="px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wider bg-amber-100 hover:bg-amber-200 text-[#8B4513] border border-amber-300 transition cursor-pointer flex items-center gap-1">
+                        <i class="fa-solid fa-location-arrow text-[10px]"></i> Track
+                    </button>
                 </div>
             </div>
 
@@ -276,6 +280,171 @@ export function quickReorder(name, size, price) {
     } else {
         window.location.href = "/products";
     }
+}
+window.quickReorder = quickReorder;
+
+// ==========================================
+// 3B. TRACK ORDER CONTROLLER
+// ==========================================
+export function initTrackOrderPanel() {
+    const form = document.getElementById("account-track-form");
+    if (!form || form.dataset.bound) return;
+    form.dataset.bound = "true";
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const input = document.getElementById("account-track-input");
+        if (input && input.value.trim()) {
+            performAccountTrackingLookup(input.value.trim());
+        }
+    });
+}
+
+export async function performAccountTrackingLookup(query) {
+    const input = document.getElementById("account-track-input");
+    const resultContainer = document.getElementById("account-tracking-result");
+    const trackBtn = document.getElementById("account-track-btn");
+
+    const trimmed = String(query || (input ? input.value : "")).trim();
+    if (!trimmed) {
+        showToast("Please enter a Tracking ID or Order ID.", "error");
+        return;
+    }
+
+    if (input) input.value = trimmed;
+    if (!resultContainer) return;
+
+    resultContainer.classList.remove("hidden");
+    resultContainer.innerHTML = `
+        <div class="py-10 text-center text-stone-500 bg-[#FAF7EE]/50 rounded-2xl border border-[#ECE4CE] animate-pulse">
+            <i class="fa-solid fa-spinner fa-spin text-2xl text-[#8B4513] mb-2"></i>
+            <p class="text-xs sm:text-sm font-semibold text-slate-800">Searching courier and shipment updates...</p>
+        </div>
+    `;
+
+    if (trackBtn) {
+        trackBtn.disabled = true;
+        trackBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Searching...`;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/orders/track/${encodeURIComponent(trimmed)}`);
+        const result = await res.json();
+        if (!res.ok || !result.data) {
+            throw new Error(result.message || "No order found matching this Tracking ID or Order ID.");
+        }
+        renderAccountTrackingDetails(result.data);
+    } catch (err) {
+        resultContainer.innerHTML = `
+            <div class="bg-rose-50/70 border border-rose-200 rounded-2xl p-6 text-center space-y-2">
+                <i class="fa-solid fa-circle-exclamation text-2xl text-rose-600"></i>
+                <h3 class="font-bold text-slate-900 text-base">Shipment Not Found</h3>
+                <p class="text-xs text-rose-800 max-w-md mx-auto">${escapeHtml(err.message)}</p>
+                <p class="text-[11px] text-stone-500">Please verify the Tracking ID or Order ID provided by admin and try again.</p>
+            </div>
+        `;
+    } finally {
+        if (trackBtn) {
+            trackBtn.disabled = false;
+            trackBtn.innerHTML = `<i class="fa-solid fa-location-arrow"></i> Track Status`;
+        }
+    }
+}
+window.performAccountTrackingLookup = performAccountTrackingLookup;
+
+export function trackThisOrder(query) {
+    switchAccountTab('track');
+    performAccountTrackingLookup(query);
+}
+window.trackThisOrder = trackThisOrder;
+
+function renderAccountTrackingDetails(order) {
+    const resultContainer = document.getElementById("account-tracking-result");
+    if (!resultContainer) return;
+
+    const rawStatus = String(order.orderStatus || order.status || "paid").toLowerCase();
+    const status = orderStatusInfo(rawStatus);
+    const trackingNumber = order.trackingNumber || "";
+    const courierLink = order.courierLink || "";
+    const expectedDelivery = order.expectedDeliveryDate ? formatDate(order.expectedDeliveryDate) : "3-5 Business Days";
+    const orderDate = formatDate(order.createdAt);
+    const items = order.items || [];
+
+    resultContainer.innerHTML = `
+        <article class="bg-[#FAF7EE]/60 rounded-2xl border border-[#ECE4CE] p-5 sm:p-7 shadow-xs space-y-6">
+            <!-- Header Status -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-stone-200/80 pb-4">
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#8B4513]">Order ID</span>
+                        <span class="font-mono text-xs font-semibold text-slate-800 bg-white px-2 py-0.5 rounded border border-stone-200 select-all">${escapeHtml(order.razorpayOrderId || order._id)}</span>
+                    </div>
+                    <p class="text-xs text-stone-500 mt-1">Booked on ${orderDate}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-100 text-emerald-800 border border-emerald-300">
+                        ${escapeHtml(order.paymentStatus || 'Paid')}
+                    </span>
+                    <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-[#8B4513] text-white">
+                        ${escapeHtml(status.label)}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Courier & Tracking Box -->
+            <div class="bg-white rounded-2xl border border-[#ECE4CE] p-4 sm:p-5 shadow-2xs space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <p class="text-xs font-extrabold uppercase tracking-wider text-[#8B4513] flex items-center gap-1.5">
+                            <i class="fa-solid fa-truck-ramp-box"></i> Live Courier Status
+                        </p>
+                        <h3 class="text-base sm:text-lg font-bold text-slate-900 mt-0.5">${escapeHtml(status.label)}</h3>
+                        <p class="text-xs text-stone-600 mt-0.5">${escapeHtml(status.message)}</p>
+                        ${trackingNumber ? `
+                            <p class="text-xs text-slate-800 mt-2 font-medium">
+                                Tracking AWB: <span class="font-mono font-bold text-[#8B4513] bg-amber-50 px-2 py-0.5 rounded border border-amber-200 select-all">${escapeHtml(trackingNumber)}</span>
+                            </p>
+                        ` : ''}
+                    </div>
+
+                    ${courierLink ? `
+                        <a href="${escapeHtml(courierLink)}" target="_blank" rel="noopener noreferrer" class="bg-[#8B4513] hover:bg-amber-900 text-white px-4 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 shadow-xs transition shrink-0">
+                            <span>Open Courier Portal</span> <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+                        </a>
+                    ` : ''}
+                </div>
+
+                <!-- Stepper Progress Bar -->
+                ${renderProgressStepper(status.step)}
+
+                <div class="pt-2 flex items-center justify-between text-xs text-stone-500 border-t border-stone-100">
+                    <span class="flex items-center gap-1.5 font-semibold text-[#8B4513]">
+                        <i class="fa-regular fa-calendar-check"></i> Est. Delivery: ${escapeHtml(expectedDelivery)}
+                    </span>
+                    <span>Recipient: <b class="text-slate-800">${escapeHtml(order.customer?.name || 'Customer')}</b></span>
+                </div>
+            </div>
+
+            <!-- Items in this Shipment -->
+            <div class="space-y-3">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-stone-600">Items in this Package (${items.length})</h4>
+                <div class="bg-white rounded-2xl border border-[#ECE4CE] p-3 sm:p-4 divide-y divide-stone-100">
+                    ${items.map(item => `
+                        <div class="py-2.5 flex items-center justify-between gap-3 first:pt-0 last:pb-0">
+                            <div class="flex items-center gap-3">
+                                <img src="${item.image || item.imageUrl || '/static/placeholder.png'}" alt="${escapeHtml(item.name)}" class="w-12 h-12 rounded-lg object-contain border border-stone-200 p-1 bg-white shrink-0" onerror="this.src='/static/placeholder.png'">
+                                <div>
+                                    <h5 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug">${escapeHtml(item.name)}</h5>
+                                    <p class="text-[11px] text-stone-500">Size: ${escapeHtml(item.variant || item.size || 'Standard')} &bull; Qty: ${item.quantity || item.qty || 1}</p>
+                                </div>
+                            </div>
+                            <span class="font-bold text-slate-900 text-xs sm:text-sm">${money(item.lineTotal || (item.price * (item.quantity || 1)))}</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        </article>
+    `;
 }
 window.quickReorder = quickReorder;
 
@@ -633,6 +802,7 @@ document.addEventListener("DOMContentLoaded", () => {
     switchAccountTab(initialTab);
 
     initProfileForm();
+    initTrackOrderPanel();
 
     // Bind Sidebar Logout
     const logoutBtn = document.getElementById("sidebar-logout-btn");

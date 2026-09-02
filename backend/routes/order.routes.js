@@ -5,6 +5,7 @@ import { authorizeRoles, requireAuth } from "../middlewares/auth.middleware.js";
 
 const router = express.Router();
 
+router.get("/track", trackOrder);
 router.get("/track/:query", trackOrder);
 router.get("/my", requireAuth, getMyOrders);
 router.get("/buy-again", requireAuth, getBuyAgainProducts);

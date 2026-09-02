@@ -107,22 +107,52 @@ export async function toggleProductWishlist(productId, btnEl = null) {
     if (btnEl) {
         updateHeartUI(btnEl, isAdded);
     }
+    if (typeof window.showToastNotification === "function") {
+        window.showToastNotification(isAdded ? "Added to your Wishlist!" : "Removed from your Wishlist.", isAdded ? "success" : "info");
+    }
     return isAdded;
 }
 
 function updateHeartUI(btnEl, isAdded) {
+    if (!btnEl) return;
     const icon = btnEl.querySelector("i") || btnEl;
     if (isAdded) {
         icon.classList.remove("fa-regular", "text-stone-400", "text-slate-400");
         icon.classList.add("fa-solid", "text-rose-600");
+        btnEl.classList.add("bg-rose-50", "border-rose-200");
     } else {
         icon.classList.remove("fa-solid", "text-rose-600");
         icon.classList.add("fa-regular", "text-stone-400");
+        btnEl.classList.remove("bg-rose-50", "border-rose-200");
     }
 }
 
+export async function handleCardWishlistToggle(productId, btnEl, event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    return await toggleProductWishlist(productId, btnEl);
+}
+window.handleCardWishlistToggle = handleCardWishlistToggle;
+
+export function syncWishlistHeartsOnPage(wishlistItems = null) {
+    const list = wishlistItems || getLocalWishlist();
+    const productIds = new Set(list.map(item => typeof item === "string" ? item : String(item._id || item.id || "")));
+    
+    document.querySelectorAll("[data-product-id]").forEach(card => {
+        const prodId = card.getAttribute("data-product-id");
+        const btn = card.querySelector(".wishlist-toggle-btn");
+        if (btn && prodId) {
+            updateHeartUI(btn, productIds.has(String(prodId)));
+        }
+    });
+}
+window.syncWishlistHeartsOnPage = syncWishlistHeartsOnPage;
+
 window.toggleProductWishlist = toggleProductWishlist;
 
-document.addEventListener("DOMContentLoaded", () => {
-    fetchUserWishlist();
+document.addEventListener("DOMContentLoaded", async () => {
+    const wishlist = await fetchUserWishlist();
+    syncWishlistHeartsOnPage(wishlist);
 });

@@ -159,11 +159,16 @@ function renderProductCatalog(products) {
         return `
         <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
             <!-- Top Badges Bar -->
-            <div class="flex items-center justify-between z-10 mb-1.5 min-h-[22px]">
+            <div class="flex items-center justify-between z-10 mb-1.5 min-h-[26px]">
                 <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                     ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                 </span>
-                ${discountBadgeHTML}
+                <div class="flex items-center gap-1.5">
+                    ${discountBadgeHTML}
+                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                    </button>
+                </div>
             </div>
             <!-- Image Area (Seamless Blend) -->
             <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2">
@@ -202,6 +207,10 @@ function renderProductCatalog(products) {
             </div>
         </div>`;
     }).join('');
+
+    if (window.syncWishlistHeartsOnPage) {
+        window.syncWishlistHeartsOnPage();
+    }
 }
 function generateStarsHTML(rating) {
     let html = '';

@@ -67,6 +67,9 @@
             <button type="button" onclick="switchAccountTab('orders')" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="orders">
                 <i class="fa-solid fa-box text-sm"></i> My Orders
             </button>
+            <button type="button" onclick="switchAccountTab('track')" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="track">
+                <i class="fa-solid fa-location-dot text-sm"></i> Track Order
+            </button>
             <button type="button" onclick="switchAccountTab('buy-again')" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="buy-again">
                 <i class="fa-solid fa-arrow-rotate-right text-sm"></i> Buy Again
             </button>
@@ -100,6 +103,13 @@
                     <button type="button" onclick="switchAccountTab('orders')" data-tab-target="orders" class="tab-btn active w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
                         <span class="flex items-center gap-3">
                             <i class="fa-solid fa-box text-base"></i> My Orders
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>
+                    </button>
+
+                    <button type="button" onclick="switchAccountTab('track')" data-tab-target="track" class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-location-dot text-base text-amber-700"></i> Track Order
                         </span>
                         <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>
                     </button>
@@ -181,6 +191,44 @@
                     </div>
 
                     <div id="orders-container" class="space-y-6 mt-6"></div>
+                </section>
+
+
+                <!-- ==================================================== -->
+                <!-- 📍 TAB: TRACK ORDER PANEL                            -->
+                <!-- ==================================================== -->
+                <section id="panel-track" class="account-panel hidden bg-white rounded-3xl border border-[#ECE4CE] p-5 sm:p-7 shadow-sm space-y-6">
+                    <div class="pb-6 border-b border-stone-100">
+                        <div class="flex items-center gap-2 text-xs uppercase tracking-wider font-extrabold text-[#8B4513] mb-1">
+                            <i class="fa-solid fa-truck-fast"></i> Real-Time Shipment Tracking
+                        </div>
+                        <h2 class="text-xl sm:text-2xl font-fraunces font-bold text-slate-900">Track Order Status</h2>
+                        <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Enter the Tracking ID (AWB Number), Order ID, or Payment ID provided by admin/SMS to view live courier status.</p>
+                    </div>
+
+                    <!-- Search Box -->
+                    <form id="account-track-form" class="bg-gradient-to-br from-[#FAF7EE] to-[#FFFDF9] p-4 sm:p-6 rounded-2xl border border-[#ECE4CE] shadow-2xs space-y-3">
+                        <label for="account-track-input" class="block text-xs font-bold uppercase tracking-wider text-stone-700">
+                            Tracking ID / AWB / Order ID
+                        </label>
+                        <div class="flex flex-col sm:flex-row gap-3">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                    <i class="fa-solid fa-magnifying-glass text-sm"></i>
+                                </span>
+                                <input type="text" id="account-track-input" placeholder="e.g. AWB12345678, order_ABC123, or pay_..." required class="w-full bg-white border border-[#DCD3BA] rounded-xl pl-10 pr-4 py-3 text-sm font-semibold text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition shadow-2xs">
+                            </div>
+                            <button type="submit" id="account-track-btn" class="bg-[#8B4513] hover:bg-[#6F370F] text-white px-6 py-3 rounded-xl text-xs sm:text-sm font-bold uppercase tracking-wider transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer shrink-0">
+                                <i class="fa-solid fa-location-arrow"></i> Track Status
+                            </button>
+                        </div>
+                        <p class="text-[11px] text-stone-400 font-medium flex items-center gap-1.5 pt-1">
+                            <i class="fa-solid fa-circle-info text-amber-600"></i> Admin will provide your Tracking ID via SMS/Email once the order is dispatched.
+                        </p>
+                    </form>
+
+                    <!-- Dynamic Tracking Result Container -->
+                    <div id="account-tracking-result" class="hidden"></div>
                 </section>
 
 

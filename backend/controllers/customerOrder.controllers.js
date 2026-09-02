@@ -60,19 +60,29 @@ export const getMyOrders = async (req, res) => {
 // safe without also requiring a second secret like the customer's phone.
 export const trackOrder = async (req, res) => {
   try {
-    const identifier = String(req.query.orderId || "").trim();
+    const rawIdentifier = req.query.orderId || req.query.trackingId || req.query.query || req.params.query || "";
+    const identifier = String(rawIdentifier).trim();
     if (!identifier) {
-      return res.status(400).json({ success: false, message: "Enter your Order ID or Payment ID." });
+      return res.status(400).json({ success: false, message: "Enter your Tracking ID, Order ID, or Payment ID." });
     }
 
-    const order = await Order.findOne({
-      $or: [{ razorpayOrderId: identifier }, { razorpayPaymentId: identifier }]
-    })
+    const searchConditions = [
+      { razorpayOrderId: identifier },
+      { razorpayPaymentId: identifier },
+      { trackingNumber: identifier },
+      { trackingNumber: { $regex: new RegExp(`^${identifier.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`, 'i') } }
+    ];
+
+    if (/^[0-9a-fA-F]{24}$/.test(identifier)) {
+      searchConditions.push({ _id: identifier });
+    }
+
+    const order = await Order.findOne({ $or: searchConditions })
       .select("razorpayOrderId orderStatus paymentStatus trackingNumber courierLink expectedDeliveryDate createdAt items totalAmount customer.name")
       .lean();
 
     if (!order) {
-      return res.status(404).json({ success: false, message: "No order found for that Order ID or Payment ID." });
+      return res.status(404).json({ success: false, message: "No active order found matching this Tracking ID or Order ID." });
     }
 
     return res.status(200).json({ success: true, data: order });

@@ -27,6 +27,15 @@ document.addEventListener('DOMContentLoaded', () => {
             handleCartButtonClick(e.currentTarget);
         });
     }
+    const wishBtn = document.getElementById('single-wishlist-btn');
+    if (wishBtn) {
+        wishBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentProductData?._id && window.handleCardWishlistToggle) {
+                window.handleCardWishlistToggle(currentProductData._id, wishBtn, e);
+            }
+        });
+    }
     const qtyMinusBtn = document.getElementById('qty-minus');
     const qtyPlusBtn = document.getElementById('qty-plus');
     if (qtyMinusBtn) qtyMinusBtn.addEventListener('click', () => updateQty(-1));
@@ -48,6 +57,13 @@ async function loadProductDetails() {
         currentProductData = product; 
         if (!pathMatch) window.history.replaceState({}, "", getProductUrl(product));
         console.log("Fetched Product Data:", product);
+
+        // Sync wishlist button status for single product
+        const wishBtn = document.getElementById('single-wishlist-btn');
+        if (wishBtn && product._id && window.syncWishlistHeartsOnPage) {
+            wishBtn.closest = () => ({ getAttribute: () => product._id, querySelector: () => wishBtn });
+            window.syncWishlistHeartsOnPage();
+        }
         const mainImg = document.getElementById('main-product-image');
         if (mainImg) {
             mainImg.onerror = function() {
