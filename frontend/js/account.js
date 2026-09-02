@@ -173,6 +173,14 @@ function renderFilteredOrders() {
             ? new Date(order.expectedDeliveryDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" }) 
             : "2–4 Business Days";
         const orderDate = new Date(order.createdAt).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+        const trackingNumber = String(order.trackingNumber || "").trim();
+        const courierLink = String(order.courierLink || "").trim();
+        const trackingDetails = trackingNumber || courierLink ? `
+            <div class="mt-3 pt-3 border-t border-[#ECE4CE] text-xs">
+                <p class="font-bold text-slate-800 flex items-center gap-1.5"><i class="fa-solid fa-location-dot text-[#8B4513]"></i> Tracking details</p>
+                ${trackingNumber ? `<p class="mt-1 text-stone-600">Tracking number: <span class="font-mono font-bold text-slate-800 select-all">${escapeHtml(trackingNumber)}</span></p>` : ""}
+                ${courierLink ? `<a href="${escapeHtml(courierLink)}" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 mt-2 font-bold text-[#8B4513] hover:underline">Track shipment <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>` : ""}
+            </div>` : "";
 
         return `
         <article class="bg-[#FAF7EE]/50 rounded-2xl border border-[#ECE4CE] p-4 sm:p-6 transition hover:shadow-md">
@@ -209,6 +217,7 @@ function renderFilteredOrders() {
                                 <i class="fa-regular fa-clock text-xs"></i> Est. Delivery: ${escapeHtml(expectedDelivery)}
                             </p>
                         ` : ''}
+                        ${trackingDetails}
                     </div>
                 </div>
                 ${renderProgressStepper(status.step)}

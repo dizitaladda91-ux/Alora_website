@@ -213,7 +213,7 @@ function initLoginForm() {
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));
                 localStorage.setItem("userRole", role);
                 localStorage.setItem("user", JSON.stringify(userObjToStore));
-                let targetUrl = "./index.html"; 
+                let targetUrl = "./account.html"; 
                 if (role === "admin") {
                     targetUrl = "./admin.html";
                 } else if (role === "seoadmin") {

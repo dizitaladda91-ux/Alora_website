@@ -1,12 +1,374 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="refresh" content="0; url=./account.html#orders">
-  <script>window.location.replace("./account.html#orders");</script>
-  <title>Redirecting to Account Orders - Alora Radiance</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account & Orders - Alora Radiance</title>
+    <meta name="description" content="Manage your Alora Radiance profile, orders, wishlist, and re-order skincare products.">
+    <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
+    <link rel="stylesheet" href="./styles/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .font-fraunces { font-family: 'Fraunces', serif; }
+        .tab-btn.active {
+            background-color: #8B4513;
+            color: #FFFFFF;
+            box-shadow: 0 4px 12px rgba(139, 69, 19, 0.25);
+        }
+        .tab-btn.active i {
+            color: #FBBF24;
+        }
+        .tab-btn:not(.active) {
+            color: #4A4A4A;
+            background-color: transparent;
+        }
+        .tab-btn:not(.active):hover {
+            background-color: #F5EBE1;
+            color: #8B4513;
+        }
+        .title-pill.selected {
+            background-color: #8B4513;
+            color: #FFFFFF;
+            border-color: #8B4513;
+        }
+        .gender-pill.selected {
+            background-color: #8B4513;
+            color: #FFFFFF;
+            border-color: #8B4513;
+        }
+    </style>
 </head>
-<body class="bg-[#FAF7EE] text-[#2A2A24] font-sans p-8 text-center">
-  <p>Redirecting to your orders dashboard...</p>
+<body class="bg-[#FAF7EE] text-[#2A2A24] min-h-screen flex flex-col antialiased">
+    <!-- Top Global Header / Navigation -->
+    <div id="navbar-placeholder"></div>
+
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+        <!-- Breadcrumb / Header Title -->
+        <div class="mb-6 md:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <p class="text-xs uppercase tracking-[0.2em] text-[#8B4513] font-extrabold flex items-center gap-1.5">
+                    <i class="fa-solid fa-crown text-amber-500 text-xs"></i> Alora Member Portal
+                </p>
+                <h1 class="text-2xl sm:text-3xl lg:text-4xl font-fraunces font-bold text-slate-900 mt-1">My Account</h1>
+            </div>
+            <div id="account-status-badge" class="flex items-center gap-2">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Active Account
+                </span>
+            </div>
+        </div>
+
+        <!-- Mobile Horizontal Tab Switcher -->
+        <div class="md:hidden flex overflow-x-auto gap-2 pb-3 mb-6 scrollbar-none">
+            <button type="button" onclick="switchAccountTab('orders')" class="tab-btn active px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="orders">
+                <i class="fa-solid fa-box text-sm"></i> My Orders
+            </button>
+            <button type="button" onclick="switchAccountTab('buy-again')" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="buy-again">
+                <i class="fa-solid fa-arrow-rotate-right text-sm"></i> Buy Again
+            </button>
+            <button type="button" onclick="switchAccountTab('wishlist')" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="wishlist">
+                <i class="fa-solid fa-heart text-sm"></i> Wishlist <span id="mobile-wishlist-count" class="bg-amber-100 text-amber-900 text-[10px] px-1.5 py-0.5 rounded-full font-extrabold hidden">0</span>
+            </button>
+            <button type="button" onclick="switchAccountTab('profile')" class="tab-btn px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap flex items-center gap-2 transition" data-tab-target="profile">
+                <i class="fa-solid fa-user text-sm"></i> Profile
+            </button>
+        </div>
+
+        <!-- Main Layout: Left Fixed Sidebar + Right Content Area -->
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            
+            <!-- 👤 LEFT USER PANEL SIDEBAR (Sticky on Desktop) -->
+            <aside class="w-full md:w-72 lg:w-80 shrink-0 bg-white rounded-3xl border border-[#ECE4CE] shadow-sm p-5 md:p-6 md:sticky md:top-24">
+                <!-- User Profile Header Card -->
+                <div class="flex items-center gap-4 pb-6 border-b border-stone-100">
+                    <div id="sidebar-avatar" class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#8B4513] to-[#5C2E0B] text-white flex items-center justify-center text-xl font-bold font-fraunces shadow-md ring-4 ring-amber-100/70 shrink-0">
+                        A
+                    </div>
+                    <div class="min-w-0 flex-1">
+                        <p class="text-xs text-stone-500 font-medium">Welcome back,</p>
+                        <h2 id="sidebar-user-name" class="font-bold text-slate-900 text-base sm:text-lg truncate capitalize font-fraunces">Valued Member</h2>
+                        <p id="sidebar-user-email" class="text-xs text-stone-600 truncate font-mono mt-0.5">user@example.com</p>
+                    </div>
+                </div>
+
+                <!-- Navigation Links List -->
+                <nav class="mt-6 space-y-1.5">
+                    <button type="button" onclick="switchAccountTab('orders')" data-tab-target="orders" class="tab-btn active w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-box text-base"></i> My Orders
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>
+                    </button>
+
+                    <button type="button" onclick="switchAccountTab('buy-again')" data-tab-target="buy-again" class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-arrow-rotate-right text-base"></i> Buy Again
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>
+                    </button>
+
+                    <button type="button" onclick="switchAccountTab('wishlist')" data-tab-target="wishlist" class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-heart text-base"></i> Wishlist
+                        </span>
+                        <span id="sidebar-wishlist-badge" class="bg-amber-100 text-amber-900 text-xs px-2 py-0.5 rounded-full font-extrabold hidden">0</span>
+                    </button>
+
+                    <button type="button" onclick="switchAccountTab('profile')" data-tab-target="profile" class="tab-btn w-full flex items-center justify-between px-4 py-3 rounded-2xl text-sm font-bold transition text-left cursor-pointer">
+                        <span class="flex items-center gap-3">
+                            <i class="fa-solid fa-user-pen text-base"></i> Profile Details
+                        </span>
+                        <i class="fa-solid fa-chevron-right text-xs opacity-60"></i>
+                    </button>
+                </nav>
+
+                <!-- Sidebar Footer & Logout -->
+                <div class="mt-8 pt-6 border-t border-stone-100 space-y-3">
+                    <a href="/products" class="w-full bg-amber-50 hover:bg-amber-100 text-[#8B4513] text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition border border-amber-200">
+                        <i class="fa-solid fa-bag-shopping"></i> Explore Shop
+                    </a>
+                    <button type="button" id="sidebar-logout-btn" class="w-full bg-stone-100 hover:bg-red-50 text-stone-700 hover:text-red-700 text-xs font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 transition border border-stone-200 cursor-pointer">
+                        <i class="fa-solid fa-right-from-bracket"></i> Logout
+                    </button>
+                </div>
+            </aside>
+
+            <!-- 📄 RIGHT MAIN CONTENT PANELS -->
+            <div class="flex-1 min-w-0 w-full space-y-6">
+
+                <!-- Toast / Notification Banner -->
+                <div id="account-toast" class="hidden rounded-2xl p-4 text-sm font-medium flex items-center justify-between gap-3 shadow-md transition-all duration-300">
+                    <span id="account-toast-text"></span>
+                    <button type="button" onclick="document.getElementById('account-toast').classList.add('hidden')" class="text-lg leading-none">&times;</button>
+                </div>
+
+                <!-- ==================================================== -->
+                <!-- 📦 TAB 1: MY ORDERS PANEL                           -->
+                <!-- ==================================================== -->
+                <section id="panel-orders" class="account-panel bg-white rounded-3xl border border-[#ECE4CE] p-5 sm:p-7 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-stone-100">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-fraunces font-bold text-slate-900">My Orders</h2>
+                            <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Track your packages, download receipts, and view live order progress.</p>
+                        </div>
+                        <!-- Order Filters -->
+                        <div class="flex items-center gap-1.5 bg-[#FAF7EE] p-1 rounded-xl border border-[#ECE4CE] text-xs font-bold overflow-x-auto scrollbar-none">
+                            <button type="button" onclick="filterOrders('all', this)" class="order-filter-btn px-3 py-1.5 rounded-lg bg-[#8B4513] text-white">All</button>
+                            <button type="button" onclick="filterOrders('active', this)" class="order-filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">In Progress</button>
+                            <button type="button" onclick="filterOrders('delivered', this)" class="order-filter-btn px-3 py-1.5 rounded-lg text-stone-600 hover:text-stone-900">Delivered</button>
+                        </div>
+                    </div>
+
+                    <!-- Orders Loader / Empty / Content List -->
+                    <div id="orders-loader" class="py-12 text-center text-stone-500">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl text-[#8B4513] mb-3"></i>
+                        <p class="text-sm font-semibold">Loading your order history...</p>
+                    </div>
+
+                    <div id="orders-empty-state" class="hidden py-12 text-center">
+                        <div class="w-16 h-16 rounded-full bg-amber-50 text-[#8B4513] mx-auto flex items-center justify-center text-2xl mb-4 border border-amber-200">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                        </div>
+                        <h3 class="text-lg font-fraunces font-bold text-slate-900">No orders placed yet</h3>
+                        <p class="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto mt-1">Discover our clinically crafted luxury skincare rituals and place your first order today.</p>
+                        <a href="/products" class="inline-block mt-5 bg-[#8B4513] hover:bg-[#6F370F] text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md">
+                            Browse Collection
+                        </a>
+                    </div>
+
+                    <div id="orders-container" class="space-y-6 mt-6"></div>
+                </section>
+
+
+                <!-- ==================================================== -->
+                <!-- 🔄 TAB 2: BUY AGAIN PANEL                           -->
+                <!-- ==================================================== -->
+                <section id="panel-buy-again" class="account-panel hidden bg-white rounded-3xl border border-[#ECE4CE] p-5 sm:p-7 shadow-sm">
+                    <div class="pb-6 border-b border-stone-100">
+                        <h2 class="text-xl sm:text-2xl font-fraunces font-bold text-slate-900">Buy Again</h2>
+                        <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Quickly re-order skincare products you previously loved.</p>
+                    </div>
+
+                    <div id="buy-again-loader" class="py-12 text-center text-stone-500">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl text-[#8B4513] mb-3"></i>
+                        <p class="text-sm font-semibold">Finding your past favorites...</p>
+                    </div>
+
+                    <div id="buy-again-empty" class="hidden py-12 text-center">
+                        <div class="w-16 h-16 rounded-full bg-amber-50 text-[#8B4513] mx-auto flex items-center justify-center text-2xl mb-4 border border-amber-200">
+                            <i class="fa-solid fa-arrow-rotate-right"></i>
+                        </div>
+                        <h3 class="text-lg font-fraunces font-bold text-slate-900">No repeat purchases available yet</h3>
+                        <p class="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto mt-1">Once you complete an order, your purchased skincare products will appear here for 1-click re-ordering.</p>
+                        <a href="/products" class="inline-block mt-5 bg-[#8B4513] hover:bg-[#6F370F] text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md">
+                            Shop Products
+                        </a>
+                    </div>
+
+                    <div id="buy-again-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6"></div>
+                </section>
+
+
+                <!-- ==================================================== -->
+                <!-- ❤️ TAB 3: WISHLIST PANEL                            -->
+                <!-- ==================================================== -->
+                <section id="panel-wishlist" class="account-panel hidden bg-white rounded-3xl border border-[#ECE4CE] p-5 sm:p-7 shadow-sm">
+                    <div class="flex items-center justify-between pb-6 border-b border-stone-100">
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-fraunces font-bold text-slate-900">My Wishlist</h2>
+                            <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Your saved skincare treasures and personal beauty wishlist.</p>
+                        </div>
+                        <span id="wishlist-header-count" class="bg-amber-100 text-amber-900 text-xs font-bold px-3 py-1 rounded-full border border-amber-200">
+                            0 Items
+                        </span>
+                    </div>
+
+                    <div id="wishlist-loader" class="py-12 text-center text-stone-500">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl text-[#8B4513] mb-3"></i>
+                        <p class="text-sm font-semibold">Loading your saved items...</p>
+                    </div>
+
+                    <div id="wishlist-empty" class="hidden py-12 text-center">
+                        <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-600 mx-auto flex items-center justify-center text-2xl mb-4 border border-rose-200">
+                            <i class="fa-regular fa-heart"></i>
+                        </div>
+                        <h3 class="text-lg font-fraunces font-bold text-slate-900">Your wishlist is empty</h3>
+                        <p class="text-xs sm:text-sm text-stone-500 max-w-sm mx-auto mt-1">Tap the heart icon on any product to save it to your wishlist and buy it whenever you're ready.</p>
+                        <a href="/products" class="inline-block mt-5 bg-[#8B4513] hover:bg-[#6F370F] text-white px-6 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition shadow-md">
+                            Discover Products
+                        </a>
+                    </div>
+
+                    <div id="wishlist-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-6"></div>
+                </section>
+
+
+                <!-- ==================================================== -->
+                <!-- 👤 TAB 4: PROFILE MANAGEMENT PANEL                  -->
+                <!-- ==================================================== -->
+                <section id="panel-profile" class="account-panel hidden bg-white rounded-3xl border border-[#ECE4CE] p-5 sm:p-8 shadow-sm">
+                    <div class="pb-6 border-b border-stone-100">
+                        <h2 class="text-xl sm:text-2xl font-fraunces font-bold text-slate-900">Profile Details</h2>
+                        <p class="text-xs sm:text-sm text-stone-500 mt-0.5">Keep your personal details, salutation, contact, and shipping address up to date.</p>
+                    </div>
+
+                    <form id="profile-form" class="mt-6 space-y-6">
+                        
+                        <!-- Salutation / Title (Mr / Ms / Mrs / Miss / Dr) -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">Title / Salutation</label>
+                            <div class="flex flex-wrap gap-2.5" id="title-pills-container">
+                                <button type="button" onclick="selectTitle('Mr.', this)" class="title-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Mr.</button>
+                                <button type="button" onclick="selectTitle('Ms.', this)" class="title-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Ms.</button>
+                                <button type="button" onclick="selectTitle('Mrs.', this)" class="title-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Mrs.</button>
+                                <button type="button" onclick="selectTitle('Miss', this)" class="title-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Miss</button>
+                                <button type="button" onclick="selectTitle('Dr.', this)" class="title-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Dr.</button>
+                            </div>
+                            <input type="hidden" id="prof-title" name="title" value="">
+                        </div>
+
+                        <!-- Name & Phone Number Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label for="prof-name" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                                    Full Name <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                        <i class="fa-regular fa-user text-sm"></i>
+                                    </span>
+                                    <input type="text" id="prof-name" name="name" required placeholder="Your full name" class="w-full bg-[#FAF7EE]/60 border border-[#DCD3BA] rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="prof-phone" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                                    Phone Number <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                        <i class="fa-solid fa-phone text-sm"></i>
+                                    </span>
+                                    <input type="tel" id="prof-phone" name="phone" required maxlength="10" placeholder="10-digit mobile number" class="w-full bg-[#FAF7EE]/60 border border-[#DCD3BA] rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email & Date of Birth Grid -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                            <div>
+                                <label for="prof-email" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                                    Email Address <span class="text-stone-400 font-normal lowercase">(read-only)</span>
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                        <i class="fa-regular fa-envelope text-sm"></i>
+                                    </span>
+                                    <input type="email" id="prof-email" name="email" readonly disabled class="w-full bg-stone-100 border border-stone-200 rounded-xl pl-10 pr-12 py-3 text-sm font-mono text-stone-600 cursor-not-allowed">
+                                    <span class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-emerald-600 text-xs font-bold" title="Verified Account">
+                                        <i class="fa-solid fa-circle-check"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="prof-dob" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                                    Date of Birth (DOB)
+                                </label>
+                                <div class="relative">
+                                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                        <i class="fa-regular fa-calendar text-sm"></i>
+                                    </span>
+                                    <input type="date" id="prof-dob" name="dob" class="w-full bg-[#FAF7EE]/60 border border-[#DCD3BA] rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Gender Selector -->
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-2">Gender (Optional)</label>
+                            <div class="flex flex-wrap gap-2.5" id="gender-pills-container">
+                                <button type="button" onclick="selectGender('Female', this)" class="gender-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Female</button>
+                                <button type="button" onclick="selectGender('Male', this)" class="gender-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Male</button>
+                                <button type="button" onclick="selectGender('Prefer not to say', this)" class="gender-pill px-4 py-2 rounded-xl text-xs font-bold border border-stone-200 bg-stone-50 hover:bg-amber-50 transition cursor-pointer">Prefer not to say</button>
+                            </div>
+                            <input type="hidden" id="prof-gender" name="gender" value="">
+                        </div>
+
+                        <!-- Delivery Address -->
+                        <div>
+                            <label for="prof-address" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">
+                                Default Shipping & Delivery Address
+                            </label>
+                            <div class="relative">
+                                <textarea id="prof-address" name="address" rows="3" placeholder="Enter your complete delivery address (House/Flat no, Street, Landmark, City, State, Pincode)" class="w-full bg-[#FAF7EE]/60 border border-[#DCD3BA] rounded-xl p-3.5 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Form Submit Button -->
+                        <div class="pt-2 flex items-center justify-end">
+                            <button type="submit" id="save-profile-btn" class="bg-[#8B4513] hover:bg-[#6F370F] text-white px-8 py-3.5 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center gap-2 cursor-pointer">
+                                <i class="fa-solid fa-floppy-disk text-sm"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- Global Footer -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Scripts -->
+    <script src="./js/include.js"></script>
+    <script type="module" src="./js/navbar-interactions.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/wishlist.js"></script>
+    <script type="module" src="./js/account.js"></script>
 </body>
 </html>
