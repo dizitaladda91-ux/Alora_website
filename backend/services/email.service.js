@@ -7,13 +7,17 @@ let cachedTransporter = null;
 const getTransporter = () => {
     const senderEmail = String(process.env.EMAIL_USER || "").trim();
     const senderPassword = String(process.env.EMAIL_PASS || "").replace(/\s+/g, "").trim();
-    if (!senderEmail || !senderPassword) return null;
+    if (!senderEmail || !senderPassword) {
+        console.warn("❌ Email config missing - EMAIL_USER:", senderEmail ? "✓" : "✗", "EMAIL_PASS:", senderPassword ? "✓" : "✗");
+        return null;
+    }
 
     if (!cachedTransporter) {
         cachedTransporter = nodemailer.createTransport({
             service: "gmail",
             auth: { user: senderEmail, pass: senderPassword }
         });
+        console.log("✓ Email transporter initialized for:", senderEmail);
     }
     return cachedTransporter;
 };
@@ -30,16 +34,26 @@ export const escapeHtml = (value) => String(value ?? "")
 export const sendMail = async (mailOptions) => {
     const transporter = getTransporter();
     if (!transporter) {
-        console.warn("Email skipped: EMAIL_USER or EMAIL_PASS is not configured.");
+        console.warn("⚠️ Email skipped: EMAIL_USER or EMAIL_PASS is not configured.");
         return;
     }
     try {
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
             from: `"ALORA PRODUCTS" <${process.env.EMAIL_USER}>`,
             ...mailOptions
         });
+        console.log("✅ Email sent successfully:", {
+            to: mailOptions.to,
+            subject: mailOptions.subject?.substring(0, 50),
+            messageId: info.messageId
+        });
     } catch (error) {
-        console.error("Email send failed:", error.message);
+        console.error("❌ Email send failed:", {
+            to: mailOptions.to,
+            subject: mailOptions.subject?.substring(0, 50),
+            error: error.message,
+            code: error.code
+        });
     }
 };
 
