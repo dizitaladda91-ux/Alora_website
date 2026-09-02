@@ -254,6 +254,54 @@
                         </div>
                     </div>
 
+                    <!-- Category 5: Radiance Skincare Articles & Single Blogs -->
+                    <div data-aos="fade-up" data-aos-delay="500" class="bg-card p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light flex flex-col justify-between md:col-span-2 lg:col-span-2">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-amber-500/10 text-amber-700 flex items-center justify-center text-xl mb-5 font-bold">
+                                <i class="fa-solid fa-newspaper"></i>
+                            </div>
+                            <h2 class="font-serif text-xl font-bold text-ink mb-4 pb-2 border-b border-sage-light flex items-center justify-between">
+                                Skincare Articles &amp; Blog Posts
+                                <span class="text-xs font-roboto font-normal text-gold uppercase tracking-wider">05</span>
+                            </h2>
+                            <div class="mb-4">
+                                <a href="/blog" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 text-[#8B4513] font-bold text-xs uppercase tracking-wider transition border border-amber-200">
+                                    <i class="fa-solid fa-book-open"></i> Main Blog Hub (/blog)
+                                </a>
+                            </div>
+                            <p class="text-xs text-stone-500 mb-3 font-semibold uppercase tracking-wider">Individual Published Articles:</p>
+                            <ul id="dynamic-blog-sitemap-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-ash">
+                                <li class="text-stone-400 text-xs py-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-spinner fa-spin text-amber-600"></i> Loading published articles...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Category 6: Skincare Product Catalog -->
+                    <div data-aos="fade-up" data-aos-delay="600" class="bg-card p-6 sm:p-8 rounded-3xl shadow-sm hover:shadow-xl transition-all duration-300 border border-sage-light flex flex-col justify-between">
+                        <div>
+                            <div class="w-12 h-12 rounded-2xl bg-[#8B4513]/10 text-[#8B4513] flex items-center justify-center text-xl mb-5 font-bold">
+                                <i class="fa-solid fa-pump-soap"></i>
+                            </div>
+                            <h2 class="font-serif text-xl font-bold text-ink mb-4 pb-2 border-b border-sage-light flex items-center justify-between">
+                                Products &amp; Kits
+                                <span class="text-xs font-roboto font-normal text-gold uppercase tracking-wider">06</span>
+                            </h2>
+                            <div class="mb-4">
+                                <a href="/products" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-stone-800 font-bold text-xs uppercase tracking-wider transition border border-stone-200">
+                                    <i class="fa-solid fa-store"></i> All Products (/products)
+                                </a>
+                            </div>
+                            <p class="text-xs text-stone-500 mb-3 font-semibold uppercase tracking-wider">Individual Products:</p>
+                            <ul id="dynamic-product-sitemap-list" class="space-y-3 text-sm text-ash">
+                                <li class="text-stone-400 text-xs py-2 flex items-center gap-2">
+                                    <i class="fa-solid fa-spinner fa-spin text-[#8B4513]"></i> Loading products...
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
                 </div>
 
             </div>
@@ -267,6 +315,69 @@
     <!-- JS Files -->
     <script src="./js/include.js"></script>
     <script type="module" src="./js/navbar-interactions.js"></script>
+
+    <!-- Dynamic Sitemap Blog & Product Fetcher -->
+    <script type="module">
+        import BASE_URL from "./js/config.js";
+
+        async function loadDynamicSitemapLinks() {
+            // 1. Fetch & Render Single Blog Articles
+            const blogListEl = document.getElementById("dynamic-blog-sitemap-list");
+            try {
+                const res = await fetch(`${BASE_URL}/api/blogs/all?limit=100`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const blogs = data.blogs || data.data || [];
+                    if (blogs.length > 0 && blogListEl) {
+                        blogListEl.innerHTML = blogs.map(b => {
+                            const rawSlug = b.slug || String(b.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                            const slug = encodeURIComponent(String(rawSlug).trim());
+                            return `
+                            <li>
+                                <a href="/post/${slug}" class="hover:text-clay transition-colors duration-200 flex items-start gap-2 text-xs sm:text-sm font-medium text-ink-light">
+                                    <i class="fa-solid fa-file-lines text-xs text-amber-600 mt-1 shrink-0"></i>
+                                    <span class="line-clamp-2">${b.title}</span>
+                                </a>
+                            </li>`;
+                        }).join("");
+                    } else if (blogListEl) {
+                        blogListEl.innerHTML = `<li class="text-xs text-stone-500 italic">No published articles found.</li>`;
+                    }
+                }
+            } catch (err) {
+                if (blogListEl) blogListEl.innerHTML = `<li class="text-xs text-stone-500">Visit <a href="/blog" class="underline text-amber-700 font-bold">Radiance Blog</a> for all articles.</li>`;
+            }
+
+            // 2. Fetch & Render Single Products
+            const prodListEl = document.getElementById("dynamic-product-sitemap-list");
+            try {
+                const res = await fetch(`${BASE_URL}/api/product/all`);
+                if (res.ok) {
+                    const data = await res.json();
+                    const products = data.products || data.data || [];
+                    if (products.length > 0 && prodListEl) {
+                        prodListEl.innerHTML = products.map(p => {
+                            const rawSlug = p.slug || String(p.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+                            const slug = encodeURIComponent(String(rawSlug).trim());
+                            return `
+                            <li>
+                                <a href="/product/${slug}" class="hover:text-clay transition-colors duration-200 flex items-center gap-2 text-xs sm:text-sm font-medium text-ink-light">
+                                    <i class="fa-solid fa-cube text-xs text-gold shrink-0"></i>
+                                    <span class="truncate">${p.name}</span>
+                                </a>
+                            </li>`;
+                        }).join("");
+                    } else if (prodListEl) {
+                        prodListEl.innerHTML = `<li class="text-xs text-stone-500 italic">No products found.</li>`;
+                    }
+                }
+            } catch (err) {
+                if (prodListEl) prodListEl.innerHTML = `<li class="text-xs text-stone-500">Visit <a href="/products" class="underline text-[#8B4513] font-bold">Shop</a> for all products.</li>`;
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", loadDynamicSitemapLinks);
+    </script>
 
     <!-- AOS Script Initialization -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>

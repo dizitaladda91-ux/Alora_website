@@ -242,12 +242,13 @@ app.get('/sitemap.xml', async (req, res) => {
     }
 
     try {
-      // Drafts must never be exposed to search engines.
-      const posts = await Post.find({ status: 'published' }, 'slug title updatedAt').lean();
+      // Include all published single blog posts in sitemap.xml
+      const posts = await Post.find({ status: { $ne: 'draft' } }, 'slug title updatedAt createdAt').lean();
       posts.forEach(p => {
-        const slug = p.slug || String(p.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const rawSlug = p.slug || String(p.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        const slug = String(rawSlug).trim();
         if (slug) {
-          const modDate = p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : today;
+          const modDate = p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : (p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : today);
           xml += `  <url>\n    <loc>${baseUrl}/post/${encodeURIComponent(slug)}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
         }
       });
