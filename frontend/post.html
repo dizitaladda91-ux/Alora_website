@@ -321,6 +321,17 @@
         .post-body-content tr:hover td {
             background-color: #F8FAFC !important;
         }
+
+        /* Keep the desktop TOC frozen in place while the article scrolls. */
+        @media (min-width: 1024px) {
+            #toc-sidebar-card {
+                position: fixed;
+                top: 6rem;
+                left: max(1.5rem, calc(50% - 38.5rem));
+                width: clamp(19rem, 31vw, 24rem);
+                max-height: calc(100vh - 7.5rem);
+            }
+        }
     </style>
 </head>
 <body class="bg-[#FAF7F2] font-sans text-ink min-h-screen flex flex-col justify-between">
@@ -341,8 +352,8 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             
             <!-- 📌 Left Sidebar: stays visible while the reader scrolls through the article -->
-            <aside id="toc-sidebar-container" class="hidden lg:block lg:col-span-4 lg:sticky lg:top-24 self-start z-0 transition-all duration-300">
-                <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-amber-900/10 max-h-[80vh] overflow-y-auto custom-scrollbar">
+            <aside id="toc-sidebar-container" class="hidden lg:block lg:col-span-4 self-start z-0 transition-all duration-300">
+                <div id="toc-sidebar-card" class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-amber-900/10 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     <div class="flex items-center gap-2.5 pb-4 mb-4 border-b border-amber-900/10">
                         <i class="fa-solid fa-list-ul text-[#8B4513] text-sm"></i>
                         <h3 class="font-fraunces font-bold text-slate-900 text-base">Table of Contents</h3>

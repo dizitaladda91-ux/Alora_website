@@ -425,17 +425,6 @@ async function applyCoupon() {
         recalculateBill();
         return;
     }
-    if (typedCode === "SECRET490" || typedCode === "ALORA490" || typedCode === "TEST490" || typedCode === "FLAT490" || typedCode === "SPECIAL490") {
-        if (addAppliedCoupon(typedCode, 490, "coupon", true)) {
-            couponMessage.innerText = `🎉 Secret Test Coupon '${typedCode}' applied successfully! (₹490 Flat Off)`;
-            couponMessage.className = "text-xs font-semibold mt-2 text-emerald-600 block";
-            couponInput.value = "";
-        } else {
-            couponMessage.innerText = appliedCoupons.some((coupon) => coupon.code === typedCode) ? "This coupon is already applied." : "You can apply up to 3 coupons.";
-            couponMessage.className = "text-xs font-semibold mt-2 text-red-600 block";
-        }
-        return;
-    }
     if (typedCode === "RAKHI30" || typedCode === "RAKHI" || typedCode === "FESTIVE30" || typedCode === "RAKHI30OFF") {
         if (addAppliedCoupon(typedCode, 30)) {
             couponMessage.innerText = `🪔 Rakhi Special Coupon '${typedCode}' applied successfully! (30% Off)`;

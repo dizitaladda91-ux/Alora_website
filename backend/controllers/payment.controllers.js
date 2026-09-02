@@ -350,9 +350,8 @@ export const createOrder = async (req, res) => {
         const candidateCodes = getRequestedCouponCodes(req.body);
 
         for (const candidateCode of candidateCodes) {
-            const isSecretTestCode = candidateCode === "SECRET490" || candidateCode === "ALORA490" || candidateCode === "TEST490" || candidateCode === "FLAT490" || candidateCode === "SPECIAL490";
             // Strict Single-Use Per Account/Email Check
-            if (customerEmail && !isSecretTestCode) {
+            if (customerEmail) {
                 const usedOrder = await Order.findOne({
                     $or: [
                         { "customer.email": customerEmail },
@@ -367,12 +366,6 @@ export const createOrder = async (req, res) => {
                 if (usedOrder) {
                     throw new Error(`Coupon '${candidateCode}' has already been redeemed on your account and can only be used once.`);
                 }
-            }
-
-            if (isSecretTestCode) {
-                flatDiscount += 490;
-                appliedCoupons.push(candidateCode);
-                continue;
             }
 
             if (candidateCode === "RAKHI30" || candidateCode === "RAKHI" || candidateCode === "FESTIVE30" || candidateCode === "RAKHI30OFF") {

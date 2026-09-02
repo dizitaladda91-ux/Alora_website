@@ -48,8 +48,7 @@ export const trackReferralClick = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid referral tracking data." });
     }
 
-    const isSecretTestCode = code === "SECRET490" || code === "ALORA490" || code === "TEST490" || code === "FLAT490" || code === "SPECIAL490";
-    if (customerEmail && !isSecretTestCode) {
+    if (customerEmail) {
       const usedOrder = await Order.findOne({
         $and: [
           { "customer.email": { $regex: new RegExp(`^${customerEmail.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "i") } },
@@ -64,10 +63,6 @@ export const trackReferralClick = async (req, res) => {
       if (usedOrder) {
         return res.status(400).json({ success: false, message: `Coupon '${code}' has already been redeemed on your account and can only be used once.` });
       }
-    }
-
-    if (isSecretTestCode) {
-      return res.status(200).json({ success: true, referralCode: code, clickId: null, flatDiscount: 490, isFlat: true });
     }
 
     if (code === "GLOW10") {
