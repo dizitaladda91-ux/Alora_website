@@ -332,6 +332,15 @@
                 max-height: calc(100vh - 7.5rem);
             }
         }
+
+        /* On mobile, keep the compact TOC accordion reachable while reading. */
+        @media (max-width: 1023px) {
+            #mobile-toc-container {
+                position: sticky;
+                top: 0.75rem;
+                z-index: 20;
+            }
+        }
     </style>
 </head>
 <body class="bg-[#FAF7F2] font-sans text-ink min-h-screen flex flex-col justify-between">
