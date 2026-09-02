@@ -637,12 +637,22 @@ document.addEventListener("DOMContentLoaded", () => {
     // Bind Sidebar Logout
     const logoutBtn = document.getElementById("sidebar-logout-btn");
     if (logoutBtn) {
-        logoutBtn.addEventListener("click", () => {
+        logoutBtn.addEventListener("click", async (e) => {
+            if (e) e.preventDefault();
+            try {
+                await fetch(`${BASE_URL}/api/auth/logout`, {
+                    method: "POST",
+                    credentials: "include"
+                });
+            } catch (err) {
+                console.warn("Logout API warning:", err);
+            }
             sessionStorage.clear();
             localStorage.removeItem("user");
             localStorage.removeItem("userToken");
             localStorage.removeItem("token");
             localStorage.removeItem("userRole");
+            localStorage.removeItem("tabAuthActive");
             window.location.href = "./login.html";
         });
     }

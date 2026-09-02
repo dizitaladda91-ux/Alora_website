@@ -111,12 +111,22 @@ export function renderNavbarState() {
                     </div>
                 `;
             }
-            const bindLogout = () => {
+            const bindLogout = async (e) => {
+                if (e) e.preventDefault();
+                try {
+                    await fetch(`${BASE_URL}/api/auth/logout`, {
+                        method: "POST",
+                        credentials: "include"
+                    });
+                } catch (err) {
+                    console.warn("Logout API warning:", err);
+                }
                 sessionStorage.clear();
                 localStorage.removeItem("token");
                 localStorage.removeItem("userToken");
                 localStorage.removeItem("user");
                 localStorage.removeItem("userRole");
+                localStorage.removeItem("tabAuthActive");
                 window.location.href = "./index.html";
             };
             document.querySelectorAll('.logout-btn-trigger').forEach((btn) => {

@@ -60,7 +60,7 @@ const authorizeRoles = (...roles) => {
 // ==========================================
 router.post('/api/auth/register', register);
 router.post('/api/auth/login', login);
-router.post('/api/auth/logout', logout);
+router.all('/api/auth/logout', logout);
 router.get('/api/auth/session', requireAuth, getSession);
 router.put('/api/auth/profile', requireAuth, updateProfile);
 

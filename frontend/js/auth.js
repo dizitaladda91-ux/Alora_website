@@ -130,7 +130,7 @@ async function handleLogout() {
     }
 }
 document.addEventListener("click", (e) => {
-    const logoutBtn = e.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
+    const logoutBtn = e.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn, .logout-btn-trigger, #sidebar-logout-btn");
     if (logoutBtn) {
         e.preventDefault();
         e.stopPropagation();
@@ -360,18 +360,13 @@ export function renderNavbarState() {
                         </div>
                     `;
                 }
-                const bindLogout = () => {
-                    sessionStorage.clear();
-                    localStorage.removeItem('user');
-                    localStorage.removeItem('userToken');
-                    localStorage.removeItem('token');
-                    localStorage.removeItem('userRole');
-                    window.location.href = './login.html';
-                };
                 document.querySelectorAll('.logout-btn-trigger').forEach((btn) => {
                     if (!btn.dataset.bound) {
                         btn.dataset.bound = "true";
-                        btn.addEventListener("click", bindLogout);
+                        btn.addEventListener("click", (e) => {
+                            e.preventDefault();
+                            handleLogout();
+                        });
                     }
                 });
             }

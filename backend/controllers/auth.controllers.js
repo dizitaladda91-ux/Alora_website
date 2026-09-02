@@ -210,8 +210,9 @@ export const logout = (req, res) => {
     httpOnly: true,
     secure: authCookieOptions.secure,
     sameSite: authCookieOptions.sameSite,
-    path: authCookieOptions.path
+    path: "/"
   });
+  res.clearCookie("token");
   res.status(200).json({ success: true, message: "Logged out successfully" });
 };
 
