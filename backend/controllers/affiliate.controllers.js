@@ -97,7 +97,7 @@ export const updateAffiliateReferral = async (req, res) => {
     for (const field of ["discountPercent", "commissionPercent"]) {
       if (req.body[field] !== undefined) update[field] = Number(req.body[field]);
     }
-    const referral = await AffiliateReferral.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).lean();
+    const referral = await AffiliateReferral.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after', runValidators: true }).lean();
     if (!referral) return res.status(404).json({ success: false, message: "Referral not found." });
     return res.status(200).json({ success: true, referral });
   } catch {
@@ -109,7 +109,7 @@ export const updateConversionStatus = async (req, res) => {
   try {
     const status = String(req.body.status || "");
     if (!["pending", "approved", "paid", "rejected"].includes(status)) return res.status(400).json({ success: false, message: "Invalid conversion status." });
-    const conversion = await AffiliateConversion.findByIdAndUpdate(req.params.id, { status }, { new: true }).lean();
+    const conversion = await AffiliateConversion.findByIdAndUpdate(req.params.id, { status }, { returnDocument: 'after' }).lean();
     if (!conversion) return res.status(404).json({ success: false, message: "Conversion not found." });
     return res.status(200).json({ success: true, conversion });
   } catch {

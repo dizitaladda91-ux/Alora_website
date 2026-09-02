@@ -107,7 +107,7 @@ export const updateAdminOrderStatus = async (req, res) => {
     if (trackingNumber !== undefined) update.trackingNumber = trackingNumber;
     if (courierLink !== undefined) update.courierLink = courierLink;
 
-    const order = await Order.findByIdAndUpdate(req.params.id, update, { new: true, runValidators: true }).lean();
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after', runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
 
     // Fire the shipping email only on the actual transition into "shipped".
@@ -133,7 +133,7 @@ export const updateExpectedDeliveryDate = async (req, res) => {
     if (Number.isNaN(expectedDeliveryDate.getTime())) {
       return res.status(400).json({ success: false, message: "Choose a valid delivery date." });
     }
-    const order = await Order.findByIdAndUpdate(req.params.id, { expectedDeliveryDate }, { new: true, runValidators: true }).lean();
+    const order = await Order.findByIdAndUpdate(req.params.id, { expectedDeliveryDate }, { returnDocument: 'after', runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
     return res.status(200).json({ success: true, data: order, message: "Expected delivery date updated." });
   } catch {
@@ -152,7 +152,7 @@ export const refundAdminOrder = async (req, res) => {
       "refund.processing": false
     }, {
       $set: { "refund.processing": true, "refund.reason": reason }
-    }, { new: true });
+    }, { returnDocument: 'after' });
 
     if (!claimedOrder) {
       return res.status(400).json({ success: false, message: "Order is already refunded, being refunded, or cannot be refunded." });
@@ -179,7 +179,7 @@ export const refundAdminOrder = async (req, res) => {
         "refund.reason": reason,
         "refund.refundedAt": new Date()
       }
-    }, { new: true });
+    }, { returnDocument: 'after' });
 
     // Unlimited-catalogue orders never reserve stock, so their refunds must not
     // add quantities. Older inventory-tracked orders retain the safe restore flow.
@@ -188,7 +188,7 @@ export const refundAdminOrder = async (req, res) => {
       const claimedForStockRestore = await Order.findOneAndUpdate(
         { _id: claimedOrder._id, stockRestoredAt: null },
         { $set: { stockRestoredAt: restoreTimestamp } },
-        { new: true }
+        { returnDocument: 'after' }
       );
       if (claimedForStockRestore) await restoreOrderStock({ ...claimedOrder.toObject(), stockRestoredAt: null });
     }

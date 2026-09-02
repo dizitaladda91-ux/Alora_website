@@ -244,7 +244,7 @@ export const updateBlogPost = async (req, res) => {
             updateData.coverImage = (coverUrl || coverImageUrl).trim();
         }
 
-        const updatedBlog = await Blog.findByIdAndUpdate(id, updateData, { new: true });
+        const updatedBlog = await Blog.findByIdAndUpdate(id, updateData, { returnDocument: 'after' });
 
         if (!updatedBlog) {
             return res.status(404).json({ success: false, message: "Blog not found to update." });

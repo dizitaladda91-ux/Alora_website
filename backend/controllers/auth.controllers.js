@@ -139,7 +139,7 @@ export const register = async (req, res, next) => {
         },
         $setOnInsert: { createdAt: new Date() }
       },
-      { upsert: true, new: true, setDefaultsOnInsert: true }
+      { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
     );
 
     // Registration should leave the customer signed in immediately. This also
@@ -243,7 +243,7 @@ export const updateProfile = async (req, res) => {
     const user = await User.findByIdAndUpdate(
       req.user.id,
       { $set: { address } },
-      { new: true, runValidators: true }
+      { returnDocument: 'after', runValidators: true }
     ).select("name email phone address role").lean();
 
     if (!user) {

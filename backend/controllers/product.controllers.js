@@ -139,7 +139,7 @@ export const updateproduct = async (req, res) => {
         const updatedProduct = await SimpleProduct.findByIdAndUpdate(
             id,
             updateProductData, 
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!updatedProduct) {
