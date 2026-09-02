@@ -1,4 +1,5 @@
 import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
+import "./wishlist.js";
 document.addEventListener("partialsLoaded", () => {
     const mobileDropdownBtn = document.getElementById("mobile-dropdown-btn");
     const mobileDropdownMenu = document.getElementById("mobile-dropdown-menu");

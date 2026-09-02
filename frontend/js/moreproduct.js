@@ -1,4 +1,5 @@
 import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
+import "./wishlist.js";
 let PRODUCTS_DATABASE = [];
 let selectedCategories = [];
 let maxPriceConstraint = 2500;

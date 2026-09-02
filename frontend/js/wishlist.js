@@ -277,6 +277,9 @@ export async function handleCardWishlistToggle(productId, btnEl, event) {
         event.preventDefault();
         event.stopPropagation();
     }
+    if (!btnEl && event?.currentTarget) {
+        btnEl = event.currentTarget;
+    }
     return await toggleProductWishlist(productId, btnEl);
 }
 window.handleCardWishlistToggle = handleCardWishlistToggle;
@@ -306,8 +309,51 @@ export function syncWishlistHeartsOnPage(wishlistItems = null) {
 window.syncWishlistHeartsOnPage = syncWishlistHeartsOnPage;
 window.toggleProductWishlist = toggleProductWishlist;
 
-document.addEventListener("DOMContentLoaded", async () => {
+// Global Delegated Click Listener with Capture phase
+document.addEventListener("click", async (e) => {
+    const btn = e.target.closest(".wishlist-toggle-btn");
+    if (!btn) return;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (btn._isToggling) return;
+    btn._isToggling = true;
+
+    try {
+        let prodId = btn.dataset.productId;
+        if (!prodId) {
+            const card = btn.closest("[data-product-id]");
+            if (card) {
+                prodId = card.getAttribute("data-product-id");
+            }
+        }
+        if (!prodId && btn.id === "single-wishlist-btn") {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pathMatch = window.location.pathname.match(/^\/product\/([^/?#]+)\/?$/i);
+            prodId = pathMatch ? decodeURIComponent(pathMatch[1]) : urlParams.get('id');
+        }
+
+        if (prodId) {
+            await toggleProductWishlist(prodId, btn);
+        }
+    } catch (err) {
+        console.warn("Wishlist click error:", err);
+    } finally {
+        setTimeout(() => {
+            btn._isToggling = false;
+        }, 400);
+    }
+}, true);
+
+async function initWishlistOnLoad() {
     injectWishlistStyles();
     const wishlist = await fetchUserWishlist();
     syncWishlistHeartsOnPage(wishlist);
-});
+}
+
+document.addEventListener("DOMContentLoaded", initWishlistOnLoad);
+document.addEventListener("partialsLoaded", initWishlistOnLoad);
+if (document.readyState === "complete" || document.readyState === "interactive") {
+    initWishlistOnLoad();
+}

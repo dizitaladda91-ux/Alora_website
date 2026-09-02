@@ -1,4 +1,5 @@
 import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
+import './wishlist.js';
 
 const RUPEE_SYMBOL = '\u20B9';
 

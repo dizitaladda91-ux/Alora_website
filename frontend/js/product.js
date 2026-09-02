@@ -1,5 +1,6 @@
 import BASE_URL, { getImageUrl, getProductUrl } from "./config.js";
 import "./toast.js";
+import "./wishlist.js";
 let currentProductData = null;
 let currentSelectedVariant = null;
 function setPurchaseAvailability() {
