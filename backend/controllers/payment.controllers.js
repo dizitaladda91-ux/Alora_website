@@ -162,54 +162,36 @@ const isValidCustomer = (customer) => (
 );
 
 const sendOrderEmails = async ({ orderData, savedOrder, itemsList }) => {
-    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminEmail = String(process.env.ADMIN_EMAIL || "").trim();
     const { customer } = savedOrder;
     const safeItems = orderData.cart.map((item) => (
         `<li>${escapeHtml(item.name)} (${escapeHtml(item.size)}) &times; ${item.qty} — INR ${item.price * item.qty}</li>`
     )).join("");
 
-    await sendMail({
+    const emailJobs = [sendMail({
         to: customer.email,
         subject: `Order confirmed — ${orderData.order_id}`,
         text: `Hi ${customer.name},\n\nYour ALORA PRODUCTS order is confirmed.\n\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nDelivery address: ${customer.address}`,
         html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>Order confirmed</h2><p>Hi ${escapeHtml(customer.name)},</p><p>Thank you for shopping with ALORA PRODUCTS. Your order has been confirmed.</p><p><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total paid:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Delivery address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p></div>`
-    });
+    })];
 
     if (adminEmail) {
-        await sendMail({
+        emailJobs.push(sendMail({
             to: adminEmail,
             subject: `New order received — ${orderData.order_id}`,
             text: `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nEmail: ${customer.email}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}`,
             html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>New order received</h2><p><strong>Customer:</strong> ${escapeHtml(customer.name)}<br><strong>Email:</strong> ${escapeHtml(customer.email)}<br><strong>Phone:</strong> ${escapeHtml(customer.phone)}<br><strong>Address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p></div>`
-        });
+        }));
+    } else {
+        console.error("Order email skipped for admin: ADMIN_EMAIL is not configured.");
     }
-};
 
-const sendMetaWhatsAppMessage = async (toPhone, messageText) => {
-    try {
-        const token = process.env.META_WHATSAPP_TOKEN;
-        const phoneId = process.env.META_PHONE_NUMBER_ID;
-        if (!token || !phoneId) return;
-
-        let formattedPhone = String(toPhone).replace(/[^0-9]/g, "");
-        if (formattedPhone.length === 10) formattedPhone = `91${formattedPhone}`;
-
-        const response = await fetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                recipient_type: "individual",
-                to: formattedPhone,
-                type: "text",
-                text: { preview_url: false, body: messageText }
-            })
-        });
-
-        if (!response.ok) console.error("Meta WhatsApp API request failed.");
-    } catch (error) {
-        console.error("Meta WhatsApp notification failed:", error.message);
-    }
+    const results = await Promise.all(emailJobs);
+    console.log("Order confirmation email summary:", {
+        orderId: orderData.order_id,
+        customerEmailSent: results[0]?.sent === true,
+        adminEmailSent: adminEmail ? results[1]?.sent === true : false
+    });
 };
 
 const sendOrderSideEffects = async (savedOrder) => {
@@ -232,11 +214,6 @@ const sendOrderSideEffects = async (savedOrder) => {
         }).catch((error) => console.error("Google Sheet sync failed:", error.message));
     }
 
-    const { customer } = savedOrder;
-    const customerMessage = `Order confirmed - ALORA PRODUCTS\n\nHi ${customer.name},\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nAddress: ${customer.address}`;
-    const adminMessage = `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}`;
-    sendMetaWhatsAppMessage(customer.phone, customerMessage);
-    if (process.env.ADMIN_PHONE) sendMetaWhatsAppMessage(process.env.ADMIN_PHONE, adminMessage);
     await sendOrderEmails({ orderData, savedOrder, itemsList });
 
     if (savedOrder.referral?.code) {

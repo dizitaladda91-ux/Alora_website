@@ -35,7 +35,7 @@ export const sendMail = async (mailOptions) => {
     const transporter = getTransporter();
     if (!transporter) {
         console.warn("⚠️ Email skipped: EMAIL_USER or EMAIL_PASS is not configured.");
-        return;
+        return { sent: false, error: "EMAIL_USER or EMAIL_PASS is not configured." };
     }
     try {
         const info = await transporter.sendMail({
@@ -47,6 +47,7 @@ export const sendMail = async (mailOptions) => {
             subject: mailOptions.subject?.substring(0, 50),
             messageId: info.messageId
         });
+        return { sent: true, messageId: info.messageId };
     } catch (error) {
         console.error("❌ Email send failed:", {
             to: mailOptions.to,
@@ -54,6 +55,7 @@ export const sendMail = async (mailOptions) => {
             error: error.message,
             code: error.code
         });
+        return { sent: false, error: error.message, code: error.code };
     }
 };
 
