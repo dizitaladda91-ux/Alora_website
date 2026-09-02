@@ -340,8 +340,8 @@
         <!-- Dual Column Grid Layout for TOC + Article -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-start">
             
-            <!-- 📌 Left Sidebar: Table of Contents (TOC) - Scrolls naturally with page -->
-            <aside id="toc-sidebar-container" class="hidden lg:block lg:col-span-4 relative z-0 transition-all duration-300">
+            <!-- 📌 Left Sidebar: stays visible while the reader scrolls through the article -->
+            <aside id="toc-sidebar-container" class="hidden lg:block lg:col-span-4 lg:sticky lg:top-24 self-start z-0 transition-all duration-300">
                 <div class="bg-white/95 backdrop-blur-md rounded-3xl p-6 shadow-sm border border-amber-900/10 max-h-[80vh] overflow-y-auto custom-scrollbar">
                     <div class="flex items-center gap-2.5 pb-4 mb-4 border-b border-amber-900/10">
                         <i class="fa-solid fa-list-ul text-[#8B4513] text-sm"></i>
