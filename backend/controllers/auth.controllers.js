@@ -233,13 +233,18 @@ export const getSession = async (req, res) => {
 
 export const updateProfile = async (req, res) => {
   try {
+    const body = req.body && typeof req.body === "object" ? req.body : {};
     const updateData = {};
-    if (req.body.title !== undefined) updateData.title = String(req.body.title || '').trim();
-    if (req.body.name !== undefined && String(req.body.name).trim()) updateData.name = String(req.body.name).trim();
-    if (req.body.phone !== undefined && String(req.body.phone).trim()) updateData.phone = String(req.body.phone).trim();
-    if (req.body.dob !== undefined) updateData.dob = String(req.body.dob || '').trim();
-    if (req.body.gender !== undefined) updateData.gender = String(req.body.gender || '').trim();
-    if (req.body.address !== undefined) updateData.address = String(req.body.address || '').trim();
+    if (body.title !== undefined) updateData.title = String(body.title || '').trim();
+    if (body.name !== undefined && String(body.name).trim()) updateData.name = String(body.name).trim();
+    if (body.phone !== undefined && String(body.phone).trim()) updateData.phone = String(body.phone).trim();
+    if (body.dob !== undefined) updateData.dob = String(body.dob || '').trim();
+    if (body.gender !== undefined) updateData.gender = String(body.gender || '').trim();
+    if (body.address !== undefined) updateData.address = String(body.address || '').trim();
+
+    if (Object.keys(updateData).length === 0) {
+      return res.status(400).json({ success: false, message: "No profile details were provided." });
+    }
 
     // If phone is updated, verify it is not already taken by another user
     if (updateData.phone) {

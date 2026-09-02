@@ -549,7 +549,7 @@ function initProfileForm() {
         try {
             const res = await fetch(`${BASE_URL}/api/auth/profile`, {
                 method: "PUT",
-                headers: getAuthHeaders(),
+                headers: getAuthHeaders({ "Content-Type": "application/json" }),
                 credentials: "include",
                 body: JSON.stringify(payload)
             });
