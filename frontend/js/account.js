@@ -466,6 +466,54 @@ export function selectGender(val, btnEl) {
 }
 window.selectGender = selectGender;
 
+function updateSidebarUI(user = {}) {
+    const sidebarName = document.getElementById("sidebar-user-name");
+    const sidebarEmail = document.getElementById("sidebar-user-email");
+    const sidebarAvatar = document.getElementById("sidebar-avatar");
+
+    const rawName = user.name || user.username || (user.email ? user.email.split('@')[0] : "");
+    const titlePrefix = user.title ? `${user.title} ` : "";
+    const displayName = rawName ? `${titlePrefix}${rawName}` : "Valued Member";
+    const displayEmail = user.email || "";
+    const avatarLetter = (rawName || user.email || "A").charAt(0).toUpperCase();
+
+    if (sidebarName) sidebarName.innerText = displayName;
+    if (sidebarEmail) sidebarEmail.innerText = displayEmail;
+    if (sidebarAvatar) sidebarAvatar.innerText = avatarLetter;
+}
+
+export async function initUserProfileSidebar() {
+    // 1. Instant optimistic sync from stored session/local storage
+    try {
+        const cachedUser = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user") || "null");
+        if (cachedUser) {
+            updateSidebarUI(cachedUser);
+        }
+    } catch (e) {}
+
+    // 2. Fetch fresh live session from server
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/session`, {
+            headers: getAuthHeaders(),
+            credentials: "include"
+        });
+
+        if (response.ok) {
+            const result = await response.json();
+            if (result && result.user) {
+                updateSidebarUI(result.user);
+                try {
+                    let localUser = JSON.parse(localStorage.getItem("user") || "{}");
+                    localUser = { ...localUser, ...result.user };
+                    localStorage.setItem("user", JSON.stringify(localUser));
+                } catch (e) {}
+            }
+        }
+    } catch (err) {
+        console.warn("Could not sync live user profile for sidebar:", err);
+    }
+}
+
 async function loadProfileDetails() {
     try {
         const response = await fetch(`${BASE_URL}/api/auth/session`, {
@@ -491,14 +539,7 @@ async function loadProfileDetails() {
         if (addressInput) addressInput.value = user.address || "";
 
         // Populate Sidebar details
-        const sidebarName = document.getElementById("sidebar-user-name");
-        const sidebarEmail = document.getElementById("sidebar-user-email");
-        const sidebarAvatar = document.getElementById("sidebar-avatar");
-
-        const displayName = (user.title ? `${user.title} ` : '') + (user.name || "Member");
-        if (sidebarName) sidebarName.innerText = displayName;
-        if (sidebarEmail) sidebarEmail.innerText = user.email || "user@example.com";
-        if (sidebarAvatar) sidebarAvatar.innerText = (user.name || "A").charAt(0).toUpperCase();
+        updateSidebarUI(user);
 
         // Highlight Title Pill
         if (user.title) {
@@ -584,7 +625,10 @@ function initProfileForm() {
 // 7. INITIALIZATION ON PAGE LOAD
 // ==========================================
 document.addEventListener("DOMContentLoaded", () => {
-    // Check initial tab from hash or default to orders
+    // 1. Instantly populate logged-in user name & email in sidebar
+    initUserProfileSidebar();
+
+    // 2. Check initial tab from hash or default to orders
     const initialTab = (window.location.hash || "#orders").replace("#", "");
     switchAccountTab(initialTab);
 
