@@ -322,14 +322,20 @@
             background-color: #F8FAFC !important;
         }
 
-        /* Keep the desktop TOC frozen in place while the article scrolls. */
+        /* Keep the desktop TOC sticky inside the article grid so it never overlaps the footer or products */
         @media (min-width: 1024px) {
+            #toc-sidebar-container {
+                position: sticky !important;
+                top: 5.5rem !important;
+                align-self: flex-start !important;
+                z-index: 10 !important;
+            }
             #toc-sidebar-card {
-                position: fixed;
-                top: 6rem;
-                left: max(1.5rem, calc(50% - 38.5rem));
-                width: clamp(19rem, 31vw, 24rem);
-                max-height: calc(100vh - 7.5rem);
+                position: static !important;
+                width: 100% !important;
+                max-height: calc(100vh - 7rem) !important;
+                overflow-y: auto !important;
+                scroll-behavior: smooth;
             }
         }
 
@@ -345,8 +351,8 @@
 </head>
 <body class="bg-[#FAF7F2] font-sans text-ink min-h-screen flex flex-col justify-between">
 
-    <!-- Header Section -->
-    <header class="w-full">
+    <!-- Header Section (Sticky / Frozen Navbar at Top) -->
+    <header class="sticky top-0 z-50 w-full bg-white shadow-sm">
         <div id="navbar-placeholder"></div>
     </header>
 

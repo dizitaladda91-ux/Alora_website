@@ -339,28 +339,82 @@ function generateTableOfContents() {
         });
     });
 
+    const tocCard = document.getElementById('toc-sidebar-card');
+
+    function setActiveHeading(activeId) {
+        if (!activeId) return;
+        let activeDesktopLink = null;
+
+        document.querySelectorAll('.toc-link').forEach((link) => {
+            if (link.getAttribute('data-heading-id') === activeId) {
+                link.classList.add('bg-amber-100/90', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs', 'border-l-4', 'border-[#8B4513]', 'pl-3');
+                activeDesktopLink = link;
+            } else {
+                link.classList.remove('bg-amber-100/90', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs', 'border-l-4', 'border-[#8B4513]', 'pl-3');
+            }
+        });
+
+        document.querySelectorAll('.mobile-toc-link').forEach((link) => {
+            if (link.getAttribute('href') === `#${activeId}`) {
+                link.classList.add('bg-amber-100', 'text-[#8B4513]', 'font-bold');
+            } else {
+                link.classList.remove('bg-amber-100', 'text-[#8B4513]', 'font-bold');
+            }
+        });
+
+        // Automatically scroll the Table of Contents container so active heading stays in view
+        if (tocCard && activeDesktopLink) {
+            const cardRect = tocCard.getBoundingClientRect();
+            const linkRect = activeDesktopLink.getBoundingClientRect();
+            const relativeTop = linkRect.top - cardRect.top;
+            const targetScroll = tocCard.scrollTop + relativeTop - (tocCard.clientHeight / 2) + (activeDesktopLink.clientHeight / 2);
+            
+            tocCard.scrollTo({
+                top: Math.max(0, targetScroll),
+                behavior: 'smooth'
+            });
+        }
+    }
+
     const observerOptions = {
         root: null,
-        rootMargin: '-80px 0px -60% 0px',
+        rootMargin: '-90px 0px -60% 0px',
         threshold: 0
     };
 
     const observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
             if (entry.isIntersecting) {
-                const activeId = entry.target.id;
-                document.querySelectorAll('.toc-link').forEach((link) => {
-                    if (link.getAttribute('data-heading-id') === activeId) {
-                        link.classList.add('bg-amber-100', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs');
-                    } else {
-                        link.classList.remove('bg-amber-100', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs');
-                    }
-                });
+                setActiveHeading(entry.target.id);
             }
         });
     }, observerOptions);
 
     headings.forEach((heading) => observer.observe(heading));
+
+    // Fallback on scroll for fast swiping / deep scroll
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => {
+            scrollTimeout = null;
+            const scrollPos = window.pageYOffset + 140;
+            let currentHeadingId = null;
+
+            for (let i = 0; i < headings.length; i++) {
+                const heading = headings[i];
+                if (heading.offsetTop <= scrollPos) {
+                    currentHeadingId = heading.id;
+                } else {
+                    break;
+                }
+            }
+
+            if (currentHeadingId) {
+                setActiveHeading(currentHeadingId);
+            }
+        }, 80);
+    }, { passive: true });
 }
 function injectSEO(blog) {
     const currentUrl = window.location.href;
