@@ -318,8 +318,8 @@ export function renderNavbarState() {
                         <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
                             <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
                         </a>
-                        <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1 border border-amber-300">
-                            <i class="fa-solid fa-bag-shopping text-xs"></i> My Orders
+                        <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1.5 border border-amber-300">
+                            <i class="fa-solid fa-user-circle text-xs"></i> My Account
                         </a>
                         <button type="button" class="logout-btn-trigger bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
                             Logout
@@ -351,7 +351,7 @@ export function renderNavbarState() {
                             </div>
                             <div class="grid grid-cols-2 gap-2 mt-2">
                                 <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] py-1.5 px-2 rounded-lg text-center font-bold flex items-center justify-center gap-1 border border-amber-300">
-                                    <i class="fa-solid fa-bag-shopping text-[10px]"></i> My Orders
+                                    <i class="fa-solid fa-user-circle text-[10px]"></i> My Account
                                 </a>
                                 <button type="button" class="logout-btn-trigger bg-slate-900 text-white text-[11px] py-1.5 px-2 rounded-lg text-center font-bold cursor-pointer">
                                     Logout
