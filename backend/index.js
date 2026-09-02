@@ -15,6 +15,7 @@ import reviewRoutes from "./routes/review.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import affiliateRoutes from "./routes/affiliate.routes.js";
 import chatbotRoutes from "./routes/chatbot.routes.js";
+import wishlistRoutes from "./routes/wishlist.routes.js";
 import dns from "dns";
 import fs from "fs";
 import path from "path";
@@ -189,8 +190,8 @@ app.get('/certificates', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'certificates.html'));
 });
 
-app.get(['/account', '/myorders', '/my-orders'], (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'myorders.html'));
+app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'account.html'));
 });
 
 app.get('/track-order', (req, res) => {
@@ -311,6 +312,7 @@ app.use("/api/affiliates", affiliateRoutes);
 app.use('/api/blogs', blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chatbot', chatbotRoutes);
+app.use('/api/wishlist', wishlistRoutes);
 
 app.get('/favicon.ico', (req, res) => {
   const target = path.join(frontendRoot, 'static', 'favicon.ico');

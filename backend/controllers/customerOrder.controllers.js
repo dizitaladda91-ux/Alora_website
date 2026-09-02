@@ -1,5 +1,6 @@
 import Order from "../models/order.models.js";
 import User from "../models/userAuth.models.js";
+import SimpleProduct from "../models/product.models.js";
 
 export const getMyOrders = async (req, res) => {
   try {
@@ -77,5 +78,69 @@ export const trackOrder = async (req, res) => {
     return res.status(200).json({ success: true, data: order });
   } catch {
     return res.status(500).json({ success: false, message: "Could not look up this order." });
+  }
+};
+
+export const getBuyAgainProducts = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("email phone").lean();
+    const queryConditions = [{ userId: req.user.id }];
+    
+    if (user?.email && user.email.trim()) {
+      const cleanEmail = user.email.trim().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      queryConditions.push({ "customer.email": new RegExp(`^${cleanEmail}$`, "i") });
+    }
+    
+    if (user?.phone && user.phone.trim()) {
+      const phoneDigits = user.phone.replace(/\D/g, '').slice(-10);
+      if (phoneDigits.length >= 7) {
+        queryConditions.push({ "customer.phone": new RegExp(phoneDigits) });
+      }
+    }
+
+    const filter = {
+      $or: queryConditions,
+      paymentStatus: { $in: ["paid", "delivered", "processing", "packed", "shipped"] }
+    };
+
+    const orders = await Order.find(filter).sort({ createdAt: -1 }).lean();
+
+    const productMap = new Map();
+    for (const order of orders) {
+      for (const item of (order.items || [])) {
+        const pId = String(item.productId || item.id || "").split("__")[0];
+        const key = pId || item.name;
+        if (key && !productMap.has(key)) {
+          productMap.set(key, {
+            productId: pId,
+            name: item.name,
+            variant: item.variant || item.size || "Standard",
+            price: item.price || item.unitPrice || 0,
+            image: item.image || item.imageUrl || "/static/placeholder.png",
+            lastOrderedAt: order.createdAt
+          });
+        }
+      }
+    }
+
+    const purchasedList = Array.from(productMap.values());
+    const catalogProducts = await SimpleProduct.find({}).lean();
+    
+    const result = purchasedList.map(item => {
+      const match = catalogProducts.find(p => String(p._id) === item.productId || String(p.name || "").toLowerCase() === String(item.name || "").toLowerCase());
+      if (match) {
+        return {
+          ...match,
+          lastOrderedAt: item.lastOrderedAt,
+          preferredVariant: item.variant
+        };
+      }
+      return item;
+    });
+
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    console.error("GET_BUY_AGAIN_ERROR:", error);
+    return res.status(500).json({ success: false, message: "Could not load buy again items." });
   }
 };

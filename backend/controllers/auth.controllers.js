@@ -220,7 +220,7 @@ export const getSession = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const user = await User.findById(id).select("name email phone address role").lean();
+    const user = await User.findById(id).select("name email phone address role title dob gender wishlist createdAt").lean();
     if (!user) {
       return res.status(401).json({ success: false, message: "Session user no longer exists." });
     }
@@ -231,20 +231,29 @@ export const getSession = async (req, res) => {
   }
 };
 
-// Lets an authenticated customer add their address from checkout when their
-// account was created earlier from the normal registration page.
 export const updateProfile = async (req, res) => {
   try {
-    const address = String(req.body?.address || '').trim();
-    if (!address) {
-      return res.status(400).json({ success: false, message: "Delivery address is required." });
+    const updateData = {};
+    if (req.body.title !== undefined) updateData.title = String(req.body.title || '').trim();
+    if (req.body.name !== undefined && String(req.body.name).trim()) updateData.name = String(req.body.name).trim();
+    if (req.body.phone !== undefined && String(req.body.phone).trim()) updateData.phone = String(req.body.phone).trim();
+    if (req.body.dob !== undefined) updateData.dob = String(req.body.dob || '').trim();
+    if (req.body.gender !== undefined) updateData.gender = String(req.body.gender || '').trim();
+    if (req.body.address !== undefined) updateData.address = String(req.body.address || '').trim();
+
+    // If phone is updated, verify it is not already taken by another user
+    if (updateData.phone) {
+      const existingPhone = await User.findOne({ phone: updateData.phone, _id: { $ne: req.user.id } });
+      if (existingPhone) {
+        return res.status(400).json({ success: false, message: "Phone number already registered with another account." });
+      }
     }
 
     const user = await User.findByIdAndUpdate(
       req.user.id,
-      { $set: { address } },
+      { $set: updateData },
       { returnDocument: 'after', runValidators: true }
-    ).select("name email phone address role").lean();
+    ).select("name email phone address role title dob gender wishlist createdAt").lean();
 
     if (!user) {
       return res.status(404).json({ success: false, message: "Account not found." });
@@ -257,7 +266,7 @@ export const updateProfile = async (req, res) => {
     });
   } catch (error) {
     console.error("UPDATE_PROFILE_ERROR:", error);
-    res.status(500).json({ message: 'Server error', error: error.message });
+    res.status(500).json({ success: false, message: error.message || 'Server error' });
   }
 };
 
