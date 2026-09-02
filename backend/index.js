@@ -201,6 +201,9 @@ app.get('/track-order', (req, res) => {
 app.get('/sitemap.xml', async (req, res) => {
   try {
     res.setHeader('Content-Type', 'application/xml');
+    // This public route does not pass through the /api database middleware.
+    // On Vercel, explicitly connect before querying dynamic product/blog URLs.
+    await db();
     const baseUrl = 'https://aloraradiance.com';
     const staticPages = [
       '',
@@ -239,7 +242,8 @@ app.get('/sitemap.xml', async (req, res) => {
     }
 
     try {
-      const posts = await Post.find({}, 'slug title updatedAt').lean();
+      // Drafts must never be exposed to search engines.
+      const posts = await Post.find({ status: 'published' }, 'slug title updatedAt').lean();
       posts.forEach(p => {
         const slug = p.slug || String(p.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
         if (slug) {
