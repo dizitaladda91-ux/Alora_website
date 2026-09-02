@@ -24,6 +24,7 @@ import { fileURLToPath } from "url";
 import User from "./models/userAuth.models.js"; 
 import Product from "./models/product.models.js";
 import Post from "./models/blog.models.js"; 
+import { generateSitemapXml } from "./services/sitemap.service.js"; 
 
 import { setSecurityHeaders, sanitizeNoSql, createRateLimiter } from "./middlewares/security.middleware.js";
 
@@ -201,64 +202,11 @@ app.get('/track-order', (req, res) => {
 app.get('/sitemap.xml', async (req, res) => {
   try {
     res.setHeader('Content-Type', 'application/xml');
-    // This public route does not pass through the /api database middleware.
-    // On Vercel, explicitly connect before querying dynamic product/blog URLs.
     await db();
-    const baseUrl = 'https://aloraradiance.com';
-    const staticPages = [
-      '',
-      '/products',
-      '/about',
-      '/blog',
-      '/certificates',
-      '/faq',
-      '/track-order',
-      '/account',
-      '/privacy-policy',
-      '/terms-and-conditions',
-      '/return-refund',
-      '/corporate-governance',
-      '/sitemap'
-    ];
-
-    let xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n`;
-    const today = new Date().toISOString().split('T')[0];
-
-    staticPages.forEach(page => {
-      xml += `  <url>\n    <loc>${baseUrl}${page}</loc>\n    <lastmod>${today}</lastmod>\n    <changefreq>${page === '' || page === '/products' ? 'daily' : 'monthly'}</changefreq>\n    <priority>${page === '' ? '1.0' : page === '/products' ? '0.9' : '0.7'}</priority>\n  </url>\n`;
-    });
-
-    try {
-      const products = await Product.find({}, 'slug name updatedAt').lean();
-      products.forEach(prod => {
-        const slug = prod.slug || String(prod.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-        if (slug) {
-          const modDate = prod.updatedAt ? new Date(prod.updatedAt).toISOString().split('T')[0] : today;
-          xml += `  <url>\n    <loc>${baseUrl}/product/${encodeURIComponent(slug)}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.8</priority>\n  </url>\n`;
-        }
-      });
-    } catch (e) {
-      console.warn("Sitemap product fetch notice:", e.message);
-    }
-
-    try {
-      // Include all published single blog posts in sitemap.xml
-      const posts = await Post.find({ status: { $ne: 'draft' } }, 'slug title updatedAt createdAt').lean();
-      posts.forEach(p => {
-        const rawSlug = p.slug || String(p.title || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
-        const slug = String(rawSlug).trim();
-        if (slug) {
-          const modDate = p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : (p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : today);
-          xml += `  <url>\n    <loc>${baseUrl}/post/${encodeURIComponent(slug)}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
-        }
-      });
-    } catch (e) {
-      console.warn("Sitemap post fetch notice:", e.message);
-    }
-
-    xml += `</urlset>`;
+    const xml = await generateSitemapXml();
     res.send(xml);
   } catch (err) {
+    console.error("Sitemap generation error:", err);
     res.sendFile(path.join(frontendRoot, 'sitemap.xml'));
   }
 });

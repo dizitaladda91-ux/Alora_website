@@ -1,6 +1,7 @@
 import Blog from '../models/blog.models.js';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
 import { sanitizeBlogHtml, sanitizePlainText, decodeEntities } from '../services/contentSanitizer.service.js';
+import { syncStaticSitemapFile } from '../services/sitemap.service.js';
 
 function cleanBlogFieldsAndSave(blog) {
     if (!blog) return blog;
@@ -127,6 +128,7 @@ export const createBlogPost = async (req, res) => {
         });
 
         await newBlog.save();
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
         return res.status(201).json({ 
             success: true, 
             message: "Blog published successfully!", 
@@ -250,6 +252,8 @@ export const updateBlogPost = async (req, res) => {
             return res.status(404).json({ success: false, message: "Blog not found to update." });
         }
 
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
+
         return res.status(200).json({ success: true, message: "Blog updated successfully!", data: updatedBlog, blog: updatedBlog });
 
     } catch (error) {
@@ -281,6 +285,8 @@ export const deleteBlogPost = async (req, res) => {
         for (const inlineUrl of inlineUrls) {
             try { await deleteFromCloudinary(inlineUrl); } catch (e) { console.warn("Cloudinary inline delete warning:", e); }
         }
+
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
 
         return res.status(200).json({ success: true, message: "Blog and associated assets deleted successfully!" });
     } catch (error) {
