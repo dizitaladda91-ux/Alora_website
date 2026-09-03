@@ -350,8 +350,25 @@ form.addEventListener('submit', async event => {
             credentials: 'include', 
             body: data 
         });
-        const result = await response.json();
-        if (!response.ok) throw new Error(result.error || result.message || 'Update failed');
+
+        const responseText = await response.text();
+        let result = {};
+        if (responseText) {
+            try {
+                result = JSON.parse(responseText);
+            } catch (err) {
+                result = { message: responseText.slice(0, 200) };
+            }
+        }
+
+        if (response.status === 413) {
+            throw new Error("⚠️ Uploaded file size is too large! Please upload a video under 100MB or compress it.");
+        }
+
+        if (!response.ok) {
+            throw new Error(result.error || result.message || `Update failed (Status ${response.status})`);
+        }
+
         alert('Product updated successfully.'); 
         window.location.href = './seoproduct.html';
     } catch (error) { 

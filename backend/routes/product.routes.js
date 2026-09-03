@@ -44,10 +44,20 @@ router.post("/add", requireAuth, authorizeRoles("admin"), (req, res, next) => {
 });
 
 // PUT: Product update karne ke liye (Single Image Upload optional)
-router.put("/update/:id", requireAuth, authorizeRoles("admin"), productUploadFields, updateproduct);
+router.put("/update/:id", requireAuth, authorizeRoles("admin"), (req, res, next) => {
+    productUploadFields(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message });
+        updateproduct(req, res, next);
+    });
+});
 
 // SEO users may edit only image, description, rating and ML/volume measurements.
-router.put("/seo-update/:id", requireAuth, authorizeRoles("admin", "seoadmin"), productUploadFields, updateProductForSeo);
+router.put("/seo-update/:id", requireAuth, authorizeRoles("admin", "seoadmin"), (req, res, next) => {
+    productUploadFields(req, res, (err) => {
+        if (err) return res.status(400).json({ error: err.message });
+        updateProductForSeo(req, res, next);
+    });
+});
 
 // DELETE: Product aur uski image remove karne ke liye
 router.delete("/delete/:id", requireAuth, authorizeRoles("admin"), deleteproduct);

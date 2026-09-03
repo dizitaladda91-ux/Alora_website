@@ -83,8 +83,8 @@ app.options(/.*/, cors(corsOptions));
 
 // Razorpay signature must be verified against the exact raw body, before JSON parsing.
 app.use("/api/payments/webhook", express.raw({ type: "application/json" }));
-app.use(express.json({ limit: '20mb' }));
-app.use(express.urlencoded({ limit: '20mb', extended: true }));
+app.use(express.json({ limit: '100mb' }));
+app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cookieParser());
 app.use(sanitizeNoSql);
 
