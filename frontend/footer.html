@@ -18,7 +18,7 @@
     <div class="absolute -top-32 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
     <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 sm:gap-10 pb-12 border-b border-white/10 relative z-10">
         
         <!-- Column 1: Company Overview -->
         <div>
@@ -64,7 +64,26 @@
             </div>
         </div>
 
-        <!-- Column 3: Quality & Certifications -->
+        <!-- Column 3: Also Available On (Marketplaces) -->
+        <div>
+            <h3 class="text-amber-300 font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto flex items-center gap-2">
+                <i class="fa-solid fa-bag-shopping text-amber-400 text-xs"></i> Also Available On
+            </h3>
+            <ul class="space-y-3 text-sm text-slate-300">
+                <li>
+                    <a href="https://www.amazon.in" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition-colors duration-200 inline-flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-[10px] text-amber-400/60"></i> Amazon
+                    </a>
+                </li>
+                <li>
+                    <a href="https://www.flipkart.com" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition-colors duration-200 inline-flex items-center gap-2">
+                        <i class="fa-solid fa-chevron-right text-[10px] text-amber-400/60"></i> Flipkart
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Column 4: Quality & Certifications -->
         <div>
             <h3 class="text-amber-300 font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto flex items-center gap-2">
                 <i class="fa-solid fa-award text-amber-400 text-xs"></i> Quality &amp; Certifications
@@ -103,7 +122,7 @@
             </ul>
         </div>
 
-        <!-- Column 4: Get in Touch Form -->
+        <!-- Column 5: Get in Touch Form -->
         <div class="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md p-6 rounded-3xl border border-amber-500/20 shadow-2xl">
             <h3 class="text-amber-300 font-fraunces font-bold text-lg mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-envelope-open-text text-amber-400 text-base"></i> Get in Touch
