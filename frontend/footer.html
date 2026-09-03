@@ -12,120 +12,130 @@
   }
 </style>
 
-<footer class="bg-gradient-to-b from-[#111C15] via-[#15241C] to-[#0E1711] text-[#F7F2E7] pt-10 pb-6 mt-12 border-t border-amber-500/30 relative overflow-hidden text-xs sm:text-sm">
+<footer class="bg-gradient-to-b from-[#0D1812] via-[#122018] to-[#0A130E] text-[#F7F2E7] pt-12 pb-8 mt-16 border-t border-[#D4AF37]/25 relative overflow-hidden font-sans">
     
-    <!-- Ambient Background Lighting -->
-    <div class="absolute -top-32 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- Ambient Glow Effects -->
+    <div class="absolute -top-40 left-1/4 w-[500px] h-[500px] bg-amber-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-40 right-1/4 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 pb-8 border-b border-white/10 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         
-        <!-- Column 1: Company Overview -->
-        <div>
-            <h3 class="text-amber-300 font-bold text-[11px] uppercase tracking-[0.18em] mb-3.5 font-roboto flex items-center gap-1.5">
-                <i class="fa-solid fa-leaf text-amber-400 text-xs"></i> Company
-            </h3>
-            <ul class="space-y-2 text-xs text-slate-300">
-                <li><a href="/about" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-amber-400/60"></i> About Our Brand</a></li>
-                <li><a href="/privacy-policy" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-amber-400/60"></i> Privacy Policy</a></li>
-                <li><a href="/terms-and-conditions" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-amber-400/60"></i> Terms &amp; Conditions</a></li>
-                <li><a href="/corporate-governance" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-chevron-right text-[8px] text-amber-400/60"></i> Corporate Governance</a></li>
-                <li><a href="/sitemap" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-sitemap text-[9px] text-amber-400"></i> Sitemap</a></li>
-            </ul>
-        </div>
-
-        <!-- Column 2: Quick Links -->
-        <div>
-            <h3 class="text-amber-300 font-bold text-[11px] uppercase tracking-[0.18em] mb-3.5 font-roboto flex items-center gap-1.5">
-                <i class="fa-solid fa-compass text-amber-400 text-xs"></i> Quick Links
-            </h3>
-            <ul class="space-y-2 text-xs text-slate-300">
-                <li><a href="/track-order" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-truck-fast text-amber-400 text-[10px]"></i> Track My Order</a></li>
-                <li><a href="/account" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-user text-amber-400 text-[10px]"></i> My Account &amp; Orders</a></li>
-                <li><a href="https://affiliation.aloraradiance.com/register" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-handshake text-amber-400 text-[10px]"></i> Become an Affiliate</a></li>
-                <li><a href="/faq" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-circle-question text-amber-400 text-[10px]"></i> Knowledge Base FAQs</a></li>
-                <li><a href="/return-refund" class="hover:text-amber-300 transition-colors inline-flex items-center gap-1.5"><i class="fa-solid fa-rotate-left text-amber-400 text-[10px]"></i> Return &amp; Refund</a></li>
-            </ul>
-        </div>
-
-        <!-- Column 3: Also Available On & Certifications -->
-        <div class="space-y-5">
-            <!-- Also Available On -->
-            <div>
-                <h3 class="text-amber-300 font-bold text-[11px] uppercase tracking-[0.18em] mb-2.5 font-roboto flex items-center gap-1.5">
-                    <i class="fa-solid fa-bag-shopping text-amber-400 text-xs"></i> Also Available On
-                </h3>
-                <div class="flex items-center gap-2">
-                    <a href="https://www.amazon.in" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-400/30 text-xs font-bold transition-all flex items-center gap-1.5">
-                        <i class="fa-brands fa-amazon text-xs"></i> Amazon
+        <!-- 🌟 TOP STRIP: ALSO AVAILABLE ON & QUALITY TRUST BADGES -->
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-10 mb-10 border-b border-white/10">
+            <!-- Marketplaces -->
+            <div class="flex flex-col sm:flex-row items-center gap-3.5 text-center sm:text-left">
+                <span class="text-xs uppercase tracking-[0.2em] font-bold text-[#D4AF37] flex items-center gap-2">
+                    <i class="fa-solid fa-bag-shopping text-sm text-amber-400"></i> Also Available On:
+                </span>
+                <div class="flex items-center gap-2.5">
+                    <a href="https://www.amazon.in" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 text-[#F7F2E7] hover:text-amber-300 px-4 py-2 rounded-xl border border-white/15 text-xs font-bold transition-all duration-300 flex items-center gap-2 shadow-xs hover:border-[#D4AF37]/50 hover:-translate-y-0.5">
+                        <i class="fa-brands fa-amazon text-sm text-amber-400"></i> Amazon
                     </a>
-                    <a href="https://www.flipkart.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-amber-400 hover:text-slate-950 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-400/30 text-xs font-bold transition-all flex items-center gap-1.5">
-                        <i class="fa-solid fa-cart-shopping text-[10px]"></i> Flipkart
+                    <a href="https://www.flipkart.com" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 text-[#F7F2E7] hover:text-amber-300 px-4 py-2 rounded-xl border border-white/15 text-xs font-bold transition-all duration-300 flex items-center gap-2 shadow-xs hover:border-[#D4AF37]/50 hover:-translate-y-0.5">
+                        <i class="fa-solid fa-cart-shopping text-xs text-amber-400"></i> Flipkart
                     </a>
                 </div>
             </div>
 
-            <!-- Quality & Certifications -->
-            <div>
-                <h3 class="text-amber-300 font-bold text-[11px] uppercase tracking-[0.18em] mb-2 font-roboto flex items-center gap-1.5">
-                    <i class="fa-solid fa-award text-amber-400 text-xs"></i> Quality &amp; Safety
-                </h3>
-                <ul class="space-y-1.5 text-xs text-slate-300">
-                    <li><a href="/certificates#govt-license" class="hover:text-amber-300 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-square-check text-amber-400 text-[10px]"></i> Govt Cosmetic License</a></li>
-                    <li><a href="/certificates#patch-test" class="hover:text-amber-300 transition-colors flex items-center gap-1.5"><i class="fa-solid fa-square-check text-amber-400 text-[10px]"></i> Patch Test Declaration</a></li>
-                    <li class="pt-1">
-                        <a href="/certificates" class="text-amber-300 hover:underline text-[11px] font-semibold inline-flex items-center gap-1">
-                            View All Certifications <i class="fa-solid fa-arrow-right text-[8px]"></i>
-                        </a>
-                    </li>
-                </ul>
+            <!-- Trust Highlights -->
+            <div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 text-xs text-stone-300">
+                <a href="/certificates#govt-license" class="hover:text-amber-300 transition-colors flex items-center gap-2 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                    <i class="fa-solid fa-award text-amber-400 text-sm"></i>
+                    <span>Govt Approved License</span>
+                </a>
+                <a href="/certificates#patch-test" class="hover:text-amber-300 transition-colors flex items-center gap-2 bg-white/5 hover:bg-white/10 px-3 py-1.5 rounded-lg border border-white/10">
+                    <i class="fa-solid fa-flask-vial text-amber-400 text-sm"></i>
+                    <span>Dermatologically Tested</span>
+                </a>
             </div>
         </div>
 
-        <!-- Column 4: Contact & Social -->
-        <div class="bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md p-4 sm:p-5 rounded-2xl border border-amber-500/20 shadow-xl flex flex-col justify-between">
-            <div>
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="text-amber-300 font-bold text-xs uppercase tracking-wider flex items-center gap-1.5">
-                        <i class="fa-solid fa-envelope-open-text text-amber-400 text-xs"></i> Get in Touch
-                    </h3>
-                    <div class="flex items-center gap-2">
-                        <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-amber-300 hover:bg-amber-400 hover:text-slate-950 transition text-[11px]">
-                            <i class="fa-brands fa-facebook-f"></i>
+        <!-- 🏛️ MAIN FOOTER 4-COLUMN GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 lg:gap-8 pb-12">
+            
+            <!-- Column 1: Brand Bio & Helpline (lg:col-span-4) -->
+            <div class="lg:col-span-4 space-y-4">
+                <div class="flex items-center gap-3">
+                    <img src="./static/logo2.png" alt="Alora Radiance Logo" class="h-9 w-auto brightness-110">
+                </div>
+                <p class="text-xs sm:text-sm text-stone-300 leading-relaxed max-w-sm">
+                    Crafted with nature's purest botanical extracts and clinical research to deliver clean, radiant, and timelessly healthy skin.
+                </p>
+                <div class="pt-2 flex flex-col gap-3">
+                    <a href="tel:8920434560" class="inline-flex items-center gap-2.5 bg-gradient-to-r from-amber-400/15 to-amber-500/10 hover:from-amber-400 hover:to-amber-500 text-amber-300 hover:text-slate-950 px-4 py-2.5 rounded-xl border border-amber-400/30 text-xs font-bold transition-all duration-300 w-fit shadow-xs">
+                        <i class="fa-solid fa-phone-volume text-sm"></i> Dedicated Support: 8920434560
+                    </a>
+                    <!-- Social Links -->
+                    <div class="flex items-center gap-3 pt-1">
+                        <span class="text-xs text-stone-400 font-medium">Follow Us:</span>
+                        <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400 hover:text-slate-950 flex items-center justify-center text-amber-300 transition-all shadow-sm border border-white/10">
+                            <i class="fa-brands fa-facebook-f text-xs"></i>
                         </a>
-                        <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-amber-300 hover:bg-amber-400 hover:text-slate-950 transition text-[11px]">
-                            <i class="fa-brands fa-instagram"></i>
+                        <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="w-8 h-8 rounded-full bg-white/10 hover:bg-amber-400 hover:text-slate-950 flex items-center justify-center text-amber-300 transition-all shadow-sm border border-white/10">
+                            <i class="fa-brands fa-instagram text-xs"></i>
                         </a>
                     </div>
                 </div>
+            </div>
 
-                <form id="contactForm" class="space-y-2">
-                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your Name" class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 border border-amber-900/40">
-                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your Email" class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 border border-amber-900/40">
-                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Message..." class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400 border border-amber-900/40 resize-none"></textarea>
-                    <button type="submit" aria-label="Submit" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold py-2 rounded-lg text-[11px] transition-all tracking-wider uppercase shadow-md active:scale-98">
+            <!-- Column 2: Quick Links (lg:col-span-2) -->
+            <div class="lg:col-span-2">
+                <h3 class="text-[#D4AF37] font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto">
+                    Quick Links
+                </h3>
+                <ul class="space-y-3 text-xs sm:text-sm text-stone-300">
+                    <li><a href="/products" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Shop All Skincare</a></li>
+                    <li><a href="/track-order" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Track My Order</a></li>
+                    <li><a href="/account" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">My Account</a></li>
+                    <li><a href="/certificates" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Certifications</a></li>
+                    <li><a href="https://affiliation.aloraradiance.com/register" target="_blank" rel="noopener noreferrer" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Become an Affiliate</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 3: Customer Care & Policies (lg:col-span-2) -->
+            <div class="lg:col-span-2">
+                <h3 class="text-[#D4AF37] font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto">
+                    Customer Care
+                </h3>
+                <ul class="space-y-3 text-xs sm:text-sm text-stone-300">
+                    <li><a href="/about" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">About Our Story</a></li>
+                    <li><a href="/faq" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">FAQs &amp; Help</a></li>
+                    <li><a href="/return-refund" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Return &amp; Refund Policy</a></li>
+                    <li><a href="/privacy-policy" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Privacy Policy</a></li>
+                    <li><a href="/terms-and-conditions" class="hover:text-amber-300 hover:translate-x-1 transition-all inline-block">Terms &amp; Conditions</a></li>
+                </ul>
+            </div>
+
+            <!-- Column 4: Premium Inquiry Form (lg:col-span-4) -->
+            <div class="lg:col-span-4 bg-gradient-to-b from-white/10 to-white/5 backdrop-blur-md p-5 sm:p-6 rounded-3xl border border-amber-500/20 shadow-2xl">
+                <h3 class="text-amber-300 font-bold text-sm uppercase tracking-wider mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-envelope-open-text text-amber-400"></i> Get In Touch
+                </h3>
+                <p class="text-[11px] text-stone-300 mb-4">Questions about your routine? Send us a note.</p>
+                
+                <form id="contactForm" class="space-y-3">
+                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your Name" class="w-full bg-[#16271D] text-[#F7F2E7] placeholder-stone-400 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 border border-white/10 shadow-inner">
+                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your Email" class="w-full bg-[#16271D] text-[#F7F2E7] placeholder-stone-400 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 border border-white/10 shadow-inner">
+                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Your Message..." class="w-full bg-[#16271D] text-[#F7F2E7] placeholder-stone-400 rounded-xl px-3.5 py-2 text-xs focus:outline-none focus:ring-2 focus:ring-amber-400 border border-white/10 shadow-inner resize-none"></textarea>
+                    <button type="submit" aria-label="Submit" class="w-full bg-gradient-to-r from-amber-400 via-amber-500 to-amber-600 hover:from-amber-500 hover:to-amber-700 text-slate-950 font-bold py-2.5 rounded-xl text-xs transition-all duration-300 tracking-wider uppercase shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 active:scale-[0.99] cursor-pointer">
                         Send Message
                     </button>
                 </form>
             </div>
 
-            <div class="mt-3 pt-2.5 border-t border-white/10 text-center">
-                <a href="tel:8920434560" class="text-[11px] font-bold text-amber-300 hover:underline inline-flex items-center gap-1.5">
-                    <i class="fa-solid fa-phone text-[10px]"></i> Help Helpline: 8920434560
-                </a>
+        </div>
+
+        <!-- 📜 COPYRIGHT & BOTTOM BAR -->
+        <div class="pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-stone-400">
+            <p>Copyright © 2026 <span class="text-stone-200 font-semibold">Alora Radiance</span>. All Rights Reserved.</p>
+            <div class="flex items-center gap-4 text-[11px]">
+                <a href="/sitemap" class="hover:text-amber-300 transition-colors">Sitemap</a>
+                <a href="/sitemap.xml" target="_blank" class="hover:text-amber-300 transition-colors text-amber-400/80">XML</a>
+                <span class="text-stone-600">•</span>
+                <span class="text-amber-300/90 font-medium">Crafted for Pure Radiance ✨</span>
             </div>
         </div>
 
-    </div>
-
-    <!-- Copyright Footer Bar -->
-    <div class="text-center pt-5 text-xs text-slate-400 font-medium relative z-10 flex flex-col sm:flex-row items-center justify-center gap-2">
-        <span>Copyright © 2026 Alora Radiance. All Rights Reserved.</span>
-        <span class="hidden sm:inline text-amber-500">•</span>
-        <a href="/sitemap" class="hover:text-amber-300 transition-colors">Sitemap</a>
-        <a href="/sitemap.xml" target="_blank" class="hover:text-amber-300 transition-colors text-[11px] text-amber-400/80">(XML)</a>
-        <span class="hidden sm:inline text-amber-500">•</span>
-        <span class="text-amber-400/90 font-semibold">Crafted for Pure Radiance ✨</span>
     </div>
 
 </footer>
