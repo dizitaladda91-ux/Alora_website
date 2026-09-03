@@ -39,14 +39,23 @@ export function getProductUrl(product) {
         .replace(/^-+|-+$/g, "");
     return `/product/${encodeURIComponent(slug || "product")}`;
 }
-export function getAuthHeaders(headers = {}) {
+export function getAuthHeaders(headers = {}, isJson = true) {
     const token = typeof localStorage !== 'undefined' ? (localStorage.getItem("token") || localStorage.getItem("userToken") || sessionStorage.getItem("token")) : null;
     const authHeader = token ? { "Authorization": `Bearer ${token}` } : {};
-    return {
-        "Content-Type": "application/json",
+    const base = isJson ? { "Content-Type": "application/json" } : {};
+    const result = {
+        ...base,
         ...authHeader,
         ...headers
     };
+    if (result["Content-Type"] === null || result["Content-Type"] === undefined || result["Content-Type"] === false) {
+        delete result["Content-Type"];
+    }
+    return result;
+}
+
+export function getAuthUploadHeaders(headers = {}) {
+    return getAuthHeaders(headers, false);
 }
 export async function safeFetchJson(url, options = {}) {
     const isGetMethod = !options.method || options.method.toUpperCase() === 'GET';

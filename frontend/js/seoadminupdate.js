@@ -1,4 +1,4 @@
-import BASE_URL, { getAuthHeaders } from './config.js';
+import BASE_URL, { getAuthHeaders, getAuthUploadHeaders } from './config.js';
 if (typeof Quill !== 'undefined') {
     const BlockEmbed = Quill.import('blots/block/embed');
     class TableBlot extends BlockEmbed {
@@ -102,7 +102,7 @@ async function sanitizeAndUploadQuillImages(quillInstance) {
                 formData.append('image', compressed);
                 const response = await fetch(`${BASE_URL}/api/blogs/upload-image`, {
                     method: 'POST',
-                    headers: getAuthHeaders(),
+                    headers: getAuthUploadHeaders(),
                     credentials: 'include',
                     body: formData
                 });
@@ -146,7 +146,7 @@ async function uploadImageFile(file) {
         formData.append('image', compressedFile);
         const response = await fetch(`${BASE_URL}/api/blogs/upload-image`, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: getAuthUploadHeaders(),
             credentials: 'include',
             body: formData
         });
@@ -387,7 +387,7 @@ function parseMultipleSchemas(rawInput) {
         submitBtn.innerText = "Updating Post...";
         const response = await fetch(`${BASE_URL}/api/blogs/update/${blogId}`, {
             method: 'PUT',
-            headers: getAuthHeaders(),
+            headers: getAuthUploadHeaders(),
             credentials: 'include',
             body: formData
         });

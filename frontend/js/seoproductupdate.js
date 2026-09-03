@@ -1,4 +1,4 @@
-import BASE_URL, { getAuthHeaders, getImageUrl } from './config.js';
+import BASE_URL, { getAuthHeaders, getAuthUploadHeaders, getImageUrl } from './config.js';
 const productId = new URLSearchParams(window.location.search).get('id');
 const form = document.getElementById('seo-product-form');
 if (!productId) window.location.replace('./seoproduct.html');
@@ -81,7 +81,7 @@ form.addEventListener('submit', async event => {
     try {
         const response = await fetch(`${BASE_URL}/api/product/seo-update/${productId}`, { 
             method: 'PUT', 
-            headers: getAuthHeaders(), 
+            headers: getAuthUploadHeaders(), 
             credentials: 'include', 
             body: data 
         });

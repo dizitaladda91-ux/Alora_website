@@ -1,4 +1,4 @@
-import BASE_URL, { getAuthHeaders } from "./config.js";
+import BASE_URL, { getAuthHeaders, getAuthUploadHeaders } from "./config.js";
 function getVariantRowHTML(isFirstRow = false) {
     return `
         <div>
@@ -78,7 +78,7 @@ document.getElementById('productForm').addEventListener('submit', async (e) => {
     try {
         const response = await fetch(`${BASE_URL}/api/product/add`, {
             method: 'POST',
-            headers: getAuthHeaders(),
+            headers: getAuthUploadHeaders(),
             credentials: 'include',
             body: formData 
         });
