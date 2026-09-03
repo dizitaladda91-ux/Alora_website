@@ -180,16 +180,45 @@ export const updateProductForSeo = async (req, res) => {
         if (mainImage) {
             if (product.imagepath) await deleteFromCloudinary(product.imagepath);
             product.imagepath = mainImage.path;
+        } else if (req.body.removeMainImage === 'true') {
+            if (product.imagepath) await deleteFromCloudinary(product.imagepath);
+            product.imagepath = '';
         }
 
-        if (galleryImages.length > 0) {
+        let remainingExistingGallery = product.galleryImages || [];
+        if (req.body.existingGallery !== undefined) {
+            try {
+                const parsed = JSON.parse(req.body.existingGallery);
+                if (Array.isArray(parsed)) {
+                    remainingExistingGallery = parsed;
+                }
+            } catch (e) {}
+            // Delete removed existing gallery files from Cloudinary
+            const toDelete = (product.galleryImages || []).filter(img => !remainingExistingGallery.includes(img));
+            if (toDelete.length > 0) {
+                await Promise.all(toDelete.map(deleteFromCloudinary));
+            }
+        } else if (galleryImages.length > 0) {
             await Promise.all((product.galleryImages || []).map(deleteFromCloudinary));
-            product.galleryImages = galleryImages.map((file) => file.path);
+            remainingExistingGallery = [];
         }
 
-        if (req.body.videoUrl !== undefined) product.videoUrl = req.body.videoUrl;
+        const newGalleryPaths = galleryImages.map((file) => file.path);
+        if (req.body.existingGallery !== undefined || newGalleryPaths.length > 0) {
+            product.galleryImages = [...remainingExistingGallery, ...newGalleryPaths].slice(0, 6);
+        }
+
+        if (req.body.removeVideo === 'true') {
+            if (product.videoUrl) await deleteFromCloudinary(product.videoUrl);
+            product.videoUrl = '';
+        } else if (req.body.videoUrl !== undefined) {
+            product.videoUrl = req.body.videoUrl;
+        }
         const videoFile = req.files?.productVideo?.[0];
-        if (videoFile) product.videoUrl = videoFile.path;
+        if (videoFile) {
+            if (product.videoUrl) await deleteFromCloudinary(product.videoUrl);
+            product.videoUrl = videoFile.path;
+        }
 
         if (req.body.faqs !== undefined) {
             try {
