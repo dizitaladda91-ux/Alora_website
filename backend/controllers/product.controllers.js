@@ -178,11 +178,14 @@ export const updateProductForSeo = async (req, res) => {
         const mainImage = req.files?.imagepath?.[0] || req.file;
         const galleryImages = req.files?.galleryImages || [];
         if (mainImage) {
-            if (product.imagepath) await deleteFromCloudinary(product.imagepath);
+            if (product.imagepath && product.imagepath !== mainImage.path) {
+                await deleteFromCloudinary(product.imagepath);
+            }
             product.imagepath = mainImage.path;
-        } else if (req.body.removeMainImage === 'true') {
-            if (product.imagepath) await deleteFromCloudinary(product.imagepath);
-            product.imagepath = '';
+        }
+
+        if (!product.imagepath) {
+            product.imagepath = './static/alora image 2.jpeg';
         }
 
         let remainingExistingGallery = product.galleryImages || [];

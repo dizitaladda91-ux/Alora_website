@@ -9,45 +9,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="./styles/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script>
-    tailwind.config = {
-        theme: {
-            extend: {
-                colors: {
-                    ink: '#152219',
-                    'ink-light': '#1F3327',
-                    'ink-soft': '#28402F',
-                    parchment: '#F7F2E7',
-                    card: '#FFFFFF',
-                    clay: '#A24C3D',
-                    'clay-light': '#C97E63',
-                    'clay-dark': '#7E3A2F',
-                    sage: '#6C8763',
-                    'sage-light': '#E7ECDF',
-                    gold: '#BB9556',
-                    ash: '#6B685F',
-                },
-                fontFamily: {
-                    robot: ['"PT Sans"', 'ui-robot', 'Georgia', 'robot'],
-                    sans: ['"PT Sans"', 'Manrope', 'sans-serif'],
-                    roboto: ['"Roboto Mono"', 'monospace'],
-                },
-            }
-        }
-    }
-    </script>
     <style>
-        /* 🚀 0ms Instant Critical Paint (Eliminates Initial White Screen / Flash) */
         html, body {
             background-color: #FAF7F2 !important;
             color: #152219;
             margin: 0;
             padding: 0;
         }
-
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-
+        img {
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: high-quality;
+        }
         @keyframes youtubeShimmer {
             0% { background-position: -200% 0; }
             100% { background-position: 200% 0; }
@@ -65,7 +39,6 @@
             animation: cardFadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
     </style>
-
 </head>
 <body class="bg-parchment text-[#2A2A24] font-sans antialiased min-h-screen flex flex-col justify-between">
 
@@ -89,8 +62,6 @@
     </div>
 
     <main class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-4 sm:py-8 flex-grow">
-        <!-- Mobile Filter Backdrop & Drawer -->
-        <div id="filter-backdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-40 hidden opacity-0 transition-opacity duration-300 lg:hidden"></div>
 
         <!-- Mobile Filter Toggle Bar -->
         <div class="lg:hidden flex items-center justify-between mb-4 bg-white border border-amber-900/15 p-3.5 rounded-2xl shadow-sm">

@@ -10,15 +10,15 @@ function computeBaseUrl() {
     return "";
 }
 const BASE_URL = computeBaseUrl();
-export function getImageUrl(imagePath, fallback = "/static/placeholder.png", width = 400) {
+export function getImageUrl(imagePath, fallback = "/static/placeholder.png", width = 1400) {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
     if (trimmed.includes('res.cloudinary.com')) {
         if (trimmed.includes('/upload/')) {
-            // Replace any existing w_XXX or add optimal w_400 limit
-            const optTransforms = `f_auto,q_auto,w_${width},c_limit`;
-            if (trimmed.includes('f_auto') || trimmed.includes('q_auto')) {
+            // High-definition crisp rendering with smart WebP/AVIF auto-format and lossless/high quality
+            const optTransforms = `f_auto,q_auto:best,w_${width},c_limit,dpr_auto`;
+            if (trimmed.includes('f_auto') || trimmed.includes('q_auto') || trimmed.includes('w_')) {
                 return trimmed.replace(/\/upload\/(?:[^\/]+\/)?/, `/upload/${optTransforms}/`);
             }
             return trimmed.replace('/upload/', `/upload/${optTransforms}/`);

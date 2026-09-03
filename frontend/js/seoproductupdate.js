@@ -70,9 +70,12 @@ if (mainImgInput) {
 
 if (removeMainImgBtn) {
     removeMainImgBtn.addEventListener('click', () => {
-        if (mainImgInput) mainImgInput.value = '';
-        removeMainImageFlag = true;
-        renderMainImageUI();
+        if (mainImgInput && mainImgInput.files && mainImgInput.files[0]) {
+            mainImgInput.value = '';
+            renderMainImageUI();
+        } else {
+            alert("A primary product image is required. Choose a new file to replace it.");
+        }
     });
 }
 
@@ -323,8 +326,6 @@ form.addEventListener('submit', async event => {
     // Main Image handling
     if (mainImgInput && mainImgInput.files && mainImgInput.files[0]) {
         data.append('imagepath', mainImgInput.files[0]);
-    } else if (removeMainImageFlag) {
-        data.append('removeMainImage', 'true');
     }
 
     // Gallery Images handling
