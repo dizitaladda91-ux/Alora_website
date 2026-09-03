@@ -193,6 +193,13 @@ export const getBlogBySlug = async (req, res) => {
         if (!blog && param) {
             blog = await Blog.findOne({ slug: param });
         }
+        if (!blog && param && /-\d+$/.test(param)) {
+            const strippedSlug = param.replace(/-\d+$/, '');
+            blog = await Blog.findOne({ slug: strippedSlug });
+        }
+        if (!blog && param) {
+            blog = await Blog.findOne({ slug: { $regex: new RegExp(`^${param.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&')}$`, 'i') } });
+        }
 
         if (!blog) return res.status(404).json({ success: false, message: "Article not found." });
         
