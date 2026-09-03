@@ -42,6 +42,21 @@ document.addEventListener('click', (event) => {
         return;
     }
 
+    const wishlistNav = event.target.closest('a[href*="wishlist"], a[href*="account.html#wishlist"]');
+    if (wishlistNav) {
+        const isLogged = Boolean(localStorage.getItem('user') || sessionStorage.getItem('user'));
+        if (!isLogged) {
+            event.preventDefault();
+            event.stopPropagation();
+            if (typeof window.openWishlistAuthModal === 'function') {
+                window.openWishlistAuthModal();
+            } else {
+                window.location.href = './login.html';
+            }
+            return;
+        }
+    }
+
     const searchContainer = document.getElementById('search-container');
     if (event.target.closest('#search-open-btn')) {
         event.preventDefault();

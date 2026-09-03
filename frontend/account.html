@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Account & Orders - Alora Radiance</title>
     <meta name="description" content="Manage your Alora Radiance profile, orders, wishlist, and re-order skincare products.">
+    <script>
+        (function() {
+            try {
+                var user = localStorage.getItem("user") || sessionStorage.getItem("user");
+                if (!user) {
+                    window.location.replace("./login.html");
+                }
+            } catch (e) {}
+        })();
+    </script>
     <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
     <link rel="stylesheet" href="./styles/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">

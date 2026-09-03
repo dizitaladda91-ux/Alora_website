@@ -50,6 +50,66 @@ export function isUserLoggedIn() {
 }
 window.isUserLoggedIn = isUserLoggedIn;
 
+export function openWishlistAuthModal() {
+    let modal = document.getElementById("wishlist-auth-modal");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "wishlist-auth-modal";
+        modal.className = "fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-all duration-300";
+        modal.innerHTML = `
+            <div class="bg-[#FFFDF9] rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-amber-900/15 relative transform transition-all animate-fade-in">
+                <button type="button" id="wishlist-modal-close" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-900 text-lg font-bold flex items-center justify-center transition cursor-pointer" aria-label="Close">&times;</button>
+                
+                <div class="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 mx-auto flex items-center justify-center text-2xl shadow-xs mb-4">
+                    <i class="fa-solid fa-heart"></i>
+                </div>
+
+                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 font-serif tracking-tight">Save Your Skincare Favorites</h3>
+                <p class="text-xs sm:text-sm text-stone-600 mt-2 mb-6 leading-relaxed">
+                    For adding your product to wishlist, login to your account or create an account.
+                </p>
+
+                <div class="space-y-3">
+                    <a href="./login.html" class="w-full bg-[#8B4513] hover:bg-amber-900 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-right-to-bracket"></i> Login to Your Account
+                    </a>
+                    <a href="./register.html" class="w-full bg-white hover:bg-amber-50/50 text-[#8B4513] border border-[#8B4513]/30 py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-user-plus"></i> Create New Account
+                    </a>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        const closeBtn = modal.querySelector("#wishlist-modal-close");
+        const dismiss = (e) => {
+            if (e) e.preventDefault();
+            modal.classList.add("opacity-0", "pointer-events-none");
+            setTimeout(() => modal.classList.add("hidden"), 300);
+        };
+        closeBtn.addEventListener("click", dismiss);
+        modal.addEventListener("click", (e) => {
+            if (e.target === modal) dismiss(e);
+        });
+    }
+
+    modal.classList.remove("hidden", "opacity-0", "pointer-events-none");
+}
+window.openWishlistAuthModal = openWishlistAuthModal;
+
+export function handleNavbarWishlistClick(event) {
+    if (!isUserLoggedIn()) {
+        if (event) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+        openWishlistAuthModal();
+        return false;
+    }
+    return true;
+}
+window.handleNavbarWishlistClick = handleNavbarWishlistClick;
+
 export function updateWishlistVisibility(isLoggedIn = null) {
     const logged = isLoggedIn !== null ? isLoggedIn : isUserLoggedIn();
     const allWishBtns = document.querySelectorAll(".wishlist-toggle-btn, #single-wishlist-btn");

@@ -44,7 +44,7 @@
             </div>
 
             <!-- Wishlist Section -->
-            <a href="./account.html#wishlist" aria-label="My Wishlist" title="My Wishlist" class="relative text-base text-black hover:text-gold transition">
+            <a href="./account.html#wishlist" onclick="return window.handleNavbarWishlistClick ? window.handleNavbarWishlistClick(event) : true" aria-label="My Wishlist" title="My Wishlist" class="relative text-base text-black hover:text-gold transition">
                 <i class="fa-regular fa-heart" aria-hidden="true"></i>
                 <span id="global-wishlist-badge" class="absolute -top-2 -right-2 bg-amber-700 text-[10px] leading-none px-1.5 py-1 rounded-full text-white hidden">0</span>
             </a>
