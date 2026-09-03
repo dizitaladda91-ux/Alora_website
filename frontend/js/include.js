@@ -104,6 +104,7 @@ async function loadAllPartials() {
         if (typeof window.renderNavbarState === 'function') {
             window.renderNavbarState();
         }
+    }
 
     const loadDeferredPartials = async () => {
         await loadPartial("#footer-placeholder", footerUrl);
