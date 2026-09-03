@@ -65,47 +65,126 @@ async function loadProductDetails() {
             wishBtn.closest = () => ({ getAttribute: () => product._id, querySelector: () => wishBtn });
             window.syncWishlistHeartsOnPage();
         }
-        const mainImg = document.getElementById('main-product-image');
-        if (mainImg) {
-            mainImg.onerror = function() {
-                this.onerror = null;
-                this.src = '/static/placeholder.png';
-            };
-            mainImg.src = getImageUrl(product.imagepath, "/static/placeholder.png");
-            mainImg.alt = product.name || "Product Image";
-        }
+        // Setup Media Carousel & Thumbnails
+        const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
         const thumbnailsContainer = document.getElementById('thumbnails-container');
-        if (thumbnailsContainer) {
-            const gallery = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
-            let thumbnailsHTML = gallery.map((imagePath, index) => `
-                <button type="button" class="w-16 h-16 rounded-lg border ${index === 0 ? 'border-clay' : 'border-[#E7DFC7]'} overflow-hidden bg-white hover:border-amber-500 transition" onclick="window.selectGalleryImage('${getImageUrl(imagePath, '/static/placeholder.png')}')">
-                    <img src="${getImageUrl(imagePath, '/static/placeholder.png')}" alt="${product.name || 'Product'} image ${index + 1}" loading="lazy" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='/static/placeholder.png'">
-                </button>`).join('');
-            if (product.videoUrl && String(product.videoUrl).trim()) {
-                thumbnailsHTML += `
-                <button type="button" class="w-16 h-16 rounded-lg border border-amber-500 overflow-hidden bg-slate-900 text-white flex flex-col items-center justify-center hover:scale-105 transition relative group" onclick="window.selectGalleryVideo('${product.videoUrl}')" title="Play Product Video">
-                    <i class="fa-solid fa-play text-amber-400 text-lg"></i>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-200 mt-0.5 font-mono">Video</span>
-                </button>`;
+        const prevMediaBtn = document.getElementById('prev-media-btn');
+        const nextMediaBtn = document.getElementById('next-media-btn');
+
+        const mediaList = [];
+        const galleryImgs = [product.imagepath, ...(product.galleryImages || [])].filter(Boolean);
+        galleryImgs.forEach(img => {
+            mediaList.push({
+                type: 'image',
+                url: getImageUrl(img, "/static/placeholder.png")
+            });
+        });
+
+        if (product.videoUrl && String(product.videoUrl).trim()) {
+            const rawVid = product.videoUrl.trim();
+            let posterUrl = '';
+            const ytMatch = rawVid.match(/(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))([\w-]{11})/);
+            if (ytMatch) {
+                posterUrl = `https://img.youtube.com/vi/${ytMatch[1]}/hqdefault.jpg`;
+            } else if (rawVid.includes('cloudinary.com')) {
+                posterUrl = rawVid.replace(/\.(mp4|webm|mov|mkv)$/i, '.jpg');
             }
-            thumbnailsContainer.innerHTML = thumbnailsHTML;
+            mediaList.push({
+                type: 'video',
+                url: rawVid,
+                poster: posterUrl
+            });
         }
-window.selectGalleryImage = function(imgUrl) {
-    const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
-    if (!mediaContainer) return;
-    mediaContainer.innerHTML = `<img id="main-product-image" src="${imgUrl}" alt="Product Image" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
-};
-window.selectGalleryVideo = function(videoUrl) {
-    const mediaContainer = document.getElementById('main-media-container') || document.querySelector('.imagesection');
-    if (!mediaContainer) return;
-    let fullVideoUrl = getImageUrl(videoUrl, '');
-    if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-        let embedUrl = videoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
-        mediaContainer.innerHTML = `<iframe src="${embedUrl}?autoplay=1" class="w-full h-full rounded-2xl border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-    } else {
-        mediaContainer.innerHTML = `<video controls autoplay class="w-full h-full object-contain rounded-2xl bg-black"><source src="${fullVideoUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
-    }
-};
+
+        let currentMediaIndex = 0;
+
+        function updateActiveThumbnail() {
+            if (!thumbnailsContainer) return;
+            const buttons = thumbnailsContainer.querySelectorAll('button');
+            buttons.forEach((btn, idx) => {
+                if (idx === currentMediaIndex) {
+                    btn.className = 'w-16 h-16 rounded-xl border-2 border-amber-600 shadow-md ring-2 ring-amber-500/30 overflow-hidden bg-white shrink-0 transition-all scale-105 relative group cursor-pointer';
+                    btn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+                } else {
+                    btn.className = 'w-16 h-16 rounded-xl border border-[#E7DFC7] hover:border-amber-500/80 overflow-hidden bg-white shrink-0 transition-all opacity-80 hover:opacity-100 relative group cursor-pointer';
+                }
+            });
+        }
+
+        function showMediaByIndex(index) {
+            if (!mediaList.length || !mediaContainer) return;
+            currentMediaIndex = (index + mediaList.length) % mediaList.length;
+            const item = mediaList[currentMediaIndex];
+
+            if (item.type === 'image') {
+                mediaContainer.innerHTML = `<img id="main-product-image" src="${item.url}" alt="${product.name || 'Product Image'}" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
+            } else if (item.type === 'video') {
+                const vidUrl = item.url;
+                if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
+                    let embedUrl = vidUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
+                    mediaContainer.innerHTML = `<iframe src="${embedUrl}?autoplay=1" class="w-full h-full rounded-2xl border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                } else {
+                    const fullVideoUrl = getImageUrl(vidUrl, '');
+                    mediaContainer.innerHTML = `<video controls autoplay class="w-full h-full object-contain rounded-2xl bg-black shadow-inner"><source src="${fullVideoUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
+                }
+            }
+
+            updateActiveThumbnail();
+        }
+
+        // Initialize First Media
+        showMediaByIndex(0);
+
+        // Render Thumbnails
+        if (thumbnailsContainer && mediaList.length > 0) {
+            thumbnailsContainer.innerHTML = mediaList.map((item, idx) => {
+                if (item.type === 'image') {
+                    return `
+                        <button type="button" aria-label="View Image ${idx + 1}" class="w-16 h-16 rounded-xl border ${idx === 0 ? 'border-2 border-amber-600 shadow-md ring-2 ring-amber-500/30' : 'border-[#E7DFC7]'} overflow-hidden bg-white shrink-0 transition-all cursor-pointer hover:border-amber-500/80 relative" onclick="window.selectMediaIndex(${idx})">
+                            <img src="${item.url}" alt="${product.name || 'Product'} image ${idx + 1}" loading="lazy" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                        </button>
+                    `;
+                } else {
+                    // Video Thumbnail with Snapshot & Play Icon Overlay
+                    const poster = item.poster || '';
+                    return `
+                        <button type="button" aria-label="Play Product Video" class="w-16 h-16 rounded-xl border ${idx === 0 ? 'border-2 border-amber-600 shadow-md ring-2 ring-amber-500/30' : 'border-[#E7DFC7]'} overflow-hidden bg-slate-900 shrink-0 transition-all cursor-pointer hover:border-amber-500/80 relative group" onclick="window.selectMediaIndex(${idx})" title="Play Product Video">
+                            ${poster ? `<img src="${poster}" alt="Video preview" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition">` : `<video src="${getImageUrl(item.url, '')}#t=0.5" preload="metadata" class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition"></video>`}
+                            <div class="absolute inset-0 bg-black/25 flex items-center justify-center group-hover:bg-black/10 transition">
+                                <div class="w-7 h-7 rounded-full bg-amber-500 text-slate-950 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition">
+                                    <i class="fa-solid fa-play text-[11px] ml-0.5"></i>
+                                </div>
+                            </div>
+                        </button>
+                    `;
+                }
+            }).join('');
+        }
+
+        // Configure Navigation Arrows
+        if (prevMediaBtn && nextMediaBtn) {
+            if (mediaList.length > 1) {
+                prevMediaBtn.classList.remove('hidden');
+                nextMediaBtn.classList.remove('hidden');
+                prevMediaBtn.onclick = (e) => { e.preventDefault(); showMediaByIndex(currentMediaIndex - 1); };
+                nextMediaBtn.onclick = (e) => { e.preventDefault(); showMediaByIndex(currentMediaIndex + 1); };
+            } else {
+                prevMediaBtn.classList.add('hidden');
+                nextMediaBtn.classList.add('hidden');
+            }
+        }
+
+        window.selectMediaIndex = function(idx) {
+            showMediaByIndex(idx);
+        };
+        window.selectGalleryImage = function(imgUrl) {
+            const foundIdx = mediaList.findIndex(m => m.type === 'image' && m.url === imgUrl);
+            showMediaByIndex(foundIdx !== -1 ? foundIdx : 0);
+        };
+        window.selectGalleryVideo = function(videoUrl) {
+            const foundIdx = mediaList.findIndex(m => m.type === 'video');
+            showMediaByIndex(foundIdx !== -1 ? foundIdx : 0);
+        };
         const titleEl = document.getElementById('product-title');
         if (titleEl) titleEl.innerText = product.name || "No Title Available";
         const descEl = document.getElementById('product-desc');
