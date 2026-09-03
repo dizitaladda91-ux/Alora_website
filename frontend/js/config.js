@@ -10,22 +10,18 @@ function computeBaseUrl() {
     return "";
 }
 const BASE_URL = computeBaseUrl();
-export function getImageUrl(imagePath, fallback = "/static/placeholder.png", width = 1400) {
+export function getImageUrl(imagePath, fallback = "/static/placeholder.png") {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
-    if (trimmed.includes('res.cloudinary.com')) {
-        if (trimmed.includes('/upload/')) {
-            // High-definition crisp rendering with smart WebP/AVIF auto-format and lossless/high quality
-            const optTransforms = `f_auto,q_auto:best,w_${width},c_limit,dpr_auto`;
-            if (trimmed.includes('f_auto') || trimmed.includes('q_auto') || trimmed.includes('w_')) {
-                return trimmed.replace(/\/upload\/(?:[^\/]+\/)?/, `/upload/${optTransforms}/`);
-            }
-            return trimmed.replace('/upload/', `/upload/${optTransforms}/`);
-        }
-        return trimmed;
+
+    // Handle Cloudinary and absolute URLs safely without deleting path segments
+    if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) {
+        // Remove any obsolete restrictive transformation strings if previously stored
+        return trimmed
+            .replace('/upload/f_auto,q_auto,w_400,c_limit/', '/upload/')
+            .replace('/upload/f_auto,q_auto:best,w_1400,c_limit,dpr_auto/', '/upload/');
     }
-    if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) return trimmed;
 
     const base = String(BASE_URL).replace(/\/+$/, '');
     const normalized = trimmed.replace(/^\.?\//, '/');
