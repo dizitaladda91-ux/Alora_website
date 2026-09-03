@@ -101,7 +101,9 @@ async function loadAllPartials() {
             navPlaceholder.classList.add('sticky', 'top-0', 'z-50', 'w-full', 'bg-white');
         }
         await loadPartial("#navbar-placeholder", navUrl);
-    }
+        if (typeof window.renderNavbarState === 'function') {
+            window.renderNavbarState();
+        }
 
     const loadDeferredPartials = async () => {
         await loadPartial("#footer-placeholder", footerUrl);

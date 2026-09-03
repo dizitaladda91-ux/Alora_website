@@ -1,4 +1,4 @@
-import BASE_URL, { getImageUrl, getProductUrl } from './config.js';
+import BASE_URL, { getImageUrl, getProductUrl, getAuthHeaders } from './config.js';
 import './wishlist.js';
 
 const RUPEE_SYMBOL = '\u20B9';
@@ -92,8 +92,162 @@ document.addEventListener('keydown', (event) => {
 document.addEventListener('partialsLoaded', () => {
     initSearchFeature();
     updateCartAndAuthStatus();
+    renderNavbarState();
+});
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartAndAuthStatus();
+    renderNavbarState();
+});
+window.addEventListener('load', () => {
+    updateCartAndAuthStatus();
+    renderNavbarState();
 });
 document.addEventListener('cartUpdated', updateCartAndAuthStatus);
+renderNavbarState();
+
+export async function handleLogout() {
+    try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { 
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+    } catch (err) {
+        console.error("Logout API error:", err);
+    } finally {
+        sessionStorage.clear();
+        localStorage.removeItem("user");
+        localStorage.removeItem("userRole");
+        localStorage.removeItem("token");
+        localStorage.removeItem("tabAuthActive");
+        window.location.replace("./login.html");
+    }
+}
+window.handleLogout = handleLogout;
+
+export function renderNavbarState() {
+    const storedUserStr = localStorage.getItem("user") || sessionStorage.getItem("user");
+    
+    const updateUI = (authContainer) => {
+        if (!storedUserStr) {
+            authContainer.innerHTML = `
+                <a href="./login.html" aria-label="User Account Login" title="User Account Login" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    <span class="sr-only">User Account Login</span>
+                </a>
+            `;
+            return;
+        }
+
+        try {
+            const user = JSON.parse(storedUserStr);
+            const role = user.role || sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+            if (role === "admin" || role === "seoadmin") {
+                authContainer.innerHTML = `
+                    <a href="${role === 'admin' ? './admin.html' : './seoadmin.html'}" aria-label="Admin Portal" title="Admin Portal" class="text-base text-black hover:text-gold transition">
+                        <i class="fa-solid fa-user" aria-hidden="true"></i>
+                        <span class="sr-only">Admin Portal</span>
+                    </a>
+                `;
+            } else {
+                const userName = user.name || user.username || (user.email ? user.email.split('@')[0] : "User");
+                authContainer.innerHTML = `
+                    <!-- Desktop View: Full Controls -->
+                    <div class="hidden md:flex items-center gap-2.5 text-sm font-medium text-black normal-case">
+                        <a href="./account.html" class="hover:text-[#A0522D] transition flex items-center gap-1">
+                            <span class="whitespace-nowrap">Hi, <b class="text-[#2A2A24] font-bold uppercase">${userName}</b></span>
+                        </a>
+                        <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-extrabold shadow-xs flex items-center gap-1.5 border border-amber-300">
+                            <i class="fa-solid fa-user-circle text-xs"></i> My Account
+                        </a>
+                        <button type="button" class="logout-btn-trigger bg-black hover:bg-orange-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg transition uppercase tracking-wider font-bold shadow-sm cursor-pointer">
+                            Logout
+                        </button>
+                    </div>
+                    <!-- Mobile View: Compact Sleek User Profile Icon -->
+                    <div class="flex md:hidden items-center">
+                        <a href="./account.html" class="relative text-[#152219] hover:text-[#8B4513] transition p-1.5 flex items-center justify-center rounded-full bg-amber-50 border border-amber-200/80 shadow-2xs" title="My Account (${userName})">
+                            <i class="fa-solid fa-user text-sm text-[#8B4513]"></i>
+                            <span class="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white"></span>
+                        </a>
+                    </div>
+                `;
+
+                // Also update Mobile Drawer Auth Section if present
+                const mobileDrawerAuth = document.querySelector('#mobile-menu-drawer .pt-6.border-t');
+                if (mobileDrawerAuth) {
+                    mobileDrawerAuth.innerHTML = `
+                        <div class="p-3 bg-amber-50/90 rounded-2xl border border-amber-200/80 shadow-2xs mb-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-8 h-8 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs font-bold uppercase shrink-0">
+                                    ${userName.charAt(0)}
+                                </div>
+                                <div class="min-w-0 flex-1">
+                                    <p class="text-xs font-bold text-slate-900 truncate">Hi, ${userName}</p>
+                                    <p class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 inline-block"></span> Logged In
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 mt-2">
+                                <a href="./account.html" class="bg-amber-100 hover:bg-amber-200 text-[#8B4513] text-[11px] py-1.5 px-2 rounded-lg text-center font-bold flex items-center justify-center gap-1 border border-amber-300">
+                                    <i class="fa-solid fa-user-circle text-[10px]"></i> My Account
+                                </a>
+                                <button type="button" class="logout-btn-trigger bg-slate-900 text-white text-[11px] py-1.5 px-2 rounded-lg text-center font-bold cursor-pointer">
+                                    Logout
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                document.querySelectorAll('.logout-btn-trigger').forEach((btn) => {
+                    if (!btn.dataset.bound) {
+                        btn.dataset.bound = "true";
+                        btn.addEventListener("click", (e) => {
+                            e.preventDefault();
+                            handleLogout();
+                        });
+                    }
+                });
+            }
+        } catch (err) {
+            console.error("Error parsing user from storage:", err);
+            localStorage.removeItem("user");
+        }
+    };
+
+    const checkAndRender = () => {
+        let authActions = document.getElementById("auth-actions");
+        if (!authActions) {
+            const navAuthContainer = document.getElementById("nav-auth-container");
+            if (navAuthContainer) {
+                authActions = navAuthContainer.querySelector('#auth-actions');
+                if (!authActions) {
+                    authActions = document.createElement('div');
+                    authActions.id = 'auth-actions';
+                    authActions.className = 'flex items-center gap-4';
+                    navAuthContainer.appendChild(authActions);
+                }
+            }
+        }
+        if (authActions) {
+            updateUI(authActions);
+            return true;
+        }
+        return false;
+    };
+
+    if (checkAndRender()) return;
+    let attempts = 0;
+    const interval = setInterval(() => {
+        attempts++;
+        if (checkAndRender() || attempts > 30) {
+            clearInterval(interval);
+        }
+    }, 100);
+}
+window.renderNavbarState = renderNavbarState;
 
 function initSearchFeature() {
     const input = document.getElementById('search-input');
@@ -169,4 +323,5 @@ function updateCartAndAuthStatus() {
     document.querySelectorAll('#global-cart-badge, .cart-badge, #cart-count').forEach((badge) => {
         badge.textContent = String(cartCount);
     });
+    renderNavbarState();
 }
