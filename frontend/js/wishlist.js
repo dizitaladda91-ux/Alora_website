@@ -55,26 +55,45 @@ export function openWishlistAuthModal() {
     if (!modal) {
         modal = document.createElement("div");
         modal.id = "wishlist-auth-modal";
-        modal.className = "fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs transition-all duration-300";
+        modal.className = "fixed inset-0 z-[10000] flex items-center justify-center p-4 transition-all duration-300";
+        modal.style.cssText = "background-color: rgba(15, 12, 10, 0.72); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);";
         modal.innerHTML = `
-            <div class="bg-[#FFFDF9] rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-amber-900/15 relative transform transition-all animate-fade-in">
-                <button type="button" id="wishlist-modal-close" class="absolute top-4 right-4 w-8 h-8 rounded-full bg-stone-100 hover:bg-stone-200 text-stone-500 hover:text-stone-900 text-lg font-bold flex items-center justify-center transition cursor-pointer" aria-label="Close">&times;</button>
+            <div style="background-color: #FAF7EE; border: 1.5px solid #E5DEC9; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);" class="rounded-3xl p-6 sm:p-8 max-w-md w-full text-center relative transform transition-all animate-fade-in">
+                <!-- Close Button -->
+                <button type="button" id="wishlist-modal-close" style="background-color: #EFE8DA; color: #5C4D3C;" class="absolute top-4 right-4 w-9 h-9 rounded-full hover:bg-stone-300 hover:text-stone-900 text-lg font-bold flex items-center justify-center transition shadow-xs cursor-pointer border border-[#DDD4C0]" aria-label="Close">&times;</button>
                 
-                <div class="w-16 h-16 rounded-2xl bg-rose-50 text-rose-600 border border-rose-200 mx-auto flex items-center justify-center text-2xl shadow-xs mb-4">
-                    <i class="fa-solid fa-heart"></i>
+                <!-- Heart Icon Badge with Glow -->
+                <div style="background-color: #FFEAEF; border: 1.5px solid #FFCCD7; box-shadow: 0 0 20px rgba(225, 29, 72, 0.18);" class="w-16 h-16 rounded-2xl text-rose-600 mx-auto flex items-center justify-center text-2xl mb-4 transform hover:scale-105 transition-transform duration-300">
+                    <i class="fa-solid fa-heart animate-pulse"></i>
                 </div>
 
-                <h3 class="text-xl sm:text-2xl font-bold text-slate-900 font-serif tracking-tight">Save Your Skincare Favorites</h3>
-                <p class="text-xs sm:text-sm text-stone-600 mt-2 mb-6 leading-relaxed">
-                    For adding your product to wishlist, login to your account or create an account.
+                <!-- Title & Subtitle -->
+                <p style="color: #8B4513; letter-spacing: 0.12em;" class="text-[11px] font-extrabold uppercase mb-1">Alora Beauty Club</p>
+                <h3 style="color: #2D241E; font-family: 'Fraunces', Georgia, serif;" class="text-2xl sm:text-[26px] font-bold tracking-tight leading-snug">Save Your Skincare Favorites</h3>
+                
+                <p style="color: #63564A; line-height: 1.6;" class="text-xs sm:text-sm mt-2.5 mb-6 font-medium">
+                    Create your personal beauty wishlist to track saved items and sync your skincare routine across all your devices.
                 </p>
 
+                <!-- Value Proposition Badges -->
+                <div style="background-color: #FFFFFF; border: 1px solid #ECE4CE;" class="rounded-2xl p-3.5 mb-6 text-left space-y-2.5 shadow-2xs">
+                    <div class="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                        <span class="w-5 h-5 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-[10px] shrink-0 font-bold"><i class="fa-solid fa-check"></i></span>
+                        <span>One-click add to cart from your wishlist</span>
+                    </div>
+                    <div class="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                        <span class="w-5 h-5 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-[10px] shrink-0 font-bold"><i class="fa-solid fa-check"></i></span>
+                        <span>Access your favorites across phone & desktop</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
                 <div class="space-y-3">
-                    <a href="./login.html" class="w-full bg-[#8B4513] hover:bg-amber-900 text-white py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-right-to-bracket"></i> Login to Your Account
+                    <a href="./login.html" style="background-color: #8B4513; color: #FFFFFF; box-shadow: 0 4px 14px rgba(139, 69, 19, 0.3);" class="w-full hover:opacity-95 py-3.5 px-5 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 hover:shadow-lg active:scale-[0.99] cursor-pointer">
+                        <i class="fa-solid fa-right-to-bracket text-sm"></i> Login to Your Account
                     </a>
-                    <a href="./register.html" class="w-full bg-white hover:bg-amber-50/50 text-[#8B4513] border border-[#8B4513]/30 py-3.5 px-4 rounded-xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-user-plus"></i> Create New Account
+                    <a href="./register.html" style="background-color: #FFFFFF; color: #8B4513; border: 1.5px solid #8B4513;" class="w-full hover:bg-amber-50/60 py-3.5 px-5 rounded-2xl font-bold text-xs sm:text-sm uppercase tracking-wider transition-all flex items-center justify-center gap-2.5 active:scale-[0.99] cursor-pointer">
+                        <i class="fa-solid fa-user-plus text-sm"></i> Create New Account
                     </a>
                 </div>
             </div>
