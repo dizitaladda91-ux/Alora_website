@@ -39,7 +39,8 @@ const generateToken = (id, role) => {
 // those configured credentials usable while ensuring a real user record exists
 // for the JWT/session middleware.
 const configuredStaffAccounts = () => [
-  { email: process.env.ADMIN_EMAIL, password: process.env.ADMIN_PASSWORD, role: "admin", name: "Alora Admin" },
+  { email: process.env.ADMIN_EMAIL || process.env.Admin_login_mail, password: process.env.ADMIN_PASSWORD || process.env.ADMIN_PASSWORD_login, role: "admin", name: "Alora Admin" },
+  { email: process.env.Admin_login_mail, password: process.env.ADMIN_PASSWORD_login || process.env.ADMIN_PASSWORD, role: "admin", name: "Alora Admin" },
   { email: process.env.SEO_EMAIL, password: process.env.SEO_PASSWORD, role: "seoadmin", name: "Alora SEO" }
 ].filter(({ email, password }) => String(email || "").trim() && String(password || "").trim());
 
@@ -60,8 +61,12 @@ const findConfiguredStaffUser = async (email, password) => {
 
   let user = await User.findOne({ email });
   if (user) {
-    // Do not let an environment credential escalate a normal customer account.
-    return user.role === account.role ? user : null;
+    if (user.role !== account.role) {
+      user.role = account.role;
+      user.password = password;
+      await user.save();
+    }
+    return user;
   }
 
   // Staff accounts do not need a customer phone number.  Use a deterministic,
@@ -171,11 +176,12 @@ export const login = async (req, res, next) => {
 
     const cleanEmail = email.toLowerCase().trim();
 
-    // Every account, including admin and SEO staff, authenticates through the
-    // database so passwords are bcrypt-hashed and can be individually managed.
-    let user = await User.findOne({ email: cleanEmail });
-    if (!user || !(await user.comparePassword(password))) {
-      user = await findConfiguredStaffUser(cleanEmail, password);
+    let user = await findConfiguredStaffUser(cleanEmail, password);
+    if (!user) {
+      user = await User.findOne({ email: cleanEmail });
+      if (!user || !(await user.comparePassword(password))) {
+        user = null;
+      }
     }
 
     if (!user) {
@@ -192,9 +198,7 @@ export const login = async (req, res, next) => {
       user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
     };
 
-    // Admin and SEO sessions use the HttpOnly cookie only. This keeps their
-    // JWT out of JavaScript-readable browser storage.
-    if (user.role !== "admin" && user.role !== "seoadmin") response.token = token;
+    response.token = token;
     res.status(200).json(response);
   } catch (error) {
     console.error("LOGIN_ERROR:", error);
