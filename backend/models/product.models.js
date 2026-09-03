@@ -91,5 +91,10 @@ const SimpleProductSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
-const SimpleProduct = mongoose.model('SimpleProduct', SimpleProductSchema);
+const SimpleProduct = mongoose.models.SimpleProduct || mongoose.model('SimpleProduct', SimpleProductSchema);
+if (!mongoose.models.Product) {
+    try {
+        mongoose.model('Product', SimpleProductSchema);
+    } catch (_) {}
+}
 export default SimpleProduct;

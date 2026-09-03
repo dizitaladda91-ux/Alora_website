@@ -3,13 +3,33 @@ import SimpleProduct from "../models/product.models.js";
 
 export const getWishlist = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate("wishlist").lean();
+    const user = await User.findById(req.user.id).lean();
     if (!user) {
       return res.status(404).json({ success: false, message: "User not found." });
     }
 
-    const validWishlist = (user.wishlist || []).filter(Boolean);
-    return res.status(200).json({ success: true, data: validWishlist });
+    const rawWishlistIds = (user.wishlist || []).filter(Boolean);
+    if (!rawWishlistIds.length) {
+      return res.status(200).json({ success: true, data: [] });
+    }
+
+    // Direct collection query by IDs is 100% reliable
+    const products = await SimpleProduct.find({ _id: { $in: rawWishlistIds } }).lean();
+
+    const formattedProducts = products.map(p => ({
+      _id: p._id,
+      id: p._id,
+      name: p.name,
+      slug: p.slug,
+      price: p.variants?.[0]?.price || p.price || 0,
+      comparePrice: p.variants?.[0]?.comparePrice || p.comparePrice || p.mrp || 0,
+      imagepath: p.imagepath,
+      category: p.category,
+      isBestseller: p.isBestseller,
+      rating: p.rating
+    }));
+
+    return res.status(200).json({ success: true, data: formattedProducts });
   } catch (error) {
     console.error("GET_WISHLIST_ERROR:", error);
     return res.status(500).json({ success: false, message: "Could not load wishlist." });
@@ -31,7 +51,7 @@ export const toggleWishlist = async (req, res) => {
     if (!Array.isArray(user.wishlist)) user.wishlist = [];
 
     const stringId = String(productId);
-    const existingIndex = user.wishlist.findIndex(id => String(id) === stringId);
+    const existingIndex = user.wishlist.findIndex(id => String(id?._id || id) === stringId);
 
     let isAdded = false;
     if (existingIndex > -1) {

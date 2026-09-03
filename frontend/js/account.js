@@ -1,4 +1,4 @@
-import BASE_URL, { getAuthHeaders } from "./config.js";
+import BASE_URL, { getAuthHeaders, getImageUrl, getProductUrl } from "./config.js";
 import { fetchUserWishlist, toggleProductWishlist } from "./wishlist.js";
 
 const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
@@ -547,8 +547,40 @@ async function loadWishlistTab() {
     if (emptyState) emptyState.classList.add("hidden");
 
     try {
-        const list = await fetchUserWishlist();
+        let list = await fetchUserWishlist();
         if (loader) loader.classList.add("hidden");
+
+        // If items are string IDs, enrich with product details from API
+        const hasStringIds = list.some(item => typeof item === "string");
+        if (hasStringIds && list.length > 0) {
+            try {
+                const prodRes = await fetch(`${BASE_URL}/api/product/all`);
+                const allProds = await prodRes.json();
+                const prodList = Array.isArray(allProds) ? allProds : (allProds?.products || allProds?.data || []);
+                const prodMap = new Map(prodList.map(p => [String(p._id || p.id), p]));
+
+                list = list.map(item => {
+                    if (typeof item === "string") {
+                        const matched = prodMap.get(item);
+                        if (matched) {
+                            return {
+                                _id: matched._id,
+                                id: matched._id,
+                                name: matched.name,
+                                slug: matched.slug,
+                                price: matched.variants?.[0]?.price || matched.price || 0,
+                                comparePrice: matched.variants?.[0]?.comparePrice || matched.comparePrice || 0,
+                                imagepath: matched.imagepath,
+                                category: matched.category
+                            };
+                        }
+                    }
+                    return item;
+                }).filter(Boolean);
+            } catch (e) {
+                console.warn("Could not enrich wishlist products:", e);
+            }
+        }
 
         if (headerCount) headerCount.innerText = `${list.length} ${list.length === 1 ? 'Item' : 'Items'}`;
 
@@ -564,18 +596,19 @@ async function loadWishlistTab() {
             const isObj = typeof item === "object" && item !== null;
             const id = isObj ? (item._id || item.id) : item;
             const name = isObj ? (item.name || "Skincare Product") : "Alora Product";
-            const price = isObj ? (item.price || 149) : 149;
-            const img = isObj ? (item.imagepath || item.imageUrl || "/static/placeholder.png") : "/static/placeholder.png";
-            const slug = isObj ? (item.slug || String(name).toLowerCase().trim().replace(/[^a-z0-9]+/g, "-")) : "product";
+            const price = isObj ? (item.price || (item.variants && item.variants[0]?.price) || 149) : 149;
+            const rawImg = isObj ? (item.imagepath || item.imageUrl || item.image || "/static/placeholder.png") : "/static/placeholder.png";
+            const img = getImageUrl(rawImg, "/static/placeholder.png");
+            const productLink = isObj ? getProductUrl(item) : `/product?id=${id}`;
 
             return `
             <div class="bg-[#FAF7EE]/60 rounded-2xl p-4 border border-[#ECE4CE] flex flex-col justify-between hover:shadow-md transition relative group">
-                <button type="button" onclick="removeFromWishlistTab('${id}', this)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white text-stone-400 hover:text-rose-600 border border-stone-200 flex items-center justify-center transition shadow-2xs z-10" title="Remove from wishlist">
+                <button type="button" onclick="removeFromWishlistTab('${id}', this)" class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white text-stone-400 hover:text-rose-600 border border-stone-200 flex items-center justify-center transition shadow-2xs z-10 cursor-pointer" title="Remove from wishlist">
                     <i class="fa-solid fa-trash text-xs"></i>
                 </button>
                 <div>
                     <div class="w-full h-36 bg-white rounded-xl border border-[#ECE4CE] flex items-center justify-center p-2 mb-3 overflow-hidden">
-                        <a href="/product/${encodeURIComponent(slug)}" class="w-full h-full flex items-center justify-center">
+                        <a href="${productLink}" class="w-full h-full flex items-center justify-center">
                             <img src="${img}" alt="${escapeHtml(name)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.src='/static/placeholder.png'">
                         </a>
                     </div>
