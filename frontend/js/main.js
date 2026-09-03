@@ -369,6 +369,8 @@ async function loadSliderProducts() {
                 }
             }
 
+            const isUserLoggedIn = Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
+
             return `
             <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] h-[430px] sm:h-[450px] flex-shrink-0 snap-center product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
                 <!-- Top Badges Bar -->
@@ -378,7 +380,7 @@ async function loadSliderProducts() {
                     </span>
                     <div class="flex items-center gap-1.5">
                         ${discountBadgeHTML}
-                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn ${isUserLoggedIn ? '' : 'hidden'} w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
                             <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
                         </button>
                     </div>

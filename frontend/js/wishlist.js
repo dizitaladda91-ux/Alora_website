@@ -45,6 +45,34 @@ function injectWishlistStyles() {
     document.head.appendChild(style);
 }
 
+export function isUserLoggedIn() {
+    return Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
+}
+window.isUserLoggedIn = isUserLoggedIn;
+
+export function updateWishlistVisibility(isLoggedIn = null) {
+    const logged = isLoggedIn !== null ? isLoggedIn : isUserLoggedIn();
+    const allWishBtns = document.querySelectorAll(".wishlist-toggle-btn, #single-wishlist-btn");
+    allWishBtns.forEach(btn => {
+        if (logged) {
+            btn.classList.remove("hidden");
+            btn.style.display = "";
+        } else {
+            btn.classList.add("hidden");
+            btn.style.display = "none";
+        }
+    });
+
+    const badges = document.querySelectorAll("#global-wishlist-badge, #mobile-wishlist-count, #sidebar-wishlist-badge");
+    if (!logged) {
+        badges.forEach(b => {
+            b.classList.add("hidden");
+            b.innerText = "0";
+        });
+    }
+}
+window.updateWishlistVisibility = updateWishlistVisibility;
+
 export function getLocalWishlist() {
     try {
         return JSON.parse(localStorage.getItem(LOCAL_WISHLIST_KEY) || "[]");
@@ -62,6 +90,10 @@ export function saveLocalWishlist(list) {
 }
 
 export function updateWishlistBadge(count) {
+    if (!isUserLoggedIn()) {
+        updateWishlistVisibility(false);
+        return;
+    }
     const badges = document.querySelectorAll("#global-wishlist-badge, #mobile-wishlist-count, #sidebar-wishlist-badge, .wishlist-badge");
     badges.forEach(badge => {
         if (badge) {
@@ -196,11 +228,9 @@ function updateHeartUI(btnEl, isAdded, triggerAnimation = false) {
 }
 
 export async function fetchUserWishlist() {
-    const isLogged = Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
-    if (!isLogged) {
-        const local = getLocalWishlist();
-        updateWishlistBadge(local.length);
-        return local;
+    if (!isUserLoggedIn()) {
+        updateWishlistVisibility(false);
+        return [];
     }
 
     try {
@@ -218,58 +248,48 @@ export async function fetchUserWishlist() {
         console.warn("Could not fetch remote wishlist:", err);
     }
 
-    const local = getLocalWishlist();
-    updateWishlistBadge(local.length);
-    return local;
+    return [];
 }
 
 export async function toggleProductWishlist(productId, btnEl = null) {
-    if (!productId) return;
-    const isLogged = Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
+    if (!productId) return false;
 
-    if (isLogged) {
-        try {
-            const res = await fetch(`${BASE_URL}/api/wishlist/toggle`, {
-                method: "POST",
-                headers: getAuthHeaders(),
-                credentials: "include",
-                body: JSON.stringify({ productId })
-            });
-            const data = await res.json();
-            if (res.ok && data.success) {
-                updateWishlistBadge(data.wishlistCount);
-                if (btnEl) {
-                    updateHeartUI(btnEl, data.isAdded, true);
-                }
-                notifyWishlist(data.isAdded ? "Added to your Wishlist ❤️" : "Removed from your Wishlist.", data.isAdded ? "success" : "info");
-                return data.isAdded;
+    // Check if user is logged in
+    if (!isUserLoggedIn()) {
+        notifyWishlist("Please log in or create an account to use Wishlist.", "info");
+        setTimeout(() => {
+            window.location.href = "./login.html";
+        }, 1200);
+        return false;
+    }
+
+    try {
+        const res = await fetch(`${BASE_URL}/api/wishlist/toggle`, {
+            method: "POST",
+            headers: getAuthHeaders(),
+            credentials: "include",
+            body: JSON.stringify({ productId })
+        });
+        const data = await res.json();
+        if (res.ok && data.success) {
+            updateWishlistBadge(data.wishlistCount);
+            if (btnEl) {
+                updateHeartUI(btnEl, data.isAdded, true);
             }
-        } catch (err) {
-            console.warn("Wishlist toggle API error:", err);
+            notifyWishlist(data.isAdded ? "Added to your Wishlist ❤️" : "Removed from your Wishlist.", data.isAdded ? "success" : "info");
+            return data.isAdded;
+        } else if (res.status === 401) {
+            notifyWishlist("Session expired. Please log in again.", "info");
+            setTimeout(() => {
+                window.location.href = "./login.html";
+            }, 1200);
+            return false;
         }
+    } catch (err) {
+        console.warn("Wishlist toggle API error:", err);
     }
 
-    // Guest / LocalStorage fallback
-    let local = getLocalWishlist();
-    const stringId = String(productId);
-    const idx = local.findIndex(item => (typeof item === "string" ? item === stringId : String(item._id || item.id) === stringId));
-    let isAdded = false;
-
-    if (idx > -1) {
-        local.splice(idx, 1);
-        isAdded = false;
-    } else {
-        local.push(productId);
-        isAdded = true;
-    }
-
-    saveLocalWishlist(local);
-    updateWishlistBadge(local.length);
-    if (btnEl) {
-        updateHeartUI(btnEl, isAdded, true);
-    }
-    notifyWishlist(isAdded ? "Added to your Wishlist ❤️" : "Removed from your Wishlist.", isAdded ? "success" : "info");
-    return isAdded;
+    return false;
 }
 
 export async function handleCardWishlistToggle(productId, btnEl, event) {
@@ -285,7 +305,12 @@ export async function handleCardWishlistToggle(productId, btnEl, event) {
 window.handleCardWishlistToggle = handleCardWishlistToggle;
 
 export function syncWishlistHeartsOnPage(wishlistItems = null) {
-    const list = wishlistItems || getLocalWishlist();
+    const logged = isUserLoggedIn();
+    updateWishlistVisibility(logged);
+
+    if (!logged) return;
+
+    const list = wishlistItems || [];
     const productIds = new Set(list.map(item => typeof item === "string" ? item : String(item._id || item.id || "")));
     
     document.querySelectorAll("[data-product-id]").forEach(card => {
@@ -348,8 +373,12 @@ document.addEventListener("click", async (e) => {
 
 async function initWishlistOnLoad() {
     injectWishlistStyles();
-    const wishlist = await fetchUserWishlist();
-    syncWishlistHeartsOnPage(wishlist);
+    const logged = isUserLoggedIn();
+    updateWishlistVisibility(logged);
+    if (logged) {
+        const wishlist = await fetchUserWishlist();
+        syncWishlistHeartsOnPage(wishlist);
+    }
 }
 
 document.addEventListener("DOMContentLoaded", initWishlistOnLoad);
