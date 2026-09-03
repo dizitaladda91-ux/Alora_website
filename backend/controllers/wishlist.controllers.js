@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import User from "../models/userAuth.models.js";
 import SimpleProduct from "../models/product.models.js";
 
@@ -50,15 +51,31 @@ export const toggleWishlist = async (req, res) => {
 
     if (!Array.isArray(user.wishlist)) user.wishlist = [];
 
-    const stringId = String(productId);
-    const existingIndex = user.wishlist.findIndex(id => String(id?._id || id) === stringId);
+    // Resolve product ID (handle either valid ObjectId or product slug)
+    let targetObjectId = null;
+    const rawId = String(productId).trim();
+    if (mongoose.Types.ObjectId.isValid(rawId)) {
+      targetObjectId = rawId;
+    } else {
+      const prod = await SimpleProduct.findOne({ slug: rawId }).select("_id").lean();
+      if (prod) {
+        targetObjectId = String(prod._id);
+      }
+    }
+
+    if (!targetObjectId) {
+      return res.status(404).json({ success: false, message: "Product not found." });
+    }
+
+    const targetStr = String(targetObjectId);
+    const existingIndex = user.wishlist.findIndex(id => String(id?._id || id) === targetStr);
 
     let isAdded = false;
     if (existingIndex > -1) {
       user.wishlist.splice(existingIndex, 1);
       isAdded = false;
     } else {
-      user.wishlist.push(productId);
+      user.wishlist.push(targetObjectId);
       isAdded = true;
     }
 

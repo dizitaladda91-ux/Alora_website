@@ -40,9 +40,13 @@ export function getProductUrl(product) {
     return `/product/${encodeURIComponent(slug || "product")}`;
 }
 export function getAuthHeaders(headers = {}) {
-    // Auth tokens are in httpOnly cookies, automatically sent with credentials: 'include'
-    // No need to manually add Authorization header
-    return { ...headers };
+    const token = typeof localStorage !== 'undefined' ? (localStorage.getItem("token") || localStorage.getItem("userToken") || sessionStorage.getItem("token")) : null;
+    const authHeader = token ? { "Authorization": `Bearer ${token}` } : {};
+    return {
+        "Content-Type": "application/json",
+        ...authHeader,
+        ...headers
+    };
 }
 export async function safeFetchJson(url, options = {}) {
     const isGetMethod = !options.method || options.method.toUpperCase() === 'GET';

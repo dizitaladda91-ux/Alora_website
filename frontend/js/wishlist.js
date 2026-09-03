@@ -72,7 +72,7 @@ export function openWishlistAuthModal() {
                 <h3 style="color: #2D241E; font-family: 'Fraunces', Georgia, serif;" class="text-2xl sm:text-[26px] font-bold tracking-tight leading-snug">Save Your Skincare Favorites</h3>
                 
                 <p style="color: #63564A; line-height: 1.6;" class="text-xs sm:text-sm mt-2.5 mb-6 font-medium">
-                    Create your personal beauty wishlist to track saved items and sync your skincare routine across all your devices.
+                    To add and save products to your Wishlist, please log in to your account or create a new account.
                 </p>
 
                 <!-- Value Proposition Badges -->
@@ -133,13 +133,8 @@ export function updateWishlistVisibility(isLoggedIn = null) {
     const logged = isLoggedIn !== null ? isLoggedIn : isUserLoggedIn();
     const allWishBtns = document.querySelectorAll(".wishlist-toggle-btn, #single-wishlist-btn");
     allWishBtns.forEach(btn => {
-        if (logged) {
-            btn.classList.remove("hidden");
-            btn.style.display = "";
-        } else {
-            btn.classList.add("hidden");
-            btn.style.display = "none";
-        }
+        btn.classList.remove("hidden");
+        btn.style.display = "";
     });
 
     const badges = document.querySelectorAll("#global-wishlist-badge, #mobile-wishlist-count, #sidebar-wishlist-badge");
@@ -335,10 +330,7 @@ export async function toggleProductWishlist(productId, btnEl = null) {
 
     // Check if user is logged in
     if (!isUserLoggedIn()) {
-        notifyWishlist("Please log in or create an account to use Wishlist.", "info");
-        setTimeout(() => {
-            window.location.href = "./login.html";
-        }, 1200);
+        openWishlistAuthModal();
         return false;
     }
 
@@ -358,10 +350,7 @@ export async function toggleProductWishlist(productId, btnEl = null) {
             notifyWishlist(data.isAdded ? "Added to your Wishlist ❤️" : "Removed from your Wishlist.", data.isAdded ? "success" : "info");
             return data.isAdded;
         } else if (res.status === 401) {
-            notifyWishlist("Session expired. Please log in again.", "info");
-            setTimeout(() => {
-                window.location.href = "./login.html";
-            }, 1200);
+            openWishlistAuthModal();
             return false;
         }
     } catch (err) {
@@ -378,6 +367,10 @@ export async function handleCardWishlistToggle(productId, btnEl, event) {
     }
     if (!btnEl && event?.currentTarget) {
         btnEl = event.currentTarget;
+    }
+    if (!isUserLoggedIn()) {
+        openWishlistAuthModal();
+        return false;
     }
     return await toggleProductWishlist(productId, btnEl);
 }

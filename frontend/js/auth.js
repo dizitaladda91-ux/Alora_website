@@ -166,6 +166,13 @@ function initRegisterForm() {
             });
             const data = await response.json();
             if (response.ok) {
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    sessionStorage.setItem("token", data.token);
+                }
+                const userData = data.user || {};
+                localStorage.setItem("user", JSON.stringify(userData));
+                sessionStorage.setItem("user", JSON.stringify(userData));
                 showSuccessModal("Registration Successful!", data.message || "Account successful created!", () => {
                     window.location.href = "./index.html";
                 });
@@ -200,6 +207,10 @@ function initLoginForm() {
             });
             const data = await response.json();
             if (response.ok && data.success !== false) {
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    sessionStorage.setItem("token", data.token);
+                }
                 const userData = data.user || data.data || {};
                 const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
                 const userObjToStore = {
@@ -207,7 +218,6 @@ function initLoginForm() {
                     name: displayName
                 };
                 const role = userData.role ? userData.role.toLowerCase().trim() : "user";
-                // Store only user data (not sensitive), auth tokens are in httpOnly cookies
                 sessionStorage.setItem("tabAuthActive", "true");
                 sessionStorage.setItem("userRole", role);
                 sessionStorage.setItem("user", JSON.stringify(userObjToStore));

@@ -166,7 +166,7 @@ function renderProductCatalog(products) {
                 </span>
                 <div class="flex items-center gap-1.5">
                     ${discountBadgeHTML}
-                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" class="wishlist-toggle-btn ${Boolean(localStorage.getItem('user') || sessionStorage.getItem('user')) ? '' : 'hidden'} w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
                     </button>
                 </div>
