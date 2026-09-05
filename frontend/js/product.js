@@ -117,15 +117,15 @@ async function loadProductDetails() {
             const item = mediaList[currentMediaIndex];
 
             if (item.type === 'image') {
-                mediaContainer.innerHTML = `<img id="main-product-image" src="${item.url}" alt="${product.name || 'Product Image'}" class="h-full w-auto object-contain transition-transform duration-300 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
+                mediaContainer.innerHTML = `<img id="main-product-image" src="${item.url}" alt="${product.name || 'Product Image'}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
             } else if (item.type === 'video') {
                 const vidUrl = item.url;
                 if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
                     let embedUrl = vidUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/');
-                    mediaContainer.innerHTML = `<iframe src="${embedUrl}?autoplay=1" class="w-full h-full rounded-2xl border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+                    mediaContainer.innerHTML = `<iframe src="${embedUrl}?autoplay=1" class="w-full h-full rounded-2xl md:rounded-3xl border-0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
                 } else {
                     const fullVideoUrl = getImageUrl(vidUrl, '');
-                    mediaContainer.innerHTML = `<video controls autoplay class="w-full h-full object-contain rounded-2xl bg-black shadow-inner"><source src="${fullVideoUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
+                    mediaContainer.innerHTML = `<video controls autoplay class="w-full h-full object-cover rounded-2xl md:rounded-3xl bg-black shadow-inner"><source src="${fullVideoUrl}" type="video/mp4">Your browser does not support video playback.</video>`;
                 }
             }
 
@@ -141,7 +141,7 @@ async function loadProductDetails() {
                 if (item.type === 'image') {
                     return `
                         <button type="button" aria-label="View Image ${idx + 1}" class="w-16 h-16 rounded-xl border ${idx === 0 ? 'border-2 border-amber-600 shadow-md ring-2 ring-amber-500/30' : 'border-[#E7DFC7]'} overflow-hidden bg-white shrink-0 transition-all cursor-pointer hover:border-amber-500/80 relative" onclick="window.selectMediaIndex(${idx})">
-                            <img src="${item.url}" alt="${product.name || 'Product'} image ${idx + 1}" loading="lazy" class="w-full h-full object-contain p-1" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                            <img src="${item.url}" alt="${product.name || 'Product'} image ${idx + 1}" loading="lazy" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                         </button>
                     `;
                 } else {

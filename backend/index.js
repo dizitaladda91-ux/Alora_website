@@ -92,7 +92,7 @@ app.use("/api", globalLimiter);
 app.use("/api/auth", authLimiter);
 
 // High-Speed HTTP Response Caching for Public Catalog GET Endpoints
-app.use(['/api/product/all', '/api/product/search', '/api/blogs/all', '/api/reviews'], (req, res, next) => {
+app.use(['/api/product/all', '/api/product/search', '/api/products/all', '/api/blogs/all', '/api/blog/all', '/api/blogs', '/api/blog', '/api/reviews'], (req, res, next) => {
   if (req.method === 'GET') {
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
   }
@@ -224,13 +224,21 @@ app.get(['/affiliate', '/affiliate-register'], (req, res) => {
   res.redirect(301, 'https://affiliation.aloraradiance.com/register');
 });
 
-// Serve post detail HTML at clean slug route: /post/:slug
-app.get('/post/:slug', (req, res) => {
+// Serve post detail HTML at clean slug route: /post/:slug, /blog/:slug, /blogs/:slug
+app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));
 });
 
 app.get('/post', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'post.html'));
+});
+
+// Blog listing page routes
+app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'], (req, res) => {
+  const target = fs.existsSync(path.join(frontendRoot, 'Blog.html'))
+    ? path.join(frontendRoot, 'Blog.html')
+    : path.join(frontendRoot, 'blog.html');
+  res.sendFile(target);
 });
 
 // Auto-resolve direct page-names like /login, /lead, /privacy, /return-refund
@@ -256,13 +264,13 @@ app.get('/:viewName', (req, res, next) => {
 // ==========================================
 // VIEWS & API ROUTING
 // ==========================================
-app.use('/api/product', productRouter);
+app.use(['/api/product', '/api/products'], productRouter);
 app.use('/api/queries', queryRoutes);
 app.use('/api/lead', leadRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/affiliates", affiliateRoutes);
-app.use('/api/blogs', blogRoutes); 
+app.use(['/api/blogs', '/api/blog'], blogRoutes); 
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 app.use('/api/wishlist', wishlistRoutes);
