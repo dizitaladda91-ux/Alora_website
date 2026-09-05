@@ -73,19 +73,19 @@ async function renderBlogCards() {
                 const safeTitle = escapeHtml(post.title || 'Untitled');
                 const safeSlug = escapeHtml(post.slug || '');
                 const cardHTML = `
-                    <div class="bg-white rounded-3xl p-4 sm:p-5 shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer" onclick="goToPost('${safeSlug}')">
-                        <!-- Top Image Area with Overlay Category Pill (Aspect Ratio Preserved to Avoid Text Cropping) -->
-                        <div class="relative w-full aspect-[16/9.5] sm:aspect-[16/9] rounded-2xl overflow-hidden mb-4 bg-slate-100 flex items-center justify-center">
-                            <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/logo2.png'">
+                    <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer overflow-hidden" onclick="goToPost('${safeSlug}')">
+                        <!-- Top Image Area: Full-Bleed Edges (Left, Right & Top) -->
+                        <div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-100 flex items-center justify-center">
+                            <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/logo2.png'">
                             <!-- Category Badge Pill on Top-Left of Image -->
-                            <div class="absolute top-3 left-3 z-10">
+                            <div class="absolute top-3.5 left-3.5 z-10">
                                 <span class="bg-white/95 text-slate-900 border border-[#800000] text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">
                                     ${categoryName}
                                 </span>
                             </div>
                         </div>
-                        <!-- Card Content Section -->
-                        <div class="flex-1 flex flex-col justify-between space-y-3">
+                        <!-- Card Content Section (Internal Padding Below Full-Edge Cover) -->
+                        <div class="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-3">
                             <div>
                                 <!-- Rich Maroon Title -->
                                 <h3 class="text-lg sm:text-xl font-bold font-sans leading-snug text-[#800000] group-hover:text-[#8B0000] transition-colors duration-200 line-clamp-2 mb-2">
