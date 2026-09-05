@@ -174,6 +174,31 @@ async function loadProductDetails() {
             }
         }
 
+        // Mobile Touch Swipe Navigation (Seamless Finger Swiping on Mobile & Tablets)
+        if (mediaContainer) {
+            let touchStartX = 0;
+            let touchEndX = 0;
+            mediaContainer.addEventListener('touchstart', (e) => {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    touchStartX = e.changedTouches[0].screenX;
+                }
+            }, { passive: true });
+
+            mediaContainer.addEventListener('touchend', (e) => {
+                if (e.changedTouches && e.changedTouches.length > 0) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    const diff = touchEndX - touchStartX;
+                    if (Math.abs(diff) > 40) {
+                        if (diff < 0) {
+                            showMediaByIndex(currentMediaIndex + 1); // Swiped Left -> Next
+                        } else {
+                            showMediaByIndex(currentMediaIndex - 1); // Swiped Right -> Prev
+                        }
+                    }
+                }
+            }, { passive: true });
+        }
+
         window.selectMediaIndex = function(idx) {
             showMediaByIndex(idx);
         };
