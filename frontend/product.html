@@ -51,9 +51,12 @@
             }
         }
 
+        /* CHANGE 1: aspect-ratio yahan sirf FALLBACK hai (jab tak image load na ho).
+           JS is ratio ko image ke actual size ke hisaab se overwrite kar dega. */
         #main-media-container, .imagesection {
-            aspect-ratio: 10 / 9;
             width: 100%;
+            aspect-ratio: 1 / 1;
+            transition: aspect-ratio 0.2s ease;
         }
 
         #main-media-container img, .imagesection img {
@@ -74,12 +77,15 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-start">
                 
                 <!-- LEFT SIDE: IMAGES & GALLERY -->
-                <div class="product-media-gallery space-y-4 relative z-0">
-                    <div class="relative group">
-                        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] aspect-[10/9] flex items-center justify-center p-0 shadow-sm relative overflow-hidden" style="aspect-ratio: 10 / 9;">
-                            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
-                        </div>
-
+               <div class="product-media-gallery space-y-4 relative z-0">
+    <div class="relative group">
+        <!-- CHANGE 2: "aspect-square" Tailwind class hataya gaya hai —
+             wo hamesha container ko square force karta tha aur inline style ko override kar deta tha. -->
+        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] flex items-center justify-center p-0 shadow-sm relative overflow-hidden" style="aspect-ratio: 1 / 1;">
+            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-contain transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+        </div>
+    </div>
+</div>
                         <!-- Left & Right Media Navigation Arrows -->
                         <button type="button" id="prev-media-btn" aria-label="Previous Image" class="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/95 hover:bg-white text-slate-800 hover:text-amber-600 shadow-md border border-slate-200/80 flex items-center justify-center transition-all opacity-80 hover:opacity-100 hover:scale-110 z-10 cursor-pointer hidden">
                             <i class="fa-solid fa-chevron-left text-sm"></i>
@@ -285,5 +291,32 @@
     <script src="/js/app.js"></script>
     <script type="module" src="/js/contacts.js"></script>
     <script type="module" src="/js/lead.js"></script>
+
+    <!-- CHANGE 3: Ye naya script main image ke real width/height ke hisaab se
+         container ka aspect-ratio dynamically set karta hai. Isse na image
+         crop hogi, na blank/white space bachega — container hamesha image
+         ke actual shape jaisa fit ho jayega. Ye product.js ke thumbnail-click
+         se image src badalne par bhi kaam karega, kyunki har naye src pe
+         browser fresh "load" event fire karta hai. -->
+    <script>
+        (function() {
+            const mainImg = document.getElementById('main-product-image');
+            const mainContainer = document.getElementById('main-media-container');
+
+            function adjustAspectRatio() {
+                if (mainImg.naturalWidth && mainImg.naturalHeight) {
+                    mainContainer.style.aspectRatio = mainImg.naturalWidth + ' / ' + mainImg.naturalHeight;
+                }
+            }
+
+            // Agar image already cache se load ho chuki hai to turant adjust karo
+            if (mainImg.complete && mainImg.naturalWidth) {
+                adjustAspectRatio();
+            }
+
+            // Har baar jab bhi src badle (thumbnail click) aur naya image load ho
+            mainImg.addEventListener('load', adjustAspectRatio);
+        })();
+    </script>
 </body>
 </html>
