@@ -51,6 +51,11 @@
             }
         }
 
+        #main-media-container, .imagesection {
+            aspect-ratio: 10 / 9;
+            width: 100%;
+        }
+
         #main-media-container img, .imagesection img {
             image-rendering: -webkit-optimize-contrast;
             image-rendering: high-quality;
@@ -71,7 +76,7 @@
                 <!-- LEFT SIDE: IMAGES & GALLERY -->
                 <div class="product-media-gallery space-y-4 relative z-0">
                     <div class="relative group">
-                        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] aspect-square flex items-center justify-center p-0 shadow-sm relative overflow-hidden">
+                        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] aspect-[10/9] flex items-center justify-center p-0 shadow-sm relative overflow-hidden" style="aspect-ratio: 10 / 9;">
                             <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                         </div>
 
