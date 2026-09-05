@@ -38,13 +38,41 @@ router.post('/create', requireAuth, authorizeRoles('admin', 'seoadmin'), handleI
 // 1.5 Inline Editor Image Upload (Uploads to Cloudinary & returns image URL)
 router.post('/upload-image', requireAuth, authorizeRoles('admin', 'seoadmin'), handleImageUpload('image'), uploadInlineImage);
 
-// 2. Get All Blogs
-router.get('/', getAllBlogs);
-router.get('/all', getAllBlogs);
+// Helper to detect if a request is a direct browser address-bar visit
+const isBrowserVisit = (req) => {
+    const accept = req.headers['accept'] || '';
+    return accept.includes('text/html') && !req.xhr && !req.headers['x-requested-with'];
+};
 
-// 3. Get Single Blog by Slug or ID
-router.get('/post/:slug', getBlogBySlug);
-router.get('/:slug', getBlogBySlug);
+// 2. Get All Blogs (Redirects browser address bar visits to /blog, serves JSON for API/fetch)
+router.get('/', (req, res, next) => {
+    if (isBrowserVisit(req)) {
+        return res.redirect(302, '/blog');
+    }
+    return getAllBlogs(req, res, next);
+});
+
+router.get('/all', (req, res, next) => {
+    if (isBrowserVisit(req)) {
+        return res.redirect(302, '/blog');
+    }
+    return getAllBlogs(req, res, next);
+});
+
+// 3. Get Single Blog by Slug or ID (Redirects browser address bar visits to /post/:slug, serves JSON for API/fetch)
+router.get('/post/:slug', (req, res, next) => {
+    if (isBrowserVisit(req)) {
+        return res.redirect(302, `/post/${encodeURIComponent(req.params.slug)}`);
+    }
+    return getBlogBySlug(req, res, next);
+});
+
+router.get('/:slug', (req, res, next) => {
+    if (isBrowserVisit(req)) {
+        return res.redirect(302, `/post/${encodeURIComponent(req.params.slug)}`);
+    }
+    return getBlogBySlug(req, res, next);
+});
 
 // 4. Update / Edit Blog
 router.put('/:id', requireAuth, authorizeRoles('admin', 'seoadmin'), handleImageUpload('coverImage'), updateBlogPost);

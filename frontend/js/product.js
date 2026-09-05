@@ -117,7 +117,7 @@ async function loadProductDetails() {
             const item = mediaList[currentMediaIndex];
 
             if (item.type === 'image') {
-                mediaContainer.innerHTML = `<img id="main-product-image" src="${item.url}" alt="${product.name || 'Product Image'}" class="w-full h-full object-cover transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
+                mediaContainer.innerHTML = `<img id="main-product-image" src="${item.url}" alt="${product.name || 'Product Image'}" class="w-full h-full object-contain transition-transform duration-500 hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">`;
             } else if (item.type === 'video') {
                 const vidUrl = item.url;
                 if (vidUrl.includes('youtube.com') || vidUrl.includes('youtu.be')) {
