@@ -75,11 +75,11 @@ async function renderBlogCards() {
                 const cardHTML = `
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-200/80 flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 group relative cursor-pointer overflow-hidden" onclick="goToPost('${safeSlug}')">
                         <!-- Top Image Area: Full-Bleed Edges (Left, Right & Top) -->
-                        <div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-100 flex items-center justify-center">
+                        <div class="relative w-full aspect-[16/9] overflow-hidden bg-slate-100 block">
                             <img src="${escapeHtml(absoluteCoverImage)}" alt="${safeTitle}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.onerror=null; this.src='./static/logo2.png'">
-                            <!-- Category Badge Pill on Top-Left of Image -->
-                            <div class="absolute top-3.5 left-3.5 z-10">
-                                <span class="bg-white/95 text-slate-900 border border-[#800000] text-[11px] font-bold px-3 py-1 rounded-full shadow-sm tracking-wide">
+                            <!-- Category Badge Pill in Upper Left Corner -->
+                            <div style="position: absolute; top: 12px; left: 12px; z-index: 10;">
+                                <span style="background-color: rgba(255, 255, 255, 0.95); color: #152219; border: 1.5px solid #800000; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 9999px; box-shadow: 0 1px 3px rgba(0,0,0,0.12); letter-spacing: 0.025em; display: inline-block;">
                                     ${categoryName}
                                 </span>
                             </div>

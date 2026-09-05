@@ -159,8 +159,37 @@ app.get('/products', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'moreproduct.html'));
 });
 
-app.get('/product/:id', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'product.html'));
+app.get('/product/:id', async (req, res) => {
+  const rawId = String(req.params.id || '').trim();
+  const productHtmlPath = path.join(frontendRoot, 'product.html');
+  if (!rawId) return res.status(404).sendFile(productHtmlPath);
+
+  try {
+    await db();
+    const product = await Product.findOne({
+      $or: [
+        { slug: rawId },
+        { slug: decodeURIComponent(rawId) },
+        { _id: rawId.match(/^[0-9a-fA-F]{24}$/) ? rawId : null }
+      ].filter(Boolean)
+    }).lean();
+
+    if (!product) {
+      return res.status(404).sendFile(productHtmlPath);
+    }
+
+    let html = await fs.promises.readFile(productHtmlPath, 'utf8');
+    const cleanTitle = String(product.metaTitle || product.name || 'Alora Radiance').replace(/"/g, '&quot;');
+    const cleanDesc = String(product.metaDescription || product.description || 'Luxury skincare formulation.').replace(/"/g, '&quot;');
+
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${cleanTitle} | Alora Radiance</title>`);
+    html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${cleanDesc}">`);
+    
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  } catch (err) {
+    return res.sendFile(productHtmlPath);
+  }
 });
 
 app.get('/about', (req, res) => {
@@ -216,21 +245,84 @@ app.get(['/sitemap', '/sitemap.html'], (req, res) => {
 });
 
 app.get('/robots.txt', (req, res) => {
-  res.setHeader('Content-Type', 'text/plain');
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.sendFile(path.join(frontendRoot, 'robots.txt'));
+});
+
+app.get(['/llms.txt', '/llms-full.txt'], (req, res) => {
+  res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+  const filename = req.path.includes('full') ? 'llms-full.txt' : 'llms.txt';
+  const target = path.join(frontendRoot, filename);
+  if (fs.existsSync(target)) {
+    return res.sendFile(target);
+  }
+  return res.sendFile(path.join(frontendRoot, 'llms.txt'));
 });
 
 app.get(['/affiliate', '/affiliate-register'], (req, res) => {
   res.redirect(301, 'https://affiliation.aloraradiance.com/register');
 });
 
-// Serve post detail HTML at clean slug route: /post/:slug, /blog/:slug, /blogs/:slug
-app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'post.html'));
+// Dynamic SEO Prerender Handler for Blog Articles (Eliminates Google Soft 404 & Guarantees Indexation)
+app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], async (req, res) => {
+  const rawSlug = String(req.params.slug || '').trim();
+  const postHtmlPath = path.join(frontendRoot, 'post.html');
+  if (!rawSlug) {
+    return res.status(404).sendFile(postHtmlPath);
+  }
+
+  try {
+    await db();
+    const blog = await Post.findOne({
+      $or: [
+        { slug: rawSlug },
+        { slug: decodeURIComponent(rawSlug) },
+        { _id: rawSlug.match(/^[0-9a-fA-F]{24}$/) ? rawSlug : null }
+      ].filter(Boolean),
+      status: { $ne: 'draft' }
+    }).lean();
+
+    if (!blog) {
+      // Return genuine HTTP 404 status (Prevents Google Soft 404 error)
+      return res.status(404).sendFile(postHtmlPath);
+    }
+
+    let html = await fs.promises.readFile(postHtmlPath, 'utf8');
+
+    const cleanTitle = String(blog.metaTitle || blog.title || 'Alora Radiance').replace(/"/g, '&quot;');
+    const cleanDesc = String(blog.metaDesc || blog.title || 'Explore expert skincare insights and healthy skin guides by Alora Radiance.').replace(/"/g, '&quot;');
+    const cleanKeywords = String(blog.keywords || '').replace(/"/g, '&quot;');
+    const canonicalUrl = `https://aloraradiance.com/post/${encodeURIComponent(blog.slug || rawSlug)}`;
+    const coverImg = blog.coverImage || 'https://aloraradiance.com/static/logo2.png';
+    const absoluteCover = coverImg.startsWith('http') ? coverImg : `https://aloraradiance.com${coverImg.startsWith('/') ? '' : '/'}${coverImg}`;
+
+    // Inject exact Title, Meta Description, Keywords, Canonical & Social OpenGraph
+    html = html.replace(/<title id="dynamic-title">.*?<\/title>/i, `<title id="dynamic-title">${cleanTitle} | Alora Radiance</title>`);
+    html = html.replace(/<meta id="dynamic-meta-desc" name="description" content="[^"]*">/i, `<meta id="dynamic-meta-desc" name="description" content="${cleanDesc}">`);
+    html = html.replace(/<meta id="dynamic-keywords" name="keywords" content="[^"]*">/i, `<meta id="dynamic-keywords" name="keywords" content="${cleanKeywords}">`);
+    html = html.replace(/<link id="dynamic-canonical" rel="canonical" href="[^"]*" \/>/i, `<link id="dynamic-canonical" rel="canonical" href="${canonicalUrl}" />`);
+    html = html.replace(/<meta id="og-title" property="og:title" content="[^"]*">/i, `<meta id="og-title" property="og:title" content="${cleanTitle}">`);
+    html = html.replace(/<meta id="og-desc" property="og:description" content="[^"]*">/i, `<meta id="og-desc" property="og:description" content="${cleanDesc}">`);
+    html = html.replace(/<meta id="og-image" property="og:image" content="[^"]*">/i, `<meta id="og-image" property="og:image" content="${absoluteCover}">`);
+    html = html.replace(/<meta id="og-url" property="og:url" content="[^"]*">/i, `<meta id="og-url" property="og:url" content="${canonicalUrl}">`);
+
+    if (blog.schema) {
+      try {
+        const schemaStr = typeof blog.schema === 'string' ? blog.schema : JSON.stringify(blog.schema);
+        html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, `<script id="dynamic-json-ld" type="application/ld+json">\n${schemaStr}\n</script>`);
+      } catch (_) {}
+    }
+
+    res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    return res.status(200).send(html);
+  } catch (err) {
+    console.error("Blog SSR SEO error:", err);
+    return res.sendFile(postHtmlPath);
+  }
 });
 
 app.get('/post', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'post.html'));
+  res.redirect(302, '/blog');
 });
 
 // Blog listing page routes

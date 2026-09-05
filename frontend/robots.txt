@@ -1,7 +1,77 @@
+# Robots.txt for Alora Radiance (https://aloraradiance.com)
+
+# Search Engines & Standard Crawlers
 User-agent: *
 Allow: /
+Allow: /blog
+Allow: /post/
+Allow: /products
+Allow: /product/
+Allow: /about
+Allow: /certificates
+Allow: /faq
 Disallow: /admin
 Disallow: /seoadmin
+Disallow: /seoproduct
+Disallow: /seoproductupdate
+Disallow: /account
+Disallow: /myorders
+Disallow: /checkout
 Disallow: /api/
 
+# Major Search Engine Bots
+User-agent: Googlebot
+Allow: /
+
+User-agent: Googlebot-Image
+Allow: /
+
+User-agent: Googlebot-News
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+User-agent: Applebot
+Allow: /
+
+User-agent: Applebot-Extended
+Allow: /
+
+User-agent: DuckDuckBot
+Allow: /
+
+User-agent: YandexBot
+Allow: /
+
+# Generative AI & LLM Search Engine Crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: CCBot
+Allow: /
+
+User-agent: Bytespider
+Allow: /
+
+# Sitemap & LLMs.txt Directives
 Sitemap: https://aloraradiance.com/sitemap.xml
+LLMs-txt: https://aloraradiance.com/llms.txt
