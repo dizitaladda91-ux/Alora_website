@@ -224,6 +224,10 @@ app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, 
   res.sendFile(path.join(frontendRoot, 'account.html'));
 });
 
+app.get(['/verify-email', '/verify-email.html'], (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'verify-email.html'));
+});
+
 app.get('/track-order', (req, res) => {
   res.sendFile(path.join(frontendRoot, 'trackorder.html'));
 });

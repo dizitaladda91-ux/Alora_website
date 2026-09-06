@@ -96,6 +96,79 @@ const getTransporter = () => {
 // Password-reset links must always be delivered to the account owner.
 export const getPasswordResetRecipient = (user) => String(user?.email || "").trim().toLowerCase();
 
+export const generateVerificationToken = () => {
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const hashedToken = crypto.createHash("sha256").update(rawToken).digest("hex");
+  const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  return { rawToken, hashedToken, expiresAt };
+};
+
+export const sendVerificationEmail = async (user, rawToken, req) => {
+  const transporter = getTransporter();
+  if (!transporter) {
+    console.warn("EMAIL_USER or EMAIL_PASS not configured. Skipping verification email delivery.");
+    return false;
+  }
+
+  const clientUrl = process.env.CLIENT_URL || (req ? `${req.protocol}://${req.get("host")}` : "https://aloraradiance.com");
+  const verifyUrl = `${clientUrl}/verify-email?token=${rawToken}`;
+  const userName = user.name || "Valued Customer";
+
+  const mailOptions = {
+    from: `"Alora Radiance" <${process.env.EMAIL_USER}>`,
+    to: user.email,
+    subject: `Verify Your Email Address - Alora Radiance`,
+    html: `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <style>
+          body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #FAF7EE; color: #2A2A24; margin: 0; padding: 20px; }
+          .container { max-width: 580px; margin: 0 auto; background: #ffffff; border: 1px solid #ECE4CE; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.04); }
+          .header { background: #2A2A24; padding: 30px 20px; text-align: center; color: #FAF7EE; }
+          .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; text-transform: uppercase; font-weight: 700; color: #FAF7EE; }
+          .header p { margin: 5px 0 0 0; font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; color: #D4AF37; }
+          .content { padding: 35px 30px; line-height: 1.6; }
+          .content h2 { color: #2A2A24; font-size: 20px; margin-top: 0; font-weight: 600; }
+          .content p { color: #555550; font-size: 14px; margin-bottom: 20px; }
+          .btn-container { text-align: center; margin: 30px 0; }
+          .btn { background-color: #8B4513; color: #ffffff !important; padding: 14px 32px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 13px; letter-spacing: 1px; text-transform: uppercase; display: inline-block; box-shadow: 0 3px 8px rgba(139,69,19,0.3); }
+          .footer { background: #FAF7EE; padding: 20px; text-align: center; font-size: 11px; color: #8C877B; border-top: 1px solid #ECE4CE; }
+          .note { font-size: 12px; color: #888; margin-top: 25px; border-top: 1px dashed #E5DFD1; padding-top: 15px; word-break: break-all; }
+        </style>
+      </head>
+      <body>
+        <div class="container">
+          <div class="header">
+            <h1>ALORA RADIANCE</h1>
+            <p>Luxury Ayurvedic & Botanical Skincare</p>
+          </div>
+          <div class="content">
+            <h2>Welcome, ${userName}!</h2>
+            <p>Thank you for creating an account with Alora Radiance. Please verify your email address to confirm your account and receive your verified member badge.</p>
+            <div class="btn-container">
+              <a href="${verifyUrl}" class="btn" target="_blank">Verify Email Address</a>
+            </div>
+            <p style="font-size: 13px; color: #666;">This verification link will remain valid for the next <strong>24 hours</strong>.</p>
+            <div class="note">
+              <p style="margin: 0 0 5px 0;">If the button above does not work, copy and paste this link into your browser:</p>
+              <a href="${verifyUrl}" style="color: #8B4513; text-decoration: underline;">${verifyUrl}</a>
+            </div>
+          </div>
+          <div class="footer">
+            <p style="margin: 0;">&copy; ${new Date().getFullYear()} Alora Radiance. All rights reserved.</p>
+            <p style="margin: 4px 0 0 0;">Crafted with pure botanicals & active skincare essentials.</p>
+          </div>
+        </div>
+      </body>
+      </html>
+    `
+  };
+
+  return await transporter.sendMail(mailOptions);
+};
+
 export const register = async (req, res, next) => {
   try {
     const { name, email, password, phone, address, source } = req.body;
@@ -118,8 +191,9 @@ export const register = async (req, res, next) => {
       return res.status(400).json({ message: 'Phone number already registered.' });
     }
 
-    // 3. Safe UpperCase Conversion & Creation
+    // 3. Safe UpperCase Conversion & Creation with Verification Token
     const formattedName = String(name).trim().toUpperCase();
+    const { rawToken, hashedToken, expiresAt } = generateVerificationToken();
 
     const user = await User.create({ 
       name: formattedName, 
@@ -127,8 +201,18 @@ export const register = async (req, res, next) => {
       password, 
       phone: phone.trim(),
       address: String(address || '').trim(),
-      role: "user" 
+      role: "user",
+      isEmailVerified: false,
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: expiresAt
     });
+
+    // Send verification email asynchronously
+    try {
+      await sendVerificationEmail(user, rawToken, req);
+    } catch (mailErr) {
+      console.warn("Could not send verification email on register:", mailErr.message);
+    }
 
     // A newly registered customer is a lead by definition. Using the account
     // email as the key avoids creating a new lead every time they checkout.
@@ -154,13 +238,107 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful!',
+      message: 'Registration successful! Verification email sent.',
       token,
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        phone: user.phone, 
+        address: user.address, 
+        role: user.role,
+        isEmailVerified: user.isEmailVerified || false
+      }
     });
   } catch (error) {
     console.error("REGISTER_ERROR:", error);
     res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+// ==========================================
+// EMAIL VERIFICATION CONTROLLERS
+// ==========================================
+export const verifyEmail = async (req, res) => {
+  try {
+    const token = String(req.query.token || req.body?.token || "").trim();
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Verification token is required." });
+    }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: { $gt: Date.now() }
+    });
+
+    if (!user) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "This email verification link is invalid or has expired. Please request a new verification link." 
+      });
+    }
+
+    user.isEmailVerified = true;
+    user.emailVerificationToken = null;
+    user.emailVerificationExpires = null;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully! Your account now has a verified blue tick badge.",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        isEmailVerified: true
+      }
+    });
+  } catch (error) {
+    console.error("VERIFY_EMAIL_ERROR:", error);
+    return res.status(500).json({ success: false, message: "Server error during verification.", error: error.message });
+  }
+};
+
+export const resendVerificationEmail = async (req, res) => {
+  try {
+    const targetEmail = req.user?.id 
+      ? null 
+      : String(req.body?.email || "").toLowerCase().trim();
+
+    let user;
+    if (req.user?.id) {
+      user = await User.findById(req.user.id);
+    } else if (targetEmail) {
+      user = await User.findOne({ email: targetEmail });
+    }
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User account not found." });
+    }
+
+    if (user.isEmailVerified) {
+      return res.status(400).json({ success: false, message: "Your email is already verified." });
+    }
+
+    const { rawToken, hashedToken, expiresAt } = generateVerificationToken();
+    user.emailVerificationToken = hashedToken;
+    user.emailVerificationExpires = expiresAt;
+    await user.save();
+
+    try {
+      await sendVerificationEmail(user, rawToken, req);
+    } catch (mailErr) {
+      console.warn("Could not send verification email on resend:", mailErr.message);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "Verification email has been sent! Please check your inbox."
+    });
+  } catch (error) {
+    console.error("RESEND_VERIFICATION_ERROR:", error);
+    return res.status(500).json({ success: false, message: "Could not send verification email.", error: error.message });
   }
 };
 
@@ -195,7 +373,15 @@ export const login = async (req, res, next) => {
     const response = {
       success: true,
       message: 'Login successful!', 
-      user: { id: user._id, name: user.name, email: user.email, phone: user.phone, address: user.address, role: user.role }
+      user: { 
+        id: user._id, 
+        name: user.name, 
+        email: user.email, 
+        phone: user.phone, 
+        address: user.address, 
+        role: user.role,
+        isEmailVerified: user.isEmailVerified || false
+      }
     };
 
     response.token = token;
@@ -225,7 +411,7 @@ export const getSession = async (req, res) => {
   try {
     const { id } = req.user;
 
-    const user = await User.findById(id).select("name email phone address role title dob gender wishlist createdAt").lean();
+    const user = await User.findById(id).select("name email phone address role title dob gender wishlist isEmailVerified createdAt").lean();
     if (!user) {
       return res.status(401).json({ success: false, message: "Session user no longer exists." });
     }
@@ -263,7 +449,7 @@ export const updateProfile = async (req, res) => {
       req.user.id,
       { $set: updateData },
       { returnDocument: 'after', runValidators: true }
-    ).select("name email phone address role title dob gender wishlist createdAt").lean();
+    ).select("name email phone address role title dob gender wishlist isEmailVerified createdAt").lean();
 
     if (!user) {
       return res.status(404).json({ success: false, message: "Account not found." });

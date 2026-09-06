@@ -672,6 +672,8 @@ function updateSidebarUI(user = {}) {
     const sidebarName = document.getElementById("sidebar-user-name");
     const sidebarEmail = document.getElementById("sidebar-user-email");
     const sidebarAvatar = document.getElementById("sidebar-avatar");
+    const verifiedBadge = document.getElementById("sidebar-verified-badge");
+    const verificationStatus = document.getElementById("sidebar-verification-status");
 
     const rawName = user.name || user.username || (user.email ? user.email.split('@')[0] : "");
     const titlePrefix = user.title ? `${user.title} ` : "";
@@ -682,6 +684,28 @@ function updateSidebarUI(user = {}) {
     if (sidebarName) sidebarName.innerText = displayName;
     if (sidebarEmail) sidebarEmail.innerText = displayEmail;
     if (sidebarAvatar) sidebarAvatar.innerText = avatarLetter;
+
+    const isVerified = Boolean(user.isEmailVerified);
+    if (verifiedBadge) {
+        if (isVerified) verifiedBadge.classList.remove("hidden");
+        else verifiedBadge.classList.add("hidden");
+    }
+
+    if (verificationStatus) {
+        if (isVerified) {
+            verificationStatus.innerHTML = `
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200">
+                    <i class="fa-solid fa-circle-check text-blue-600"></i> Verified Member
+                </span>
+            `;
+        } else {
+            verificationStatus.innerHTML = `
+                <button type="button" onclick="triggerResendVerificationEmail()" class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition cursor-pointer" title="Click to resend verification email">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Unverified &bull; Verify Now
+                </button>
+            `;
+        }
+    }
 }
 
 export async function initUserProfileSidebar() {
@@ -716,6 +740,50 @@ export async function initUserProfileSidebar() {
     }
 }
 
+export async function triggerResendVerificationEmail() {
+    const resendBtn = document.getElementById("btn-resend-verification");
+    const origText = resendBtn ? resendBtn.innerHTML : "";
+
+    if (resendBtn) {
+        resendBtn.disabled = true;
+        resendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+    }
+
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/resend-verification`, {
+            method: "POST",
+            headers: getAuthHeaders({ "Content-Type": "application/json" }),
+            credentials: "include",
+            body: JSON.stringify({})
+        });
+
+        const data = await response.json();
+        if (response.ok && data.success) {
+            showToast(data.message || "Verification email sent! Please check your inbox.", "success");
+            if (resendBtn) {
+                resendBtn.innerHTML = `<i class="fa-solid fa-check"></i> Sent!`;
+                setTimeout(() => {
+                    resendBtn.disabled = false;
+                    resendBtn.innerHTML = origText;
+                }, 5000);
+            }
+        } else {
+            showToast(data.message || "Could not resend verification email.", "error");
+            if (resendBtn) {
+                resendBtn.disabled = false;
+                resendBtn.innerHTML = origText;
+            }
+        }
+    } catch (err) {
+        showToast("Network error. Please try again.", "error");
+        if (resendBtn) {
+            resendBtn.disabled = false;
+            resendBtn.innerHTML = origText;
+        }
+    }
+}
+window.triggerResendVerificationEmail = triggerResendVerificationEmail;
+
 async function loadProfileDetails() {
     try {
         const response = await fetch(`${BASE_URL}/api/auth/session`, {
@@ -734,11 +802,39 @@ async function loadProfileDetails() {
         const dobInput = document.getElementById("prof-dob");
         const addressInput = document.getElementById("prof-address");
 
+        const emailBadge = document.getElementById("prof-email-badge");
+        const emailIcon = document.getElementById("prof-email-icon");
+        const unverifiedCta = document.getElementById("prof-email-unverified-cta");
+
         if (nameInput) nameInput.value = user.name || "";
         if (phoneInput) phoneInput.value = user.phone || "";
         if (emailInput) emailInput.value = user.email || "";
         if (dobInput) dobInput.value = user.dob || "";
         if (addressInput) addressInput.value = user.address || "";
+
+        // Populate Email Verification Status
+        const isVerified = Boolean(user.isEmailVerified);
+        if (isVerified) {
+            if (emailBadge) {
+                emailBadge.innerHTML = `<span class="inline-flex items-center gap-1 text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded-full text-[11px] font-extrabold"><i class="fa-solid fa-circle-check text-blue-600"></i> Verified</span>`;
+            }
+            if (emailIcon) {
+                emailIcon.innerHTML = `<i class="fa-solid fa-circle-check text-blue-600 text-sm" title="Verified Account"></i>`;
+            }
+            if (unverifiedCta) {
+                unverifiedCta.classList.add("hidden");
+            }
+        } else {
+            if (emailBadge) {
+                emailBadge.innerHTML = `<span class="inline-flex items-center gap-1 text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full text-[11px] font-bold"><i class="fa-solid fa-triangle-exclamation text-amber-600"></i> Unverified</span>`;
+            }
+            if (emailIcon) {
+                emailIcon.innerHTML = `<i class="fa-solid fa-triangle-exclamation text-amber-600 text-sm" title="Email not verified"></i>`;
+            }
+            if (unverifiedCta) {
+                unverifiedCta.classList.remove("hidden");
+            }
+        }
 
         // Populate Sidebar details
         updateSidebarUI(user);

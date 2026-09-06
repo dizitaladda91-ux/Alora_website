@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import crypto from "node:crypto";
 import { createRateLimiter } from "../backend/middlewares/security.middleware.js";
-import { getPasswordResetRecipient } from "../backend/controllers/auth.controllers.js";
+import { getPasswordResetRecipient, generateVerificationToken } from "../backend/controllers/auth.controllers.js";
 
 const makeResponse = () => ({
   headers: {},
@@ -35,3 +36,35 @@ test("password reset recipient is always the account email", () => {
   );
   assert.equal(getPasswordResetRecipient({}), "");
 });
+
+test("email verification generates cryptographically secure 64-character raw token and sha256 hash", () => {
+  const { rawToken, hashedToken, expiresAt } = generateVerificationToken();
+
+  assert.equal(typeof rawToken, "string");
+  assert.equal(rawToken.length, 64);
+  assert.equal(typeof hashedToken, "string");
+  assert.equal(hashedToken.length, 64);
+
+  // SHA256 of rawToken must equal hashedToken
+  const expectedHash = crypto.createHash("sha256").update(rawToken).digest("hex");
+  assert.equal(hashedToken, expectedHash);
+
+  // Expiration should be in the future (approx 24 hours)
+  const now = Date.now();
+  assert.ok(expiresAt instanceof Date);
+  assert.ok(expiresAt.getTime() > now + 23 * 60 * 60 * 1000);
+  assert.ok(expiresAt.getTime() <= now + 25 * 60 * 60 * 1000);
+});
+
+test("email verification token correctly matches incoming candidate tokens", () => {
+  const { rawToken, hashedToken } = generateVerificationToken();
+  const candidateValid = rawToken;
+  const candidateInvalid = crypto.randomBytes(32).toString("hex");
+
+  const validHash = crypto.createHash("sha256").update(candidateValid).digest("hex");
+  const invalidHash = crypto.createHash("sha256").update(candidateInvalid).digest("hex");
+
+  assert.equal(validHash, hashedToken);
+  assert.notEqual(invalidHash, hashedToken);
+});
+
