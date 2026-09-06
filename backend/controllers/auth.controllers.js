@@ -231,15 +231,12 @@ export const register = async (req, res, next) => {
       { upsert: true, returnDocument: 'after', setDefaultsOnInsert: true }
     );
 
-    // Registration should leave the customer signed in immediately. This also
-    // makes checkout account creation a single step rather than register + login.
-    const token = generateToken(user._id, user.role);
-    res.cookie("token", token, authCookieOptions);
-
+    // Unverified accounts are not logged in until email verification completes
     res.status(201).json({
       success: true,
+      isUnverified: true,
+      email: user.email,
       message: 'Registration successful! Verification email sent.',
-      token,
       user: { 
         id: user._id, 
         name: user.name, 
@@ -247,7 +244,7 @@ export const register = async (req, res, next) => {
         phone: user.phone, 
         address: user.address, 
         role: user.role,
-        isEmailVerified: user.isEmailVerified || false
+        isEmailVerified: false
       }
     });
   } catch (error) {
@@ -343,6 +340,50 @@ export const resendVerificationEmail = async (req, res) => {
 };
 
 // ==========================================
+// REAL-TIME POLLING FOR LIVE AUTO-LOGIN
+// ==========================================
+export const pollVerificationStatus = async (req, res) => {
+  try {
+    const email = String(req.body?.email || req.query?.email || "").toLowerCase().trim();
+    if (!email) {
+      return res.status(400).json({ success: false, verified: false, message: "Email is required." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ success: false, verified: false, message: "Account not found." });
+    }
+
+    if (!user.isEmailVerified) {
+      return res.status(200).json({ success: true, verified: false, message: "Waiting for email verification." });
+    }
+
+    // User is verified -> issue JWT session cookie and auto-login!
+    const token = generateToken(user._id, user.role);
+    res.cookie("token", token, authCookieOptions);
+
+    return res.status(200).json({
+      success: true,
+      verified: true,
+      message: "Email verified successfully! Logging you in...",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        role: user.role,
+        isEmailVerified: true
+      }
+    });
+  } catch (error) {
+    console.error("POLL_VERIFICATION_ERROR:", error);
+    return res.status(500).json({ success: false, verified: false, message: "Server error during verification polling." });
+  }
+};
+
+// ==========================================
 // LOGIN USER
 // ==========================================
 export const login = async (req, res, next) => {
@@ -364,6 +405,26 @@ export const login = async (req, res, next) => {
 
     if (!user) {
       return res.status(401).json({ message: 'Invalid email or password.' });
+    }
+
+    // Customer accounts MUST be email verified before allowing login
+    if (user.role === "user" && !user.isEmailVerified) {
+      try {
+        const { rawToken, hashedToken, expiresAt } = generateVerificationToken();
+        user.emailVerificationToken = hashedToken;
+        user.emailVerificationExpires = expiresAt;
+        await user.save();
+        await sendVerificationEmail(user, rawToken, req);
+      } catch (err) {
+        console.warn("Could not resend email on unverified login attempt:", err.message);
+      }
+
+      return res.status(403).json({
+        success: false,
+        isUnverified: true,
+        email: user.email,
+        message: "Aapka email verify nahi hai. Kripya pehle email verify karein! Humne aapko naya verification link bhej diya hai."
+      });
     }
 
     const token = generateToken(user._id, user.role);

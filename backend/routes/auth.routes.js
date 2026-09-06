@@ -1,5 +1,5 @@
 import express from "express";
-import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile, verifyEmail, resendVerificationEmail } from '../controllers/auth.controllers.js';
+import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile, verifyEmail, resendVerificationEmail, pollVerificationStatus } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
 import { requireAuth, verifyAuthToken } from "../middlewares/auth.middleware.js";
 import User from "../models/userAuth.models.js";
@@ -67,6 +67,7 @@ router.put('/api/auth/profile', requireAuth, updateProfile);
 // Email Verification API Routes
 router.get('/api/auth/verify-email', verifyEmail);
 router.post('/api/auth/verify-email', verifyEmail);
+router.post('/api/auth/poll-verification', pollVerificationStatus);
 router.post('/api/auth/resend-verification', (req, res, next) => {
   const token = req.cookies?.token;
   if (token) {

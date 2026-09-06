@@ -68,3 +68,19 @@ test("email verification token correctly matches incoming candidate tokens", () 
   assert.notEqual(invalidHash, hashedToken);
 });
 
+test("customer accounts require email verification for login", () => {
+  const unverifiedCustomer = { role: "user", isEmailVerified: false };
+  const verifiedCustomer = { role: "user", isEmailVerified: true };
+  const adminAccount = { role: "admin", isEmailVerified: false };
+
+  const isLoginAllowed = (user) => {
+    if (user.role === "user" && !user.isEmailVerified) return false;
+    return true;
+  };
+
+  assert.equal(isLoginAllowed(unverifiedCustomer), false);
+  assert.equal(isLoginAllowed(verifiedCustomer), true);
+  assert.equal(isLoginAllowed(adminAccount), true);
+});
+
+

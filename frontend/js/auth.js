@@ -29,36 +29,162 @@ export function showSuccessModal(title, message, callback) {
     });
 }
 
-export function showRegistrationSuccessModal(userEmail, callback) {
+export function showVerificationWaitingModal(userEmail, callback) {
     const existingModal = document.getElementById("custom-success-modal");
     if (existingModal) existingModal.remove();
+
+    let pollTimer = null;
+
+    const cleanup = () => {
+        if (pollTimer) {
+            clearInterval(pollTimer);
+            pollTimer = null;
+        }
+    };
+
     const modal = document.createElement("div");
     modal.id = "custom-success-modal";
     modal.className = "fixed inset-0 flex items-center justify-center z-[9999] bg-black/60 backdrop-blur-sm p-4";
     modal.innerHTML = `
         <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-900/10 text-center relative overflow-hidden">
-            <div class="w-16 h-16 mx-auto mb-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 flex items-center justify-center text-2xl shadow-inner">
-                <i class="fa-solid fa-envelope-circle-check"></i>
+            <!-- Top Accent Bar -->
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-600 via-[#8B4513] to-amber-700"></div>
+
+            <!-- Rotating Spinner State -->
+            <div id="polling-spinner-container" class="w-16 h-16 mx-auto mb-3 bg-amber-50 text-[#8B4513] rounded-2xl border border-amber-200 flex items-center justify-center text-3xl shadow-inner">
+                <i class="fa-solid fa-spinner fa-spin"></i>
             </div>
-            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 mb-2">
-                <i class="fa-solid fa-circle-check text-blue-600"></i> Verification Link Sent
+
+            <!-- Verified Checkmark State (Hidden initially) -->
+            <div id="polling-verified-container" class="hidden w-16 h-16 mx-auto mb-3 bg-emerald-50 text-emerald-600 rounded-2xl border-2 border-emerald-200 flex items-center justify-center text-3xl shadow-inner">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+
+            <span id="polling-badge" class="inline-flex items-center gap-1.5 text-[11px] font-bold text-amber-800 bg-amber-50 px-3 py-1 rounded-full border border-amber-300 mb-2">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span> Waiting for Email Verification...
             </span>
-            <h3 class="text-2xl font-bold text-slate-900 font-serif mb-1">Account Created!</h3>
-            <p class="text-stone-600 text-xs sm:text-sm mb-4 leading-relaxed">
-                We sent a 1-click verification email to <strong class="text-slate-900 font-mono select-all">${escapeHtml(userEmail)}</strong>. Please click the link in your email to activate your <strong>Verified Blue Tick Badge</strong>.
+
+            <h3 id="polling-title" class="text-2xl font-bold text-slate-900 font-serif mb-1">Verify Your Email</h3>
+            <p id="polling-desc" class="text-stone-600 text-xs sm:text-sm mb-4 leading-relaxed">
+                Verification link sent to <strong class="text-slate-900 font-mono select-all">${escapeHtml(userEmail)}</strong>.<br>
+                <span class="text-[#8B4513] font-semibold mt-1 block">Click the link in your email to instantly auto-login!</span>
             </p>
-            <div class="space-y-2.5 pt-1">
-                <button id="modal-ok-btn" class="w-full bg-[#8B4513] hover:bg-amber-900 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition shadow-md cursor-pointer flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-user-circle"></i> Continue to My Account
+
+            <div id="polling-actions" class="space-y-2 pt-1">
+                <button id="modal-resend-btn" type="button" class="w-full bg-[#8B4513] hover:bg-amber-900 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition shadow-md cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Resend Verification Email
+                </button>
+                <button id="modal-close-btn" type="button" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 font-bold text-xs uppercase tracking-wider py-2.5 rounded-xl transition border border-stone-200 cursor-pointer">
+                    Cancel
                 </button>
             </div>
         </div>
     `;
     document.body.appendChild(modal);
-    document.getElementById("modal-ok-btn").addEventListener("click", () => {
-        modal.remove();
-        if (callback) callback();
-    });
+
+    // Bind Resend button
+    const resendBtn = document.getElementById("modal-resend-btn");
+    if (resendBtn) {
+        resendBtn.addEventListener("click", async () => {
+            const orig = resendBtn.innerHTML;
+            resendBtn.disabled = true;
+            resendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+            try {
+                const res = await fetch(`${BASE_URL}/api/auth/resend-verification`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: userEmail })
+                });
+                const resData = await res.json();
+                if (res.ok && resData.success) {
+                    resendBtn.innerHTML = `<i class="fa-solid fa-check"></i> Email Resent!`;
+                    setTimeout(() => {
+                        resendBtn.innerHTML = orig;
+                        resendBtn.disabled = false;
+                    }, 4000);
+                } else {
+                    resendBtn.innerHTML = orig;
+                    resendBtn.disabled = false;
+                }
+            } catch (e) {
+                resendBtn.innerHTML = orig;
+                resendBtn.disabled = false;
+            }
+        });
+    }
+
+    // Bind Close button
+    const closeBtn = document.getElementById("modal-close-btn");
+    if (closeBtn) {
+        closeBtn.addEventListener("click", () => {
+            cleanup();
+            modal.remove();
+        });
+    }
+
+    // Real-Time Polling Engine
+    const checkStatus = async () => {
+        try {
+            const res = await fetch(`${BASE_URL}/api/auth/poll-verification`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                credentials: "include",
+                body: JSON.stringify({ email: userEmail })
+            });
+
+            const data = await res.json();
+            if (res.ok && data.verified === true) {
+                cleanup();
+
+                // UI Success Transition
+                const spinnerEl = document.getElementById("polling-spinner-container");
+                const verifiedEl = document.getElementById("polling-verified-container");
+                const badgeEl = document.getElementById("polling-badge");
+                const titleEl = document.getElementById("polling-title");
+                const descEl = document.getElementById("polling-desc");
+                const actionsEl = document.getElementById("polling-actions");
+
+                if (spinnerEl) spinnerEl.classList.add("hidden");
+                if (verifiedEl) verifiedEl.classList.remove("hidden");
+                if (badgeEl) {
+                    badgeEl.className = "inline-flex items-center gap-1.5 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 mb-2";
+                    badgeEl.innerHTML = '<i class="fa-solid fa-circle-check text-blue-600"></i> Verified Blue Tick Active!';
+                }
+                if (titleEl) titleEl.innerText = "Email Verified!";
+                if (descEl) descEl.innerHTML = "<span class='text-emerald-700 font-bold'>Account verified successfully! Logging you in now...</span>";
+                if (actionsEl) actionsEl.innerHTML = "";
+
+                // Store user session
+                if (data.token) {
+                    localStorage.setItem("token", data.token);
+                    sessionStorage.setItem("token", data.token);
+                }
+                const userData = data.user || {};
+                const displayName = userData.name || userData.username || (userData.email ? userData.email.split('@')[0] : "User");
+                const userObjToStore = {
+                    ...userData,
+                    name: displayName
+                };
+                const role = userData.role ? userData.role.toLowerCase().trim() : "user";
+                sessionStorage.setItem("tabAuthActive", "true");
+                sessionStorage.setItem("userRole", role);
+                sessionStorage.setItem("user", JSON.stringify(userObjToStore));
+                localStorage.setItem("userRole", role);
+                localStorage.setItem("user", JSON.stringify(userObjToStore));
+
+                setTimeout(() => {
+                    modal.remove();
+                    if (callback) callback();
+                    else window.location.href = "./account.html";
+                }, 1200);
+            }
+        } catch (pollErr) {
+            console.warn("Poll error:", pollErr);
+        }
+    };
+
+    // Run first check after 2 seconds, then poll every 2.5 seconds
+    pollTimer = setInterval(checkStatus, 2500);
 }
 async function runAuthGuard() {
     const currentPath = window.location.pathname.toLowerCase();
@@ -200,15 +326,8 @@ function initRegisterForm() {
                 credentials: "include"
             });
             const data = await response.json();
-            if (response.ok) {
-                if (data.token) {
-                    localStorage.setItem("token", data.token);
-                    sessionStorage.setItem("token", data.token);
-                }
-                const userData = data.user || {};
-                localStorage.setItem("user", JSON.stringify(userData));
-                sessionStorage.setItem("user", JSON.stringify(userData));
-                showRegistrationSuccessModal(email, () => {
+            if (response.ok || data.isUnverified) {
+                showVerificationWaitingModal(email, () => {
                     window.location.href = "./account.html";
                 });
             } else {
@@ -241,6 +360,12 @@ function initLoginForm() {
                 credentials: "include" 
             });
             const data = await response.json();
+            if (data.isUnverified) {
+                showVerificationWaitingModal(email, () => {
+                    window.location.href = "./account.html";
+                });
+                return;
+            }
             if (response.ok && data.success !== false) {
                 if (data.token) {
                     localStorage.setItem("token", data.token);
