@@ -1,4 +1,7 @@
 import BASE_URL from "./config.js";
+
+const escapeHtml = (value = "") => String(value).replace(/[&<>'"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "'": "&#39;", '"': "&quot;" }[char]));
+
 export function showSuccessModal(title, message, callback) {
     const existingModal = document.getElementById("custom-success-modal");
     if (existingModal) existingModal.remove();
@@ -14,9 +17,41 @@ export function showSuccessModal(title, message, callback) {
             </div>
             <h3 class="text-lg font-bold text-gray-900 mb-1">${title}</h3>
             <p class="text-gray-500 text-sm mb-6">${message}</p>
-            <button id="modal-ok-btn" class="w-full bg-[#2A2A24] hover:bg-amber-800 text-white font-semibold py-2.5 rounded-xl transition shadow-md focus:outline-none">
+            <button id="modal-ok-btn" class="w-full bg-[#2A2A24] hover:bg-amber-800 text-white font-semibold py-2.5 rounded-xl transition shadow-md focus:outline-none cursor-pointer">
                 OK
             </button>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    document.getElementById("modal-ok-btn").addEventListener("click", () => {
+        modal.remove();
+        if (callback) callback();
+    });
+}
+
+export function showRegistrationSuccessModal(userEmail, callback) {
+    const existingModal = document.getElementById("custom-success-modal");
+    if (existingModal) existingModal.remove();
+    const modal = document.createElement("div");
+    modal.id = "custom-success-modal";
+    modal.className = "fixed inset-0 flex items-center justify-center z-[9999] bg-black/60 backdrop-blur-sm p-4";
+    modal.innerHTML = `
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-amber-900/10 text-center relative overflow-hidden">
+            <div class="w-16 h-16 mx-auto mb-3 bg-blue-50 text-blue-600 rounded-2xl border border-blue-200 flex items-center justify-center text-2xl shadow-inner">
+                <i class="fa-solid fa-envelope-circle-check"></i>
+            </div>
+            <span class="inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 px-3 py-1 rounded-full border border-blue-200 mb-2">
+                <i class="fa-solid fa-circle-check text-blue-600"></i> Verification Link Sent
+            </span>
+            <h3 class="text-2xl font-bold text-slate-900 font-serif mb-1">Account Created!</h3>
+            <p class="text-stone-600 text-xs sm:text-sm mb-4 leading-relaxed">
+                We sent a 1-click verification email to <strong class="text-slate-900 font-mono select-all">${escapeHtml(userEmail)}</strong>. Please click the link in your email to activate your <strong>Verified Blue Tick Badge</strong>.
+            </p>
+            <div class="space-y-2.5 pt-1">
+                <button id="modal-ok-btn" class="w-full bg-[#8B4513] hover:bg-amber-900 text-white font-bold text-xs uppercase tracking-wider py-3.5 rounded-xl transition shadow-md cursor-pointer flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-user-circle"></i> Continue to My Account
+                </button>
+            </div>
         </div>
     `;
     document.body.appendChild(modal);
@@ -173,8 +208,8 @@ function initRegisterForm() {
                 const userData = data.user || {};
                 localStorage.setItem("user", JSON.stringify(userData));
                 sessionStorage.setItem("user", JSON.stringify(userData));
-                showSuccessModal("Registration Successful!", data.message || "Account successful created!", () => {
-                    window.location.href = "./index.html";
+                showRegistrationSuccessModal(email, () => {
+                    window.location.href = "./account.html";
                 });
             } else {
                 showSuccessModal("Registration Failed", data.message || "Could not complete registration.", null);
