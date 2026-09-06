@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Email Address | Alora Radiance</title>
-    <meta name="description" content="Verify your email address to activate your member account on Alora Radiance.">
+    <title>Email Verification | Alora Radiance</title>
+    <meta name="description" content="Verify your email address to activate your member account and get your verified blue tick badge on Alora Radiance.">
     <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
     <link rel="stylesheet" href="./styles/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -25,8 +25,11 @@
             <!-- Decorative Accent Top Bar -->
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-amber-600 via-[#8B4513] to-amber-700"></div>
 
-            <!-- 1. LOADING STATE -->
-            <div id="state-loading" class="py-8 space-y-4">
+            <!-- Toast / Message Box -->
+            <div id="verify-toast" class="hidden mb-4 p-3.5 rounded-xl text-xs font-semibold text-left transition-all"></div>
+
+            <!-- 1. LOADING STATE (Token Verification in Progress) -->
+            <div id="state-loading" class="hidden py-8 space-y-4">
                 <div class="w-16 h-16 rounded-full bg-amber-50 text-[#8B4513] mx-auto flex items-center justify-center text-2xl border border-amber-200">
                     <i class="fa-solid fa-spinner fa-spin"></i>
                 </div>
@@ -34,17 +37,17 @@
                 <p class="text-xs sm:text-sm text-stone-500 max-w-xs mx-auto">Please wait while we validate your verification token with our secure server.</p>
             </div>
 
-            <!-- 2. SUCCESS STATE -->
+            <!-- 2. SUCCESS STATE (Token Verified) -->
             <div id="state-success" class="hidden py-4 space-y-5">
                 <div class="w-20 h-20 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center text-3xl border-2 border-emerald-200 shadow-inner">
                     <i class="fa-solid fa-circle-check"></i>
                 </div>
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-2">
-                        <i class="fa-solid fa-certificate text-blue-600"></i> Verified Blue Tick Active
+                        <i class="fa-solid fa-circle-check text-blue-600"></i> Verified Blue Tick Active
                     </span>
                     <h2 class="text-2xl sm:text-3xl font-fraunces font-bold text-slate-900">Email Verified!</h2>
-                    <p id="success-message" class="text-xs sm:text-sm text-stone-600 mt-2">Your email address has been successfully verified. Your account is now fully active with official verified status.</p>
+                    <p id="success-message" class="text-xs sm:text-sm text-stone-600 mt-2">Your email address has been successfully verified. Your account is now fully active with official verified member status.</p>
                 </div>
 
                 <div class="pt-4 space-y-2.5">
@@ -57,19 +60,81 @@
                 </div>
             </div>
 
-            <!-- 3. ERROR / EXPIRED STATE -->
-            <div id="state-error" class="hidden py-4 space-y-5">
-                <div class="w-20 h-20 rounded-full bg-rose-50 text-rose-600 mx-auto flex items-center justify-center text-3xl border-2 border-rose-200">
-                    <i class="fa-solid fa-circle-exclamation"></i>
+            <!-- 3. REQUEST VERIFICATION EMAIL FORM (When landing without token or needing new link) -->
+            <div id="state-request" class="py-4 space-y-5">
+                <div class="w-16 h-16 rounded-full bg-blue-50 text-blue-600 mx-auto flex items-center justify-center text-2xl border border-blue-200 shadow-inner">
+                    <i class="fa-solid fa-envelope-circle-check"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-fraunces font-bold text-slate-900">Verification Failed</h2>
-                    <p id="error-message" class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 mt-3">This verification link is invalid or has expired.</p>
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 mb-2">
+                        <i class="fa-solid fa-circle-check text-blue-600"></i> Member Blue Tick
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-fraunces font-bold text-slate-900">Verify Your Email</h2>
+                    <p class="text-xs sm:text-sm text-stone-500 mt-1 max-w-xs mx-auto">Enter your registered email address to receive your 1-click verification link.</p>
+                </div>
+
+                <form id="resend-form" class="space-y-4 text-left pt-2">
+                    <div>
+                        <label for="req-email" class="block text-xs font-bold uppercase tracking-wider text-stone-700 mb-1.5">Registered Email Address</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-stone-400">
+                                <i class="fa-regular fa-envelope text-sm"></i>
+                            </span>
+                            <input type="email" id="req-email" required placeholder="name@example.com" class="w-full bg-[#FAF7EE]/60 border border-[#DCD3BA] rounded-xl pl-10 pr-4 py-3 text-sm font-medium text-slate-900 focus:outline-none focus:border-[#8B4513] focus:ring-2 focus:ring-[#8B4513]/20 transition">
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-send-link" class="w-full bg-[#8B4513] hover:bg-[#6F370F] text-white py-3.5 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i> Send Verification Link
+                    </button>
+                </form>
+
+                <div class="pt-2 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+                    <a href="/login.html" class="hover:text-slate-900 font-bold transition flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-left text-[10px]"></i> Back to Login
+                    </a>
+                    <a href="/account" class="hover:text-slate-900 font-bold transition flex items-center gap-1">
+                        My Account <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4. EMAIL SENT CONFIRMATION STATE -->
+            <div id="state-sent" class="hidden py-4 space-y-5">
+                <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center text-2xl border border-emerald-200 shadow-inner">
+                    <i class="fa-solid fa-paper-plane"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl sm:text-3xl font-fraunces font-bold text-slate-900">Check Your Inbox!</h2>
+                    <p class="text-xs sm:text-sm text-stone-600 mt-2">
+                        We have sent a verification email to <strong id="sent-target-email" class="text-slate-900 font-mono"></strong>. Click the link in the email to activate your <strong>Verified Blue Tick</strong>.
+                    </p>
+                    <p class="text-[11px] text-stone-400 mt-2">Didn't receive it? Check your spam folder or wait 1 minute before requesting again.</p>
                 </div>
 
                 <div class="pt-3 space-y-2.5">
-                    <button type="button" id="btn-resend" onclick="handleResend()" class="w-full bg-[#8B4513] hover:bg-[#6F370F] text-white py-3.5 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
-                        <i class="fa-solid fa-paper-plane"></i> Resend Verification Email
+                    <button type="button" onclick="showRequestFormAgain()" class="w-full bg-amber-50 hover:bg-amber-100 text-[#8B4513] py-3 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition border border-amber-200 flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-rotate-right"></i> Try Another Email
+                    </button>
+                    <a href="/login.html" class="w-full bg-[#8B4513] hover:bg-[#6F370F] text-white py-3.5 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Back to Login
+                    </a>
+                </div>
+            </div>
+
+            <!-- 5. ERROR / EXPIRED TOKEN STATE -->
+            <div id="state-error" class="hidden py-4 space-y-5">
+                <div class="w-16 h-16 rounded-full bg-rose-50 text-rose-600 mx-auto flex items-center justify-center text-2xl border border-rose-200">
+                    <i class="fa-solid fa-circle-exclamation"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-fraunces font-bold text-slate-900">Link Expired or Invalid</h2>
+                    <p id="error-message" class="text-xs sm:text-sm text-rose-700 bg-rose-50 border border-rose-200 rounded-xl p-3 mt-3">This verification link has expired or has already been used.</p>
+                </div>
+
+                <div class="pt-3 space-y-2.5">
+                    <button type="button" onclick="showRequestFormAgain()" class="w-full bg-[#8B4513] hover:bg-[#6F370F] text-white py-3.5 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition shadow-md flex items-center justify-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-paper-plane"></i> Get New Verification Link
                     </button>
                     <a href="/login.html" class="w-full bg-stone-100 hover:bg-stone-200 text-stone-700 py-3 px-6 rounded-xl font-bold text-xs uppercase tracking-wider transition border border-stone-200 flex items-center justify-center gap-2">
                         <i class="fa-solid fa-arrow-right-to-bracket"></i> Back to Login
@@ -83,22 +148,62 @@
     <div id="footer-placeholder"></div>
 
     <script>
+        const loadingState = document.getElementById("state-loading");
+        const successState = document.getElementById("state-success");
+        const requestState = document.getElementById("state-request");
+        const sentState = document.getElementById("state-sent");
+        const errorState = document.getElementById("state-error");
+        const errorMsg = document.getElementById("error-message");
+        const successMsg = document.getElementById("success-message");
+        const toastBox = document.getElementById("verify-toast");
+        const reqEmailInput = document.getElementById("req-email");
+
+        function hideAllStates() {
+            loadingState.classList.add("hidden");
+            successState.classList.add("hidden");
+            requestState.classList.add("hidden");
+            sentState.classList.add("hidden");
+            errorState.classList.add("hidden");
+        }
+
+        function showToast(msg, type = "success") {
+            if (!toastBox) return;
+            toastBox.innerText = msg;
+            toastBox.className = `p-3.5 rounded-xl text-xs font-semibold mb-4 transition-all ${
+                type === "success" 
+                    ? "bg-emerald-50 text-emerald-900 border border-emerald-200" 
+                    : "bg-rose-50 text-rose-900 border border-rose-200"
+            }`;
+            toastBox.classList.remove("hidden");
+        }
+
+        function showRequestFormAgain() {
+            hideAllStates();
+            requestState.classList.remove("hidden");
+        }
+
         document.addEventListener("DOMContentLoaded", async () => {
-            const loadingState = document.getElementById("state-loading");
-            const successState = document.getElementById("state-success");
-            const errorState = document.getElementById("state-error");
-            const errorMsg = document.getElementById("error-message");
-            const successMsg = document.getElementById("success-message");
+            // Auto-populate logged-in or cached email if present
+            try {
+                const user = JSON.parse(localStorage.getItem("user") || sessionStorage.getItem("user") || "null");
+                if (user?.email && reqEmailInput) {
+                    reqEmailInput.value = user.email;
+                }
+            } catch (e) {}
 
             const urlParams = new URLSearchParams(window.location.search);
             const token = urlParams.get("token");
 
+            // If no token in URL, display the clean "Verify Your Email" request form
             if (!token) {
-                loadingState.classList.add("hidden");
-                errorState.classList.remove("hidden");
-                errorMsg.innerText = "Verification token is missing in the URL. Please click the full link sent to your email.";
+                hideAllStates();
+                requestState.classList.remove("hidden");
                 return;
             }
+
+            // If token is present, perform automatic token validation
+            hideAllStates();
+            loadingState.classList.remove("hidden");
 
             try {
                 const res = await fetch(`/api/auth/verify-email?token=${encodeURIComponent(token)}`, {
@@ -108,7 +213,7 @@
                 });
 
                 const data = await res.json();
-                loadingState.classList.add("hidden");
+                hideAllStates();
 
                 if (res.ok && data.success) {
                     successState.classList.remove("hidden");
@@ -126,49 +231,57 @@
                     } catch (e) {}
                 } else {
                     errorState.classList.remove("hidden");
-                    errorMsg.innerText = data.message || "Invalid or expired verification link.";
+                    errorMsg.innerText = data.message || "This verification link is invalid or has expired.";
                 }
             } catch (err) {
-                loadingState.classList.add("hidden");
+                hideAllStates();
                 errorState.classList.remove("hidden");
                 errorMsg.innerText = "Network error. Please check your internet connection and try again.";
             }
         });
 
-        async function handleResend() {
-            const btn = document.getElementById("btn-resend");
-            const orig = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+        // Handle Send Verification Link Form
+        const resendForm = document.getElementById("resend-form");
+        if (resendForm) {
+            resendForm.addEventListener("submit", async (e) => {
+                e.preventDefault();
+                const sendBtn = document.getElementById("btn-send-link");
+                const emailVal = reqEmailInput ? reqEmailInput.value.trim().toLowerCase() : "";
 
-            try {
-                let userEmail = "";
-                try {
-                    const cached = JSON.parse(localStorage.getItem("user") || "null");
-                    if (cached?.email) userEmail = cached.email;
-                } catch (e) {}
-
-                const res = await fetch("/api/auth/resend-verification", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    credentials: "include",
-                    body: JSON.stringify({ email: userEmail })
-                });
-
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    alert(data.message || "A new verification link has been sent to your email!");
-                    btn.innerHTML = `<i class="fa-solid fa-check"></i> Sent!`;
-                } else {
-                    alert(data.message || "Could not resend email. Please login and click Resend from your profile.");
-                    btn.innerHTML = orig;
-                    btn.disabled = false;
+                if (!emailVal) {
+                    showToast("Please enter your registered email address.", "error");
+                    return;
                 }
-            } catch (err) {
-                alert("Network error. Please try again.");
-                btn.innerHTML = orig;
-                btn.disabled = false;
-            }
+
+                const origBtn = sendBtn.innerHTML;
+                sendBtn.disabled = true;
+                sendBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Sending...`;
+
+                try {
+                    const res = await fetch("/api/auth/resend-verification", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        credentials: "include",
+                        body: JSON.stringify({ email: emailVal })
+                    });
+
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        hideAllStates();
+                        sentState.classList.remove("hidden");
+                        const targetEl = document.getElementById("sent-target-email");
+                        if (targetEl) targetEl.innerText = emailVal;
+                    } else {
+                        showToast(data.message || "Could not send verification email. Please verify the email address.", "error");
+                        sendBtn.innerHTML = origBtn;
+                        sendBtn.disabled = false;
+                    }
+                } catch (err) {
+                    showToast("Network error. Please check your connection and try again.", "error");
+                    sendBtn.innerHTML = origBtn;
+                    sendBtn.disabled = false;
+                }
+            });
         }
     </script>
     <script src="./js/include.js"></script>
