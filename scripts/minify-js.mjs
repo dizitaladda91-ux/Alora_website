@@ -4,13 +4,13 @@ import { minify } from 'terser';
 
 const root = process.cwd();
 const jsDir = path.join(root, 'frontend', 'js');
-const outputDir = path.join(jsDir, 'min');
+const outputDir = jsDir;
 const htmlDir = path.join(root, 'frontend');
 
 await fs.mkdir(outputDir, { recursive: true });
 
 const jsFiles = (await fs.readdir(jsDir))
-  .filter((name) => name.endsWith('.js'));
+  .filter((name) => name.endsWith('.js') && !name.endsWith('.min.js'));
 
 for (const name of jsFiles) {
   const source = await fs.readFile(path.join(jsDir, name), 'utf8');
@@ -29,7 +29,10 @@ for (const name of await fs.readdir(htmlDir)) {
   if (!name.endsWith('.html')) continue;
   const filePath = path.join(htmlDir, name);
   const html = await fs.readFile(filePath, 'utf8');
-  const minifiedHtml = html.replace(/((?:\.\/|\/)js\/[^"'?#]+)\.js(?=\?[^"']*)?(?=["'])/g, '$1.min.js');
+  // Normalise files produced by an earlier build, then only update references
+  // that do not already point to a minified file. This keeps repeat builds safe.
+  const normalizedHtml = html.replace(/\.min(?:\.min)+\.js/g, '.min.js');
+  const minifiedHtml = normalizedHtml.replace(/((?:\.\/|\/)js\/[^"'?#]+?)(?<!\.min)\.js(?=\?[^"']*)?(?=["'])/g, '$1.min.js');
   if (html !== minifiedHtml) await fs.writeFile(filePath, minifiedHtml, 'utf8');
 }
 
