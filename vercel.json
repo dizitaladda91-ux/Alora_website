@@ -4,6 +4,22 @@
   "trailingSlash": false,
   "redirects": [
     {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.aloraradiance.com"
+        }
+      ],
+      "destination": "https://aloraradiance.com/$1",
+      "permanent": true
+    },
+    {
+      "source": "/aboutus.html",
+      "destination": "/about",
+      "permanent": true
+    },
+    {
       "source": "/moreproduct.html",
       "destination": "/products",
       "permanent": true
@@ -34,7 +50,7 @@
     },
     {
       "src": "/product/[^/]+/?",
-      "dest": "/frontend/product"
+      "dest": "/api/index.js"
     },
     {
       "src": "/about/?",
@@ -117,7 +133,7 @@
     },
     {
       "src": "/blog/(.*)",
-      "dest": "/frontend/post"
+      "dest": "/api/index.js"
     },
     {
       "handle": "filesystem"
