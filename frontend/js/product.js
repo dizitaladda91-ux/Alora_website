@@ -217,6 +217,10 @@ async function loadProductDetails() {
         document.title = product.metaTitle || product.name || 'Alora Radiance';
         const metaDescription = document.querySelector('meta[name="description"]');
         if (metaDescription && product.metaDescription) metaDescription.setAttribute('content', product.metaDescription);
+        const keywordsEl = document.getElementById('dynamic-keywords') || document.querySelector('meta[name="keywords"]');
+        if (keywordsEl && product.keywords) {
+            keywordsEl.setAttribute('content', product.keywords);
+        }
         const canonicalTag = document.getElementById('dynamic-canonical') || document.querySelector('link[rel="canonical"]');
         if (canonicalTag) {
             canonicalTag.setAttribute('href', `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id)}`);

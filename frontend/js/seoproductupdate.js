@@ -277,6 +277,9 @@ async function loadProduct() {
         document.getElementById('product-name').textContent = product.name || 'Product Details';
         form.description.value = product.description || '';
         form.rating.value = product.rating ?? 4.5;
+        if (form.metaTitle) form.metaTitle.value = product.metaTitle || '';
+        if (form.metaDescription) form.metaDescription.value = product.metaDescription || '';
+        if (form.keywords) form.keywords.value = product.keywords || '';
 
         // Main Image
         originalMainImage = product.imagepath || '';
@@ -320,6 +323,9 @@ form.addEventListener('submit', async event => {
     const data = new FormData();
     data.append('description', form.description.value.trim());
     data.append('rating', String(form.rating.value));
+    data.append('metaTitle', form.metaTitle ? form.metaTitle.value.trim() : '');
+    data.append('metaDescription', form.metaDescription ? form.metaDescription.value.trim() : '');
+    data.append('keywords', form.keywords ? form.keywords.value.trim() : '');
     data.append('volumes', JSON.stringify([...document.querySelectorAll('.seo-volume')].map(input => input.value.trim())));
     data.append('faqs', JSON.stringify(getCollectedProductFaqs()));
 

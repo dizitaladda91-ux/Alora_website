@@ -178,14 +178,15 @@ app.get('/product/:id', async (req, res) => {
       return res.status(404).sendFile(productHtmlPath);
     }
 
-    let html = await fs.promises.readFile(productHtmlPath, 'utf8');
     const cleanTitle = String(product.metaTitle || product.name || 'Alora Radiance').replace(/"/g, '&quot;');
     const cleanDesc = String(product.metaDescription || product.description || 'Luxury skincare formulation.').replace(/"/g, '&quot;');
+    const cleanKeywords = String(product.keywords || `${product.name}, skincare, luxury skincare, Alora Radiance`).replace(/"/g, '&quot;');
     const canonicalUrl = `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id || rawId)}`;
 
     html = html.replace(/<title>.*?<\/title>/i, `<title>${cleanTitle} | Alora Radiance</title>`);
     html = html.replace(/<meta id="dynamic-meta-desc" name="description" content="[^"]*">/i, `<meta id="dynamic-meta-desc" name="description" content="${cleanDesc}">`);
     html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${cleanDesc}">`);
+    html = html.replace(/<meta id="dynamic-keywords" name="keywords" content="[^"]*">/i, `<meta id="dynamic-keywords" name="keywords" content="${cleanKeywords}">`);
     html = html.replace(/<link id="dynamic-canonical" rel="canonical" href="[^"]*" \/>/i, `<link id="dynamic-canonical" rel="canonical" href="${canonicalUrl}" />`);
     
     res.setHeader('Content-Type', 'text/html; charset=utf-8');

@@ -164,6 +164,9 @@ export const updateProductForSeo = async (req, res) => {
 
         if (req.body.description !== undefined) product.description = req.body.description;
         if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
+        if (req.body.metaTitle !== undefined) product.metaTitle = String(req.body.metaTitle || '').trim();
+        if (req.body.metaDescription !== undefined) product.metaDescription = String(req.body.metaDescription || '').trim();
+        if (req.body.keywords !== undefined) product.keywords = String(req.body.keywords || '').trim();
 
         if (req.body.volumes) {
             const volumes = JSON.parse(req.body.volumes);

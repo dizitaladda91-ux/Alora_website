@@ -50,6 +50,7 @@ const SimpleProductSchema = new mongoose.Schema({
     isFeatured: { type: Boolean, default: false },
     metaTitle: { type: String, trim: true, default: '' },
     metaDescription: { type: String, trim: true, default: '' },
+    keywords: { type: String, trim: true, default: '' },
     videoUrl: { type: String, trim: true, default: '' },
     category: {
         type: String,
