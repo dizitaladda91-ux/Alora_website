@@ -4,13 +4,13 @@ function getSlugFromLocation() {
     const querySlug = urlParams.get('slug');
     if (querySlug) return querySlug;
     const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog');
+    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog' || part.toLowerCase() === 'blogs');
     if (postIndex >= 0 && pathParts[postIndex + 1]) {
         return decodeURIComponent(pathParts[postIndex + 1]);
     }
     if (pathParts.length > 0) {
         const lastPart = pathParts[pathParts.length - 1];
-        if (!lastPart.endsWith('.html')) {
+        if (!lastPart.endsWith('.html') && lastPart.toLowerCase() !== 'blog' && lastPart.toLowerCase() !== 'blogs') {
             return decodeURIComponent(lastPart);
         }
     }
@@ -424,7 +424,8 @@ function generateTableOfContents() {
     }, { passive: true });
 }
 function injectSEO(blog) {
-    const currentUrl = window.location.href;
+    const rawSlug = blog.slug || getSlugFromLocation();
+    const currentUrl = rawSlug ? `https://aloraradiance.com/blog/${encodeURIComponent(rawSlug)}` : window.location.href;
     const finalTitle = decodeEntities(blog.metaTitle || blog.title || "Alora Radiance");
     document.title = finalTitle;
     const titleEl = document.getElementById('dynamic-title');

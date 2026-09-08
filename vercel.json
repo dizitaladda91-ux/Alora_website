@@ -98,20 +98,26 @@
       "dest": "backend/uploads/$1"
     },
     {
-      "src": "/blog/(.*)",
-      "dest": "frontend/post"
-    },
-    {
       "src": "/post/(.*)",
-      "dest": "frontend/post"
+      "status": 301,
+      "headers": { "Location": "/blog/$1" }
     },
     {
-      "src": "/blog",
-      "dest": "frontend/Blog"
+      "src": "/post/?",
+      "status": 301,
+      "headers": { "Location": "/blog" }
     },
     {
-      "src": "/Blog",
-      "dest": "frontend/Blog"
+      "src": "/blog/?",
+      "dest": "/frontend/Blog"
+    },
+    {
+      "src": "/Blog/?",
+      "dest": "/frontend/Blog"
+    },
+    {
+      "src": "/blog/(.*)",
+      "dest": "/frontend/post"
     },
     {
       "handle": "filesystem"

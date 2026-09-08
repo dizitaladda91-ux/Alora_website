@@ -181,9 +181,12 @@ app.get('/product/:id', async (req, res) => {
     let html = await fs.promises.readFile(productHtmlPath, 'utf8');
     const cleanTitle = String(product.metaTitle || product.name || 'Alora Radiance').replace(/"/g, '&quot;');
     const cleanDesc = String(product.metaDescription || product.description || 'Luxury skincare formulation.').replace(/"/g, '&quot;');
+    const canonicalUrl = `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id || rawId)}`;
 
     html = html.replace(/<title>.*?<\/title>/i, `<title>${cleanTitle} | Alora Radiance</title>`);
+    html = html.replace(/<meta id="dynamic-meta-desc" name="description" content="[^"]*">/i, `<meta id="dynamic-meta-desc" name="description" content="${cleanDesc}">`);
     html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${cleanDesc}">`);
+    html = html.replace(/<link id="dynamic-canonical" rel="canonical" href="[^"]*" \/>/i, `<link id="dynamic-canonical" rel="canonical" href="${canonicalUrl}" />`);
     
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(html);
@@ -267,8 +270,16 @@ app.get(['/affiliate', '/affiliate-register'], (req, res) => {
   res.redirect(301, 'https://affiliation.aloraradiance.com/register');
 });
 
-// Dynamic SEO Prerender Handler for Blog Articles (Eliminates Google Soft 404 & Guarantees Indexation)
-app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], async (req, res) => {
+// Blog listing page routes
+app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'], (req, res) => {
+  const target = fs.existsSync(path.join(frontendRoot, 'Blog.html'))
+    ? path.join(frontendRoot, 'Blog.html')
+    : path.join(frontendRoot, 'blog.html');
+  res.sendFile(target);
+});
+
+// Dynamic SEO Prerender Handler for Blog Articles (/blog/:slug)
+app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
   const rawSlug = String(req.params.slug || '').trim();
   const postHtmlPath = path.join(frontendRoot, 'post.html');
   if (!rawSlug) {
@@ -296,7 +307,7 @@ app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], async (req, res) => {
     const cleanTitle = String(blog.metaTitle || blog.title || 'Alora Radiance').replace(/"/g, '&quot;');
     const cleanDesc = String(blog.metaDesc || blog.title || 'Explore expert skincare insights and healthy skin guides by Alora Radiance.').replace(/"/g, '&quot;');
     const cleanKeywords = String(blog.keywords || '').replace(/"/g, '&quot;');
-    const canonicalUrl = `https://aloraradiance.com/post/${encodeURIComponent(blog.slug || rawSlug)}`;
+    const canonicalUrl = `https://aloraradiance.com/blog/${encodeURIComponent(blog.slug || rawSlug)}`;
     const coverImg = blog.coverImage || 'https://aloraradiance.com/static/logo2.png';
     const absoluteCover = coverImg.startsWith('http') ? coverImg : `https://aloraradiance.com${coverImg.startsWith('/') ? '' : '/'}${coverImg}`;
 
@@ -325,16 +336,15 @@ app.get(['/post/:slug', '/blog/:slug', '/blogs/:slug'], async (req, res) => {
   }
 });
 
-app.get('/post', (req, res) => {
-  res.redirect(302, '/blog');
+// 301 Permanent Redirects for legacy /post and /post/:slug paths to /blog and /blog/:slug
+app.get('/post/:slug', (req, res) => {
+  const rawSlug = String(req.params.slug || '').trim();
+  if (!rawSlug) return res.redirect(301, '/blog');
+  res.redirect(301, `/blog/${encodeURIComponent(rawSlug)}`);
 });
 
-// Blog listing page routes
-app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'], (req, res) => {
-  const target = fs.existsSync(path.join(frontendRoot, 'Blog.html'))
-    ? path.join(frontendRoot, 'Blog.html')
-    : path.join(frontendRoot, 'blog.html');
-  res.sendFile(target);
+app.get('/post', (req, res) => {
+  res.redirect(301, '/blog');
 });
 
 // Auto-resolve direct page-names like /login, /lead, /privacy, /return-refund

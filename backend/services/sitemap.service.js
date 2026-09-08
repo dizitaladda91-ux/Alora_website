@@ -56,7 +56,7 @@ export async function generateSitemapXml() {
             const slug = String(rawSlug).trim();
             if (slug) {
                 const modDate = p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : (p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : today);
-                xml += `  <url>\n    <loc>${baseUrl}/post/${encodeURIComponent(slug)}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
+                xml += `  <url>\n    <loc>${baseUrl}/blog/${encodeURIComponent(slug)}</loc>\n    <lastmod>${modDate}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>\n`;
             }
         });
     } catch (e) {

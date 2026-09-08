@@ -77,7 +77,7 @@ function renderBlogTable(blogs) {
                 </span>
             </td>
             <td class="px-6 py-4 text-slate-500 font-mono text-xs">
-                <span class="bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700">/post/${blog.slug}</span>
+                <span class="bg-slate-100 px-2.5 py-1 rounded-lg border border-slate-200 text-slate-700">/blog/${blog.slug}</span>
             </td>
             <td class="px-6 py-4 text-right whitespace-nowrap space-x-2">
                 <button data-id="${blogId}" class="edit-btn inline-flex items-center gap-1.5 bg-amber-50 text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-300 px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all shadow-xs">

@@ -4,6 +4,7 @@
 User-agent: *
 Allow: /
 Allow: /blog
+Allow: /blog/
 Allow: /post/
 Allow: /products
 Allow: /product/

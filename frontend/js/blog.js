@@ -132,7 +132,7 @@ async function renderBlogCards() {
 function goToPost(slug) {
     const cleanSlug = String(slug || '').trim();
     if (!cleanSlug) return;
-    const targetPath = `/post/${encodeURIComponent(cleanSlug)}`;
+    const targetPath = `/blog/${encodeURIComponent(cleanSlug)}`;
     const host = window.location.hostname;
     const isLocalLiveHost = host === 'localhost' || host === '127.0.0.1' || host === '::1';
     let resolvedBase = BASE_URL;
