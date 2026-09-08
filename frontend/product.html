@@ -92,7 +92,7 @@
                             <!-- IMPORTANT: source image must be uploaded as 1:1 (square),
                                  e.g. 800x800 or 1200x1200 — object-cover will crop anything
                                  that isn't already square. -->
-                            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                         </div>
 
                         <!-- Left & Right Media Navigation Arrows -->

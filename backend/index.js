@@ -172,7 +172,9 @@ app.get('/product/:id', async (req, res) => {
         { slug: decodeURIComponent(rawId) },
         { _id: rawId.match(/^[0-9a-fA-F]{24}$/) ? rawId : null }
       ].filter(Boolean)
-    }).lean();
+    })
+      .select('slug name metaTitle metaDescription description keywords')
+      .lean();
 
     if (!product) {
       return res.status(404).sendFile(productHtmlPath);
@@ -192,6 +194,9 @@ app.get('/product/:id', async (req, res) => {
     html = html.replace(/<link id="dynamic-canonical" rel="canonical" href="[^"]*" \/>/i, `<link id="dynamic-canonical" rel="canonical" href="${canonicalUrl}" />`);
     
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    // Product detail pages are public and can be safely cached at the CDN.
+    // This avoids a database round-trip for every crawler and repeat visit.
+    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
     return res.status(200).send(html);
   } catch (err) {
     return res.sendFile(productHtmlPath);
