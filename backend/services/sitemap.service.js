@@ -17,7 +17,6 @@ export async function generateSitemapXml() {
         '/certificates',
         '/faq',
         '/track-order',
-        '/account',
         '/privacy-policy',
         '/terms-and-conditions',
         '/return-refund',
@@ -35,7 +34,9 @@ export async function generateSitemapXml() {
 
     // 2. Products
     try {
-        const products = await SimpleProduct.find({}, 'slug name updatedAt').lean();
+        // Include only products that are available to customers. Private or
+        // unavailable products must not be advertised to search crawlers.
+        const products = await SimpleProduct.find({ isAvailable: true }, 'slug name updatedAt').lean();
         products.forEach(prod => {
             const rawSlug = prod.slug || String(prod.name || '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
             const slug = String(rawSlug).trim();

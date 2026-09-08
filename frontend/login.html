@@ -7,21 +7,9 @@
   <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
   <link rel="canonical" href="https://aloraradiance.com/login.html" />
   <meta name="description" content="Log in to your Alora Radiance account to track orders, manage your wishlist, and enjoy exclusive offers.">
-  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="./styles/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700&display=swap">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            serif: ['Fraunces', 'Georgia', 'serif'],
-            sans: ['Manrope', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body class="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#FAF7F2] font-sans">
 
@@ -36,7 +24,7 @@
     <!-- LOGIN FORM -->
     <div id="loginSection">
       <div class="text-center mb-6">
-        <h2 class="text-2xl sm:text-3xl font-serif font-bold text-slate-900 tracking-tight">Login to Alora</h2>
+        <h1 class="text-2xl sm:text-3xl font-serif font-bold text-slate-900 tracking-tight">Login to Alora</h1>
         <p class="text-xs text-slate-500 mt-1">Welcome back! Enter your credentials to access your account.</p>
       </div>
 
@@ -109,7 +97,7 @@
     }
   </script>
 
-  <script src="./js/include.js"></script>
-  <script type="module" src="./js/auth.js"></script>
+  <script src="./js/include.min.js"></script>
+  <script type="module" src="./js/auth.min.js"></script>
 </body>
 </html>

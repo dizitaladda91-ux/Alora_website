@@ -178,6 +178,8 @@ app.get('/product/:id', async (req, res) => {
       return res.status(404).sendFile(productHtmlPath);
     }
 
+    let html = await fs.promises.readFile(productHtmlPath, 'utf8');
+
     const cleanTitle = String(product.metaTitle || product.name || 'Alora Radiance').replace(/"/g, '&quot;');
     const cleanDesc = String(product.metaDescription || product.description || 'Luxury skincare formulation.').replace(/"/g, '&quot;');
     const cleanKeywords = String(product.keywords || `${product.name}, skincare, luxury skincare, Alora Radiance`).replace(/"/g, '&quot;');

@@ -73,6 +73,5 @@ Allow: /
 User-agent: Bytespider
 Allow: /
 
-# Sitemap & LLMs.txt Directives
+# Sitemap
 Sitemap: https://aloraradiance.com/sitemap.xml
-LLMs-txt: https://aloraradiance.com/llms.txt

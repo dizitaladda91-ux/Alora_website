@@ -1768,18 +1768,18 @@
             window.addEventListener('touchstart', loadGSAP, { passive: true, once: true });
         })();
     </script>
-    <script src="./js/include.js" async defer></script>
-    <script type="module" src="./js/navbar-interactions.js"></script>
-    <script type="module" src="./js/main.js"></script>
+    <script src="./js/include.min.js" async defer></script>
+    <script type="module" src="./js/navbar-interactions.min.js"></script>
+    <script type="module" src="./js/main.min.js"></script>
     <script>
         // Defer secondary interaction scripts (cart.js, auth.js, app.js, lead.js) to idle time to eliminate unused JS on initial render
         window.addEventListener('load', () => {
             const loadSecondaryScripts = () => {
-                ['./js/cart.js', './js/auth.js', './js/app.js', './js/lead.js'].forEach(src => {
+                ['./js/cart.min.js', './js/auth.min.js', './js/app.min.js', './js/lead.min.js'].forEach(src => {
                     if (!document.querySelector(`script[src="${src}"]`)) {
                         const s = document.createElement('script');
                         s.src = src;
-                        if (src !== './js/cart.js') {
+                        if (src !== './js/cart.min.js') {
                             s.type = 'module';
                         }
                         document.body.appendChild(s);
