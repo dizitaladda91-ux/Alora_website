@@ -601,7 +601,7 @@ async function loadCartMoreProducts() {
                 </div>` : ''}
                 <div class="w-full flex justify-center items-center h-[130px] sm:h-[160px] overflow-hidden relative my-1">
                     <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain transition-transform duration-500 group-hover:scale-105 filter drop-shadow-sm" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="h-full w-auto object-contain filter drop-shadow-sm" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </a>
                 </div>
                 <div class="flex-1 flex flex-col justify-between space-y-1 mb-2">

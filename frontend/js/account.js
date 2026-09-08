@@ -489,7 +489,7 @@ async function loadBuyAgainItems() {
                 <div>
                     <div class="w-full h-36 bg-white rounded-xl border border-[#ECE4CE] flex items-center justify-center p-2 mb-3 overflow-hidden">
                         <a href="/product/${encodeURIComponent(slug)}" class="w-full h-full flex items-center justify-center">
-                            <img src="${img}" alt="${escapeHtml(p.name)}" class="w-full h-full object-contain hover:scale-105 transition-transform duration-300" onerror="this.src='/static/placeholder.png'">
+                            <img src="${img}" alt="${escapeHtml(p.name)}" class="w-full h-full object-contain" onerror="this.src='/static/placeholder.png'">
                         </a>
                     </div>
                     <h3 class="product-name font-fraunces font-bold text-sm text-slate-900 line-clamp-1 capitalize">${escapeHtml(p.name)}</h3>
@@ -609,7 +609,7 @@ async function loadWishlistTab() {
                 <div>
                     <div class="w-full h-36 bg-white rounded-xl border border-[#ECE4CE] flex items-center justify-center p-2 mb-3 overflow-hidden">
                         <a href="${productLink}" class="w-full h-full flex items-center justify-center">
-                            <img src="${img}" alt="${escapeHtml(name)}" class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300" onerror="this.src='/static/placeholder.png'">
+                            <img src="${img}" alt="${escapeHtml(name)}" class="w-full h-full object-contain" onerror="this.src='/static/placeholder.png'">
                         </a>
                     </div>
                     <h3 class="font-fraunces font-bold text-sm text-slate-900 line-clamp-1 capitalize">${escapeHtml(name)}</h3>
