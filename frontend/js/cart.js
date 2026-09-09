@@ -599,9 +599,9 @@ async function loadCartMoreProducts() {
                         ${discountPercent}% OFF
                     </span>
                 </div>` : ''}
-                <div class="w-full flex justify-center items-center h-[145px] sm:h-[175px] overflow-hidden relative my-1 bg-gradient-to-b from-[#FAF8F5] to-[#F5F2EA] rounded-2xl p-2.5">
+                <div class="w-full flex justify-center items-center h-[145px] sm:h-[175px] overflow-hidden relative my-1 bg-white rounded-2xl p-2.5 border border-stone-200/70 shadow-2xs">
                     <a href="/product/${encodeURIComponent(slug)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-xs" style="mix-blend-mode: multiply; filter: brightness(1.08) contrast(1.06);" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                        <img src="${fullImgUrl}" alt="${product.name}" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='/static/placeholder.png'">
                     </a>
                 </div>
                 <div class="flex-1 flex flex-col justify-between space-y-1 mb-2">

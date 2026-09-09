@@ -145,10 +145,11 @@
         body { overflow-x: hidden; }
         img, video { max-width: 100%; display: block; }
         .product-card-img {
-            mix-blend-mode: multiply;
-            filter: brightness(1.08) contrast(1.06);
-            image-rendering: high-quality;
             image-rendering: -webkit-optimize-contrast;
+            image-rendering: high-quality;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.06));
+            transform: translateZ(0);
+            backface-visibility: hidden;
         }
         .product-card:hover .add-to-cart-btn { transform: translateY(0); opacity: 1; }
         .label-perforation {

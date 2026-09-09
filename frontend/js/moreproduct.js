@@ -171,10 +171,10 @@ function renderProductCatalog(products) {
                     </button>
                 </div>
             </div>
-            <!-- Image Area (Seamless Blend & Full Edges) -->
-            <div class="w-full flex justify-center items-center h-[155px] sm:h-[195px] overflow-hidden relative my-1 sm:my-2 bg-gradient-to-b from-[#FAF8F5] to-[#F5F2EA] rounded-2xl p-2.5">
+            <!-- Image Area (Crisp HD Studio Frame) -->
+            <div class="w-full flex justify-center items-center h-[160px] sm:h-[195px] overflow-hidden relative my-1 sm:my-2 bg-white rounded-2xl p-2.5 border border-stone-200/70 shadow-2xs">
                 <a href="${product.productUrl}" class="block w-full h-full flex items-center justify-center">
-                    <img src="${product.baseImg}" alt="${product.name}" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-xs" style="mix-blend-mode: multiply; filter: brightness(1.08) contrast(1.06);">
+                    <img src="${product.baseImg}" alt="${product.name}" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105">
                 </a>
             </div>
             <!-- Product Info Section -->
