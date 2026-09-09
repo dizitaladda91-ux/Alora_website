@@ -74,7 +74,7 @@ async function loadPartial(selector, url) {
     const el = document.querySelector(selector);
     if (!el) return; 
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, { cache: "no-cache" });
         if (!res.ok) throw new Error(`${url} not found (status ${res.status})`);
         const html = await res.text();
         el.innerHTML = html;

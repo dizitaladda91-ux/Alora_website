@@ -1,40 +1,50 @@
 <style>
-  /* 🌸 Soft Light Saffron (#FCA34D) Styles for Footer */
+  /* ========================================================
+     🎨 FOOTER COLOR CONTROLS (Yaha se direct color change karein)
+     ======================================================== */
+  :root, footer, #footer-placeholder {
+    --footer-accent-color: #FCA34D;       /* 👈 Main Headings, Icons & Border Color */
+    --footer-hover-color: #FFE4CC;        /* 👈 Link Hover Color */
+    --footer-btn-gradient-from: #FDBA74;  /* 👈 Submit Button Gradient Start */
+    --footer-btn-gradient-to: #F59E0B;    /* 👈 Submit Button Gradient End */
+    --footer-btn-text-color: #0E1711;     /* 👈 Submit Button Text Color */
+  }
+
   .footer-custom-heading {
-    color: #FCA34D !important;
+    color: var(--footer-accent-color) !important;
   }
   .footer-custom-icon {
-    color: #FCA34D !important;
+    color: var(--footer-accent-color) !important;
   }
   .footer-custom-link {
     transition: color 0.2s ease;
   }
   .footer-custom-link:hover {
-    color: #FFE4CC !important;
+    color: var(--footer-hover-color) !important;
   }
   .footer-custom-subicon {
-    color: rgba(252, 163, 77, 0.8) !important;
+    color: var(--footer-accent-color) !important;
   }
   .footer-custom-pill {
     background-color: rgba(252, 163, 77, 0.12) !important;
-    border: 1.5px solid rgba(252, 163, 77, 0.45) !important;
-    color: #FCA34D !important;
+    border: 1.5px solid var(--footer-accent-color) !important;
+    color: var(--footer-accent-color) !important;
     transition: all 0.3s ease;
   }
   .footer-custom-pill:hover {
-    background-color: #FCA34D !important;
+    background-color: var(--footer-accent-color) !important;
     color: #0E1711 !important;
-    border-color: #FCA34D !important;
+    border-color: var(--footer-accent-color) !important;
   }
   .footer-custom-btn {
-    background: linear-gradient(135deg, #FDBA74 0%, #F59E0B 100%) !important;
-    color: #0E1711 !important;
+    background: linear-gradient(135deg, var(--footer-btn-gradient-from) 0%, var(--footer-btn-gradient-to) 100%) !important;
+    color: var(--footer-btn-text-color) !important;
     box-shadow: 0 4px 15px rgba(252, 163, 77, 0.35) !important;
-    border: 1px solid rgba(253, 186, 116, 0.4) !important;
+    border: 1px solid var(--footer-btn-gradient-from) !important;
     transition: all 0.3s ease;
   }
   .footer-custom-btn:hover {
-    background: linear-gradient(135deg, #FED7AA 0%, #FBBF24 100%) !important;
+    background: linear-gradient(135deg, var(--footer-hover-color) 0%, var(--footer-btn-gradient-from) 100%) !important;
     box-shadow: 0 6px 20px rgba(252, 163, 77, 0.5) !important;
     transform: translateY(-1px);
   }
@@ -52,7 +62,7 @@
   }
 </style>
 
-<footer style="border-top: 2.5px solid rgba(252, 163, 77, 0.5);" class="bg-gradient-to-b from-[#111C15] via-[#15241C] to-[#0E1711] text-[#F7F2E7] pt-16 pb-8 mt-16 relative overflow-hidden">
+<footer style="border-top: 2.5px solid var(--footer-accent-color);" class="bg-gradient-to-b from-[#111C15] via-[#15241C] to-[#0E1711] text-[#F7F2E7] pt-16 pb-8 mt-16 relative overflow-hidden">
     
     <!-- Ambient Background Lighting -->
     <div class="absolute -top-32 left-1/4 w-96 h-96 bg-[#FCA34D]/10 rounded-full blur-3xl pointer-events-none"></div>
@@ -159,7 +169,7 @@
         </div>
 
         <!-- Column 4: Get in Touch Form -->
-        <div style="border: 1px solid rgba(252, 163, 77, 0.4); background: linear-gradient(180deg, rgba(252, 163, 77, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);" class="backdrop-blur-md p-6 rounded-3xl shadow-2xl">
+        <div style="border: 1px solid var(--footer-accent-color); background: linear-gradient(180deg, rgba(252, 163, 77, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);" class="backdrop-blur-md p-6 rounded-3xl shadow-2xl">
             <h3 class="footer-custom-heading font-fraunces font-bold text-lg mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-envelope-open-text footer-custom-icon text-base"></i> Get in Touch
             </h3>
