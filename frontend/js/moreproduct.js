@@ -161,16 +161,16 @@ function renderProductCatalog(products) {
         const reviewCount = Math.floor(450 + (product.rating || 4.8) * 280);
 
         return `
-        <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-white rounded-3xl p-3 sm:p-3.5 shadow-xs border border-stone-200/90 flex flex-col justify-between">
+        <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-white rounded-3xl shadow-xs border border-stone-200/90 flex flex-col justify-between overflow-hidden">
             <div>
-                <!-- Product Image Container (Dot & Key Style Square Box with Floating Badges) -->
-                <div class="relative w-full aspect-square rounded-2xl overflow-hidden bg-[#FAF7F2] border border-stone-100/80">
+                <!-- Product Image Container (Full Bleed to Top, Left, and Right of Card) -->
+                <div class="relative w-full aspect-square overflow-hidden bg-[#FAF7F2]">
                     <a href="${product.productUrl}" class="w-full h-full block">
                         <img src="${product.baseImg}" alt="${product.name}" class="product-card-img w-full h-full object-cover">
                     </a>
 
                     <!-- Floating Top-Left Badges Over Image -->
-                    <div class="absolute z-10 flex flex-col gap-1 items-start pointer-events-none" style="top: 8px; left: 8px;">
+                    <div class="absolute z-10 flex flex-col gap-1 items-start pointer-events-none" style="top: 10px; left: 10px;">
                         ${product.isBestseller ? `
                             <span class="bg-[#FFF4E5]/95 backdrop-blur-xs text-[#D97706] border border-[#FDE68A] text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1 pointer-events-auto">
                                 BESTSELLER <i class="fa-solid fa-star text-[8px] text-amber-500"></i>
@@ -184,13 +184,13 @@ function renderProductCatalog(products) {
                     </div>
 
                     <!-- Floating Top-Right Wishlist Button Over Image -->
-                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" style="position: absolute; top: 8px; right: 8px; left: auto;" class="wishlist-toggle-btn z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" style="position: absolute; top: 10px; right: 10px; left: auto;" class="wishlist-toggle-btn z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart text-xs sm:text-sm hover:text-rose-600 transition-colors"></i>
                     </button>
                 </div>
 
-                <!-- Product Info Section (Left Aligned Dot & Key Style) -->
-                <div class="pt-2.5 flex flex-col">
+                <!-- Product Info Section (Padded Content Below Image) -->
+                <div class="px-3.5 sm:px-4 pt-3 flex flex-col">
                     <!-- Skin Type / Category Pill -->
                     <span class="self-start inline-block bg-stone-100/90 text-stone-600 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-md mb-1.5">
                         ${skinType}
@@ -220,8 +220,8 @@ function renderProductCatalog(products) {
                 </div>
             </div>
 
-            <!-- Add to Cart Action Bar -->
-            <div class="pt-3">
+            <!-- Add to Cart Action Bar (Padded at Bottom) -->
+            <div class="px-3.5 sm:px-4 pb-3.5 sm:pb-4 pt-3">
                 <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 active:scale-95 cursor-pointer">
                     <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
                 </button>
