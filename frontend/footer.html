@@ -1,17 +1,38 @@
 <style>
   /* ========================================================
-     🎨 FOOTER COLOR CONTROLS (Yaha se direct color change karein)
+     🎨 ALORA RADIANCE FOOTER MASTER PALETTE
      ======================================================== */
   :root, footer, #footer-placeholder {
-    --footer-bg-from: #35492F;            /* 👈 Light Luxury Olive Green (Top) */
-    --footer-bg-via: #445D3B;             /* 👈 Light Luxury Olive Green (Middle) */
-    --footer-bg-to: #2E3E28;              /* 👈 Light Luxury Olive Green (Bottom) */
-    --footer-input-bg: #3C5234;           /* 👈 Contact Form Inputs Background */
-    --footer-accent-color: #fe6f3f;       /* 👈 Main Headings, Icons & Border Color */
-    --footer-hover-color: #FFB39E;        /* 👈 Link Hover Color */
-    --footer-btn-gradient-from: #fe6f3f;  /* 👈 Submit Button Gradient Start */
-    --footer-btn-gradient-to: #fe6f3f;    /* 👈 Submit Button Gradient End */
-    --footer-btn-text-color: #FFFFFF;     /* 👈 Submit Button Text Color */
+    /* Backgrounds */
+    --footer-bg-main: #1E2B1C;                         /* 👈 Deep Forest Green */
+    --footer-card-bg: #25331F;                         /* 👈 Get in Touch Card Green */
+    --footer-input-bg: #1E2B1C;                        /* 👈 Inputs Dark Green */
+
+    /* Accents */
+    --footer-accent-color: #D9713A;                    /* 👈 Primary Terracotta/Orange */
+    --footer-hover-color: #E9A26C;                     /* 👈 Lighter Orange Hover */
+    --footer-gold: #C9A227;                            /* 👈 Gold Hairline & Checkmarks */
+
+    /* Texts */
+    --footer-text-primary: #EFEAD9;                    /* 👈 Ivory / Cream */
+    --footer-text-muted: #A9AE9C;                      /* 👈 Secondary / Muted */
+    --footer-text-extra-muted: #8E9481;                /* 👈 Copyright Line */
+
+    /* Borders (With Opacity) */
+    --footer-border-gold: rgba(201, 162, 39, 0.4);     /* 👈 Gold Border (~40% opacity) */
+    --footer-border-orange: rgba(217, 113, 58, 0.55);  /* 👈 Orange Border (~55% opacity) */
+    --footer-divider-gold: rgba(201, 162, 39, 0.25);   /* 👈 Gold Hairline Dividers */
+
+    /* Buttons */
+    --footer-btn-bg: #D9713A;
+    --footer-btn-hover: #E9A26C;
+    --footer-btn-text: #FFFFFF;
+  }
+
+  footer {
+    background-color: var(--footer-bg-main) !important;
+    color: var(--footer-text-primary) !important;
+    border-top: 2.5px solid var(--footer-accent-color) !important;
   }
 
   .footer-custom-heading {
@@ -20,7 +41,11 @@
   .footer-custom-icon {
     color: var(--footer-accent-color) !important;
   }
+  .footer-gold-icon {
+    color: var(--footer-gold) !important;
+  }
   .footer-custom-link {
+    color: var(--footer-text-muted) !important;
     transition: color 0.2s ease;
   }
   .footer-custom-link:hover {
@@ -30,8 +55,8 @@
     color: var(--footer-accent-color) !important;
   }
   .footer-custom-pill {
-    background-color: rgba(255, 255, 255, 0.08) !important;
-    border: 1.5px solid var(--footer-accent-color) !important;
+    background-color: rgba(255, 255, 255, 0.06) !important;
+    border: 1.5px solid var(--footer-border-orange) !important;
     color: #ffffff !important;
     transition: all 0.3s ease;
   }
@@ -47,15 +72,15 @@
     color: #ffffff !important;
   }
   .footer-custom-btn {
-    background: linear-gradient(135deg, var(--footer-btn-gradient-from) 0%, var(--footer-btn-gradient-to) 100%) !important;
-    color: var(--footer-btn-text-color) !important;
-    box-shadow: 0 4px 15px rgba(252, 163, 77, 0.35) !important;
-    border: 1px solid var(--footer-btn-gradient-from) !important;
+    background: var(--footer-btn-bg) !important;
+    color: var(--footer-btn-text) !important;
+    box-shadow: 0 4px 15px rgba(217, 113, 58, 0.35) !important;
+    border: 1px solid var(--footer-border-orange) !important;
     transition: all 0.3s ease;
   }
   .footer-custom-btn:hover {
-    background: linear-gradient(135deg, var(--footer-hover-color) 0%, var(--footer-btn-gradient-from) 100%) !important;
-    box-shadow: 0 6px 20px rgba(252, 163, 77, 0.5) !important;
+    background: var(--footer-btn-hover) !important;
+    box-shadow: 0 6px 20px rgba(233, 162, 108, 0.5) !important;
     transform: translateY(-1px);
   }
 
@@ -66,26 +91,26 @@
   #contactForm textarea:-webkit-autofill,
   #contactForm textarea:-webkit-autofill:hover,
   #contactForm textarea:-webkit-autofill:focus {
-    -webkit-text-fill-color: #F7F2E7 !important;
-    -webkit-box-shadow: 0 0 0px 1000px #3C5234 inset !important;
+    -webkit-text-fill-color: var(--footer-text-primary) !important;
+    -webkit-box-shadow: 0 0 0px 1000px var(--footer-input-bg) inset !important;
     transition: background-color 5000s ease-in-out 0s;
   }
 </style>
 
-<footer style="border-top: 2.5px solid var(--footer-accent-color); background: linear-gradient(180deg, var(--footer-bg-from) 0%, var(--footer-bg-via) 50%, var(--footer-bg-to) 100%);" class="text-[#F7F2E7] pt-16 pb-8 mt-16 relative overflow-hidden">
+<footer style="border-top: 2.5px solid var(--footer-accent-color); background-color: var(--footer-bg-main);" class="text-[#EFEAD9] pt-16 pb-8 mt-16 relative overflow-hidden">
     
     <!-- Ambient Background Lighting -->
-    <div class="absolute -top-32 left-1/4 w-96 h-96 bg-[#FCA34D]/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-[#7B8E5E]/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -top-32 left-1/4 w-96 h-96 bg-[#D9713A]/10 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-[#C9A227]/10 rounded-full blur-3xl pointer-events-none"></div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10 relative z-10">
+    <div style="border-bottom: 1px solid var(--footer-divider-gold);" class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 relative z-10">
         
         <!-- Column 1: Company Overview -->
         <div>
             <h3 class="footer-custom-heading font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto flex items-center gap-2">
                 <i class="fa-solid fa-leaf footer-custom-icon text-xs"></i> Company Overview
             </h3>
-            <ul class="space-y-3 text-sm text-slate-300">
+            <ul class="space-y-3 text-sm">
                 <li><a href="/about" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] footer-custom-subicon"></i> About Our Brand</a></li>
                 <li><a href="/privacy-policy" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] footer-custom-subicon"></i> Privacy Policy</a></li>
                 <li><a href="/terms-and-conditions" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-chevron-right text-[10px] footer-custom-subicon"></i> Terms &amp; Conditions</a></li>
@@ -99,7 +124,7 @@
             <h3 class="footer-custom-heading font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto flex items-center gap-2">
                 <i class="fa-solid fa-compass footer-custom-icon text-xs"></i> Quick Links
             </h3>
-            <ul class="space-y-3 text-sm text-slate-300 mb-6">
+            <ul class="space-y-3 text-sm mb-6">
                 <li><a href="/track-order" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-truck-fast footer-custom-icon text-xs"></i> Track My Order</a></li>
                 <li><a href="/account" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-user footer-custom-icon text-xs"></i> My Account &amp; Orders</a></li>
                 <li><a href="https://affiliation.aloraradiance.com/register" target="_blank" rel="noopener noreferrer" class="footer-custom-link inline-flex items-center gap-2"><i class="fa-solid fa-handshake footer-custom-icon text-xs"></i> Become an Affiliate</a></li>
@@ -129,30 +154,30 @@
             <h3 class="footer-custom-heading font-bold text-xs uppercase tracking-[0.2em] mb-5 font-roboto flex items-center gap-2">
                 <i class="fa-solid fa-award footer-custom-icon text-xs"></i> Quality &amp; Certifications
             </h3>
-            <ul class="space-y-3 text-sm text-slate-300">
+            <ul class="space-y-3 text-sm">
                 <li>
                     <a href="/certificates#govt-license" class="footer-custom-link flex items-center gap-2.5">
-                        <i class="fa-solid fa-square-check footer-custom-icon text-xs"></i> Govt Cosmetic License
+                        <i class="fa-solid fa-square-check footer-gold-icon text-xs"></i> Govt Cosmetic License
                     </a>
                 </li>
                 <li>
                     <a href="/certificates#patch-test" class="footer-custom-link flex items-center gap-2.5">
-                        <i class="fa-solid fa-square-check footer-custom-icon text-xs"></i> Patch Test Declaration
+                        <i class="fa-solid fa-square-check footer-gold-icon text-xs"></i> Patch Test Declaration
                     </a>
                 </li>
                 <li>
                     <a href="/certificates#facewash-cert" class="footer-custom-link flex items-center gap-2.5">
-                        <i class="fa-solid fa-square-check footer-custom-icon text-xs"></i> Face Wash Clinical Test
+                        <i class="fa-solid fa-square-check footer-gold-icon text-xs"></i> Face Wash Clinical Test
                     </a>
                 </li>
                 <li>
                     <a href="/certificates#serum-cert" class="footer-custom-link flex items-center gap-2.5">
-                        <i class="fa-solid fa-square-check footer-custom-icon text-xs"></i> Face Serum Clinical Test
+                        <i class="fa-solid fa-square-check footer-gold-icon text-xs"></i> Face Serum Clinical Test
                     </a>
                 </li>
                 <li>
                     <a href="/certificates#bodylotion-cert" class="footer-custom-link flex items-center gap-2.5">
-                        <i class="fa-solid fa-square-check footer-custom-icon text-xs"></i> Body Lotion Clinical Test
+                        <i class="fa-solid fa-square-check footer-gold-icon text-xs"></i> Body Lotion Clinical Test
                     </a>
                 </li>
                 <li class="pt-2">
@@ -163,7 +188,7 @@
             </ul>
 
             <!-- Also Available On (Marketplaces) -->
-            <div class="mt-6 pt-5 border-t border-white/10">
+            <div style="border-top: 1px solid var(--footer-divider-gold);" class="mt-6 pt-5">
                 <h4 class="footer-custom-heading font-bold text-xs uppercase tracking-[0.2em] mb-3 font-roboto flex items-center gap-2">
                     <i class="fa-solid fa-bag-shopping footer-custom-icon text-xs"></i> Also Available On
                 </h4>
@@ -179,22 +204,22 @@
         </div>
 
         <!-- Column 4: Get in Touch Form -->
-        <div style="border: 1px solid var(--footer-accent-color); background: linear-gradient(180deg, rgba(252, 163, 77, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%);" class="backdrop-blur-md p-6 rounded-3xl shadow-2xl">
+        <div style="border: 1px solid var(--footer-border-gold); background-color: var(--footer-card-bg);" class="backdrop-blur-md p-6 rounded-3xl shadow-2xl">
             <h3 class="footer-custom-heading font-fraunces font-bold text-lg mb-4 flex items-center gap-2">
                 <i class="fa-solid fa-envelope-open-text footer-custom-icon text-base"></i> Get in Touch
             </h3>
             <form id="contactForm" class="space-y-3.5">
                 <div>
-                    <label for="name" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Name</label>
-                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner">
+                    <label for="name" style="color: var(--footer-text-muted);" class="block text-[10px] uppercase font-bold tracking-widest mb-1">Name</label>
+                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" style="background-color: var(--footer-input-bg); border: 1px solid var(--footer-border-gold); color: var(--footer-text-primary);" class="w-full placeholder-[#A9AE9C]/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] shadow-inner">
                 </div>
                 <div>
-                    <label for="email" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Email</label>
-                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner">
+                    <label for="email" style="color: var(--footer-text-muted);" class="block text-[10px] uppercase font-bold tracking-widest mb-1">Email</label>
+                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" style="background-color: var(--footer-input-bg); border: 1px solid var(--footer-border-gold); color: var(--footer-text-primary);" class="w-full placeholder-[#A9AE9C]/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] shadow-inner">
                 </div>
                 <div>
-                    <label for="message" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Message</label>
-                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner resize-none"></textarea>
+                    <label for="message" style="color: var(--footer-text-muted);" class="block text-[10px] uppercase font-bold tracking-widest mb-1">Message</label>
+                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." style="background-color: var(--footer-input-bg); border: 1px solid var(--footer-border-gold); color: var(--footer-text-primary);" class="w-full placeholder-[#A9AE9C]/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] shadow-inner resize-none"></textarea>
                 </div>
                 <button type="submit" aria-label="Submit Contact Message" class="footer-custom-btn w-full font-bold py-3 rounded-xl text-xs transition-all duration-300 tracking-widest uppercase cursor-pointer mt-2">
                     Submit Message
@@ -205,7 +230,7 @@
     </div>
 
     <!-- Copyright Footer Bar -->
-    <div class="text-center pt-8 text-xs text-slate-400 font-medium relative z-10 flex flex-col sm:flex-row items-center justify-center gap-2">
+    <div style="color: var(--footer-text-extra-muted);" class="text-center pt-8 text-xs font-medium relative z-10 flex flex-col sm:flex-row items-center justify-center gap-2">
         <span>Copyright © 2026 Alora Radiance. All Rights Reserved.</span>
         <span class="hidden sm:inline footer-custom-icon">•</span>
         <a href="/sitemap" class="footer-custom-link">Sitemap</a>
