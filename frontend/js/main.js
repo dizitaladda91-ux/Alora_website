@@ -382,13 +382,13 @@ async function loadSliderProducts() {
                         </a>
 
                         <!-- Floating Top-Left Badges Over Image -->
-                        <div class="absolute top-2 left-2 z-10 flex flex-col gap-1 items-start">
+                        <div class="absolute z-10 flex flex-col gap-1 items-start pointer-events-none" style="top: 8px; left: 8px;">
                             ${product.isBestseller ? `
-                                <span class="bg-[#FFF4E5]/95 backdrop-blur-xs text-[#D97706] border border-[#FDE68A] text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1">
+                                <span class="bg-[#FFF4E5]/95 backdrop-blur-xs text-[#D97706] border border-[#FDE68A] text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1 pointer-events-auto">
                                     BESTSELLER <i class="fa-solid fa-star text-[8px] text-amber-500"></i>
                                 </span>
                             ` : `
-                                <span class="bg-white/95 backdrop-blur-xs text-slate-900 border border-slate-200 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs">
+                                <span class="bg-white/95 backdrop-blur-xs text-slate-900 border border-slate-200 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs pointer-events-auto">
                                     NEW
                                 </span>
                             `}
@@ -396,7 +396,7 @@ async function loadSliderProducts() {
                         </div>
 
                         <!-- Floating Top-Right Wishlist Button Over Image -->
-                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn absolute top-2 right-2 z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" style="position: absolute; top: 8px; right: 8px; left: auto;" class="wishlist-toggle-btn z-10 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
                             <i class="fa-regular fa-heart text-xs sm:text-sm hover:text-rose-600 transition-colors"></i>
                         </button>
                     </div>
