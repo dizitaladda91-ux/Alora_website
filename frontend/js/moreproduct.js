@@ -158,27 +158,25 @@ function renderProductCatalog(products) {
             </div>
         `;
         return `
-        <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-xl hover:-translate-y-1 border border-amber-900/15 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
-            <!-- Top Badges Bar -->
-            <div class="flex items-center justify-between z-10 mb-1.5 min-h-[26px]">
-                <span class="inline-flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
-                    ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
-                </span>
-                <div class="flex items-center gap-1.5">
+        <div data-product-id="${product.id}" class="animate-fade-in relative w-full flex-shrink-0 product-card bg-white rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 border border-stone-200/80 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
+            <!-- Image Area (Full-Bleed Edge-to-Edge) -->
+            <div class="w-full h-[180px] sm:h-[210px] bg-[#FAF8F5] relative overflow-hidden flex items-center justify-center border-b border-stone-100">
+                <!-- Floating Badges Bar -->
+                <div class="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
+                    <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
+                        ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
+                    </span>
                     ${discountBadgeHTML}
-                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
-                        <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
-                    </button>
                 </div>
-            </div>
-            <!-- Image Area (Crisp HD Studio Frame) -->
-            <div class="w-full flex justify-center items-center h-[160px] sm:h-[195px] overflow-hidden relative my-1 sm:my-2 bg-white rounded-2xl p-2.5 border border-stone-200/70 shadow-2xs">
-                <a href="${product.productUrl}" class="block w-full h-full flex items-center justify-center">
+                <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product.id}', this, event)" class="wishlist-toggle-btn absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                </button>
+                <a href="${product.productUrl}" class="w-full h-full flex items-center justify-center p-3">
                     <img src="${product.baseImg}" alt="${product.name}" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105">
                 </a>
             </div>
             <!-- Product Info Section -->
-            <div class="flex-1 flex flex-col justify-between space-y-1.5 mb-2.5">
+            <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-1.5">
                 <div>
                     <h3 class="text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1 product-name">${product.name}</h3>
                     <p class="product-desc-text text-[10px] sm:text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[1.8rem] sm:min-h-[2.2rem] leading-tight sm:leading-relaxed">
@@ -199,12 +197,12 @@ function renderProductCatalog(products) {
                     <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg"><span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${initialSize.price}</span>
                     <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialSize.mrp ? '<span style="font-family:Arial,\'Noto Sans\',sans-serif">&#8377;</span>' + initialSize.mrp : ''}</span>
                 </div>
-            </div>
-            <!-- Add to Cart Action Bar -->
-            <div class="pt-1">
-                <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
-                    <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
-                </button>
+                <!-- Add to Cart Action Bar -->
+                <div class="pt-1">
+                    <button type="button" onclick="handleCartButtonClick('${product.id}', this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
+                        <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                    </button>
+                </div>
             </div>
         </div>`;
     }).join('');
