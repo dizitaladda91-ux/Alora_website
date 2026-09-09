@@ -372,26 +372,27 @@ async function loadSliderProducts() {
             const isUserLoggedIn = Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
 
             return `
-            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-2xl sm:rounded-3xl shadow-sm hover:shadow-xl hover:-translate-y-1 border border-stone-200/80 flex flex-col justify-between transition-all duration-300 group overflow-hidden">
-                <!-- Product Image Area (Full-Bleed Edge-to-Edge) -->
-                <div class="w-full h-[180px] sm:h-[210px] bg-[#FAF8F5] relative overflow-hidden flex items-center justify-center border-b border-stone-100">
-                    <!-- Floating Badges Bar -->
-                    <div class="absolute top-2.5 left-2.5 z-10 flex items-center gap-1.5">
-                        <span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
+            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-lg hover:-translate-y-1 border border-stone-200/80 flex flex-col justify-between transition-all duration-300 group">
+                <!-- Top Badges & Wishlist Bar (Clean, No Overlap) -->
+                <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                             ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                         </span>
                         ${discountBadgeHTML}
                     </div>
-                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn absolute top-2.5 right-2.5 z-10 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-stone-50 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
                         <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
                     </button>
-                    <!-- Product Image -->
-                    <a href="${getProductUrl(product)}" class="w-full h-full flex items-center justify-center p-3">
-                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105">
+                </div>
+                <!-- Product Image Area (Simple, Clean, Centered) -->
+                <div class="w-full h-[155px] sm:h-[185px] flex items-center justify-center my-1 relative">
+                    <a href="${getProductUrl(product)}" class="w-full h-full flex items-center justify-center">
+                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105">
                     </a>
                 </div>
                 <!-- Product Info Section -->
-                <div class="p-3 sm:p-4 flex-1 flex flex-col justify-between space-y-1.5">
+                <div class="flex-1 flex flex-col justify-between space-y-1.5 my-1">
                     <div>
                         <h3 class="text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1">${product.name}</h3>
                         <p class="text-[10px] sm:text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[1.8rem] sm:min-h-[2.2rem] leading-tight sm:leading-relaxed">
@@ -412,12 +413,12 @@ async function loadSliderProducts() {
                         <span class="product-price font-fraunces font-bold text-[#8B4513] text-base sm:text-lg"><span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${initialPrice}</span>
                         <span class="product-mrp text-[11px] sm:text-xs line-through text-slate-400 font-mono">${initialComparePrice ? '<span style="font-family:Arial,\'Noto Sans\',sans-serif">&#8377;</span>' + initialComparePrice : ''}</span>
                     </div>
-                    <!-- Add to Cart Action Bar -->
-                    <div class="pt-1">
-                        <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95">
-                            <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
-                        </button>
-                    </div>
+                </div>
+                <!-- Add to Cart Action Bar -->
+                <div class="pt-1">
+                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                    </button>
                 </div>
             </div>
             `;
