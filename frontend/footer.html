@@ -3,6 +3,10 @@
      🎨 FOOTER COLOR CONTROLS (Yaha se direct color change karein)
      ======================================================== */
   :root, footer, #footer-placeholder {
+    --footer-bg-from: #1E2B1A;            /* 👈 Luxury Olive Green (Top) */
+    --footer-bg-via: #273922;             /* 👈 Luxury Olive Green (Middle) */
+    --footer-bg-to: #172214;              /* 👈 Luxury Olive Green (Bottom) */
+    --footer-input-bg: #2C3F27;           /* 👈 Contact Form Inputs Background */
     --footer-accent-color: #fe6f3f;       /* 👈 Main Headings, Icons & Border Color */
     --footer-hover-color: #FFB39E;        /* 👈 Link Hover Color */
     --footer-btn-gradient-from: #fe6f3f;  /* 👈 Submit Button Gradient Start */
@@ -55,7 +59,7 @@
     transform: translateY(-1px);
   }
 
-  /* Fix browser autofill white background in footer form */
+  /* Fix browser autofill background in footer form */
   #contactForm input:-webkit-autofill,
   #contactForm input:-webkit-autofill:hover, 
   #contactForm input:-webkit-autofill:focus,
@@ -63,16 +67,16 @@
   #contactForm textarea:-webkit-autofill:hover,
   #contactForm textarea:-webkit-autofill:focus {
     -webkit-text-fill-color: #F7F2E7 !important;
-    -webkit-box-shadow: 0 0 0px 1000px #1A2E22 inset !important;
+    -webkit-box-shadow: 0 0 0px 1000px #2C3F27 inset !important;
     transition: background-color 5000s ease-in-out 0s;
   }
 </style>
 
-<footer style="border-top: 2.5px solid var(--footer-accent-color);" class="bg-gradient-to-b from-[#111C15] via-[#15241C] to-[#0E1711] text-[#F7F2E7] pt-16 pb-8 mt-16 relative overflow-hidden">
+<footer style="border-top: 2.5px solid var(--footer-accent-color); background: linear-gradient(180deg, var(--footer-bg-from) 0%, var(--footer-bg-via) 50%, var(--footer-bg-to) 100%);" class="text-[#F7F2E7] pt-16 pb-8 mt-16 relative overflow-hidden">
     
     <!-- Ambient Background Lighting -->
     <div class="absolute -top-32 left-1/4 w-96 h-96 bg-[#FCA34D]/10 rounded-full blur-3xl pointer-events-none"></div>
-    <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl pointer-events-none"></div>
+    <div class="absolute -bottom-32 right-1/4 w-96 h-96 bg-[#7B8E5E]/10 rounded-full blur-3xl pointer-events-none"></div>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 pb-12 border-b border-white/10 relative z-10">
         
@@ -182,15 +186,15 @@
             <form id="contactForm" class="space-y-3.5">
                 <div>
                     <label for="name" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Name</label>
-                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FCA34D] border border-amber-900/40 shadow-inner">
+                    <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner">
                 </div>
                 <div>
                     <label for="email" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Email</label>
-                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FCA34D] border border-amber-900/40 shadow-inner">
+                    <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner">
                 </div>
                 <div>
                     <label for="message" class="block text-[10px] uppercase font-bold tracking-widest text-slate-300 mb-1">Message</label>
-                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." class="w-full bg-[#1A2E22] text-[#F7F2E7] placeholder-slate-400 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#FCA34D] border border-amber-900/40 shadow-inner resize-none"></textarea>
+                    <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." style="background-color: var(--footer-input-bg);" class="w-full text-[#F7F2E7] placeholder-slate-300/60 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[var(--footer-accent-color)] border border-white/10 shadow-inner resize-none"></textarea>
                 </div>
                 <button type="submit" aria-label="Submit Contact Message" class="footer-custom-btn w-full font-bold py-3 rounded-xl text-xs transition-all duration-300 tracking-widest uppercase cursor-pointer mt-2">
                     Submit Message
