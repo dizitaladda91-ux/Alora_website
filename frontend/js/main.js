@@ -386,9 +386,9 @@ async function loadSliderProducts() {
                     </button>
                 </div>
                 <!-- Product Image Area (Full Edge-to-Edge Horizontally Side-to-Side) -->
-                <div class="-mx-3 sm:-mx-4 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] h-[175px] sm:h-[205px] flex items-center justify-center my-1 relative overflow-hidden bg-white">
-                    <a href="${getProductUrl(product)}" class="w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img w-full h-full object-contain">
+                <div class="-mx-3 sm:-mx-4 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] aspect-square flex items-center justify-center my-1 relative overflow-hidden bg-white">
+                    <a href="${getProductUrl(product)}" class="w-full h-full block">
+                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img w-full h-full object-cover">
                     </a>
                 </div>
                 <!-- Product Info Section -->
