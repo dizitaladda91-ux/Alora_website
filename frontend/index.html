@@ -144,6 +144,12 @@
         html { scroll-behavior: smooth; }
         body { overflow-x: hidden; }
         img, video { max-width: 100%; display: block; }
+        .product-card-img {
+            mix-blend-mode: multiply;
+            filter: brightness(1.08) contrast(1.06);
+            image-rendering: high-quality;
+            image-rendering: -webkit-optimize-contrast;
+        }
         .product-card:hover .add-to-cart-btn { transform: translateY(0); opacity: 1; }
         .label-perforation {
             background-image: radial-gradient(circle, #E4DCC9 1.5px, transparent 1.5px);

@@ -386,9 +386,9 @@ async function loadSliderProducts() {
                     </div>
                 </div>
                 <!-- Product Image Area (Seamless Blend & Full Edges) -->
-                <div class="w-full flex justify-center items-center h-[140px] sm:h-[180px] overflow-hidden relative my-1 sm:my-2 bg-[#F8F5EE]/60 rounded-xl sm:rounded-2xl p-2 border border-[#ECE4CE]/40">
+                <div class="w-full flex justify-center items-center h-[155px] sm:h-[195px] overflow-hidden relative my-1 sm:my-2 bg-gradient-to-b from-[#FAF8F5] to-[#F5F2EA] rounded-2xl p-2.5">
                     <a href="${getProductUrl(product)}" class="block w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" style="mix-blend-mode: multiply;" class="h-full w-full object-contain mix-blend-multiply transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm">
+                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img h-full w-full object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-xs" style="mix-blend-mode: multiply; filter: brightness(1.08) contrast(1.06);">
                     </a>
                 </div>
                 <!-- Product Info Section -->
