@@ -101,7 +101,7 @@
         }
         msgDiv.innerHTML = `
             <div class="w-7 h-7 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
-                ✨
+                <i class="fa-solid fa-spa text-xs"></i>
             </div>
             <div class="bg-white border border-amber-900/10 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] text-xs sm:text-sm text-slate-800 leading-relaxed">
                 <div>${htmlContent}</div>
@@ -119,7 +119,7 @@
         typingDiv.className = "flex items-start space-x-2.5 animate-pulse";
         typingDiv.innerHTML = `
             <div class="w-7 h-7 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
-                ✨
+                <i class="fa-solid fa-spa text-xs"></i>
             </div>
             <div class="bg-white border border-amber-900/10 px-3.5 py-2.5 rounded-2xl rounded-tl-none shadow-sm flex items-center space-x-1.5 text-slate-400">
                 <span class="w-1.5 h-1.5 bg-amber-700 rounded-full animate-bounce"></span>
@@ -187,7 +187,7 @@
         container.innerHTML = `
             <div class="flex items-start space-x-2.5">
                 <div class="w-7 h-7 rounded-full bg-[#8B4513] text-white flex items-center justify-center text-xs flex-shrink-0 mt-0.5 shadow-sm">
-                    ✨
+                    <i class="fa-solid fa-spa text-xs"></i>
                 </div>
                 <div class="bg-white border border-amber-900/10 p-3 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] space-y-2">
                     <p class="text-slate-700 leading-relaxed">
