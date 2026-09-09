@@ -372,29 +372,29 @@ async function loadSliderProducts() {
             const isUserLoggedIn = Boolean(localStorage.getItem("user") || sessionStorage.getItem("user"));
 
             return `
-            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm hover:shadow-lg hover:-translate-y-1 border border-stone-200/80 flex flex-col justify-between transition-all duration-300 group">
-                <!-- Top Badges & Wishlist Bar (Clean, No Overlap) -->
-                <div class="flex items-center justify-between min-h-[26px] mb-1.5">
+            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 shadow-sm border border-stone-200/80 flex flex-col justify-between overflow-hidden">
+                <!-- Top Badges & Wishlist Bar (Clean, Inset with Padding) -->
+                <div class="flex items-center justify-between min-h-[26px] mb-1">
                     <div class="flex items-center gap-1.5 flex-wrap">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full ${product.isBestseller ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold' : 'bg-slate-900 text-white font-bold'} text-[9px] sm:text-[10px] uppercase tracking-wider shadow-xs">
                             ${product.isBestseller ? 'BESTSELLER' : 'NEW'}
                         </span>
                         ${discountBadgeHTML}
                     </div>
-                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-stone-50 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish" title="Add to Wishlist" aria-label="Add to Wishlist">
-                        <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                    <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" class="wishlist-toggle-btn w-7 h-7 rounded-full bg-stone-50 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center cursor-pointer" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <i class="fa-regular fa-heart text-xs text-stone-400 hover:text-rose-600 transition-colors"></i>
                     </button>
                 </div>
-                <!-- Product Image Area (Simple, Clean, Centered) -->
-                <div class="w-full h-[155px] sm:h-[185px] flex items-center justify-center my-1 relative">
+                <!-- Product Image Area (Full Edge-to-Edge Horizontally Side-to-Side) -->
+                <div class="-mx-3 sm:-mx-4 w-[calc(100%+1.5rem)] sm:w-[calc(100%+2rem)] h-[175px] sm:h-[205px] flex items-center justify-center my-1 relative overflow-hidden bg-white">
                     <a href="${getProductUrl(product)}" class="w-full h-full flex items-center justify-center">
-                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105">
+                        <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img w-full h-full object-contain">
                     </a>
                 </div>
                 <!-- Product Info Section -->
                 <div class="flex-1 flex flex-col justify-between space-y-1.5 my-1">
                     <div>
-                        <h3 class="text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug group-hover:text-[#8B4513] transition-colors capitalize line-clamp-1">${product.name}</h3>
+                        <h3 class="text-xs sm:text-sm font-fraunces font-bold text-slate-900 text-center leading-snug capitalize line-clamp-1">${product.name}</h3>
                         <p class="text-[10px] sm:text-[11px] text-slate-600 text-center font-sans mt-0.5 line-clamp-2 min-h-[1.8rem] sm:min-h-[2.2rem] leading-tight sm:leading-relaxed">
                             ${product.description || 'Dermatologist-tested luxury formulation.'}
                         </p>
@@ -416,7 +416,7 @@ async function loadSliderProducts() {
                 </div>
                 <!-- Add to Cart Action Bar -->
                 <div class="pt-1">
-                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 transform active:scale-95 cursor-pointer">
+                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-[11px] sm:text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 active:scale-95 cursor-pointer">
                         <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
                     </button>
                 </div>
