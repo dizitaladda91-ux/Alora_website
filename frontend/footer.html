@@ -5,71 +5,56 @@
   :root, footer, #footer-placeholder {
     --footer-bg-cream: #FAF7EE;
     --footer-card-bg: #FFFFFF;
-    --footer-heading-color: #1A2618;
+    --footer-heading-color: #D9713A;
+    --footer-subheading-color: #1A2618;
     --footer-accent-color: #D9713A;
+    --footer-hover-color: #E8652A;
     --footer-gold-color: #C9A227;
-    --footer-text-primary: #2C3527;
-    --footer-text-muted: #5A6553;
-    --footer-text-subtle: #7E8B76;
-    --footer-border-subtle: #E8E2D2;
-    --footer-border-hover: #D9713A;
+    --footer-text-primary: #1F291E;
+    --footer-text-muted: #3D4A3A;
+    --footer-border-subtle: #E5DFCE;
+    --footer-border-card: #DFD7C2;
   }
 
   footer.alora-cream-footer {
     background-color: var(--footer-bg-cream) !important;
     color: var(--footer-text-primary) !important;
-    border-top: 1.5px solid var(--footer-border-subtle) !important;
+    border-top: 2px solid #E5DFCE !important;
     position: relative;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  .footer-heading {
-    font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-    color: var(--footer-heading-color) !important;
+  .footer-custom-heading {
+    color: #D9713A !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
     font-weight: 800;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-size: 0.8rem;
-    position: relative;
-    display: inline-block;
+    font-size: 0.78rem;
   }
 
-  .footer-heading::after {
-    content: '';
-    position: absolute;
-    bottom: -6px;
-    left: 0;
-    width: 24px;
-    height: 2px;
-    background: linear-gradient(90deg, #D9713A, #C9A227);
-    border-radius: 2px;
-  }
-
-  .footer-link-item {
-    color: var(--footer-text-muted) !important;
-    font-size: 0.85rem;
-    font-weight: 500;
-    transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  .footer-custom-link {
+    color: #2D3A2A !important;
+    font-size: 0.86rem;
+    font-weight: 600;
+    transition: all 0.22s ease;
     display: inline-flex;
     align-items: center;
-    gap: 0.35rem;
   }
 
-  .footer-link-item:hover {
-    color: var(--footer-accent-color) !important;
-    transform: translateX(4px);
+  .footer-custom-link:hover {
+    color: #D9713A !important;
+    transform: translateX(3px);
   }
 
-  .footer-link-item i {
-    font-size: 0.6rem;
-    opacity: 0;
-    transform: translateX(-4px);
-    transition: all 0.2s ease;
-    color: var(--footer-accent-color);
+  .footer-gold-icon {
+    color: #C9A227 !important;
+    font-size: 0.85rem;
   }
 
-  .footer-link-item:hover i {
-    opacity: 1;
-    transform: translateX(0);
+  .footer-accent-icon {
+    color: #D9713A !important;
+    font-size: 0.85rem;
   }
 
   /* Social Icons */
@@ -81,174 +66,307 @@
     height: 36px;
     border-radius: 50%;
     color: #ffffff !important;
-    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
   }
 
   .footer-social-btn:hover {
     transform: translateY(-3px) scale(1.08);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.16);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
   }
 
-  /* Marketplace pills */
-  .marketplace-pill {
+  /* Pills & Buttons */
+  .footer-action-pill {
     background-color: #FFFFFF;
-    border: 1px solid var(--footer-border-subtle);
-    color: #2C3527;
-    font-size: 0.75rem;
+    border: 1.5px solid #D5CCB7;
+    color: #1A2618 !important;
+    font-size: 0.78rem;
     font-weight: 700;
-    padding: 0.4rem 0.75rem;
-    border-radius: 0.65rem;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
     transition: all 0.25s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
-  .marketplace-pill:hover {
-    background-color: #FFFFFF;
-    border-color: var(--footer-accent-color);
-    color: var(--footer-accent-color);
+  .footer-action-pill:hover {
+    background-color: #D9713A;
+    border-color: #D9713A;
+    color: #FFFFFF !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(217, 113, 58, 0.15);
+    box-shadow: 0 4px 12px rgba(217, 113, 58, 0.25);
   }
 
-  /* Floating Scroll to top button */
-  #footer-scroll-top-btn {
-    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
-    background-color: #FFFFFF;
-    border: 1px solid var(--footer-border-subtle);
-    color: var(--footer-heading-color);
+  .footer-action-pill:hover i {
+    color: #FFFFFF !important;
   }
 
-  #footer-scroll-top-btn:hover {
-    transform: translateY(-4px);
-    background-color: var(--footer-accent-color);
-    border-color: var(--footer-accent-color);
-    color: #FFFFFF;
-    box-shadow: 0 8px 18px rgba(217, 113, 58, 0.3);
+  .footer-submit-btn {
+    background: linear-gradient(135deg, #D9713A 0%, #E8652A 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 14px rgba(217, 113, 58, 0.35) !important;
+    transition: all 0.3s ease;
+  }
+
+  .footer-submit-btn:hover {
+    background: linear-gradient(135deg, #C85F28 0%, #D9541E 100%) !important;
+    box-shadow: 0 6px 20px rgba(217, 113, 58, 0.5) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Form inputs */
+  .footer-input-field {
+    background-color: #FFFFFF !important;
+    border: 1.5px solid #DFD7C2 !important;
+    color: #1A2618 !important;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .footer-input-field:focus {
+    border-color: #D9713A !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(217, 113, 58, 0.15) !important;
+  }
+
+  #contactForm input:-webkit-autofill,
+  #contactForm input:-webkit-autofill:hover, 
+  #contactForm input:-webkit-autofill:focus,
+  #contactForm textarea:-webkit-autofill,
+  #contactForm textarea:-webkit-autofill:hover,
+  #contactForm textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #1A2618 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
   }
 </style>
 
 <footer class="alora-cream-footer pt-16 pb-8 mt-16 relative overflow-hidden">
-  <!-- Subtle ambient luxury light -->
-  <div class="absolute top-0 right-1/4 w-96 h-96 bg-amber-200/20 rounded-full blur-3xl pointer-events-none"></div>
+  <!-- Subtle Ambient Glow -->
+  <div class="absolute top-0 right-1/4 w-96 h-96 bg-amber-200/25 rounded-full blur-3xl pointer-events-none"></div>
   <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-[#D9713A]/10 rounded-full blur-3xl pointer-events-none"></div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12 border-b border-[#E8E2D2]">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12 border-b border-[#E5DFCE]">
       
-      <!-- Column 1: Brand & Contact Info -->
+      <!-- ====================================================
+           Column 1: COMPANY OVERVIEW
+           ==================================================== -->
       <div class="space-y-4">
-        <a href="/" class="inline-block group">
-          <img src="./static/alora.png" alt="Alora Radiance Logo" class="h-9 sm:h-10 w-auto object-contain transition-transform group-hover:scale-102" onerror="this.outerHTML='<span class=\'font-fraunces font-bold text-2xl text-[#1A2618] tracking-wider\'>ALORA RADIANCE</span>'">
-        </a>
-        <p class="text-xs sm:text-[13px] text-stone-600 leading-relaxed max-w-xs font-sans">
-          We see beauty not just as an appearance, but as an opportunity to craft pure, dermatologist-tested luxury skincare rituals for naturally glowing Indian skin.
-        </p>
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-leaf text-xs text-[#D9713A]"></i>
+          <span>Company Overview</span>
+        </h3>
+        <ul class="space-y-3 pt-1">
+          <li>
+            <a href="/aboutus.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <span>About Our Brand</span>
+            </a>
+          </li>
+          <li>
+            <a href="/PrivacyPolicy.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <span>Privacy Policy</span>
+            </a>
+          </li>
+          <li>
+            <a href="/termCondition.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <span>Terms &amp; Conditions</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Corporate Governance.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <span>Corporate Governance</span>
+            </a>
+          </li>
+          <li>
+            <a href="/sitemap.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-sitemap text-[11px] text-[#D9713A]"></i>
+              <span>Sitemap</span>
+            </a>
+          </li>
+        </ul>
+      </div>
 
-        <!-- Phone & Email Badges -->
-        <div class="space-y-2 text-xs pt-1 font-sans">
-          <p class="flex items-center gap-2.5 text-stone-700">
-            <span class="w-6 h-6 rounded-lg bg-white border border-[#E8E2D2] flex items-center justify-center text-[#D9713A] shadow-2xs shrink-0">
-              <i class="fa-solid fa-mobile-screen-button text-[11px]"></i>
-            </span>
-            <span>Phone: <a href="tel:8920434560" class="hover:text-[#D9713A] font-bold text-stone-900 transition">+91-8920434560</a></span>
-          </p>
-          <p class="flex items-center gap-2.5 text-stone-700">
-            <span class="w-6 h-6 rounded-lg bg-white border border-[#E8E2D2] flex items-center justify-center text-[#D9713A] shadow-2xs shrink-0">
-              <i class="fa-regular fa-envelope text-[11px]"></i>
-            </span>
-            <span>Email: <a href="mailto:support@aloraradiance.com" class="hover:text-[#D9713A] font-bold text-stone-900 transition">support@aloraradiance.com</a></span>
-          </p>
+      <!-- ====================================================
+           Column 2: QUICK LINKS
+           ==================================================== -->
+      <div class="space-y-4">
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-compass text-xs text-[#D9713A]"></i>
+          <span>Quick Links</span>
+        </h3>
+        <ul class="space-y-3 pt-1 mb-5">
+          <li>
+            <a href="/trackorder.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-truck-fast footer-accent-icon text-xs"></i>
+              <span>Track My Order</span>
+            </a>
+          </li>
+          <li>
+            <a href="/account.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-user footer-accent-icon text-xs"></i>
+              <span>My Account &amp; Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="/affiliate.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-handshake footer-accent-icon text-xs"></i>
+              <span>Become an Affiliate</span>
+            </a>
+          </li>
+          <li>
+            <a href="/KnowledegeFAQ.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-circle-question footer-accent-icon text-xs"></i>
+              <span>Knowledge Base FAQs</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ReturnRefund.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-rotate-left footer-accent-icon text-xs"></i>
+              <span>Return &amp; Refund Policy</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Follow Along -->
+        <div class="pt-2 border-t border-[#E5DFCE]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#D9713A] mb-2 font-mono">Follow Along</span>
+          <div class="flex items-center gap-2.5 mb-3">
+            <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="footer-social-btn bg-[#1877F2]">
+              <i class="fa-brands fa-facebook-f text-xs"></i>
+            </a>
+            <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="footer-social-btn bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888]">
+              <i class="fa-brands fa-instagram text-sm"></i>
+            </a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="footer-social-btn bg-[#FF0000]">
+              <i class="fa-brands fa-youtube text-xs"></i>
+            </a>
+          </div>
+
+          <div>
+            <a href="tel:8920434560" class="footer-action-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full">
+              <i class="fa-solid fa-phone text-[#D9713A] text-xs"></i>
+              <span>Need Help Fast? <strong>8920434560</strong></span>
+            </a>
+          </div>
         </div>
-        
-        <!-- Social Icons (Vibrant luxury pills) -->
-        <div class="flex items-center gap-3 pt-2">
-          <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="footer-social-btn bg-gradient-to-tr from-[#f09433] via-[#dc2743] to-[#bc1888]" title="Follow on Instagram">
-            <i class="fa-brands fa-instagram text-sm"></i>
-          </a>
-          <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="footer-social-btn bg-[#1877F2]" title="Follow on Facebook">
-            <i class="fa-brands fa-facebook-f text-xs"></i>
-          </a>
-          <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="footer-social-btn bg-[#FF0000]" title="Subscribe on YouTube">
-            <i class="fa-brands fa-youtube text-xs"></i>
-          </a>
-        </div>
       </div>
 
-      <!-- Column 2: OUR PRODUCTS -->
+      <!-- ====================================================
+           Column 3: QUALITY & CERTIFICATIONS
+           ==================================================== -->
       <div class="space-y-4">
-        <h3 class="footer-heading mb-4">OUR PRODUCTS</h3>
-        <ul class="space-y-2.5">
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> All Skincare Rituals</a></li>
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Family Packs &amp; Combos</a></li>
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Facial Serums &amp; Cleansers</a></li>
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Soothing Body Lotions</a></li>
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Bestseller Formulations</a></li>
-          <li><a href="/certificates.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Quality &amp; Lab Certifications</a></li>
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-award text-xs text-[#D9713A]"></i>
+          <span>Quality &amp; Certifications</span>
+        </h3>
+        <ul class="space-y-2.5 pt-1">
+          <li>
+            <a href="/certificates.html#govt-license" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Govt Cosmetic License</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#patch-test" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Patch Test Declaration</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#facewash-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Face Wash Clinical Test</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#serum-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Face Serum Clinical Test</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#bodylotion-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Body Lotion Clinical Test</span>
+            </a>
+          </li>
+          <li class="pt-1">
+            <a href="/certificates.html" class="footer-action-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl">
+              <span>View All Certificates</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </li>
         </ul>
-      </div>
 
-      <!-- Column 3: USEFUL LINKS -->
-      <div class="space-y-4">
-        <h3 class="footer-heading mb-4">USEFUL LINKS</h3>
-        <ul class="space-y-2.5">
-          <li><a href="/PrivacyPolicy.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Privacy Policy</a></li>
-          <li><a href="/ReturnRefund.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Cancellation &amp; Refund Policy</a></li>
-          <li><a href="/termCondition.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Terms &amp; Conditions</a></li>
-          <li><a href="/KnowledegeFAQ.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Contact Us &amp; FAQs</a></li>
-          <li><a href="/aboutus.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> About Our Story</a></li>
-        </ul>
-      </div>
-
-      <!-- Column 4: FOOTER MENU & MARKETPLACES -->
-      <div class="space-y-4">
-        <h3 class="footer-heading mb-4">FOOTER MENU</h3>
-        <ul class="space-y-2.5">
-          <li><a href="/termCondition.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Quality Disclaimer</a></li>
-          <li><a href="/trackorder.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Track Your Order</a></li>
-          <li><a href="/Corporate Governance.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Corporate Governance</a></li>
-          <li><a href="/moreproduct.html" class="footer-link-item"><i class="fa-solid fa-chevron-right"></i> Shop All Collections</a></li>
-        </ul>
-        
-        <!-- Marketplace badges -->
-        <div class="mt-5 pt-4 border-t border-[#E8E2D2]">
-          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#1A2618] mb-2 font-mono">Also Available On</span>
+        <!-- Also Available On -->
+        <div class="pt-3 border-t border-[#E5DFCE]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#D9713A] mb-2 font-mono flex items-center gap-1.5">
+            <i class="fa-solid fa-bag-shopping text-xs"></i> Also Available On
+          </span>
           <div class="flex items-center gap-2">
-            <a href="https://www.amazon.in/s?k=ALORA+RADIANCE&ref=nb_sb_noss" target="_blank" rel="noopener noreferrer" class="marketplace-pill">
+            <a href="https://www.amazon.in/s?k=ALORA+RADIANCE&ref=nb_sb_noss" target="_blank" rel="noopener noreferrer" class="footer-action-pill px-3 py-1 rounded-lg inline-flex items-center gap-1.5">
               <i class="fa-brands fa-amazon text-sm text-[#FF9900]"></i> Amazon
             </a>
-            <a href="https://www.flipkart.com/search?q=alora%20radiance&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off" target="_blank" rel="noopener noreferrer" class="marketplace-pill">
+            <a href="https://www.flipkart.com/search?q=alora%20radiance&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off" target="_blank" rel="noopener noreferrer" class="footer-action-pill px-3 py-1 rounded-lg inline-flex items-center gap-1.5">
               <i class="fa-solid fa-cart-shopping text-xs text-[#2874F0]"></i> Flipkart
             </a>
           </div>
         </div>
       </div>
 
+      <!-- ====================================================
+           Column 4: Get in Touch Form Card
+           ==================================================== -->
+      <div class="bg-white p-6 rounded-3xl border border-[#DFD7C2] shadow-sm">
+        <h3 class="font-fraunces font-bold text-lg text-[#1A2618] mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-envelope-open-text text-[#D9713A] text-base"></i>
+          <span>Get in Touch</span>
+        </h3>
+        
+        <form id="contactForm" class="space-y-3.5">
+          <div>
+            <label for="name" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Name</label>
+            <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs">
+          </div>
+          <div>
+            <label for="email" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Email</label>
+            <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs">
+          </div>
+          <div>
+            <label for="message" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Message</label>
+            <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs resize-none"></textarea>
+          </div>
+          <button type="submit" aria-label="Submit Contact Message" class="footer-submit-btn w-full font-bold py-3 rounded-xl cursor-pointer">
+            Submit Message
+          </button>
+        </form>
+      </div>
+
     </div>
 
-    <!-- Divider and Copyright Bar -->
-    <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-stone-600 gap-4">
+    <!-- ====================================================
+         Copyright Bottom Bar
+         ==================================================== -->
+    <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-[#556350] gap-4 font-medium">
       <div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
-        <p class="font-medium text-stone-700">Copyright @2026 <strong class="text-stone-900">Alora Radiance</strong>. All rights reserved.</p>
-        <span class="hidden sm:inline text-stone-400">•</span>
-        <span class="text-[11px] text-[#D9713A] font-semibold">Crafted for Pure Radiance ✨</span>
+        <p>Copyright © 2026 <strong class="text-[#1A2618]">Alora Radiance</strong>. All Rights Reserved.</p>
+        <span class="hidden sm:inline text-[#D9713A]">•</span>
+        <a href="/sitemap.html" class="hover:text-[#1A2618] transition">Sitemap</a>
+        <a href="/sitemap.xml" target="_blank" class="text-[#D9713A] font-bold">(XML)</a>
+        <span class="hidden sm:inline text-[#D9713A]">•</span>
+        <span class="text-[#D9713A] font-bold">Crafted for Pure Radiance ✨</span>
       </div>
 
-      <div class="flex items-center gap-4 text-xs text-stone-600">
-        <a href="/PrivacyPolicy.html" class="hover:text-stone-900 transition font-medium">Privacy</a>
-        <span class="text-stone-300">•</span>
-        <a href="/termCondition.html" class="hover:text-stone-900 transition font-medium">Terms</a>
-        <span class="text-stone-300">•</span>
-        <a href="/sitemap.html" class="hover:text-stone-900 transition font-medium">Sitemap</a>
-        
-        <!-- Scroll to Top Button -->
-        <button type="button" id="footer-scroll-top-btn" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top" class="w-9 h-9 rounded-full shadow-xs flex items-center justify-center cursor-pointer ml-2" title="Scroll to top">
-          <i class="fa-solid fa-chevron-up text-xs"></i>
-        </button>
-      </div>
+      <!-- Floating Scroll to Top -->
+      <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top" class="w-9 h-9 rounded-full bg-white border border-[#D5CCB7] text-[#1A2618] shadow-xs flex items-center justify-center cursor-pointer hover:bg-[#D9713A] hover:text-white hover:border-[#D9713A] transition-all" title="Scroll to top">
+        <i class="fa-solid fa-chevron-up text-xs"></i>
+      </button>
     </div>
   </div>
 </footer>
