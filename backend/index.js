@@ -25,6 +25,7 @@ import User from "./models/userAuth.models.js";
 import Product from "./models/product.models.js";
 import Post from "./models/blog.models.js"; 
 import { generateSitemapXml } from "./services/sitemap.service.js"; 
+import { parseAndNormalizeSchemas } from "./services/contentSanitizer.service.js"; 
 
 import { setSecurityHeaders, sanitizeNoSql, createRateLimiter } from "./middlewares/security.middleware.js";
 
@@ -306,7 +307,6 @@ app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
     }).lean();
 
     if (!blog) {
-      // Return genuine HTTP 404 status (Prevents Google Soft 404 error)
       return res.status(404).sendFile(postHtmlPath);
     }
 
@@ -331,8 +331,24 @@ app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
 
     if (blog.schema) {
       try {
-        const schemaStr = typeof blog.schema === 'string' ? blog.schema : JSON.stringify(blog.schema);
-        html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, `<script id="dynamic-json-ld" type="application/ld+json">\n${schemaStr}\n</script>`);
+        const parsedSchemas = parseAndNormalizeSchemas(blog.schema);
+        if (parsedSchemas.length === 1) {
+          const single = { ...parsedSchemas[0] };
+          if (!single["@context"]) single["@context"] = "https://schema.org";
+          const jsonStr = JSON.stringify(single, null, 2);
+          html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, `<script id="dynamic-json-ld" type="application/ld+json">\n${jsonStr}\n</script>`);
+        } else if (parsedSchemas.length > 1) {
+          const graphSchema = {
+            "@context": "https://schema.org",
+            "@graph": parsedSchemas.map(s => {
+              const copy = { ...s };
+              if (copy["@context"]) delete copy["@context"];
+              return copy;
+            })
+          };
+          const jsonStr = JSON.stringify(graphSchema, null, 2);
+          html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, `<script id="dynamic-json-ld" type="application/ld+json">\n${jsonStr}\n</script>`);
+        }
       } catch (_) {}
     }
 

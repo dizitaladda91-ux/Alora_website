@@ -74,11 +74,132 @@ export const sanitizeHttpUrl = (value) => {
   }
 };
 
+export const deduplicateSchemas = (schemas) => {
+  if (!Array.isArray(schemas)) return [];
+  const seen = new Set();
+  const result = [];
+  for (const s of schemas) {
+    if (!s || typeof s !== "object") continue;
+    const key = JSON.stringify(s);
+    if (!seen.has(key)) {
+      seen.add(key);
+      result.push(s);
+    }
+  }
+  return result;
+};
+
+export const parseAndNormalizeSchemas = (rawInput) => {
+  if (!rawInput) return [];
+  if (Array.isArray(rawInput)) {
+    return deduplicateSchemas(rawInput.filter(item => item && typeof item === "object"));
+  }
+  if (typeof rawInput === "object" && rawInput !== null) {
+    if (Array.isArray(rawInput["@graph"])) {
+      return deduplicateSchemas(rawInput["@graph"].filter(item => item && typeof item === "object"));
+    }
+    return [rawInput];
+  }
+  let cleaned = String(rawInput).trim();
+  if (!cleaned) return [];
+
+  if (cleaned.includes("<script")) {
+    const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+    if (scriptMatches && scriptMatches.length > 0) {
+      const extracted = [];
+      for (const match of scriptMatches) {
+        const content = match.replace(/<script[^>]*>/i, "").replace(/<\/script>/i, "").trim();
+        if (content) {
+          const sub = parseAndNormalizeSchemas(content);
+          extracted.push(...sub);
+        }
+      }
+      if (extracted.length > 0) return deduplicateSchemas(extracted);
+    } else {
+      cleaned = cleaned.replace(/<[^>]*>/g, "").trim();
+    }
+  }
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    if (Array.isArray(parsed)) {
+      return deduplicateSchemas(parsed.filter(item => item && typeof item === "object"));
+    }
+    if (parsed && typeof parsed === "object") {
+      if (Array.isArray(parsed["@graph"])) {
+        return deduplicateSchemas(parsed["@graph"].filter(item => item && typeof item === "object"));
+      }
+      return [parsed];
+    }
+  } catch (_) {}
+
+  const schemas = [];
+  let depth = 0;
+  let startIndex = -1;
+  let inString = false;
+  let isEscaped = false;
+
+  for (let i = 0; i < cleaned.length; i++) {
+    const char = cleaned[i];
+    if (isEscaped) {
+      isEscaped = false;
+      continue;
+    }
+    if (char === "\\") {
+      isEscaped = true;
+      continue;
+    }
+    if (char === '"') {
+      inString = !inString;
+      continue;
+    }
+    if (!inString) {
+      if (char === "{" || char === "[") {
+        if (depth === 0) startIndex = i;
+        depth++;
+      } else if (char === "}" || char === "]") {
+        depth--;
+        if (depth === 0 && startIndex !== -1) {
+          const chunk = cleaned.substring(startIndex, i + 1).trim();
+          try {
+            const parsedObj = JSON.parse(chunk);
+            if (Array.isArray(parsedObj)) {
+              schemas.push(...parsedObj.filter(item => item && typeof item === "object"));
+            } else if (parsedObj && typeof parsedObj === "object") {
+              if (Array.isArray(parsedObj["@graph"])) {
+                schemas.push(...parsedObj["@graph"].filter(item => item && typeof item === "object"));
+              } else {
+                schemas.push(parsedObj);
+              }
+            }
+          } catch (_) {}
+          startIndex = -1;
+        }
+      }
+    }
+  }
+
+  return deduplicateSchemas(schemas);
+};
+
+export const formatSchemaForStorage = (value) => {
+  if (!value) return "";
+  const parsed = parseAndNormalizeSchemas(value);
+  if (!parsed || parsed.length === 0) return "";
+  if (parsed.length === 1) {
+    const single = { ...parsed[0] };
+    if (!single["@context"]) single["@context"] = "https://schema.org";
+    return JSON.stringify(single, null, 2);
+  }
+  return JSON.stringify(parsed, null, 2);
+};
+
 export const sanitizeJsonObject = (value) => {
   if (value === undefined || value === null || value === "") return "";
-  const parsed = typeof value === "string" ? JSON.parse(value) : value;
-  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-    throw new Error("Schema must be a JSON object.");
+  const schemas = parseAndNormalizeSchemas(value);
+  if (!schemas || schemas.length === 0) {
+    throw new Error("Invalid JSON-LD Schema format provided.");
   }
-  return JSON.stringify(parsed);
+  return formatSchemaForStorage(schemas);
 };
+

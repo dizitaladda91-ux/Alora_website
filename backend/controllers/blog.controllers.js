@@ -1,6 +1,6 @@
 import Blog from '../models/blog.models.js';
 import { deleteFromCloudinary } from '../middlewares/cloudinaryUpload.js';
-import { sanitizeBlogHtml, sanitizePlainText, decodeEntities } from '../services/contentSanitizer.service.js';
+import { sanitizeBlogHtml, sanitizePlainText, decodeEntities, parseAndNormalizeSchemas, formatSchemaForStorage } from '../services/contentSanitizer.service.js';
 import { syncStaticSitemapFile } from '../services/sitemap.service.js';
 
 function cleanBlogFieldsAndSave(blog) {
@@ -80,17 +80,15 @@ export const createBlogPost = async (req, res) => {
             return res.status(400).json({ success: false, message: "Article content is a required field." });
         }
 
-        // Server-side Schema JSON Validation if provided
+        // Server-side Schema JSON Validation and Normalization if provided
+        let normalizedSchema = "";
         if (schema && String(schema).trim()) {
             const rawSchema = String(schema).trim();
-            const containsScript = rawSchema.includes('<script');
-            if (!containsScript) {
-                try {
-                    JSON.parse(rawSchema);
-                } catch (e) {
-                    return res.status(400).json({ success: false, message: "Invalid JSON-LD Schema format provided." });
-                }
+            const parsedSchemas = parseAndNormalizeSchemas(rawSchema);
+            if (parsedSchemas.length === 0) {
+                return res.status(400).json({ success: false, message: "Invalid JSON-LD Schema format provided." });
             }
+            normalizedSchema = formatSchemaForStorage(parsedSchemas);
         }
 
         // Auto-generate slug from title if slug is missing
@@ -121,7 +119,7 @@ export const createBlogPost = async (req, res) => {
             keywords: sanitizePlainText(keywords || "", 300),     
             category: sanitizePlainText(category || "Skincare", 100),
             metaDesc: sanitizePlainText(metaDesc || "", 500),
-            schema: (schema || "").trim(),       
+            schema: normalizedSchema,       
             publisher: sanitizePlainText(publisher || "Alora Radiance", 100),    
             coverImage: finalCover,
             status: status === 'draft' ? 'draft' : 'published'
@@ -226,7 +224,18 @@ export const updateBlogPost = async (req, res) => {
         if (keywords !== undefined) updateData.keywords = sanitizePlainText(keywords, 300);
         if (category !== undefined) updateData.category = sanitizePlainText(category, 100);
         if (metaDesc !== undefined) updateData.metaDesc = sanitizePlainText(metaDesc, 500);
-        if (schema !== undefined) updateData.schema = String(schema).trim();
+        if (schema !== undefined) {
+            const rawSchema = String(schema).trim();
+            if (rawSchema) {
+                const parsedSchemas = parseAndNormalizeSchemas(rawSchema);
+                if (parsedSchemas.length === 0) {
+                    return res.status(400).json({ success: false, message: "Invalid JSON-LD Schema format provided." });
+                }
+                updateData.schema = formatSchemaForStorage(parsedSchemas);
+            } else {
+                updateData.schema = "";
+            }
+        }
         if (publisher !== undefined) updateData.publisher = sanitizePlainText(publisher, 100);
         if (status !== undefined) updateData.status = status === 'draft' ? 'draft' : 'published';
 

@@ -1,60 +1,62 @@
 <style>
   /* ========================================================
-     🎨 ALORA RADIANCE LUXURY WARM CREAM FOOTER
+     🎨 ALORA RADIANCE LUXURY DEEP WARM CREAM FOOTER
      ======================================================== */
   :root, footer, #footer-placeholder {
-    --footer-bg-cream: #FAF7EE;
+    --footer-bg-cream: #EAE1CD;
+    --footer-bg-bottom: #DFD3BA;
     --footer-card-bg: #FFFFFF;
-    --footer-heading-color: #D9713A;
-    --footer-subheading-color: #1A2618;
-    --footer-accent-color: #D9713A;
-    --footer-hover-color: #E8652A;
-    --footer-gold-color: #C9A227;
-    --footer-text-primary: #1F291E;
-    --footer-text-muted: #3D4A3A;
-    --footer-border-subtle: #E5DFCE;
-    --footer-border-card: #DFD7C2;
+    --footer-heading-color: #B8460E;
+    --footer-subheading-color: #141E14;
+    --footer-accent-color: #B8460E;
+    --footer-hover-color: #D9541E;
+    --footer-gold-color: #B8860B;
+    --footer-text-primary: #141E14;
+    --footer-text-muted: #2E3B2C;
+    --footer-border-subtle: #D8CCA8;
+    --footer-border-card: #CEBE96;
   }
 
   footer.alora-cream-footer {
     background-color: var(--footer-bg-cream) !important;
     color: var(--footer-text-primary) !important;
-    border-top: 2px solid #E5DFCE !important;
+    border-top: 3px solid #D2C29B !important;
     position: relative;
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   .footer-custom-heading {
-    color: #D9713A !important;
+    color: #B8460E !important;
     font-family: 'Plus Jakarta Sans', sans-serif;
-    font-weight: 800;
+    font-weight: 800 !important;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
+    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.4);
   }
 
   .footer-custom-link {
-    color: #2D3A2A !important;
-    font-size: 0.86rem;
-    font-weight: 600;
+    color: #141E14 !important;
+    font-size: 0.88rem;
+    font-weight: 700 !important;
     transition: all 0.22s ease;
     display: inline-flex;
     align-items: center;
   }
 
   .footer-custom-link:hover {
-    color: #D9713A !important;
-    transform: translateX(3px);
+    color: #B8460E !important;
+    transform: translateX(4px);
   }
 
   .footer-gold-icon {
-    color: #C9A227 !important;
-    font-size: 0.85rem;
+    color: #B8860B !important;
+    font-size: 0.9rem;
   }
 
   .footer-accent-icon {
-    color: #D9713A !important;
-    font-size: 0.85rem;
+    color: #B8460E !important;
+    font-size: 0.9rem;
   }
 
   /* Social Icons (Solid Branded Colors) */
@@ -69,7 +71,7 @@
     font-size: 1rem !important;
     transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
   }
 
   .social-btn-facebook {
@@ -96,20 +98,20 @@
   /* Pills & Buttons */
   .footer-action-pill {
     background-color: #FFFFFF;
-    border: 1.5px solid #D5CCB7;
-    color: #1A2618 !important;
-    font-size: 0.78rem;
-    font-weight: 700;
+    border: 1.5px solid #C8B88E;
+    color: #141E14 !important;
+    font-size: 0.8rem;
+    font-weight: 800 !important;
     transition: all 0.25s ease;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
   }
 
   .footer-action-pill:hover {
-    background-color: #D9713A;
-    border-color: #D9713A;
+    background-color: #B8460E;
+    border-color: #B8460E;
     color: #FFFFFF !important;
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(217, 113, 58, 0.25);
+    box-shadow: 0 4px 12px rgba(184, 70, 14, 0.3);
   }
 
   .footer-action-pill:hover i {
@@ -117,36 +119,36 @@
   }
 
   .footer-submit-btn {
-    background: linear-gradient(135deg, #D9713A 0%, #E8652A 100%) !important;
+    background: linear-gradient(135deg, #B8460E 0%, #D9541E 100%) !important;
     color: #FFFFFF !important;
-    font-weight: 800;
+    font-weight: 800 !important;
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     border-radius: 0.75rem;
-    box-shadow: 0 4px 14px rgba(217, 113, 58, 0.35) !important;
+    box-shadow: 0 4px 14px rgba(184, 70, 14, 0.38) !important;
     transition: all 0.3s ease;
   }
 
   .footer-submit-btn:hover {
-    background: linear-gradient(135deg, #C85F28 0%, #D9541E 100%) !important;
-    box-shadow: 0 6px 20px rgba(217, 113, 58, 0.5) !important;
+    background: linear-gradient(135deg, #A33A07 0%, #C84714 100%) !important;
+    box-shadow: 0 6px 20px rgba(184, 70, 14, 0.55) !important;
     transform: translateY(-1px);
   }
 
   /* Form inputs */
   .footer-input-field {
     background-color: #FFFFFF !important;
-    border: 1.5px solid #DFD7C2 !important;
-    color: #1A2618 !important;
-    font-weight: 500;
+    border: 1.5px solid #CEBE96 !important;
+    color: #141E14 !important;
+    font-weight: 600 !important;
     transition: all 0.2s ease;
   }
 
   .footer-input-field:focus {
-    border-color: #D9713A !important;
+    border-color: #B8460E !important;
     outline: none;
-    box-shadow: 0 0 0 3px rgba(217, 113, 58, 0.15) !important;
+    box-shadow: 0 0 0 3px rgba(184, 70, 14, 0.2) !important;
   }
 
   #contactForm input:-webkit-autofill,
@@ -155,55 +157,55 @@
   #contactForm textarea:-webkit-autofill,
   #contactForm textarea:-webkit-autofill:hover,
   #contactForm textarea:-webkit-autofill:focus {
-    -webkit-text-fill-color: #1A2618 !important;
+    -webkit-text-fill-color: #141E14 !important;
     -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
   }
 </style>
 
-<footer class="alora-cream-footer pt-16 pb-8 mt-16 relative overflow-hidden">
+<footer class="alora-cream-footer pt-16 pb-0 mt-16 relative overflow-hidden">
   <!-- Subtle Ambient Glow -->
-  <div class="absolute top-0 right-1/4 w-96 h-96 bg-amber-200/25 rounded-full blur-3xl pointer-events-none"></div>
-  <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-[#D9713A]/10 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute top-0 right-1/4 w-96 h-96 bg-amber-300/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-[#B8460E]/10 rounded-full blur-3xl pointer-events-none"></div>
 
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12 border-b border-[#E5DFCE]">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12">
       
       <!-- ====================================================
            Column 1: COMPANY OVERVIEW
            ==================================================== -->
       <div class="space-y-4">
         <h3 class="footer-custom-heading flex items-center gap-2">
-          <i class="fa-solid fa-leaf text-xs text-[#D9713A]"></i>
+          <i class="fa-solid fa-leaf text-xs text-[#B8460E]"></i>
           <span>Company Overview</span>
         </h3>
         <ul class="space-y-3 pt-1">
           <li>
             <a href="/aboutus.html" class="footer-custom-link gap-2">
-              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
               <span>About Our Brand</span>
             </a>
           </li>
           <li>
             <a href="/PrivacyPolicy.html" class="footer-custom-link gap-2">
-              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
               <span>Privacy Policy</span>
             </a>
           </li>
           <li>
             <a href="/termCondition.html" class="footer-custom-link gap-2">
-              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
               <span>Terms &amp; Conditions</span>
             </a>
           </li>
           <li>
             <a href="/Corporate Governance.html" class="footer-custom-link gap-2">
-              <i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A]"></i>
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
               <span>Corporate Governance</span>
             </a>
           </li>
           <li>
             <a href="/sitemap.html" class="footer-custom-link gap-2">
-              <i class="fa-solid fa-sitemap text-[11px] text-[#D9713A]"></i>
+              <i class="fa-solid fa-sitemap text-[11px] text-[#B8460E] font-bold"></i>
               <span>Sitemap</span>
             </a>
           </li>
@@ -215,7 +217,7 @@
            ==================================================== -->
       <div class="space-y-4">
         <h3 class="footer-custom-heading flex items-center gap-2">
-          <i class="fa-solid fa-compass text-xs text-[#D9713A]"></i>
+          <i class="fa-solid fa-compass text-xs text-[#B8460E]"></i>
           <span>Quick Links</span>
         </h3>
         <ul class="space-y-3 pt-1 mb-5">
@@ -252,8 +254,8 @@
         </ul>
 
         <!-- Follow Along -->
-        <div class="pt-2 border-t border-[#E5DFCE]">
-          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#D9713A] mb-2 font-mono">Follow Along</span>
+        <div class="pt-2 border-t border-[#D8CCA8]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#B8460E] mb-2 font-mono">Follow Along</span>
           <div class="flex items-center gap-3 mb-3">
             <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="footer-social-btn social-btn-facebook" style="background-color: #1877F2 !important; color: #FFFFFF !important;" title="Facebook">
               <i class="fa-brands fa-facebook-f text-sm text-white"></i>
@@ -268,8 +270,8 @@
 
           <div>
             <a href="tel:8920434560" class="footer-action-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full">
-              <i class="fa-solid fa-phone text-[#D9713A] text-xs"></i>
-              <span>Need Help Fast? <strong>8920434560</strong></span>
+              <i class="fa-solid fa-phone text-[#B8460E] text-xs"></i>
+              <span>Need Help Fast? <strong class="text-[#141E14]">8920434560</strong></span>
             </a>
           </div>
         </div>
@@ -280,7 +282,7 @@
            ==================================================== -->
       <div class="space-y-4">
         <h3 class="footer-custom-heading flex items-center gap-2">
-          <i class="fa-solid fa-award text-xs text-[#D9713A]"></i>
+          <i class="fa-solid fa-award text-xs text-[#B8460E]"></i>
           <span>Quality &amp; Certifications</span>
         </h3>
         <ul class="space-y-2.5 pt-1">
@@ -323,8 +325,8 @@
         </ul>
 
         <!-- Also Available On -->
-        <div class="pt-3 border-t border-[#E5DFCE]">
-          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#D9713A] mb-2 font-mono flex items-center gap-1.5">
+        <div class="pt-3 border-t border-[#D8CCA8]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#B8460E] mb-2 font-mono flex items-center gap-1.5">
             <i class="fa-solid fa-bag-shopping text-xs"></i> Also Available On
           </span>
           <div class="flex items-center gap-2">
@@ -341,24 +343,24 @@
       <!-- ====================================================
            Column 4: Get in Touch Form Card
            ==================================================== -->
-      <div class="bg-white p-6 rounded-3xl border border-[#DFD7C2] shadow-sm">
-        <h3 class="font-fraunces font-bold text-lg text-[#1A2618] mb-4 flex items-center gap-2">
-          <i class="fa-solid fa-envelope-open-text text-[#D9713A] text-base"></i>
+      <div class="bg-white p-6 rounded-3xl border border-[#CEBE96] shadow-md">
+        <h3 class="font-fraunces font-bold text-lg text-[#141E14] mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-envelope-open-text text-[#B8460E] text-base"></i>
           <span>Get in Touch</span>
         </h3>
         
         <form id="contactForm" class="space-y-3.5">
           <div>
-            <label for="name" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Name</label>
-            <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs">
+            <label for="name" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Name</label>
+            <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs">
           </div>
           <div>
-            <label for="email" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Email</label>
-            <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs">
+            <label for="email" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Email</label>
+            <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs">
           </div>
           <div>
-            <label for="message" class="block text-[10px] uppercase font-bold tracking-widest text-[#3D4A3A] mb-1">Message</label>
-            <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#8A9586]/70 shadow-2xs resize-none"></textarea>
+            <label for="message" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Message</label>
+            <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs resize-none"></textarea>
           </div>
           <button type="submit" aria-label="Submit Contact Message" class="footer-submit-btn w-full font-bold py-3 rounded-xl cursor-pointer">
             Submit Message
@@ -367,22 +369,24 @@
       </div>
 
     </div>
+  </div>
 
-    <!-- ====================================================
-         Copyright Bottom Bar
-         ==================================================== -->
-    <div class="pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-[#556350] gap-4 font-medium">
+  <!-- ====================================================
+       Copyright Bottom Bar (Distinct Deeper Grounding Strip)
+       ==================================================== -->
+  <div class="w-full bg-[#DFD3BA] border-t-2 border-[#D0BF98] py-4 relative z-10 mt-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#2A3728] gap-4 font-bold">
       <div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
-        <p>Copyright © 2026 <strong class="text-[#1A2618]">Alora Radiance</strong>. All Rights Reserved.</p>
-        <span class="hidden sm:inline text-[#D9713A]">•</span>
-        <a href="/sitemap.html" class="hover:text-[#1A2618] transition">Sitemap</a>
-        <a href="/sitemap.xml" target="_blank" class="text-[#D9713A] font-bold">(XML)</a>
-        <span class="hidden sm:inline text-[#D9713A]">•</span>
-        <span class="text-[#D9713A] font-bold">Crafted for Pure Radiance ✨</span>
+        <p>Copyright © 2026 <strong class="text-[#141E14] font-extrabold">Alora Radiance</strong>. All Rights Reserved.</p>
+        <span class="hidden sm:inline text-[#B8460E]">•</span>
+        <a href="/sitemap.html" class="hover:text-[#B8460E] transition font-bold">Sitemap</a>
+        <a href="/sitemap.xml" target="_blank" class="text-[#B8460E] font-extrabold">(XML)</a>
+        <span class="hidden sm:inline text-[#B8460E]">•</span>
+        <span class="text-[#B8460E] font-extrabold">Crafted for Pure Radiance ✨</span>
       </div>
 
       <!-- Floating Scroll to Top -->
-      <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top" class="w-9 h-9 rounded-full bg-white border border-[#D5CCB7] text-[#1A2618] shadow-xs flex items-center justify-center cursor-pointer hover:bg-[#D9713A] hover:text-white hover:border-[#D9713A] transition-all" title="Scroll to top">
+      <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top" class="w-9 h-9 rounded-full bg-white border border-[#C8B88E] text-[#141E14] shadow-xs flex items-center justify-center cursor-pointer hover:bg-[#B8460E] hover:text-white hover:border-[#B8460E] transition-all" title="Scroll to top">
         <i class="fa-solid fa-chevron-up text-xs"></i>
       </button>
     </div>

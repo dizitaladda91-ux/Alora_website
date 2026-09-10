@@ -41,7 +41,7 @@ async function fetchPostDetails() {
         showError("Failed to load article: " + err.message);
     }
 }
-function sanitizePostBodyContent(contentHtml, blogTitle) {
+function sanitizePostBodyContent(contentHtml, postTitle = '') {
     if (!contentHtml) return contentHtml;
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contentHtml;
@@ -52,55 +52,70 @@ function sanitizePostBodyContent(contentHtml, blogTitle) {
         headingNode.remove();
     });
 
-    // 2. Clean empty paragraphs & unwrap accidental full-paragraph bolding from pasted text
-    const pNodes = tempDiv.querySelectorAll('p');
-    pNodes.forEach((p) => {
-        const text = p.innerText ? p.innerText.trim() : '';
-        const html = p.innerHTML.trim().toLowerCase();
-
-        if (!text && (html === '' || html === '<br>' || html === '&nbsp;')) {
-            p.remove();
+    // 2. Clean empty headings, empty paragraphs, whitespace spacers & unwrap accidental full-paragraph bolding
+    const allBlocks = tempDiv.querySelectorAll('p, h2, h3, h4, h5, h6, div');
+    allBlocks.forEach((el) => {
+        const cleanText = (el.textContent || '').replace(/[\s\u00A0\u200B\uFEFF]/g, '');
+        const hasMedia = el.querySelector('img, video, iframe, table, input, button, audio');
+        if (!cleanText && !hasMedia) {
+            el.remove();
             return;
         }
 
-        // Strip inline font-weight on paragraph level
-        if (p.style && p.style.fontWeight) {
-            p.style.fontWeight = '';
-        }
+        if (el.tagName === 'P') {
+            // Strip inline font-weight on paragraph level
+            if (el.style && el.style.fontWeight) {
+                el.style.fontWeight = '';
+            }
 
-        // Strip inline font-weight on span level if wrapping full text
-        p.querySelectorAll('span').forEach((span) => {
-            if (span.style && (span.style.fontWeight === 'bold' || span.style.fontWeight === '700' || span.style.fontWeight === '600')) {
-                if (span.innerText && span.innerText.trim() === text) {
-                    span.style.fontWeight = '';
+            // Strip inline font-weight on span level if wrapping full text or empty spans
+            el.querySelectorAll('span').forEach((span) => {
+                const spanText = (span.textContent || '').replace(/[\s\u00A0\u200B\uFEFF]/g, '');
+                if (!spanText && !span.querySelector('img, video, iframe')) {
+                    span.remove();
+                } else if (span.style && (span.style.fontWeight === 'bold' || span.style.fontWeight === '700' || span.style.fontWeight === '600')) {
+                    if (span.innerText && span.innerText.trim() === el.innerText.trim()) {
+                        span.style.fontWeight = '';
+                    }
                 }
-            }
-        });
+            });
 
-        // Unwrap <strong> or <b> if it wraps 100% of paragraph text (accidental full-paragraph bold)
-        const children = Array.from(p.childNodes).filter((node) => node.nodeType === 1 || (node.nodeType === 3 && node.textContent.trim().length > 0));
-        if (children.length === 1 && (children[0].tagName === 'STRONG' || children[0].tagName === 'B')) {
-            const boldElem = children[0];
-            while (boldElem.firstChild) {
-                p.insertBefore(boldElem.firstChild, boldElem);
+            // Unwrap <strong> or <b> if it wraps 100% of paragraph text (accidental full-paragraph bold)
+            const children = Array.from(el.childNodes).filter((node) => node.nodeType === 1 || (node.nodeType === 3 && node.textContent.trim().length > 0));
+            if (children.length === 1 && (children[0].tagName === 'STRONG' || children[0].tagName === 'B')) {
+                const boldElem = children[0];
+                while (boldElem.firstChild) {
+                    el.insertBefore(boldElem.firstChild, boldElem);
+                }
+                boldElem.remove();
             }
-            boldElem.remove();
         }
     });
 
-    // 3. Style grid tables
+    // 3. Remove consecutive <br> tags
+    tempDiv.querySelectorAll('br').forEach((br) => {
+        let prev = br.previousSibling;
+        while (prev && prev.nodeType === 3 && !prev.textContent.trim()) {
+            prev = prev.previousSibling;
+        }
+        if (prev && prev.nodeName === 'BR') {
+            br.remove();
+        }
+    });
+
+    // 4. Style grid tables
     const tableNodes = tempDiv.querySelectorAll('table');
     tableNodes.forEach((table) => {
-        table.classList.add('w-full', 'my-6', 'border-collapse', 'rounded-xl', 'overflow-hidden');
+        table.classList.add('w-full', 'my-4', 'border-collapse', 'rounded-xl', 'overflow-hidden');
         if (!table.parentElement || !table.parentElement.classList.contains('blog-table-responsive')) {
             const wrapper = document.createElement('div');
-            wrapper.className = 'blog-table-responsive overflow-x-auto my-6 rounded-2xl border border-slate-300 shadow-sm bg-white';
+            wrapper.className = 'blog-table-responsive overflow-x-auto my-4 rounded-2xl border border-slate-300 shadow-sm bg-white';
             table.parentNode.insertBefore(wrapper, table);
             wrapper.appendChild(table);
         }
     });
 
-    // 4. Sanitize inline TOC elements so they never float or overlap on mobile
+    // 5. Sanitize inline TOC elements so they never float or overlap on mobile
     const inlineTocNodes = tempDiv.querySelectorAll('.toc, #toc, .table-of-contents, .ez-toc-container, [class*="toc"]');
     inlineTocNodes.forEach((toc) => {
         toc.style.position = 'static';
@@ -245,13 +260,15 @@ async function renderRelatedProducts(blog) {
 
             const cardHtml = `
                 <div data-product-id="${product._id || product.id}" class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative">
-                    <a href="${prodUrl}" class="block relative aspect-square rounded-xl overflow-hidden mb-3 bg-slate-50">
-                        <img src="${prodImg}" alt="${prodName}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='./static/logo2.png'">
-                        ${prodMrp > prodPrice ? `<span class="absolute top-2 left-2 bg-[#800000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs">SALE</span>` : ''}
-                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id || product.id}', this, event)" class="wishlist-toggle-btn absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish z-10" title="Add to Wishlist" aria-label="Add to Wishlist">
+                    <div class="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-slate-50">
+                        <a href="${prodUrl}" class="w-full h-full block">
+                            <img src="${prodImg}" alt="${prodName}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='./static/logo2.png'">
+                        </a>
+                        ${prodMrp > prodPrice ? `<span class="absolute top-2 left-2 z-10 bg-[#800000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs pointer-events-none">SALE</span>` : ''}
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id || product.id}', this, event)" style="position: absolute !important; top: 8px !important; right: 8px !important; left: auto !important; margin: 0 !important; z-index: 20 !important;" class="wishlist-toggle-btn absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish z-20" title="Add to Wishlist" aria-label="Add to Wishlist">
                             <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
                         </button>
-                    </a>
+                    </div>
                     <div>
                         <a href="${prodUrl}" class="font-bold text-sm text-slate-900 hover:text-[#8B4513] transition-colors line-clamp-2 mb-1">
                             ${prodName}
@@ -457,9 +474,35 @@ function injectSEO(blog) {
     }
     injectMultipleSchemasToDOM(blog.schema);
 }
+function deduplicateSchemas(schemas) {
+    if (!Array.isArray(schemas)) return [];
+    const seen = new Set();
+    const result = [];
+    for (const s of schemas) {
+        if (!s || typeof s !== 'object') continue;
+        const key = JSON.stringify(s);
+        if (!seen.has(key)) {
+            seen.add(key);
+            result.push(s);
+        }
+    }
+    return result;
+}
+
 function parseMultipleSchemas(rawInput) {
-    if (!rawInput || !String(rawInput).trim()) return [];
+    if (!rawInput) return [];
+    if (Array.isArray(rawInput)) {
+        return deduplicateSchemas(rawInput.filter(item => item && typeof item === 'object'));
+    }
+    if (typeof rawInput === 'object' && rawInput !== null) {
+        if (Array.isArray(rawInput['@graph'])) {
+            return deduplicateSchemas(rawInput['@graph'].filter(item => item && typeof item === 'object'));
+        }
+        return [rawInput];
+    }
     let cleaned = String(rawInput).trim();
+    if (!cleaned) return [];
+
     if (cleaned.includes('<script')) {
         const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
         if (scriptMatches && scriptMatches.length > 0) {
@@ -471,7 +514,7 @@ function parseMultipleSchemas(rawInput) {
                     extracted.push(...subSchemas);
                 }
             }
-            if (extracted.length > 0) return extracted;
+            if (extracted.length > 0) return deduplicateSchemas(extracted);
         } else {
             cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
         }
@@ -479,9 +522,12 @@ function parseMultipleSchemas(rawInput) {
     try {
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed)) {
-            return parsed.filter(item => item && typeof item === 'object');
+            return deduplicateSchemas(parsed.filter(item => item && typeof item === 'object'));
         }
         if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed['@graph'])) {
+                return deduplicateSchemas(parsed['@graph'].filter(item => item && typeof item === 'object'));
+            }
             return [parsed];
         }
     } catch (e) {
@@ -518,7 +564,11 @@ function parseMultipleSchemas(rawInput) {
                         if (Array.isArray(parsedObj)) {
                             schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
                         } else if (parsedObj && typeof parsedObj === 'object') {
-                            schemas.push(parsedObj);
+                            if (Array.isArray(parsedObj['@graph'])) {
+                                schemas.push(...parsedObj['@graph'].filter(item => item && typeof item === 'object'));
+                            } else {
+                                schemas.push(parsedObj);
+                            }
                         }
                     } catch (err) {
                         console.warn("Failed parsing schema chunk:", err);
@@ -528,25 +578,26 @@ function parseMultipleSchemas(rawInput) {
             }
         }
     }
-    return schemas;
+    return deduplicateSchemas(schemas);
 }
+
 function injectMultipleSchemasToDOM(rawSchemaInput) {
-    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld').forEach(el => el.remove());
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"][data-dynamic="true"]').forEach(el => el.remove());
     if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
     let schemasToInject = parseMultipleSchemas(rawSchemaInput);
     if (!schemasToInject || schemasToInject.length === 0) return;
+
+    const script = document.createElement('script');
+    script.id = 'dynamic-json-ld';
+    script.type = 'application/ld+json';
+    script.className = 'dynamic-schema-injected';
+    script.setAttribute('data-dynamic', 'true');
+
     if (schemasToInject.length === 1) {
-        const script = document.createElement('script');
-        script.id = 'dynamic-json-ld';
-        script.type = 'application/ld+json';
-        script.className = 'dynamic-schema-injected';
-        script.textContent = JSON.stringify(schemasToInject[0], null, 2);
-        document.head.appendChild(script);
+        const single = { ...schemasToInject[0] };
+        if (!single["@context"]) single["@context"] = "https://schema.org";
+        script.textContent = JSON.stringify(single, null, 2);
     } else {
-        const script = document.createElement('script');
-        script.id = 'dynamic-json-ld';
-        script.type = 'application/ld+json';
-        script.className = 'dynamic-schema-injected';
         const combinedSchema = {
             "@context": "https://schema.org",
             "@graph": schemasToInject.map(s => {
@@ -556,9 +607,10 @@ function injectMultipleSchemasToDOM(rawSchemaInput) {
             })
         };
         script.textContent = JSON.stringify(combinedSchema, null, 2);
-        document.head.appendChild(script);
     }
+    document.head.appendChild(script);
 }
+window.injectMultipleSchemasToDOM = injectMultipleSchemasToDOM;
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
