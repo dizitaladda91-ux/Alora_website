@@ -5,16 +5,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- 🔴 Dynamic Hooks for SEO Elements -->
-    <title id="dynamic-title">Alora Radiance | Blog</title>
+    <title id="dynamic-title">Alora Radiance | Skincare Blog & Beauty Guides</title>
     <link rel="icon" type="image/x-icon" href="./static/favicon.ico">
-    <meta id="dynamic-meta-desc" name="description" content="Explore stories, tutorials, and structured learning modules instantly.">
-    <meta id="dynamic-keywords" name="keywords" content="blog, learning, tutorials">
+    <link rel="canonical" href="https://aloraradiance.com/blog" />
+    <meta name="robots" content="index, follow">
+    <meta id="dynamic-meta-desc" name="description" content="Explore stories, expert skincare routines, ingredient guides, and beauty insights from Alora Radiance.">
+    <meta id="dynamic-keywords" name="keywords" content="Alora Radiance blog, skincare routines, beauty guides, skincare ingredients">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,500;1,9..144,600&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="./styles/tailwind.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     
@@ -45,72 +47,23 @@
         }
     }
     </script>
-
-    <!-- 🟢 Updated Dynamic SEO Injection Script -->
-    <script type="module">
-      import BASE_URL from './js/config.js'; // Aapke config file ka path
-
-      async function loadBlogSEO() {
-        // Query Parameter se slug nikalna (e.g. blog.html?slug=my-first-blog) 
-        // Ya Path se nikalna (e.g. /blog/my-first-blog)
-        const urlParams = new URLSearchParams(window.location.search);
-        let slug = urlParams.get('slug');
-
-        if (!slug) {
-          const pathArray = window.location.pathname.split('/');
-          slug = pathArray[pathArray.length - 1].replace('.html', '');
-        }
-
-        // Agar blog listing page par hain toh default metadata rehne dein
-        if (!slug || slug === 'blog') return;
-
-        try {
-          // 🟢 Express router route: /api/blogs/post/:slug
-          const response = await fetch(`${BASE_URL}/api/blogs/post/${slug}`);
-          
-          if (!response.ok) return;
-
-          const resData = await response.json();
-          // Handling API response wrapper (agar resData.blog ho ya direct object ho)
-          const blog = resData.data || resData.blog || resData;
-
-          if (blog) {
-            // 1. Title Update
-            document.title = blog.metaTitle || blog.title || "Alora Radiance";
-
-            // 2. Meta Description
-            const metaDescEl = document.getElementById('dynamic-meta-desc');
-            if (metaDescEl && blog.metaDesc) {
-              metaDescEl.setAttribute('content', blog.metaDesc);
-            }
-
-            // 3. Meta Keywords
-            const keywordsEl = document.getElementById('dynamic-keywords');
-            if (keywordsEl && blog.keywords) {
-              keywordsEl.setAttribute('content', blog.keywords);
-            }
-
-            // 4. JSON-LD Schema Injector
-            if (blog.schema) {
-              const schemaScript = document.createElement('script');
-              schemaScript.type = 'application/ld+json';
-              schemaScript.textContent = typeof blog.schema === 'object' 
-                ? JSON.stringify(blog.schema) 
-                : blog.schema;
-              document.head.appendChild(schemaScript);
-            }
-          }
-        } catch (error) {
-          console.error("SEO metadata injection failed:", error);
-        }
-      }
-
-      document.addEventListener("DOMContentLoaded", loadBlogSEO);
+    
+    <!-- 🟢 Initial JSON-LD Schema Tag for SEO Crawlers & Extensions -->
+    <script id="dynamic-json-ld" type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Alora Radiance Skincare Blogs",
+      "description": "Explore dermatologist-tested skincare tips, guides, and natural beauty insights from Alora Radiance."
+    }
     </script>
 </head>
 <body class="bg-parchment font-sans text-ink min-h-screen flex flex-col">
 
-    <div id="navbar-placeholder"></div>
+    <!-- Header Section (Sticky / Frozen Navbar at Top) -->
+    <header class="sticky top-0 z-50 w-full bg-white shadow-sm">
+        <div id="navbar-placeholder"></div>
+    </header>
 
     <main class="flex-grow max-w-7xl w-full mx-auto px-6 py-12">
         <div class="mb-10 animate__animated animate__fadeIn">
@@ -125,8 +78,8 @@
 
     <div id="footer-placeholder"></div>
 
-    <script src="./js/include.js"></script>
-    <script type="module" src="./js/navbar-interactions.js"></script>
-    <script type="module" src="./js/blog.js"></script>
+    <script src="./js/include.min.js"></script>
+    <script type="module" src="./js/navbar-interactions.min.js"></script>
+    <script type="module" src="./js/blog.min.js"></script>
 </body>
 </html>

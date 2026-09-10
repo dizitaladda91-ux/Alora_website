@@ -1,5 +1,6 @@
 import SimpleProduct from "../models/product.models.js";
 import fs from "fs";
+import db from "../config/db.js";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 
 const toProductSlug = (value = "") => String(value)
@@ -52,6 +53,10 @@ export const addnewproduct = async (req, res) => {
         const mainImage = req.files?.imagepath?.[0];
         if (mainImage) addproduct.imagepath = mainImage.path;
         addproduct.galleryImages = (req.files?.galleryImages || []).map((file) => file.path);
+        
+        if (req.body.videoUrl) addproduct.videoUrl = req.body.videoUrl;
+        const videoFile = req.files?.productVideo?.[0];
+        if (videoFile) addproduct.videoUrl = videoFile.path;
 
         const newProduct = new SimpleProduct(addproduct);
         const savedProduct = await newProduct.save();
@@ -65,13 +70,14 @@ export const addnewproduct = async (req, res) => {
     }
 };
 
-// 2. READ (Saare Products Get Karna)
+// 2. READ (Saare Products Get Karna - Ultra Fast Lean Query)
 export const readproduct = async (req, res) => {
     try {
-        const products = await SimpleProduct.find();
-        await Promise.all(products.map(ensureProductSlug));
+        await db();
+        const products = await SimpleProduct.find().lean();
         res.status(200).json(products);
     } catch (err) {
+        console.error("readproduct error:", err);
         res.status(500).json({ error: err.message });
     }
 };
@@ -126,10 +132,14 @@ export const updateproduct = async (req, res) => {
             updateProductData.galleryImages = galleryImages.map((file) => file.path);
         }
 
+        if (req.body.videoUrl !== undefined) updateProductData.videoUrl = req.body.videoUrl;
+        const updateVideoFile = req.files?.productVideo?.[0];
+        if (updateVideoFile) updateProductData.videoUrl = updateVideoFile.path;
+
         const updatedProduct = await SimpleProduct.findByIdAndUpdate(
             id,
             updateProductData, 
-            { new: true, runValidators: true }
+            { returnDocument: 'after', runValidators: true }
         );
 
         if (!updatedProduct) {
@@ -154,6 +164,9 @@ export const updateProductForSeo = async (req, res) => {
 
         if (req.body.description !== undefined) product.description = req.body.description;
         if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
+        if (req.body.metaTitle !== undefined) product.metaTitle = String(req.body.metaTitle || '').trim();
+        if (req.body.metaDescription !== undefined) product.metaDescription = String(req.body.metaDescription || '').trim();
+        if (req.body.keywords !== undefined) product.keywords = String(req.body.keywords || '').trim();
 
         if (req.body.volumes) {
             const volumes = JSON.parse(req.body.volumes);
@@ -168,13 +181,58 @@ export const updateProductForSeo = async (req, res) => {
         const mainImage = req.files?.imagepath?.[0] || req.file;
         const galleryImages = req.files?.galleryImages || [];
         if (mainImage) {
-            if (product.imagepath) await deleteFromCloudinary(product.imagepath);
+            if (product.imagepath && product.imagepath !== mainImage.path) {
+                await deleteFromCloudinary(product.imagepath);
+            }
             product.imagepath = mainImage.path;
         }
 
-        if (galleryImages.length > 0) {
+        if (!product.imagepath) {
+            product.imagepath = './static/alora image 2.jpeg';
+        }
+
+        let remainingExistingGallery = product.galleryImages || [];
+        if (req.body.existingGallery !== undefined) {
+            try {
+                const parsed = JSON.parse(req.body.existingGallery);
+                if (Array.isArray(parsed)) {
+                    remainingExistingGallery = parsed;
+                }
+            } catch (e) {}
+            // Delete removed existing gallery files from Cloudinary
+            const toDelete = (product.galleryImages || []).filter(img => !remainingExistingGallery.includes(img));
+            if (toDelete.length > 0) {
+                await Promise.all(toDelete.map(deleteFromCloudinary));
+            }
+        } else if (galleryImages.length > 0) {
             await Promise.all((product.galleryImages || []).map(deleteFromCloudinary));
-            product.galleryImages = galleryImages.map((file) => file.path);
+            remainingExistingGallery = [];
+        }
+
+        const newGalleryPaths = galleryImages.map((file) => file.path);
+        if (req.body.existingGallery !== undefined || newGalleryPaths.length > 0) {
+            product.galleryImages = [...remainingExistingGallery, ...newGalleryPaths].slice(0, 6);
+        }
+
+        if (req.body.removeVideo === 'true') {
+            if (product.videoUrl) await deleteFromCloudinary(product.videoUrl);
+            product.videoUrl = '';
+        } else if (req.body.videoUrl !== undefined) {
+            product.videoUrl = req.body.videoUrl;
+        }
+        const videoFile = req.files?.productVideo?.[0];
+        if (videoFile) {
+            if (product.videoUrl) await deleteFromCloudinary(product.videoUrl);
+            product.videoUrl = videoFile.path;
+        }
+
+        if (req.body.faqs !== undefined) {
+            try {
+                let parsedFaqs = typeof req.body.faqs === 'string' ? JSON.parse(req.body.faqs) : req.body.faqs;
+                if (Array.isArray(parsedFaqs)) {
+                    product.faqs = parsedFaqs.filter(f => f && f.question && f.answer);
+                }
+            } catch (e) {}
         }
 
         await product.save();
@@ -205,16 +263,16 @@ export const deleteproduct = async (req, res) => {
     }
 };
 
-// 5. GET SINGLE PRODUCT
+// 5. GET SINGLE PRODUCT (Ultra Fast Lean Query)
 export const getproductbyid = async (req, res) => {
     try {
         const { id } = req.params;
-        let product = await SimpleProduct.findOne({ slug: id });
+        let product = await SimpleProduct.findOne({ slug: id }).lean();
         if (!product && /^[a-f\d]{24}$/i.test(id)) {
-            product = await SimpleProduct.findById(id);
+            product = await SimpleProduct.findById(id).lean();
         }
         if (!product) {
-            const products = await SimpleProduct.find();
+            const products = await SimpleProduct.find().lean();
             product = products.find((item) => toProductSlug(item.name) === id);
         }
 

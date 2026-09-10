@@ -1,38 +1,74 @@
-import BASE_URL from "./config.js";
-
-async function protectSeoPage() {
-    const response = await fetch(`${BASE_URL}/api/auth/session`, { credentials: "include" });
-    if (!response.ok) {
-        localStorage.removeItem("user");
-        window.location.replace("./login.html");
-        return;
+import BASE_URL, { getAuthHeaders } from "./config.js";
+async function getCurrentSession() {
+    try {
+        const response = await fetch(`${BASE_URL}/api/auth/session`, { 
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+        if (!response.ok) return null;
+        const data = await response.json();
+        return data.success ? data.user : null;
+    } catch {
+        return null;
     }
-
-    const data = await response.json();
-    const user = data.user;
-    if (!data.success || !user || !["admin", "seoadmin"].includes(user.role)) {
-        localStorage.removeItem("user");
-        window.location.replace("./login.html");
-        return;
-    }
-
-    localStorage.setItem("user", JSON.stringify(user));
-    const welcomeText = document.querySelector("main h2");
-    if (welcomeText && user.name) welcomeText.innerHTML = `Hello ${user.name.toUpperCase()}`;
 }
+async function protectSeoPage() {
+    const role = sessionStorage.getItem("userRole") || localStorage.getItem("userRole");
+    const storedUserStr = sessionStorage.getItem("user") || localStorage.getItem("user");
 
+    let storedUser = null;
+    try {
+        if (storedUserStr) storedUser = JSON.parse(storedUserStr);
+    } catch (e) {}
+
+    const isRoleValid = role === "seoadmin" || role === "admin" || (storedUser && (storedUser.role === "seoadmin" || storedUser.role === "admin"));
+
+    sessionStorage.setItem("tabAuthActive", "true");
+    if (role) sessionStorage.setItem("userRole", role);
+    if (storedUserStr) sessionStorage.setItem("user", storedUserStr);
+
+    const freshUser = await getCurrentSession();
+    if (freshUser && (freshUser.role === "seoadmin" || freshUser.role === "admin")) {
+        sessionStorage.setItem("user", JSON.stringify(freshUser));
+        sessionStorage.setItem("userRole", freshUser.role);
+        localStorage.setItem("user", JSON.stringify(freshUser));
+        localStorage.setItem("userRole", freshUser.role);
+    } else if (!isRoleValid) {
+        clearAllAuthStorageAndRedirect();
+        return;
+    }
+}
+function clearAllAuthStorageAndRedirect() {
+    sessionStorage.clear();
+    localStorage.removeItem("user");
+    localStorage.removeItem("userRole");
+    localStorage.removeItem("tabAuthActive");
+    // Auth tokens are in httpOnly cookies
+    window.location.replace("./login.html");
+}
+async function handleSeoLogout(event) {
+    if (event) {
+        event.preventDefault();
+        event.stopPropagation();
+    }
+    try {
+        await fetch(`${BASE_URL}/api/auth/logout`, { 
+            method: "POST", 
+            headers: getAuthHeaders(),
+            credentials: "include" 
+        });
+    } catch (err) {
+        console.warn("Logout request failed:", err);
+    } finally {
+        clearAllAuthStorageAndRedirect();
+    }
+}
 document.addEventListener("DOMContentLoaded", () => {
     protectSeoPage();
-
-    document.getElementById("adminLogoutBtn")?.addEventListener("click", async (event) => {
-        event.preventDefault();
-        try {
-            await fetch(`${BASE_URL}/api/auth/logout`, { method: "POST", credentials: "include" });
-        } finally {
-            localStorage.removeItem("user");
-            localStorage.removeItem("token");
-            localStorage.removeItem("userToken");
-            window.location.href = "./login.html";
-        }
-    });
+});
+document.addEventListener("click", (event) => {
+    const logoutBtn = event.target.closest("#adminLogoutBtn, #logout-btn, #seoLogoutBtn, .seo-logout-btn");
+    if (logoutBtn) {
+        handleSeoLogout(event);
+    }
 });

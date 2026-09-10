@@ -4,7 +4,7 @@
         <!-- Left: Menu Links -->
         <div class="flex items-center">
             <!-- Mobile Hamburger Button -->
-            <button id="menu-btn" type="button" class="md:hidden text-xl text-[#2A2A24] focus:outline-none p-2 cursor-pointer relative z-10" aria-label="Open Menu">
+            <button id="menu-btn" onclick="window.openMobileDrawer(event)" type="button" class="md:hidden text-xl text-[#2A2A24] focus:outline-none p-2 cursor-pointer relative z-10" aria-label="Open Menu">
                 <i class="fa-solid fa-bars pointer-events-none"></i>
             </button>
 
@@ -30,41 +30,42 @@
 
         <!-- Right: Actions Container -->
         <div id="nav-auth-container" class="flex items-center justify-end gap-5 normal-case">
-            <button id="search-open-btn" type="button" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
-                <i class="fa-solid fa-magnifying-glass pointer-events-none"></i>
+            <button id="search-open-btn" type="button" aria-label="Search products" title="Search products" class="transition p-1 text-base text-black focus:outline-none hover:text-gold cursor-pointer">
+                <i class="fa-solid fa-magnifying-glass pointer-events-none" aria-hidden="true"></i>
             </button>
 
             <!-- Floating Overlay Search Bar (Fixed layout overlapping issue) -->
             <div id="search-container" class="hidden absolute top-full left-0 right-0 w-full bg-white p-3 shadow-md border-t border-gray-100 z-50 flex items-center justify-between gap-3 px-4 md:px-8">
                 <div class="relative w-full max-w-2xl mx-auto flex items-center">
                     <input type="text" placeholder="Search products..." id="search-input" class="w-full text-sm text-black border border-gray-300 rounded-full px-4 py-2 pr-10 focus:outline-none focus:border-gold" autocomplete="off">
-                    <button id="search-close-btn" type="button" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
+                    <button id="search-close-btn" type="button" aria-label="Close search" class="absolute right-3 text-xl text-stone-500 hover:text-black">&times;</button>
                     <div id="search-suggestions" class="absolute left-0 right-0 top-full bg-white text-black shadow-2xl rounded-b hidden z-[9999] max-h-60 overflow-y-auto border border-gray-200 mt-1"></div>
                 </div>
             </div>
 
             <!-- Cart Section -->
-            <a href="./cart.html" class="relative text-base text-black hover:text-gold transition">
-                <i class="fa-solid fa-shopping-cart"></i>
+            <a href="./cart.html" aria-label="Shopping Cart" title="Shopping Cart" class="relative text-base text-black hover:text-gold transition">
+                <i class="fa-solid fa-shopping-cart" aria-hidden="true"></i>
                 <span id="global-cart-badge" class="absolute -top-2 -right-2 bg-clay text-[10px] leading-none px-1.5 py-1 rounded-full text-white">0</span>
             </a>
 
             <!-- Dynamic Auth Section -->
             <div id="auth-actions" class="flex items-center gap-4">
-                <a href="./login.html" class="text-base text-black hover:text-gold transition">
-                    <i class="fa-solid fa-user"></i>
+                <a href="./login.html" aria-label="User Account Login" title="User Account Login" class="text-base text-black hover:text-gold transition">
+                    <i class="fa-solid fa-user" aria-hidden="true"></i>
+                    <span class="sr-only">User Account Login</span>
                 </a>
             </div>
         </div>
     </div>
 
     <!-- 📱 MOBILE MENU SLIDE-OVER DRAWER -->
-    <div id="mobile-menu" class="fixed inset-0 bg-black/50 z-[9999] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
-        <div id="mobile-menu-drawer" class="fixed top-0 left-0 w-64 bg-white h-full shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000]">
+    <div id="mobile-menu" onclick="if(event.target===this) window.closeMobileDrawer(event)" class="fixed inset-0 bg-black/50 z-[9999] hidden opacity-0 transition-opacity duration-300 pointer-events-none">
+        <div id="mobile-menu-drawer" class="fixed top-0 left-0 w-64 bg-white h-full shadow-2xl p-6 flex flex-col justify-between transform -translate-x-full transition-transform duration-300 ease-in-out z-[10000] pointer-events-auto">
             <div>
                 <div class="flex justify-between items-center pb-4 border-b border-gray-200">
                     <img src="./static/logo2.png" alt="logo" class="w-28">
-                    <button id="menu-close-btn" type="button" class="text-2xl text-black focus:outline-none p-1 cursor-pointer">
+                    <button id="menu-close-btn" onclick="window.closeMobileDrawer(event)" type="button" class="text-2xl text-black focus:outline-none p-1 cursor-pointer">
                         <i class="fa-solid fa-xmark pointer-events-none"></i>
                     </button>
                 </div>

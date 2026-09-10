@@ -1,9 +1,7 @@
 import BASE_URL from "./config.js";
-
 const byId = (id) => document.getElementById(id);
 const money = (value) => `₹${Number(value || 0).toFixed(2)}`;
 const safe = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
-
 const registerForm = byId("affiliateRegisterForm");
 if (registerForm) {
   registerForm.addEventListener("submit", async (event) => {
@@ -19,7 +17,6 @@ if (registerForm) {
     } catch { message.textContent = "Could not reach the server."; message.className = "mt-4 text-sm text-red-700"; }
   });
 }
-
 const dashboard = byId("affiliateDashboard");
 if (dashboard) {
   try {

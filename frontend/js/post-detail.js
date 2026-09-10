@@ -1,48 +1,35 @@
-import BASE_URL from './config.js';
-
+import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from './config.js';
 function getSlugFromLocation() {
     const urlParams = new URLSearchParams(window.location.search);
     const querySlug = urlParams.get('slug');
     if (querySlug) return querySlug;
-
-    // Path structure: /post/saffron-benefits-for-skin ya /blog/saffron-benefits-for-skin
     const pathParts = window.location.pathname.split('/').filter(Boolean);
-    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog');
-    
+    const postIndex = pathParts.findIndex((part) => part.toLowerCase() === 'post' || part.toLowerCase() === 'blog' || part.toLowerCase() === 'blogs');
     if (postIndex >= 0 && pathParts[postIndex + 1]) {
         return decodeURIComponent(pathParts[postIndex + 1]);
     }
-
     if (pathParts.length > 0) {
         const lastPart = pathParts[pathParts.length - 1];
-        if (!lastPart.endsWith('.html')) {
+        if (!lastPart.endsWith('.html') && lastPart.toLowerCase() !== 'blog' && lastPart.toLowerCase() !== 'blogs') {
             return decodeURIComponent(lastPart);
         }
     }
-
     return '';
 }
-
 async function fetchPostDetails() {
     const slug = getSlugFromLocation();
-
     if (!slug) {
         showError("Invalid URL: Post slug is missing.");
         return;
     }
-
     try {
         const apiPath = BASE_URL ? `${BASE_URL}/api/blogs/post/${encodeURIComponent(slug)}` : `/api/blogs/post/${encodeURIComponent(slug)}`;
-
         const response = await fetch(apiPath);
         const result = await response.json();
-
         if (!response.ok) {
             throw new Error(result.message || 'Failed to fetch article');
         }
-
         const blog = result.data || result.blog || result;
-
         if (blog) {
             renderArticle(blog);
             injectSEO(blog);
@@ -54,38 +41,123 @@ async function fetchPostDetails() {
         showError("Failed to load article: " + err.message);
     }
 }
-
-function sanitizePostBodyContent(contentHtml, blogTitle) {
+function sanitizePostBodyContent(contentHtml, postTitle = '') {
     if (!contentHtml) return contentHtml;
-
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = contentHtml;
-
+    
+    // 1. Remove duplicate H1 tags if present
     const h1Nodes = tempDiv.querySelectorAll('h1');
     h1Nodes.forEach((headingNode) => {
         headingNode.remove();
     });
 
+    // 2. Clean empty headings, empty paragraphs, whitespace spacers & unwrap accidental full-paragraph bolding
+    const allBlocks = tempDiv.querySelectorAll('p, h2, h3, h4, h5, h6, div');
+    allBlocks.forEach((el) => {
+        const cleanText = (el.textContent || '').replace(/[\s\u00A0\u200B\uFEFF]/g, '');
+        const hasMedia = el.querySelector('img, video, iframe, table, input, button, audio');
+        if (!cleanText && !hasMedia) {
+            el.remove();
+            return;
+        }
+
+        if (el.tagName === 'P') {
+            // Strip inline font-weight on paragraph level
+            if (el.style && el.style.fontWeight) {
+                el.style.fontWeight = '';
+            }
+
+            // Strip inline font-weight on span level if wrapping full text or empty spans
+            el.querySelectorAll('span').forEach((span) => {
+                const spanText = (span.textContent || '').replace(/[\s\u00A0\u200B\uFEFF]/g, '');
+                if (!spanText && !span.querySelector('img, video, iframe')) {
+                    span.remove();
+                } else if (span.style && (span.style.fontWeight === 'bold' || span.style.fontWeight === '700' || span.style.fontWeight === '600')) {
+                    if (span.innerText && span.innerText.trim() === el.innerText.trim()) {
+                        span.style.fontWeight = '';
+                    }
+                }
+            });
+
+            // Unwrap <strong> or <b> if it wraps 100% of paragraph text (accidental full-paragraph bold)
+            const children = Array.from(el.childNodes).filter((node) => node.nodeType === 1 || (node.nodeType === 3 && node.textContent.trim().length > 0));
+            if (children.length === 1 && (children[0].tagName === 'STRONG' || children[0].tagName === 'B')) {
+                const boldElem = children[0];
+                while (boldElem.firstChild) {
+                    el.insertBefore(boldElem.firstChild, boldElem);
+                }
+                boldElem.remove();
+            }
+        }
+    });
+
+    // 3. Remove consecutive <br> tags
+    tempDiv.querySelectorAll('br').forEach((br) => {
+        let prev = br.previousSibling;
+        while (prev && prev.nodeType === 3 && !prev.textContent.trim()) {
+            prev = prev.previousSibling;
+        }
+        if (prev && prev.nodeName === 'BR') {
+            br.remove();
+        }
+    });
+
+    // 4. Style grid tables
+    const tableNodes = tempDiv.querySelectorAll('table');
+    tableNodes.forEach((table) => {
+        table.classList.add('w-full', 'my-4', 'border-collapse', 'rounded-xl', 'overflow-hidden');
+        if (!table.parentElement || !table.parentElement.classList.contains('blog-table-responsive')) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'blog-table-responsive overflow-x-auto my-4 rounded-2xl border border-slate-300 shadow-sm bg-white';
+            table.parentNode.insertBefore(wrapper, table);
+            wrapper.appendChild(table);
+        }
+    });
+
+    // 5. Sanitize inline TOC elements so they never float or overlap on mobile
+    const inlineTocNodes = tempDiv.querySelectorAll('.toc, #toc, .table-of-contents, .ez-toc-container, [class*="toc"]');
+    inlineTocNodes.forEach((toc) => {
+        toc.style.position = 'static';
+        toc.style.float = 'none';
+        toc.style.width = '100%';
+        toc.style.maxWidth = '100%';
+        toc.style.marginLeft = '0';
+        toc.style.marginRight = '0';
+        toc.style.boxSizing = 'border-box';
+    });
+
     return tempDiv.innerHTML;
 }
+function decodeEntities(str) {
+    if (str === null || str === undefined) return '';
+    let decoded = String(str);
+    let previous;
+    let iterations = 0;
+    do {
+        previous = decoded;
+        decoded = decoded
+            .replace(/&amp;/g, '&')
+            .replace(/&lt;/g, '<')
+            .replace(/&gt;/g, '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#039;|&#39;|&apos;/gi, "'");
+        iterations++;
+    } while (decoded !== previous && iterations < 5);
+    return decoded;
+}
 
-// 🟢 Article Details DOM Rendering
 function renderArticle(blog) {
     document.getElementById('post-loader')?.classList.add('hidden');
     document.getElementById('blog-content-area')?.classList.remove('hidden');
-
     const titleEl = document.getElementById('post-title');
-    if (titleEl) titleEl.innerText = blog.title || '';
-
+    if (titleEl) titleEl.innerText = decodeEntities(blog.title || '');
     const categoryEl = document.getElementById('post-category');
-    if (categoryEl) categoryEl.innerText = blog.category || 'General';
-
+    if (categoryEl) categoryEl.innerText = decodeEntities(blog.category || 'General');
     let contentHtml = blog.content || '';
     contentHtml = sanitizePostBodyContent(contentHtml, blog.title || '');
-
     const bodyEl = document.getElementById('post-body');
     if (bodyEl) bodyEl.innerHTML = contentHtml;
-
     if (blog.createdAt) {
         const dateEl = document.getElementById('post-date');
         if (dateEl) {
@@ -96,69 +168,449 @@ function renderArticle(blog) {
             });
         }
     }
-
     const coverImg = document.getElementById('post-cover');
-    if (coverImg && blog.coverImage) {
-        coverImg.src = blog.coverImage.startsWith('http') 
-            ? blog.coverImage 
-            : `${BASE_URL}${blog.coverImage}`;
-        coverImg.alt = blog.title || 'Blog Cover';
+    const coverContainer = coverImg?.parentElement;
+    const coverUrl = blog.coverImage || blog.coverUrl || '';
+    if (coverImg) {
+        if (coverUrl && typeof coverUrl === 'string' && coverUrl.trim()) {
+            let finalUrl = coverUrl.trim();
+            if (!finalUrl.startsWith('http') && !finalUrl.startsWith('/')) {
+                finalUrl = `/${finalUrl}`;
+            }
+            if (!finalUrl.startsWith('http') && BASE_URL) {
+                finalUrl = `${BASE_URL}${finalUrl}`;
+            }
+            coverImg.src = finalUrl;
+            coverImg.alt = blog.title || 'Blog Cover';
+            if (coverContainer) coverContainer.classList.remove('hidden');
+            coverImg.onerror = () => {
+                if (coverContainer) coverContainer.classList.add('hidden');
+            };
+        } else {
+            if (coverContainer) coverContainer.classList.add('hidden');
+        }
+    }
+    // Generate Left Table of Contents Sidebar & Mobile Accordion
+    generateTableOfContents();
+    // Render Category-Related Products Below Blog Article
+    renderRelatedProducts(blog);
+}
+
+async function renderRelatedProducts(blog) {
+    const sectionEl = document.getElementById('related-products-section');
+    const gridEl = document.getElementById('related-products-grid');
+    const headingEl = document.getElementById('related-products-heading');
+
+    if (!sectionEl || !gridEl) return;
+
+    try {
+        const apiPath = BASE_URL ? `${BASE_URL}/api/product/all` : `/api/product/all`;
+        let result = await safeFetchJson(apiPath);
+
+        if (!result) {
+            const res = await fetch(apiPath);
+            if (res.ok) result = await res.json();
+        }
+
+        const allProducts = Array.isArray(result) 
+            ? result 
+            : (result?.products || result?.data || []);
+
+        if (!allProducts || allProducts.length === 0) return;
+
+        const category = (blog.category || '').toLowerCase().trim();
+        const blogTitle = (blog.title || '').toLowerCase().trim();
+        const blogKeywords = (blog.keywords || '').toLowerCase().trim();
+
+        const categoryKeywords = ['lotion', 'serum', 'face wash', 'facewash', 'scrub', 'cream', 'sunscreen', 'kit', 'cleanser', 'travel', 'radiance'];
+        let matchedCategoryKey = categoryKeywords.find(key => category.includes(key) || blogTitle.includes(key) || blogKeywords.includes(key)) || category;
+
+        let matchedProducts = allProducts.filter(p => {
+            const pCat = (p.category || '').toLowerCase();
+            const pName = (p.name || p.title || '').toLowerCase();
+            const pDesc = (p.description || '').toLowerCase();
+
+            if (category && (pCat.includes(category) || pName.includes(category))) return true;
+            if (matchedCategoryKey && (pCat.includes(matchedCategoryKey) || pName.includes(matchedCategoryKey) || pDesc.includes(matchedCategoryKey))) return true;
+            return false;
+        });
+
+        if (matchedProducts.length === 0) {
+            matchedProducts = allProducts.slice(0, 3);
+        } else if (matchedProducts.length < 3) {
+            const otherProducts = allProducts.filter(p => !matchedProducts.includes(p));
+            matchedProducts = matchedProducts.concat(otherProducts.slice(0, 3 - matchedProducts.length));
+        }
+
+        matchedProducts = matchedProducts.slice(0, 3);
+
+        if (headingEl) {
+            headingEl.innerText = blog.category ? `Recommended ${blog.category} Products` : `Recommended Products for You`;
+        }
+
+        gridEl.innerHTML = '';
+
+        matchedProducts.forEach(product => {
+            const prodName = product.name || product.title || 'Alora Skincare Product';
+            const prodPrice = product.variants?.[0]?.price || product.price || (product.sizes && product.sizes[0]?.price) || 0;
+            const prodMrp = product.variants?.[0]?.comparePrice || product.mrp || product.comparePrice || (product.sizes && product.sizes[0]?.mrp) || 0;
+            const imgRaw = product.imagepath || (product.galleryImages && product.galleryImages[0]) || (product.images && product.images[0]) || product.image || '';
+            const prodImg = getImageUrl(imgRaw) || './static/logo2.png';
+            const prodUrl = getProductUrl(product);
+
+            const cardHtml = `
+                <div data-product-id="${product._id || product.id}" class="bg-white rounded-2xl p-4 shadow-sm border border-amber-900/10 hover:shadow-md hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between group relative">
+                    <div class="relative w-full aspect-square rounded-xl overflow-hidden mb-3 bg-slate-50">
+                        <a href="${prodUrl}" class="w-full h-full block">
+                            <img src="${prodImg}" alt="${prodName}" class="w-full h-full object-cover" onerror="this.onerror=null; this.src='./static/logo2.png'">
+                        </a>
+                        ${prodMrp > prodPrice ? `<span class="absolute top-2 left-2 z-10 bg-[#800000] text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow-xs pointer-events-none">SALE</span>` : ''}
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id || product.id}', this, event)" style="position: absolute !important; top: 8px !important; right: 8px !important; left: auto !important; margin: 0 !important; z-index: 20 !important;" class="wishlist-toggle-btn absolute top-2 right-2 w-7 h-7 rounded-full bg-white/95 hover:bg-rose-50 border border-stone-200/80 shadow-2xs flex items-center justify-center transition-all cursor-pointer group/wish z-20" title="Add to Wishlist" aria-label="Add to Wishlist">
+                            <i class="fa-regular fa-heart text-xs text-stone-400 group-hover/wish:text-rose-600 transition-colors"></i>
+                        </button>
+                    </div>
+                    <div>
+                        <a href="${prodUrl}" class="font-bold text-sm text-slate-900 hover:text-[#8B4513] transition-colors line-clamp-2 mb-1">
+                            ${prodName}
+                        </a>
+                        <div class="flex items-center gap-2 mb-3">
+                            <span class="font-extrabold text-sm text-[#800000]">₹${prodPrice}</span>
+                            ${prodMrp > prodPrice ? `<span class="text-xs text-slate-400 line-through">₹${prodMrp}</span>` : ''}
+                        </div>
+                    </div>
+                    <a href="${prodUrl}" class="w-full bg-[#152219] hover:bg-amber-950 text-white text-xs font-bold py-2 rounded-xl text-center transition-colors flex items-center justify-center gap-1.5 shadow-xs">
+                        <i class="fa-solid fa-bag-shopping text-[11px]"></i> Shop Now
+                    </a>
+                </div>
+            `;
+
+            gridEl.innerHTML += cardHtml;
+        });
+
+        if (window.syncWishlistHeartsOnPage) {
+            window.syncWishlistHeartsOnPage();
+        }
+
+        sectionEl.classList.remove('hidden');
+
+    } catch (err) {
+        console.warn("Failed to load related category products:", err);
     }
 }
 
-// 🟢 Dynamic SEO & Schema Injector Function
+function generateTableOfContents() {
+    const postBody = document.getElementById('post-body');
+    const tocList = document.getElementById('toc-list');
+    const mobileTocList = document.getElementById('mobile-toc-list');
+    const tocSidebarContainer = document.getElementById('toc-sidebar-container');
+    const mobileTocContainer = document.getElementById('mobile-toc-container');
+
+    if (!postBody || (!tocList && !mobileTocList)) return;
+
+    const headings = Array.from(postBody.querySelectorAll('h2, h3'));
+
+    if (headings.length === 0) {
+        if (tocSidebarContainer) tocSidebarContainer.classList.add('hidden');
+        if (mobileTocContainer) mobileTocContainer.classList.add('hidden');
+        return;
+    }
+
+    let tocHtml = '';
+    let mobileTocHtml = '';
+
+    headings.forEach((heading, index) => {
+        if (!heading.id) {
+            heading.id = `section-heading-${index + 1}`;
+        }
+
+        const headingText = heading.innerText.trim();
+        const isH3 = heading.tagName.toLowerCase() === 'h3';
+        const indentClass = isH3 ? 'pl-5 text-xs font-normal text-slate-500' : 'font-bold text-slate-800 text-xs sm:text-sm';
+
+        tocHtml += `
+            <a href="#${heading.id}" data-heading-id="${heading.id}" class="toc-link group flex items-start gap-2 py-2 px-3 rounded-xl hover:bg-amber-100/60 text-slate-600 hover:text-[#8B4513] transition-all duration-200 ${indentClass}">
+                <span class="inline-block w-1.5 h-1.5 rounded-full bg-amber-400 mt-1.5 shrink-0 group-hover:scale-125 transition-transform"></span>
+                <span class="line-clamp-2">${headingText}</span>
+            </a>
+        `;
+
+        mobileTocHtml += `
+            <a href="#${heading.id}" class="mobile-toc-link block py-1.5 px-2 rounded-lg hover:bg-amber-100/50 text-slate-700 hover:text-[#8B4513] ${indentClass}">
+                ${headingText}
+            </a>
+        `;
+    });
+
+    if (tocList) tocList.innerHTML = tocHtml;
+    if (mobileTocList) mobileTocList.innerHTML = mobileTocHtml;
+
+    if (tocSidebarContainer) tocSidebarContainer.classList.remove('hidden');
+    if (mobileTocContainer) mobileTocContainer.classList.remove('hidden');
+
+    document.querySelectorAll('.toc-link, .mobile-toc-link').forEach((link) => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href')?.replace('#', '');
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                const navHeight = 100;
+                const elementPosition = targetElement.getBoundingClientRect().top + window.pageYOffset;
+                window.scrollTo({
+                    top: elementPosition - navHeight,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    const tocCard = document.getElementById('toc-sidebar-card');
+
+    function setActiveHeading(activeId) {
+        if (!activeId) return;
+        let activeDesktopLink = null;
+
+        document.querySelectorAll('.toc-link').forEach((link) => {
+            if (link.getAttribute('data-heading-id') === activeId) {
+                link.classList.add('bg-amber-100/90', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs', 'border-l-4', 'border-[#8B4513]', 'pl-3');
+                activeDesktopLink = link;
+            } else {
+                link.classList.remove('bg-amber-100/90', 'text-[#8B4513]', 'font-extrabold', 'shadow-xs', 'border-l-4', 'border-[#8B4513]', 'pl-3');
+            }
+        });
+
+        document.querySelectorAll('.mobile-toc-link').forEach((link) => {
+            if (link.getAttribute('href') === `#${activeId}`) {
+                link.classList.add('bg-amber-100', 'text-[#8B4513]', 'font-bold');
+            } else {
+                link.classList.remove('bg-amber-100', 'text-[#8B4513]', 'font-bold');
+            }
+        });
+
+        // Automatically scroll the Table of Contents container so active heading stays in view
+        if (tocCard && activeDesktopLink) {
+            const cardRect = tocCard.getBoundingClientRect();
+            const linkRect = activeDesktopLink.getBoundingClientRect();
+            const relativeTop = linkRect.top - cardRect.top;
+            const targetScroll = tocCard.scrollTop + relativeTop - (tocCard.clientHeight / 2) + (activeDesktopLink.clientHeight / 2);
+            
+            tocCard.scrollTo({
+                top: Math.max(0, targetScroll),
+                behavior: 'smooth'
+            });
+        }
+    }
+
+    const observerOptions = {
+        root: null,
+        rootMargin: '-90px 0px -60% 0px',
+        threshold: 0
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+                setActiveHeading(entry.target.id);
+            }
+        });
+    }, observerOptions);
+
+    headings.forEach((heading) => observer.observe(heading));
+
+    // Fallback on scroll for fast swiping / deep scroll
+    let scrollTimeout;
+    window.addEventListener('scroll', () => {
+        if (scrollTimeout) return;
+        scrollTimeout = setTimeout(() => {
+            scrollTimeout = null;
+            const scrollPos = window.pageYOffset + 140;
+            let currentHeadingId = null;
+
+            for (let i = 0; i < headings.length; i++) {
+                const heading = headings[i];
+                if (heading.offsetTop <= scrollPos) {
+                    currentHeadingId = heading.id;
+                } else {
+                    break;
+                }
+            }
+
+            if (currentHeadingId) {
+                setActiveHeading(currentHeadingId);
+            }
+        }, 80);
+    }, { passive: true });
+}
 function injectSEO(blog) {
-    const currentUrl = window.location.href;
-    const finalTitle = blog.metaTitle || blog.title || "Alora Radiance";
-
-    // 1. Browser Tab Title Update
+    const rawSlug = blog.slug || getSlugFromLocation();
+    const currentUrl = rawSlug ? `https://aloraradiance.com/blog/${encodeURIComponent(rawSlug)}` : window.location.href;
+    const finalTitle = decodeEntities(blog.metaTitle || blog.title || "Alora Radiance");
     document.title = finalTitle;
-
-    // 2. DOM Title Element Update (Safe Side)
     const titleEl = document.getElementById('dynamic-title');
     if (titleEl) {
         titleEl.textContent = finalTitle;
     }
-
     const metaDescEl = document.getElementById('dynamic-meta-desc');
     if (metaDescEl && blog.metaDesc) {
-        metaDescEl.setAttribute('content', blog.metaDesc);
+        metaDescEl.setAttribute('content', decodeEntities(blog.metaDesc));
     }
-
     const keywordsEl = document.getElementById('dynamic-keywords');
     if (keywordsEl && blog.keywords) {
         keywordsEl.setAttribute('content', blog.keywords);
     }
-
     const publisherEl = document.getElementById('dynamic-publisher');
     if (publisherEl && blog.publisher) {
         publisherEl.setAttribute('content', blog.publisher);
     }
-
     const canonicalEl = document.getElementById('dynamic-canonical');
     if (canonicalEl) {
         canonicalEl.setAttribute('href', currentUrl);
     }
-
     document.getElementById('og-title')?.setAttribute('content', finalTitle);
     document.getElementById('og-desc')?.setAttribute('content', blog.metaDesc || '');
     document.getElementById('og-url')?.setAttribute('content', currentUrl);
-
     if (blog.coverImage) {
         const fullImgUrl = blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`;
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
-
-    const schemaEl = document.getElementById('dynamic-json-ld');
-    if (schemaEl && blog.schema) {
-        try {
-            const parsedSchema = typeof blog.schema === 'string' ? JSON.parse(blog.schema) : blog.schema;
-            schemaEl.textContent = JSON.stringify(parsedSchema, null, 2);
-        } catch (e) {
-            schemaEl.textContent = blog.schema;
+    injectMultipleSchemasToDOM(blog.schema);
+}
+function deduplicateSchemas(schemas) {
+    if (!Array.isArray(schemas)) return [];
+    const seen = new Set();
+    const result = [];
+    for (const s of schemas) {
+        if (!s || typeof s !== 'object') continue;
+        const key = JSON.stringify(s);
+        if (!seen.has(key)) {
+            seen.add(key);
+            result.push(s);
         }
     }
+    return result;
 }
+
+function parseMultipleSchemas(rawInput) {
+    if (!rawInput) return [];
+    if (Array.isArray(rawInput)) {
+        return deduplicateSchemas(rawInput.filter(item => item && typeof item === 'object'));
+    }
+    if (typeof rawInput === 'object' && rawInput !== null) {
+        if (Array.isArray(rawInput['@graph'])) {
+            return deduplicateSchemas(rawInput['@graph'].filter(item => item && typeof item === 'object'));
+        }
+        return [rawInput];
+    }
+    let cleaned = String(rawInput).trim();
+    if (!cleaned) return [];
+
+    if (cleaned.includes('<script')) {
+        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scriptMatches && scriptMatches.length > 0) {
+            const extracted = [];
+            for (const match of scriptMatches) {
+                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                if (content) {
+                    const subSchemas = parseMultipleSchemas(content);
+                    extracted.push(...subSchemas);
+                }
+            }
+            if (extracted.length > 0) return deduplicateSchemas(extracted);
+        } else {
+            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
+        }
+    }
+    try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed)) {
+            return deduplicateSchemas(parsed.filter(item => item && typeof item === 'object'));
+        }
+        if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed['@graph'])) {
+                return deduplicateSchemas(parsed['@graph'].filter(item => item && typeof item === 'object'));
+            }
+            return [parsed];
+        }
+    } catch (e) {
+    }
+    const schemas = [];
+    let depth = 0;
+    let startIndex = -1;
+    let inString = false;
+    let isEscaped = false;
+    for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (isEscaped) {
+            isEscaped = false;
+            continue;
+        }
+        if (char === '\\') {
+            isEscaped = true;
+            continue;
+        }
+        if (char === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (!inString) {
+            if (char === '{' || char === '[') {
+                if (depth === 0) startIndex = i;
+                depth++;
+            } else if (char === '}' || char === ']') {
+                depth--;
+                if (depth === 0 && startIndex !== -1) {
+                    const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
+                    try {
+                        const parsedObj = JSON.parse(jsonChunk);
+                        if (Array.isArray(parsedObj)) {
+                            schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
+                        } else if (parsedObj && typeof parsedObj === 'object') {
+                            if (Array.isArray(parsedObj['@graph'])) {
+                                schemas.push(...parsedObj['@graph'].filter(item => item && typeof item === 'object'));
+                            } else {
+                                schemas.push(parsedObj);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Failed parsing schema chunk:", err);
+                    }
+                    startIndex = -1;
+                }
+            }
+        }
+    }
+    return deduplicateSchemas(schemas);
+}
+
+function injectMultipleSchemasToDOM(rawSchemaInput) {
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"][data-dynamic="true"]').forEach(el => el.remove());
+    if (!rawSchemaInput || !String(rawSchemaInput).trim()) return;
+    let schemasToInject = parseMultipleSchemas(rawSchemaInput);
+    if (!schemasToInject || schemasToInject.length === 0) return;
+
+    const script = document.createElement('script');
+    script.id = 'dynamic-json-ld';
+    script.type = 'application/ld+json';
+    script.className = 'dynamic-schema-injected';
+    script.setAttribute('data-dynamic', 'true');
+
+    if (schemasToInject.length === 1) {
+        const single = { ...schemasToInject[0] };
+        if (!single["@context"]) single["@context"] = "https://schema.org";
+        script.textContent = JSON.stringify(single, null, 2);
+    } else {
+        const combinedSchema = {
+            "@context": "https://schema.org",
+            "@graph": schemasToInject.map(s => {
+                const copy = { ...s };
+                if (copy["@context"]) delete copy["@context"];
+                return copy;
+            })
+        };
+        script.textContent = JSON.stringify(combinedSchema, null, 2);
+    }
+    document.head.appendChild(script);
+}
+window.injectMultipleSchemasToDOM = injectMultipleSchemasToDOM;
 function showError(msg) {
     const loader = document.getElementById('post-loader');
     if (loader) {
@@ -170,7 +622,6 @@ function showError(msg) {
         `;
     }
 }
-
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', fetchPostDetails);
 } else {

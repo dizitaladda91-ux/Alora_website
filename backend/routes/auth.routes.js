@@ -1,7 +1,8 @@
 import express from "express";
-import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile } from '../controllers/auth.controllers.js';
+import { register, login, logout, forgotPassword, resetPassword, getSession, updateProfile, verifyEmail, resendVerificationEmail, pollVerificationStatus } from '../controllers/auth.controllers.js';
 import jwt from "jsonwebtoken";
-import { requireAuth } from "../middlewares/auth.middleware.js";
+import { requireAuth, verifyAuthToken } from "../middlewares/auth.middleware.js";
+import User from "../models/userAuth.models.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
@@ -15,7 +16,7 @@ const router = express.Router();
 // ==========================================
 
 // Safe Protect Middleware (Optional Chaining added to avoid undefined error crashes)
-const protectView = (req, res, next) => {
+const protectView = async (req, res, next) => {
   const token = req.cookies?.token;
 
   // Agar token nahi mila, toh directly login page par redirect kar do
@@ -29,8 +30,13 @@ const protectView = (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Contains { id, role }
+    const decoded = verifyAuthToken(token);
+    const user = await User.findById(decoded.id).select("role").lean();
+    if (!user || user.role !== decoded.role) {
+      res.clearCookie("token");
+      return res.redirect("/login.html");
+    }
+    req.user = { ...decoded, role: user.role };
     next();
   } catch (error) {
     res.clearCookie("token");
@@ -54,9 +60,21 @@ const authorizeRoles = (...roles) => {
 // ==========================================
 router.post('/api/auth/register', register);
 router.post('/api/auth/login', login);
-router.post('/api/auth/logout', logout);
+router.all('/api/auth/logout', logout);
 router.get('/api/auth/session', requireAuth, getSession);
 router.put('/api/auth/profile', requireAuth, updateProfile);
+
+// Email Verification API Routes
+router.get('/api/auth/verify-email', verifyEmail);
+router.post('/api/auth/verify-email', verifyEmail);
+router.post('/api/auth/poll-verification', pollVerificationStatus);
+router.post('/api/auth/resend-verification', (req, res, next) => {
+  const token = req.cookies?.token;
+  if (token) {
+    return requireAuth(req, res, () => resendVerificationEmail(req, res));
+  }
+  return resendVerificationEmail(req, res);
+});
 
 // Forgot Password & Reset Password API Routes
 router.post('/api/auth/forgot-password', forgotPassword);
@@ -65,6 +83,10 @@ router.post('/api/auth/reset-password', resetPassword);
 // ==========================================
 // PUBLIC PAGES SERVING
 // ==========================================
+router.get(['/verify-email', '/verify-email.html'], (req, res) => {
+  res.sendFile(path.join(__dirname, '../../frontend/verify-email.html'));
+});
+
 router.get('/reset-password.html', (req, res) => {
   res.sendFile(path.join(__dirname, '../../frontend/reset-password.html'));
 });
@@ -87,7 +109,7 @@ const registerProtectedViews = (pages, roles) => {
   pages.forEach((page) => {
     const cleanPageName = page.replace(/\.html$/, '');
     const sendProtectedPage = (req, res) => {
-    res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
+      res.sendFile(path.join(__dirname, `../../frontend/${page}`)); 
     };
 
     router.get(`/${page}`, protectView, authorizeRoles(...roles), sendProtectedPage);

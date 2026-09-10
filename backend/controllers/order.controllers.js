@@ -1,6 +1,7 @@
 import Order from "../models/order.models.js";
 import SimpleProduct from "../models/product.models.js";
 import getRazorpay from "../config/razorpay.js";
+import { sendShippingEmail } from "../services/email.service.js";
 
 const allowedStatuses = ["paid", "processing", "packed", "shipped", "delivered", "cancelled", "refunded"];
 
@@ -9,7 +10,26 @@ const restoreOrderStock = async (order) => {
 
   await Promise.all(order.items.map((item) => SimpleProduct.updateOne(
     { _id: item.productId, "variants.volume": item.variant },
-    { $inc: { "variants.$.stock": item.quantity } }
+    [
+      {
+        $set: {
+          variants: {
+            $map: {
+              input: "$variants",
+              as: "v",
+              in: {
+                $cond: [
+                  { $eq: ["$$v.volume", item.variant] },
+                  { $mergeObjects: ["$$v", { stock: { $add: ["$$v.stock", item.quantity] } }] },
+                  "$$v"
+                ]
+              }
+            }
+          },
+          isAvailable: true
+        }
+      }
+    ]
   )));
 };
 
@@ -61,8 +81,42 @@ export const updateAdminOrderStatus = async (req, res) => {
       return res.status(400).json({ success: false, message: "Invalid order status." });
     }
 
-    const order = await Order.findByIdAndUpdate(req.params.id, { orderStatus }, { new: true, runValidators: true }).lean();
+    // Fetched before the update so we can detect a genuine transition into
+    // "shipped" — this update endpoint is also called (with the same status)
+    // just to save tracking details, which must NOT re-trigger the email.
+    const previousOrder = await Order.findById(req.params.id).select("orderStatus").lean();
+    if (!previousOrder) return res.status(404).json({ success: false, message: "Order not found." });
+
+    const update = { orderStatus };
+
+    const trackingNumberProvided = Object.prototype.hasOwnProperty.call(req.body, "trackingNumber");
+    const courierLinkProvided = Object.prototype.hasOwnProperty.call(req.body, "courierLink");
+    const trackingNumber = trackingNumberProvided ? String(req.body.trackingNumber || "").trim().slice(0, 100) : undefined;
+    const courierLink = courierLinkProvided ? String(req.body.courierLink || "").trim().slice(0, 500) : undefined;
+
+    if (courierLink && !/^https?:\/\//i.test(courierLink)) {
+      return res.status(400).json({ success: false, message: "Courier tracking link must be a valid URL." });
+    }
+    if (orderStatus === "shipped" && trackingNumberProvided === false) {
+      return res.status(400).json({ success: false, message: "A tracking number is required to mark an order as shipped." });
+    }
+    if (orderStatus === "shipped" && trackingNumberProvided && !trackingNumber) {
+      return res.status(400).json({ success: false, message: "A tracking number is required to mark an order as shipped." });
+    }
+
+    if (trackingNumber !== undefined) update.trackingNumber = trackingNumber;
+    if (courierLink !== undefined) update.courierLink = courierLink;
+
+    const order = await Order.findByIdAndUpdate(req.params.id, update, { returnDocument: 'after', runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
+
+    // Fire the shipping email only on the actual transition into "shipped".
+    // Never awaited into the response — a slow/failed email must not delay
+    // or break the status-update response the admin is waiting on.
+    if (orderStatus === "shipped" && previousOrder.orderStatus !== "shipped") {
+      sendShippingEmail(order).catch((error) => console.error("Shipping email failed:", error.message));
+    }
+
     return res.status(200).json({ success: true, data: order, message: "Order status updated." });
   } catch {
     return res.status(400).json({ success: false, message: "Could not update order status." });
@@ -79,7 +133,7 @@ export const updateExpectedDeliveryDate = async (req, res) => {
     if (Number.isNaN(expectedDeliveryDate.getTime())) {
       return res.status(400).json({ success: false, message: "Choose a valid delivery date." });
     }
-    const order = await Order.findByIdAndUpdate(req.params.id, { expectedDeliveryDate }, { new: true, runValidators: true }).lean();
+    const order = await Order.findByIdAndUpdate(req.params.id, { expectedDeliveryDate }, { returnDocument: 'after', runValidators: true }).lean();
     if (!order) return res.status(404).json({ success: false, message: "Order not found." });
     return res.status(200).json({ success: true, data: order, message: "Expected delivery date updated." });
   } catch {
@@ -98,7 +152,7 @@ export const refundAdminOrder = async (req, res) => {
       "refund.processing": false
     }, {
       $set: { "refund.processing": true, "refund.reason": reason }
-    }, { new: true });
+    }, { returnDocument: 'after' });
 
     if (!claimedOrder) {
       return res.status(400).json({ success: false, message: "Order is already refunded, being refunded, or cannot be refunded." });
@@ -125,21 +179,21 @@ export const refundAdminOrder = async (req, res) => {
         "refund.reason": reason,
         "refund.refundedAt": new Date()
       }
-    }, { new: true });
+    }, { returnDocument: 'after' });
 
-    // Mark restoration before the increment so a retried maintenance action cannot add stock twice.
-    const restoreTimestamp = new Date();
-    const claimedForStockRestore = await Order.findOneAndUpdate(
-      { _id: claimedOrder._id, stockRestoredAt: null },
-      { $set: { stockRestoredAt: restoreTimestamp } },
-      { new: true }
-    );
-
-    if (claimedForStockRestore) {
-      await restoreOrderStock({ ...claimedOrder.toObject(), stockRestoredAt: null });
+    // Unlimited-catalogue orders never reserve stock, so their refunds must not
+    // add quantities. Older inventory-tracked orders retain the safe restore flow.
+    if (claimedOrder.inventoryTracked) {
+      const restoreTimestamp = new Date();
+      const claimedForStockRestore = await Order.findOneAndUpdate(
+        { _id: claimedOrder._id, stockRestoredAt: null },
+        { $set: { stockRestoredAt: restoreTimestamp } },
+        { returnDocument: 'after' }
+      );
+      if (claimedForStockRestore) await restoreOrderStock({ ...claimedOrder.toObject(), stockRestoredAt: null });
     }
 
-    return res.status(200).json({ success: true, data: order.toObject(), message: "Razorpay refund completed and stock restored." });
+    return res.status(200).json({ success: true, data: order.toObject(), message: "Razorpay refund completed." });
   } catch (error) {
     if (claimedOrder?._id) {
       await Order.updateOne({ _id: claimedOrder._id, paymentStatus: "paid" }, { $set: { "refund.processing": false } });

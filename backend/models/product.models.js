@@ -30,7 +30,6 @@ const SimpleProductSchema = new mongoose.Schema({
         required: [true, 'Product name zaroori hai'],
         trim: true
     },
-    // Public storefront URLs use this readable value instead of exposing a MongoDB ID.
     slug: {
         type: String,
         trim: true,
@@ -51,6 +50,8 @@ const SimpleProductSchema = new mongoose.Schema({
     isFeatured: { type: Boolean, default: false },
     metaTitle: { type: String, trim: true, default: '' },
     metaDescription: { type: String, trim: true, default: '' },
+    keywords: { type: String, trim: true, default: '' },
+    videoUrl: { type: String, trim: true, default: '' },
     category: {
         type: String,
         required: [true, 'Product category zaroori hai'],
@@ -84,8 +85,17 @@ const SimpleProductSchema = new mongoose.Schema({
     totalReviews: {
         type: Number,
         default: 0
-    }
+    },
+    faqs: [{
+        question: { type: String, trim: true },
+        answer: { type: String, trim: true }
+    }]
 }, { timestamps: true });
 
-const SimpleProduct = mongoose.model('SimpleProduct', SimpleProductSchema);
+const SimpleProduct = mongoose.models.SimpleProduct || mongoose.model('SimpleProduct', SimpleProductSchema);
+if (!mongoose.models.Product) {
+    try {
+        mongoose.model('Product', SimpleProductSchema);
+    } catch (_) {}
+}
 export default SimpleProduct;

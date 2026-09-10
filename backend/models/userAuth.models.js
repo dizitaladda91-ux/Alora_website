@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   name: { 
     type: String, 
     required: [true, "Name required hai"],
@@ -26,21 +31,48 @@ const userSchema = new mongoose.Schema({
     unique: true, 
     trim: true,
   },
+  dob: {
+    type: String,
+    trim: true,
+    default: ''
+  },
+  gender: {
+    type: String,
+    trim: true,
+    default: ''
+  },
   address: {
     type: String,
     trim: true,
     default: ''
   },
+  wishlist: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'SimpleProduct'
+    }
+  ],
   role: {
     type: String,
     enum: ["user", "admin", "seoadmin", "affiliate"],
     default: "user"
   },
+  isEmailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: {
+    type: String,
+    default: null
+  },
+  emailVerificationExpires: {
+    type: Date,
+    default: null
+  },
   resetToken: { type: String, default: null },
   resetTokenExpiry: { type: Date, default: null }
 }, { timestamps: true });
 
-// ✅ FIX: Async Mongoose pre-save hook without 'next' parameter
 userSchema.pre('save', async function () {
   if (!this.isModified('password')) return;
 

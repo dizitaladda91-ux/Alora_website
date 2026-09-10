@@ -36,7 +36,12 @@ const orderSchema = new mongoose.Schema({
     lastSyncError: { type: String, default: "", trim: true, maxlength: 1000 }
   },
   totalAmount: { type: Number, required: true, min: 0 },
+  // Records the checkout mode so refunds never alter stock for orders placed
+  // while the catalogue was intentionally unlimited.
+  inventoryTracked: { type: Boolean, default: false },
   expectedDeliveryDate: { type: Date, default: null },
+   trackingNumber: { type: String, default: "", trim: true },
+  courierLink: { type: String, default: "", trim: true },
   currency: { type: String, default: "INR", uppercase: true, trim: true },
   paymentStatus: { type: String, enum: ["paid", "failed", "refunded"], default: "paid" },
   refund: {

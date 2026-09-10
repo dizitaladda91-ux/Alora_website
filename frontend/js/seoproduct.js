@@ -1,13 +1,10 @@
 import BASE_URL, { getImageUrl, safeFetchJson } from './config.js';
-
 const table = document.getElementById('seo-product-table');
-
 function escapeHtml(value = '') {
     const element = document.createElement('div');
     element.textContent = value;
     return element.innerHTML;
 }
-
 async function loadProducts() {
     try {
         const products = await safeFetchJson(`${BASE_URL}/api/product/all`);

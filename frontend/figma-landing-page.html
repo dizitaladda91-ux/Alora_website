@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Figma UI - Alora Radiance Landing Page Design System</title>
+  
+  <!-- Tailwind CSS & FontAwesome -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Luxury Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Outfit:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      user-select: none;
+    }
+    .font-fraunces { font-family: 'Fraunces', serif; }
+    .font-outfit { font-family: 'Outfit', sans-serif; }
+    .font-jakarta { font-family: 'Plus Jakarta Sans', sans-serif; }
+
+    /* Figma Dot Grid Canvas */
+    .figma-canvas-grid {
+      background-color: #1E1E1E;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.12) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #1E1E1E; }
+    ::-webkit-scrollbar-thumb { background: #383838; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4E4E4E; }
+
+    .figma-selectable {
+      cursor: pointer;
+      position: relative;
+      transition: outline 0.15s ease;
+    }
+    .figma-selectable:hover {
+      outline: 1.5px solid #0D99FF !important;
+      outline-offset: 1px;
+    }
+    .figma-selectable.selected {
+      outline: 2px solid #0D99FF !important;
+      outline-offset: 2px;
+    }
+    .figma-selectable.selected::after {
+      content: attr(data-layer-name);
+      position: absolute;
+      top: -20px;
+      left: 0;
+      background: #0D99FF;
+      color: #FFFFFF;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 1px 6px;
+      border-radius: 3px;
+      z-index: 50;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+
+    .artboard-frame {
+      box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col bg-[#1E1E1E] text-[#E0E0E0] overflow-hidden">
+
+  <!-- TOP TOOLBAR -->
+  <header class="h-12 bg-[#2C2C2C] border-b border-[#383838] px-3 flex items-center justify-between text-xs shrink-0 z-40">
+    <div class="flex items-center gap-3">
+      <div class="w-7 h-7 rounded-lg bg-gradient-to-br from-[#F24E1E] via-[#A259FF] to-[#0ACF83] flex items-center justify-center text-white font-black text-xs shadow-sm">
+        <i class="fa-solid fa-shapes text-[11px]"></i>
+      </div>
+      <div class="flex items-center gap-2 border-r border-[#444] pr-3">
+        <span class="font-semibold text-white tracking-wide">Alora Radiance — Landing Page UI</span>
+        <span class="px-2 py-0.5 rounded text-[10px] bg-[#3E3E3E] text-[#AAA] font-mono">v2.4 Final</span>
+      </div>
+      <div class="flex items-center gap-1">
+        <button class="w-8 h-8 rounded hover:bg-[#383838] text-[#0D99FF] flex items-center justify-center"><i class="fa-solid fa-arrow-pointer"></i></button>
+        <button class="w-8 h-8 rounded hover:bg-[#383838] text-[#AAA] hover:text-white flex items-center justify-center"><i class="fa-solid fa-crop-simple"></i></button>
+        <button class="w-8 h-8 rounded hover:bg-[#383838] text-[#AAA] hover:text-white flex items-center justify-center"><i class="fa-regular fa-square"></i></button>
+        <button class="w-8 h-8 rounded hover:bg-[#383838] text-[#AAA] hover:text-white flex items-center justify-center"><i class="fa-solid fa-font"></i></button>
+      </div>
+    </div>
+
+    <!-- Center: View Mode Tabs -->
+    <div class="flex items-center bg-[#1E1E1E] p-0.5 rounded-lg border border-[#383838]">
+      <button id="tabDesign" onclick="switchMode('design')" class="px-3 py-1 rounded-md text-xs font-semibold bg-[#383838] text-white flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-pen-nib text-[10px]"></i> Design Artboards
+      </button>
+      <button id="tabPrototype" onclick="switchMode('prototype')" class="px-3 py-1 rounded-md text-xs font-medium text-[#AAA] hover:text-white flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-play text-[10px] text-emerald-400"></i> Prototype
+      </button>
+      <button id="tabInspect" onclick="switchMode('inspect')" class="px-3 py-1 rounded-md text-xs font-medium text-[#AAA] hover:text-white flex items-center gap-1.5 transition">
+        <i class="fa-solid fa-code text-[10px] text-amber-400"></i> Inspect CSS
+      </button>
+    </div>
+
+    <!-- Right: Zoom & Actions -->
+    <div class="flex items-center gap-2">
+      <div class="flex items-center bg-[#1E1E1E] rounded-md border border-[#383838] text-xs">
+        <button onclick="changeZoom(-0.1)" class="px-2 py-1 hover:bg-[#333] text-[#AAA] hover:text-white"><i class="fa-solid fa-minus text-[10px]"></i></button>
+        <span id="zoomDisplay" class="px-2 font-mono font-medium text-white text-[11px]">80%</span>
+        <button onclick="changeZoom(0.1)" class="px-2 py-1 hover:bg-[#333] text-[#AAA] hover:text-white"><i class="fa-solid fa-plus text-[10px]"></i></button>
+        <button onclick="resetZoom()" class="px-2 py-1 border-l border-[#333] hover:bg-[#333] text-[#AAA] hover:text-white text-[10px]">Fit</button>
+      </div>
+      <a href="./index.html" target="_blank" class="px-3 py-1.5 rounded-md bg-[#0D99FF] hover:bg-[#007BE5] text-white text-xs font-semibold flex items-center gap-1.5 shadow transition">
+        <i class="fa-solid fa-arrow-up-right-from-square"></i> Live Website
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <div class="flex-grow flex overflow-hidden">
+    <!-- LEFT SIDEBAR -->
+    <aside class="w-64 bg-[#252525] border-r border-[#383838] flex flex-col shrink-0 text-xs">
+      <div class="p-3 border-b border-[#383838] flex items-center justify-between font-semibold text-[#CCC]">
+        <div class="flex items-center gap-2">
+          <i class="fa-regular fa-folder-open text-[#0D99FF]"></i>
+          <span>Artboards &amp; Layers</span>
+        </div>
+        <span class="text-[10px] text-[#888] font-mono">3 Frames</span>
+      </div>
+
+      <div class="flex-grow overflow-y-auto p-2 space-y-1">
+        <div class="p-1.5 rounded hover:bg-[#333] cursor-pointer flex items-center justify-between text-[#DDD] font-medium" onclick="focusArtboard('desktop')">
+          <div class="flex items-center gap-2"><i class="fa-solid fa-desktop text-[#0D99FF]"></i> <span>Desktop (1440px)</span></div>
+          <span class="text-[9px] text-[#777] font-mono">1440×3400</span>
+        </div>
+        <div class="pl-5 space-y-0.5 text-[#AAA]">
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('AnnounceBar', 'Top Announcement Bar', '1440px', '38px', '#1E2B1C')"><i class="fa-solid fa-bullhorn text-[10px]"></i> Top Banner</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('HeaderNav', 'Navigation Header', '1440px', '72px', '#FFFFFF')"><i class="fa-solid fa-compass text-[10px]"></i> Navbar</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('HeroSection', 'Hero Banner', '1440px', '620px', '#1E2B1C')"><i class="fa-solid fa-image text-[10px]"></i> Hero Showcase</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('TrustBadges', 'Trust Highlights', '1440px', '100px', '#FFFFFF')"><i class="fa-solid fa-award text-[10px]"></i> Trust Bar</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('ProductGrid', 'Product Cards Grid', '1440px', '750px', '#FDFBF7')"><i class="fa-solid fa-table-cells text-[10px]"></i> Bestseller Cards</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('VideoReels', 'Video Reels Carousel', '1440px', '520px', '#1E2B1C')"><i class="fa-brands fa-instagram text-[10px] text-pink-400"></i> Reels Section</div>
+          <div class="p-1 rounded hover:bg-[#333] cursor-pointer flex items-center gap-2" onclick="selectLayer('WhiteFooter', 'Clean White Footer', '1440px', '400px', '#FFFFFF')"><i class="fa-regular fa-square text-[10px]"></i> White Footer</div>
+        </div>
+
+        <div class="pt-3"></div>
+        <div class="p-1.5 rounded hover:bg-[#333] cursor-pointer flex items-center justify-between text-[#DDD] font-medium" onclick="focusArtboard('mobile')">
+          <div class="flex items-center gap-2"><i class="fa-solid fa-mobile-screen-button text-[#A259FF]"></i> <span>Mobile (390px)</span></div>
+          <span class="text-[9px] text-[#777] font-mono">390×2800</span>
+        </div>
+
+        <div class="pt-3"></div>
+        <div class="p-1.5 rounded hover:bg-[#333] cursor-pointer flex items-center justify-between text-[#DDD] font-medium" onclick="focusArtboard('designSystem')">
+          <div class="flex items-center gap-2"><i class="fa-solid fa-palette text-[#F24E1E]"></i> <span>Design Tokens &amp; Kit</span></div>
+          <span class="text-[9px] text-[#777] font-mono">Tokens</span>
+        </div>
+      </div>
+
+      <!-- Quick Palette -->
+      <div class="p-3 border-t border-[#383838] bg-[#222]">
+        <span class="text-[10px] uppercase font-bold text-[#888] tracking-wider block mb-2 font-mono">Alora Color Swatches</span>
+        <div class="grid grid-cols-4 gap-1.5 text-center">
+          <div><div class="w-full h-7 rounded bg-[#D9713A] border border-white/10"></div><span class="text-[8px] text-[#AAA] font-mono">#D9713A</span></div>
+          <div><div class="w-full h-7 rounded bg-[#1E2B1C] border border-white/10"></div><span class="text-[8px] text-[#AAA] font-mono">#1E2B1C</span></div>
+          <div><div class="w-full h-7 rounded bg-[#C9A227] border border-white/10"></div><span class="text-[8px] text-[#AAA] font-mono">#C9A227</span></div>
+          <div><div class="w-full h-7 rounded bg-[#FFFFFF] border border-white/10"></div><span class="text-[8px] text-[#AAA] font-mono">#FFFFFF</span></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- CENTER CANVAS -->
+    <main id="figmaCanvas" class="figma-canvas-grid flex-grow overflow-auto relative p-12">
+      <div id="canvasViewport" class="flex items-start gap-16 min-w-max transition-transform duration-200 origin-top-left" style="transform: scale(0.8);">
+        
+        <!-- ARTBOARD 1: DESKTOP -->
+        <div id="artboardDesktop" class="flex flex-col">
+          <div class="flex items-center justify-between text-[#888] text-xs font-mono mb-3 px-1">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-desktop text-[#0D99FF]"></i><span class="font-semibold text-[#DDD]">Desktop Landing Page (1440px)</span></div>
+            <span>1440 × Auto • Frame</span>
+          </div>
+
+          <div class="artboard-frame w-[1440px] bg-[#FDFBF7] rounded-xl overflow-hidden text-slate-900 border border-slate-700/50">
+            
+            <!-- Announcement Bar -->
+            <div id="layerAnnounceBar" data-layer-name="Top Announcement Bar" class="figma-selectable bg-[#1E2B1C] text-amber-300 text-xs py-2.5 px-6 flex items-center justify-between border-b border-amber-400/20" onclick="selectLayer('AnnounceBar', 'Top Announcement Bar', '1440px', '38px', '#1E2B1C')">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="font-medium tracking-wide">✨ Special Inaugural Offer: Flat 20% OFF on First Order | Code: <strong class="text-white bg-amber-500/20 px-1.5 py-0.5 rounded border border-amber-400/40">ALORA20</strong></span>
+              </div>
+              <div class="flex items-center gap-4 text-[11px] text-stone-300">
+                <span><i class="fa-solid fa-truck text-amber-400 mr-1"></i> Free Shipping > ₹499</span>
+                <span><i class="fa-solid fa-certificate text-amber-400 mr-1"></i> Dermatologist Tested</span>
+              </div>
+            </div>
+
+            <!-- Navbar -->
+            <nav id="layerHeaderNav" data-layer-name="Navigation Header" class="figma-selectable bg-white/95 backdrop-blur-md px-10 py-4 flex items-center justify-between border-b border-stone-200 sticky top-0 z-30" onclick="selectLayer('HeaderNav', 'Navigation Header', '1440px', '72px', '#FFFFFF')">
+              <img src="./static/alora.png" alt="Alora Radiance" class="h-9 w-auto" onerror="this.outerHTML='<span class=\'font-fraunces font-bold text-2xl text-slate-900 tracking-wider\'>ALORA RADIANCE</span>'">
+              
+              <div class="flex items-center gap-8 text-sm font-semibold text-stone-700 font-jakarta">
+                <a href="javascript:void(0)" class="text-[#D9713A] border-b-2 border-[#D9713A] pb-1">Home</a>
+                <a href="javascript:void(0)" class="hover:text-[#D9713A] transition">All Products</a>
+                <a href="javascript:void(0)" class="hover:text-[#D9713A] transition">Serums &amp; Cleansers</a>
+                <a href="javascript:void(0)" class="hover:text-[#D9713A] transition">Body Care</a>
+                <a href="javascript:void(0)" class="hover:text-[#D9713A] transition">Bundles &amp; Combos</a>
+                <a href="javascript:void(0)" class="hover:text-[#D9713A] transition">Certificates</a>
+              </div>
+
+              <div class="flex items-center gap-4 text-stone-700">
+                <button class="w-9 h-9 rounded-full hover:bg-stone-100 flex items-center justify-center"><i class="fa-solid fa-magnifying-glass"></i></button>
+                <button class="w-9 h-9 rounded-full hover:bg-stone-100 flex items-center justify-center relative">
+                  <i class="fa-regular fa-heart"></i>
+                  <span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#D9713A] text-white text-[9px] font-bold flex items-center justify-center">2</span>
+                </button>
+                <button class="w-9 h-9 rounded-full hover:bg-stone-100 flex items-center justify-center relative">
+                  <i class="fa-solid fa-bag-shopping"></i>
+                  <span class="absolute top-1 right-1 w-4 h-4 rounded-full bg-[#D9713A] text-white text-[9px] font-bold flex items-center justify-center">1</span>
+                </button>
+                <button class="bg-[#1E2B1C] hover:bg-[#25331F] text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-sm transition">Sign In</button>
+              </div>
+            </nav>
+
+            <!-- Hero Section -->
+            <div id="layerHeroSection" data-layer-name="Hero Section" class="figma-selectable bg-gradient-to-br from-[#1E2B1C] via-[#25331F] to-[#172215] text-white px-14 py-20 relative overflow-hidden" onclick="selectLayer('HeroSection', 'Hero Section', '1440px', '620px', '#1E2B1C')">
+              <div class="absolute -top-20 -left-20 w-96 h-96 bg-[#D9713A]/20 rounded-full blur-3xl pointer-events-none"></div>
+              <div class="absolute -bottom-20 right-20 w-96 h-96 bg-[#C9A227]/15 rounded-full blur-3xl pointer-events-none"></div>
+
+              <div class="grid grid-cols-2 gap-12 items-center relative z-10">
+                <div class="space-y-6 max-w-xl">
+                  <span class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/15 border border-amber-400/30 text-amber-300 text-xs font-bold uppercase tracking-widest font-jakarta">
+                    <i class="fa-solid fa-sparkles"></i> 100% Ayurvedic &amp; Science-Backed
+                  </span>
+                  
+                  <h1 class="text-5xl font-fraunces font-bold leading-tight text-[#FAF7EE]">
+                    Awaken Your Skin’s <br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-[#D9713A]">Natural Radiance</span>
+                  </h1>
+
+                  <p class="text-stone-300 text-base leading-relaxed">
+                    Formulated with pure botanical extracts, stabilized Vitamin C, and deep hydrating ceramides. Designed for healthy, glowing, and timeless Indian skin.
+                  </p>
+
+                  <div class="flex items-center gap-4 pt-2">
+                    <button class="bg-gradient-to-r from-[#D9713A] to-[#E6824D] hover:opacity-95 text-white font-bold px-7 py-3.5 rounded-xl shadow-lg shadow-[#D9713A]/30 text-sm tracking-wide transition flex items-center gap-2">
+                      Shop Best Sellers <i class="fa-solid fa-arrow-right text-xs"></i>
+                    </button>
+                    <button class="bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-6 py-3.5 rounded-xl text-sm transition">
+                      View Clinical Certifications
+                    </button>
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-4 pt-6 border-t border-white/15 text-stone-300 text-xs">
+                    <div><p class="text-2xl font-bold font-fraunces text-amber-300">4.9 ★</p><p class="text-[11px] text-stone-400 mt-0.5">Over 15,000+ Reviews</p></div>
+                    <div><p class="text-2xl font-bold font-fraunces text-amber-300">100%</p><p class="text-[11px] text-stone-400 mt-0.5">Toxin &amp; Paraben Free</p></div>
+                    <div><p class="text-2xl font-bold font-fraunces text-amber-300">FDA</p><p class="text-[11px] text-stone-400 mt-0.5">Approved Formulations</p></div>
+                  </div>
+                </div>
+
+                <div class="relative flex justify-center">
+                  <div class="w-[420px] h-[480px] rounded-3xl p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-2xl relative overflow-hidden group">
+                    <img src="./static/combo1.webp" alt="Alora Radiance Combo" class="w-full h-full object-cover rounded-2xl">
+                    <div class="absolute bottom-6 left-6 right-6 p-4 rounded-2xl bg-black/60 backdrop-blur-md border border-white/20 text-white">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <p class="text-[10px] uppercase font-bold text-amber-400 tracking-wider">Special Bundle</p>
+                          <h4 class="font-bold text-sm">Glow Radiance 3-Step Ritual</h4>
+                        </div>
+                        <span class="text-base font-extrabold text-white">₹1,299 <span class="line-through text-xs font-normal text-stone-400">₹1,799</span></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trust Bar -->
+            <div id="layerTrustBadges" data-layer-name="Trust Badges" class="figma-selectable bg-white py-8 px-14 border-b border-stone-200 grid grid-cols-4 gap-6" onclick="selectLayer('TrustBadges', 'Trust Badges Bar', '1440px', '100px', '#FFFFFF')">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-[#D9713A] flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-leaf"></i></div>
+                <div><h4 class="font-bold text-xs uppercase tracking-wider text-stone-900">100% Botanical</h4><p class="text-[11px] text-stone-500">Pure plant actives &amp; extracts</p></div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-[#D9713A] flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-shield-halved"></i></div>
+                <div><h4 class="font-bold text-xs uppercase tracking-wider text-stone-900">Dermatologist Tested</h4><p class="text-[11px] text-stone-500">Clinically proven safety test</p></div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-[#D9713A] flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-rabbit"></i></div>
+                <div><h4 class="font-bold text-xs uppercase tracking-wider text-stone-900">Cruelty Free</h4><p class="text-[11px] text-stone-500">Never tested on animals</p></div>
+              </div>
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-amber-50 text-[#D9713A] flex items-center justify-center text-xl shrink-0"><i class="fa-solid fa-box-open"></i></div>
+                <div><h4 class="font-bold text-xs uppercase tracking-wider text-stone-900">Free &amp; Fast Shipping</h4><p class="text-[11px] text-stone-500">All India delivery in 2-4 days</p></div>
+              </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div id="layerProductGrid" data-layer-name="Product Grid" class="figma-selectable px-14 py-16 bg-[#FDFBF7]" onclick="selectLayer('ProductGrid', 'Product Cards Grid', '1440px', '750px', '#FDFBF7')">
+              <div class="text-center max-w-xl mx-auto mb-12">
+                <span class="text-xs uppercase font-bold text-[#D9713A] tracking-widest font-jakarta">Handcrafted Formulations</span>
+                <h2 class="text-3xl font-fraunces font-bold text-stone-900 mt-1">Our Most-Loved Rituals</h2>
+                <p class="text-stone-600 text-xs mt-2">Dermatologically crafted formulas with active ingredients for natural luminescence.</p>
+              </div>
+
+              <div class="grid grid-cols-3 gap-8">
+                <!-- Card 1 -->
+                <div class="bg-white rounded-3xl border border-stone-200/80 shadow-md overflow-hidden flex flex-col group">
+                  <div class="relative w-full aspect-square overflow-hidden bg-stone-100">
+                    <img src="./static/faceskin2.webp" alt="Serum" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 bg-[#D9713A] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">Bestseller</span>
+                    <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 text-stone-700 flex items-center justify-center shadow-md"><i class="fa-regular fa-heart text-xs"></i></button>
+                  </div>
+                  <div class="p-5 flex flex-col flex-grow justify-between space-y-3">
+                    <div>
+                      <div class="flex items-center gap-1 text-amber-400 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <span class="text-[11px] text-stone-500 font-semibold ml-1">(4.9/5)</span></div>
+                      <h3 class="font-bold text-base text-stone-900 mt-1.5 font-jakarta">Vitamin C Glow Serum (30ml)</h3>
+                      <p class="text-xs text-stone-500 line-clamp-2 mt-1">Boosts collagen synthesis &amp; removes dark spots with Kakadu plum.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                      <div><span class="text-lg font-extrabold text-stone-900">₹499</span><span class="text-xs text-stone-400 line-through ml-1.5">₹699</span></div>
+                      <button class="bg-[#1E2B1C] hover:bg-[#D9713A] text-white font-bold text-xs px-4 py-2 rounded-xl transition">Add to Cart</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-white rounded-3xl border border-stone-200/80 shadow-md overflow-hidden flex flex-col group">
+                  <div class="relative w-full aspect-square overflow-hidden bg-stone-100">
+                    <img src="./static/faceskin3.webp" alt="Moisturizer" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 bg-[#1E2B1C] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">Ceramide Rich</span>
+                    <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 text-stone-700 flex items-center justify-center shadow-md"><i class="fa-regular fa-heart text-xs"></i></button>
+                  </div>
+                  <div class="p-5 flex flex-col flex-grow justify-between space-y-3">
+                    <div>
+                      <div class="flex items-center gap-1 text-amber-400 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star-half-stroke"></i> <span class="text-[11px] text-stone-500 font-semibold ml-1">(4.8/5)</span></div>
+                      <h3 class="font-bold text-base text-stone-900 mt-1.5 font-jakarta">Hydra-Barrier Ceramide Cream (50g)</h3>
+                      <p class="text-xs text-stone-500 line-clamp-2 mt-1">72-Hour continuous moisture barrier repair with hyaluronic acid.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                      <div><span class="text-lg font-extrabold text-stone-900">₹549</span><span class="text-xs text-stone-400 line-through ml-1.5">₹749</span></div>
+                      <button class="bg-[#1E2B1C] hover:bg-[#D9713A] text-white font-bold text-xs px-4 py-2 rounded-xl transition">Add to Cart</button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="bg-white rounded-3xl border border-stone-200/80 shadow-md overflow-hidden flex flex-col group">
+                  <div class="relative w-full aspect-square overflow-hidden bg-stone-100">
+                    <img src="./static/faceskin4.webp" alt="Cleanser" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                    <span class="absolute top-3 left-3 bg-[#C9A227] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wider shadow-sm">Gentle Wash</span>
+                    <button class="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 text-stone-700 flex items-center justify-center shadow-md"><i class="fa-regular fa-heart text-xs"></i></button>
+                  </div>
+                  <div class="p-5 flex flex-col flex-grow justify-between space-y-3">
+                    <div>
+                      <div class="flex items-center gap-1 text-amber-400 text-xs"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i> <span class="text-[11px] text-stone-500 font-semibold ml-1">(5.0/5)</span></div>
+                      <h3 class="font-bold text-base text-stone-900 mt-1.5 font-jakarta">Gentle Clarifying Face Wash (100ml)</h3>
+                      <p class="text-xs text-stone-500 line-clamp-2 mt-1">Deep pore detox with salicylic acid and soothing green tea extract.</p>
+                    </div>
+                    <div class="flex items-center justify-between pt-2 border-t border-stone-100">
+                      <div><span class="text-lg font-extrabold text-stone-900">₹399</span><span class="text-xs text-stone-400 line-through ml-1.5">₹499</span></div>
+                      <button class="bg-[#1E2B1C] hover:bg-[#D9713A] text-white font-bold text-xs px-4 py-2 rounded-xl transition">Add to Cart</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Reels Section -->
+            <div id="layerVideoReels" data-layer-name="Video Reels Section" class="figma-selectable px-14 py-16 bg-[#1E2B1C] text-white" onclick="selectLayer('VideoReels', 'Video Reels Carousel', '1440px', '520px', '#1E2B1C')">
+              <div class="flex items-center justify-between mb-8">
+                <div>
+                  <span class="text-xs uppercase font-bold text-amber-400 tracking-widest font-jakarta">Real Skin Stories</span>
+                  <h2 class="text-3xl font-fraunces font-bold text-[#FAF7EE] mt-1">Watch It in Action</h2>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button class="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center"><i class="fa-solid fa-chevron-left text-xs"></i></button>
+                  <button class="w-9 h-9 rounded-full bg-white/10 text-white flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></button>
+                </div>
+              </div>
+
+              <div class="grid grid-cols-5 gap-4">
+                <div class="rounded-2xl bg-black/40 border border-white/10 overflow-hidden relative aspect-[9/16] group cursor-pointer shadow-lg">
+                  <img src="./static/reel1-thumbnail.png" alt="Reel 1" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.src='./static/faceskin2.webp'">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                    <span class="self-end w-6 h-6 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-[10px]"><i class="fa-brands fa-instagram"></i></span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md border border-white text-white mx-auto flex items-center justify-center mb-2"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+                      <p class="text-[11px] font-medium text-white line-clamp-2">"Real skincare glow results ✨"</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-black/40 border border-white/10 overflow-hidden relative aspect-[9/16] group cursor-pointer shadow-lg">
+                  <img src="./static/faceskin3.webp" alt="Reel 2" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                    <span class="self-end w-6 h-6 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-[10px]"><i class="fa-brands fa-instagram"></i></span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md border border-white text-white mx-auto flex items-center justify-center mb-2"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+                      <p class="text-[11px] font-medium text-white line-clamp-2">"Hydrating nourishment 🌸"</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-black/40 border border-white/10 overflow-hidden relative aspect-[9/16] group cursor-pointer shadow-lg">
+                  <img src="./static/faceskin4.webp" alt="Reel 3" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                    <span class="self-end w-6 h-6 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-[10px]"><i class="fa-brands fa-instagram"></i></span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md border border-white text-white mx-auto flex items-center justify-center mb-2"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+                      <p class="text-[11px] font-medium text-white line-clamp-2">"Pure botanical radiance ✨"</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-black/40 border border-white/10 overflow-hidden relative aspect-[9/16] group cursor-pointer shadow-lg">
+                  <img src="./static/faceskin5.webp" alt="Reel 4" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                    <span class="self-end w-6 h-6 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-[10px]"><i class="fa-brands fa-instagram"></i></span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md border border-white text-white mx-auto flex items-center justify-center mb-2"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+                      <p class="text-[11px] font-medium text-white line-clamp-2">"Daily ritual routine ☀️"</p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-black/40 border border-white/10 overflow-hidden relative aspect-[9/16] group cursor-pointer shadow-lg">
+                  <img src="./static/faceskin6.webp" alt="Reel 5" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                  <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 flex flex-col justify-between p-3">
+                    <span class="self-end w-6 h-6 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-[10px]"><i class="fa-brands fa-instagram"></i></span>
+                    <div class="text-center">
+                      <div class="w-10 h-10 rounded-full bg-white/30 backdrop-blur-md border border-white text-white mx-auto flex items-center justify-center mb-2"><i class="fa-solid fa-play text-xs ml-0.5"></i></div>
+                      <p class="text-[11px] font-medium text-white line-clamp-2">"Quick glow results 🌿"</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Luxury Cream Footer -->
+            <footer id="layerWhiteFooter" data-layer-name="Luxury Cream Footer" class="figma-selectable bg-[#FAF7EE] border-t-2 border-[#E5DFCE] px-14 pt-14 pb-8 text-[#1F291E]" onclick="selectLayer('WhiteFooter', 'Luxury Cream Footer', '1440px', '400px', '#FAF7EE')">
+              <div class="grid grid-cols-4 gap-10 pb-12 border-b border-[#E5DFCE]">
+                <!-- Col 1 -->
+                <div class="space-y-3">
+                  <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#D9713A] flex items-center gap-1.5"><i class="fa-solid fa-leaf text-xs"></i> Company Overview</h4>
+                  <ul class="space-y-2.5 text-xs text-[#2D3A2A] font-semibold">
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A] mr-1"></i> About Our Brand</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A] mr-1"></i> Privacy Policy</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A] mr-1"></i> Terms &amp; Conditions</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-chevron-right text-[10px] text-[#D9713A] mr-1"></i> Corporate Governance</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-sitemap text-[10px] text-[#D9713A] mr-1"></i> Sitemap</a></li>
+                  </ul>
+                </div>
+
+                <!-- Col 2 -->
+                <div class="space-y-3">
+                  <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#D9713A] flex items-center gap-1.5"><i class="fa-solid fa-compass text-xs"></i> Quick Links</h4>
+                  <ul class="space-y-2.5 text-xs text-[#2D3A2A] font-semibold">
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-truck-fast text-[#D9713A] mr-1.5"></i> Track My Order</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-user text-[#D9713A] mr-1.5"></i> My Account &amp; Orders</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-handshake text-[#D9713A] mr-1.5"></i> Become an Affiliate</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-circle-question text-[#D9713A] mr-1.5"></i> Knowledge Base FAQs</a></li>
+                    <li><a href="javascript:void(0)" class="hover:text-[#D9713A]"><i class="fa-solid fa-rotate-left text-[#D9713A] mr-1.5"></i> Return &amp; Refund Policy</a></li>
+                  </ul>
+                  <div class="pt-2">
+                    <span class="px-3 py-1 rounded-full bg-white border border-[#D5CCB7] text-[10px] font-bold text-slate-900 inline-flex items-center gap-1.5"><i class="fa-solid fa-phone text-[#D9713A]"></i> Need Help Fast? 8920434560</span>
+                  </div>
+                </div>
+
+                <!-- Col 3 -->
+                <div class="space-y-3">
+                  <h4 class="font-extrabold text-xs uppercase tracking-wider text-[#D9713A] flex items-center gap-1.5"><i class="fa-solid fa-award text-xs"></i> Quality &amp; Certifications</h4>
+                  <ul class="space-y-2.5 text-xs text-[#2D3A2A] font-semibold">
+                    <li><i class="fa-solid fa-square-check text-[#C9A227] mr-1.5"></i> Govt Cosmetic License</li>
+                    <li><i class="fa-solid fa-square-check text-[#C9A227] mr-1.5"></i> Patch Test Declaration</li>
+                    <li><i class="fa-solid fa-square-check text-[#C9A227] mr-1.5"></i> Face Wash Clinical Test</li>
+                    <li><i class="fa-solid fa-square-check text-[#C9A227] mr-1.5"></i> Face Serum Clinical Test</li>
+                    <li><i class="fa-solid fa-square-check text-[#C9A227] mr-1.5"></i> Body Lotion Clinical Test</li>
+                  </ul>
+                  <div class="pt-1">
+                    <span class="px-3 py-1 rounded-xl bg-white border border-[#D5CCB7] text-[10px] font-bold text-slate-900 inline-flex items-center gap-1">View All Certificates <i class="fa-solid fa-arrow-right text-[9px]"></i></span>
+                  </div>
+                </div>
+
+                <!-- Col 4 -->
+                <div class="bg-white p-5 rounded-2xl border border-[#DFD7C2] shadow-xs space-y-3">
+                  <h4 class="font-fraunces font-bold text-base text-[#1A2618] flex items-center gap-1.5"><i class="fa-solid fa-envelope-open-text text-[#D9713A]"></i> Get in Touch</h4>
+                  <div class="space-y-2">
+                    <input type="text" placeholder="Your full name" class="w-full bg-[#FAF7EE] border border-[#DFD7C2] rounded-lg px-2.5 py-1.5 text-xs">
+                    <input type="email" placeholder="Your email address" class="w-full bg-[#FAF7EE] border border-[#DFD7C2] rounded-lg px-2.5 py-1.5 text-xs">
+                    <textarea rows="2" placeholder="Your message..." class="w-full bg-[#FAF7EE] border border-[#DFD7C2] rounded-lg px-2.5 py-1.5 text-xs resize-none"></textarea>
+                    <button class="w-full bg-[#D9713A] text-white font-bold py-2 rounded-lg text-xs uppercase tracking-wider">Submit Message</button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-6 flex items-center justify-between text-xs text-[#556350] font-medium">
+                <p>Copyright © 2026 <strong class="text-[#1A2618]">Alora Radiance</strong>. All Rights Reserved. • <span class="text-[#D9713A] font-bold">Crafted for Pure Radiance ✨</span></p>
+                <div class="w-8 h-8 rounded-full bg-white border border-[#D5CCB7] text-[#1A2618] flex items-center justify-center shadow-xs"><i class="fa-solid fa-chevron-up text-xs"></i></div>
+              </div>
+            </footer>
+          </div>
+        </div>
+
+        <!-- ARTBOARD 2: MOBILE -->
+        <div id="artboardMobile" class="flex flex-col">
+          <div class="flex items-center justify-between text-[#888] text-xs font-mono mb-3 px-1">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-mobile-screen-button text-[#A259FF]"></i><span class="font-semibold text-[#DDD]">Mobile (390px iPhone 15 Pro)</span></div>
+            <span>390 × Auto • Frame</span>
+          </div>
+
+          <div class="artboard-frame w-[390px] bg-[#FDFBF7] rounded-[40px] overflow-hidden text-slate-900 border-[8px] border-[#2C2C2C] shadow-2xl relative">
+            <div class="bg-[#1E2B1C] pt-2 pb-1 px-6 flex items-center justify-between text-white text-[10px]">
+              <span>9:41</span>
+              <div class="w-20 h-4 bg-black rounded-full"></div>
+              <div class="flex items-center gap-1.5"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-full"></i></div>
+            </div>
+
+            <div class="bg-[#1E2B1C] text-amber-300 text-[10px] py-1.5 px-3 text-center border-b border-amber-400/20 font-medium">
+              ✨ Flat 20% OFF | Code: <strong>ALORA20</strong>
+            </div>
+
+            <div class="bg-white px-4 py-3 flex items-center justify-between border-b border-stone-200">
+              <button class="text-stone-800 text-base"><i class="fa-solid fa-bars"></i></button>
+              <img src="./static/alora.png" alt="Alora" class="h-6 w-auto" onerror="this.outerHTML='<span class=\'font-fraunces font-bold text-base text-slate-900\'>ALORA</span>'">
+              <div class="flex items-center gap-3 text-stone-800"><i class="fa-regular fa-heart text-sm"></i><i class="fa-solid fa-bag-shopping text-sm"></i></div>
+            </div>
+
+            <div class="bg-[#1E2B1C] text-white px-5 py-8 text-center relative">
+              <span class="inline-block px-2.5 py-1 rounded-full bg-amber-400/20 text-amber-300 text-[10px] font-bold mb-3">100% Ayurvedic &amp; Clean</span>
+              <h2 class="text-2xl font-fraunces font-bold leading-tight">Awaken Your Skin’s <span class="text-amber-300">Natural Radiance</span></h2>
+              <p class="text-stone-300 text-[11px] mt-2 leading-relaxed">Formulated with stabilized Vitamin C &amp; ceramides for Indian skin.</p>
+              <button class="bg-[#D9713A] text-white font-bold text-xs px-5 py-2.5 rounded-xl mt-4 shadow-md w-full">Shop Bestsellers</button>
+            </div>
+
+            <div class="p-4 space-y-4">
+              <h3 class="font-fraunces font-bold text-lg text-stone-900">Featured Rituals</h3>
+              <div class="bg-white rounded-2xl border border-stone-200 overflow-hidden shadow-xs">
+                <img src="./static/faceskin2.webp" alt="Serum" class="w-full h-44 object-cover">
+                <div class="p-3">
+                  <h4 class="font-bold text-xs text-stone-900">Vitamin C Glow Serum</h4>
+                  <div class="flex items-center justify-between mt-2">
+                    <span class="text-xs font-bold text-stone-900">₹499 <span class="line-through text-[10px] text-stone-400">₹699</span></span>
+                    <button class="bg-[#1E2B1C] text-white text-[10px] font-bold px-3 py-1.5 rounded-lg">Add</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="bg-white border-t border-stone-200 p-5 text-center text-xs text-stone-600 space-y-3">
+              <p class="font-bold text-stone-900 uppercase text-[11px]">ALORA RADIANCE</p>
+              <div class="flex items-center justify-center gap-3">
+                <span class="w-7 h-7 rounded-full bg-[#E1306C] text-white flex items-center justify-center text-xs"><i class="fa-brands fa-instagram"></i></span>
+                <span class="w-7 h-7 rounded-full bg-[#1877F2] text-white flex items-center justify-center text-xs"><i class="fa-brands fa-facebook-f text-[10px]"></i></span>
+                <span class="w-7 h-7 rounded-full bg-[#FF0000] text-white flex items-center justify-center text-xs"><i class="fa-brands fa-youtube text-[10px]"></i></span>
+              </div>
+              <p class="text-[10px] text-stone-400">© 2026 Alora Radiance</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARTBOARD 3: TOKENS -->
+        <div id="artboardDesignSystem" class="flex flex-col">
+          <div class="flex items-center justify-between text-[#888] text-xs font-mono mb-3 px-1">
+            <div class="flex items-center gap-2"><i class="fa-solid fa-palette text-[#F24E1E]"></i><span class="font-semibold text-[#DDD]">Design System &amp; Tokens</span></div>
+            <span>800 × Auto • Tokens</span>
+          </div>
+
+          <div class="artboard-frame w-[800px] bg-[#2A2A2A] rounded-xl p-8 text-white border border-stone-700 space-y-8">
+            <div>
+              <h3 class="text-xs uppercase font-bold text-[#0D99FF] tracking-wider font-mono mb-4">🎨 Color Tokens</h3>
+              <div class="grid grid-cols-4 gap-4">
+                <div class="p-3 bg-[#1E1E1E] rounded-xl border border-white/10 space-y-2">
+                  <div class="h-16 rounded-lg bg-[#D9713A]"></div>
+                  <div><span class="font-bold text-xs block">Primary</span><span class="text-[10px] text-stone-400 font-mono">#D9713A</span></div>
+                </div>
+                <div class="p-3 bg-[#1E1E1E] rounded-xl border border-white/10 space-y-2">
+                  <div class="h-16 rounded-lg bg-[#1E2B1C] border border-white/10"></div>
+                  <div><span class="font-bold text-xs block">Forest Green</span><span class="text-[10px] text-stone-400 font-mono">#1E2B1C</span></div>
+                </div>
+                <div class="p-3 bg-[#1E1E1E] rounded-xl border border-white/10 space-y-2">
+                  <div class="h-16 rounded-lg bg-[#C9A227]"></div>
+                  <div><span class="font-bold text-xs block">Gold Accent</span><span class="text-[10px] text-stone-400 font-mono">#C9A227</span></div>
+                </div>
+                <div class="p-3 bg-[#1E1E1E] rounded-xl border border-white/10 space-y-2">
+                  <div class="h-16 rounded-lg bg-[#FFFFFF]"></div>
+                  <div><span class="font-bold text-xs block">Pure White</span><span class="text-[10px] text-stone-400 font-mono">#FFFFFF</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="text-xs uppercase font-bold text-[#A259FF] tracking-wider font-mono mb-4">🔤 Typography Scales</h3>
+              <div class="space-y-3 bg-[#1E1E1E] p-5 rounded-xl border border-white/10 text-stone-300">
+                <div class="flex items-baseline justify-between border-b border-white/10 pb-2"><span class="text-2xl font-fraunces font-bold text-amber-200">Fraunces Display Bold (48px)</span><span class="text-[10px] text-stone-500 font-mono">Headings</span></div>
+                <div class="flex items-baseline justify-between border-b border-white/10 pb-2"><span class="text-lg font-bold font-jakarta text-white">Plus Jakarta Sans Bold (20px)</span><span class="text-[10px] text-stone-500 font-mono">Cards &amp; Subheadings</span></div>
+                <div class="flex items-baseline justify-between"><span class="text-xs text-stone-300 font-sans">Inter Regular (14px) - Clean body text.</span><span class="text-[10px] text-stone-500 font-mono">Body Text</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- RIGHT INSPECTOR -->
+    <aside class="w-72 bg-[#252525] border-l border-[#383838] flex flex-col shrink-0 text-xs">
+      <div class="p-3 border-b border-[#383838] flex items-center justify-between font-semibold text-[#CCC]">
+        <div class="flex items-center gap-2"><i class="fa-solid fa-sliders text-[#0D99FF]"></i><span>Design Properties</span></div>
+        <span id="selectedLayerId" class="text-[10px] text-[#0D99FF] font-mono">Hero Section</span>
+      </div>
+
+      <div class="flex-grow overflow-y-auto p-3 space-y-5">
+        <div>
+          <span class="text-[10px] font-bold text-[#888] uppercase tracking-wider block mb-2 font-mono">Dimensions</span>
+          <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+            <div class="bg-[#1E1E1E] p-2 rounded border border-[#383838] flex items-center justify-between"><span class="text-[#777]">W</span><span id="propW" class="text-white font-medium">1440px</span></div>
+            <div class="bg-[#1E1E1E] p-2 rounded border border-[#383838] flex items-center justify-between"><span class="text-[#777]">H</span><span id="propH" class="text-white font-medium">620px</span></div>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[10px] font-bold text-[#888] uppercase tracking-wider block mb-2 font-mono">Fill &amp; Background</span>
+          <div class="flex items-center gap-3 bg-[#1E1E1E] p-2 rounded-lg border border-[#383838]">
+            <div id="propFillPreview" class="w-6 h-6 rounded bg-[#1E2B1C] border border-white/20"></div>
+            <div class="font-mono text-xs"><span id="propFillHex" class="text-white block font-semibold">#1E2B1C</span><span class="text-[10px] text-[#777]">Forest Master</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-[10px] font-bold text-[#888] uppercase tracking-wider font-mono">CSS Code</span>
+            <button onclick="copyCSS()" class="text-[10px] text-[#0D99FF] hover:underline font-mono"><i class="fa-regular fa-copy mr-1"></i>Copy</button>
+          </div>
+          <pre id="propCSS" class="bg-[#1E1E1E] p-3 rounded-lg border border-[#383838] text-[11px] font-mono text-emerald-400 overflow-x-auto leading-relaxed">background: #1E2B1C;
+color: #FAF7EE;
+font-family: 'Fraunces', serif;</pre>
+        </div>
+
+        <div class="pt-2">
+          <a href="./index.html" target="_blank" class="w-full bg-[#0D99FF] hover:bg-[#007BE5] text-white font-bold py-2.5 rounded-lg text-xs transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Open Live Website
+          </a>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <script>
+    var currentZoom = 0.8;
+    function changeZoom(delta) { 
+      currentZoom = Math.min(1.5, Math.max(0.3, currentZoom + delta)); 
+      applyZoom(); 
+    }
+    function resetZoom() { 
+      currentZoom = 0.8; 
+      applyZoom(); 
+    }
+    function applyZoom() {
+      var viewport = document.getElementById('canvasViewport');
+      var display = document.getElementById('zoomDisplay');
+      if (viewport) viewport.style.transform = 'scale(' + currentZoom + ')';
+      if (display) display.innerText = Math.round(currentZoom * 100) + '%';
+    }
+    function focusArtboard(id) {
+      var el = id === 'desktop' ? document.getElementById('artboardDesktop')
+             : id === 'mobile' ? document.getElementById('artboardMobile')
+             : document.getElementById('artboardDesignSystem');
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start', inline: 'center' });
+    }
+    function selectLayer(id, name, width, height, color) {
+      document.querySelectorAll('.figma-selectable').forEach(function(el) { el.classList.remove('selected'); });
+      var target = document.getElementById('layer' + id);
+      if (target) target.classList.add('selected');
+      document.getElementById('selectedLayerId').innerText = name || id;
+      document.getElementById('propW').innerText = width || '1440px';
+      document.getElementById('propH').innerText = height || 'Auto';
+      if (color) {
+        document.getElementById('propFillPreview').style.backgroundColor = color;
+        document.getElementById('propFillHex').innerText = color;
+      }
+      document.getElementById('propCSS').innerText = '/* ' + (name || id) + ' */\nwidth: ' + (width || '100%') + ';\nmin-height: ' + (height || 'auto') + ';\nbackground-color: ' + (color || '#FFFFFF') + ';\ntransition: all 0.3s ease;';
+    }
+    function copyCSS() {
+      var css = document.getElementById('propCSS').innerText;
+      navigator.clipboard.writeText(css).then(function() { alert('CSS copied!'); });
+    }
+    function switchMode(mode) {
+      if (mode === 'prototype') window.open('./index.html', '_blank');
+    }
+  </script>
+</body>
+</html>

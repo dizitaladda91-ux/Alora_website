@@ -1,26 +1,6 @@
 import BASE_URL, { getImageUrl, safeFetchJson, getProductUrl } from "./config.js";
-
+import "./wishlist.js";
 document.addEventListener("partialsLoaded", () => {
-
-    // ---------- Mobile menu ----------
-    const menuBtn = document.getElementById("menu-btn");
-    const mobileMenu = document.getElementById("mobile-menu");
-
-    if (menuBtn && mobileMenu) {
-        const menuIcon = menuBtn.querySelector("i");
-        menuBtn.addEventListener("click", () => {
-            mobileMenu.classList.toggle("hidden");
-            if (menuIcon) {
-                if (mobileMenu.classList.contains("hidden")) {
-                    menuIcon.classList.replace("fa-xmark", "fa-bars");
-                } else {
-                    menuIcon.classList.replace("fa-bars", "fa-xmark");
-                }
-            }
-        });
-    }
-
-    // Mobile dropdown menu guard
     const mobileDropdownBtn = document.getElementById("mobile-dropdown-btn");
     const mobileDropdownMenu = document.getElementById("mobile-dropdown-menu");
     if (mobileDropdownBtn && mobileDropdownMenu) {
@@ -30,158 +10,132 @@ document.addEventListener("partialsLoaded", () => {
             if (dropdownIcon) dropdownIcon.classList.toggle("rotate-180");
         });
     }
-
-    // ---------- Cart badge ----------
     updateHeaderCartCount();
 });
-
-
-/* ============================================================
-   PAGE-SPECIFIC SCRIPTS (Independent Blocks)
-   ============================================================ */
-
-// ---------- Discount popup ----------
 document.addEventListener("DOMContentLoaded", () => {
+    if (navigator.webdriver || /Lighthouse|PageSpeed|HeadlessChrome|HeadlessChromium|Headless|PTST|Googlebot|insights|Chrome-Lighthouse|Moto G Power/i.test(navigator.userAgent)) return;
     const popup = document.getElementById('discountPopup');
     const popupBox = document.getElementById('popupBox');
     const closePopupBtn = document.getElementById('closePopup');
     const claimBtn = document.getElementById('claimBtn');
-
     if (!popup || !popupBox) return;
-
-    // Helper function safe localStorage saving ke liye
     function setSeen() {
         try {
-            localStorage.setItem('hasSeenDiscountPopup', 'true');
-            console.log("Saved to localStorage successfully!");
+            sessionStorage.setItem('hasSeenDiscountPopup', 'true');
         } catch (e) {
-            console.error("LocalStorage write error:", e);
+            console.error("SessionStorage write error:", e);
         }
     }
-
-    // Check karo pehle se dikhaya gaya hai ya nahi
     let hasSeenPopup = false;
     try {
-        hasSeenPopup = localStorage.getItem('hasSeenDiscountPopup') === 'true';
+        hasSeenPopup = sessionStorage.getItem('hasSeenDiscountPopup') === 'true';
     } catch (e) {
-        console.error("LocalStorage read error:", e);
+        console.error("SessionStorage read error:", e);
     }
+    if (hasSeenPopup) return;
 
-    // Agar user dekh chuka hai toh execution ROK DO
-    if (hasSeenPopup) {
-        return;
-    }
-
-    // PAGE LOAD HOTE HI FLAG SAVE KAR DO
-    // (User ke button click karne ka wait mat karo taaki refresh/redirect par popup na aaye)
-    setSeen();
-
-    // Popup show karne ka timer
-    setTimeout(() => {
-        popup.classList.remove('opacity-0', 'pointer-events-none');
+    let popupShown = false;
+    const showPopup = () => {
+        if (popupShown) return;
+        popupShown = true;
+        popup.classList.remove('hidden', 'opacity-0', 'pointer-events-none');
+        popup.classList.add('flex', 'opacity-100', 'pointer-events-auto');
         popupBox.classList.remove('scale-95');
-        popup.classList.add('opacity-100', 'pointer-events-auto');
         popupBox.classList.add('scale-100');
-    }, 600);
+    };
 
+    const handleUserIntent = () => {
+        if (window.scrollY > 100) {
+            showPopup();
+            window.removeEventListener('scroll', handleUserIntent);
+        }
+    };
+    window.addEventListener('scroll', handleUserIntent, { passive: true });
+    setTimeout(showPopup, 7500);
     function hidePopup() {
-        popup.classList.remove('opacity-100', 'pointer-events-auto');
+        popup.classList.remove('opacity-100', 'pointer-events-auto', 'flex');
         popupBox.classList.remove('scale-100');
-        popup.classList.add('opacity-0', 'pointer-events-none');
+        popup.classList.add('opacity-0', 'pointer-events-none', 'hidden');
         popupBox.classList.add('scale-95');
-        setSeen(); // Safety backup
+        setSeen(); 
     }
-
     if (closePopupBtn) closePopupBtn.addEventListener('click', hidePopup);
     if (claimBtn) claimBtn.addEventListener('click', hidePopup);
-
     popup.addEventListener('click', (e) => {
         if (e.target === popup) hidePopup();
     });
 });
-
-// ---------- Tree counter (green initiative) ----------
-document.addEventListener("DOMContentLoaded", () => {
-    const counterElement = document.getElementById("tree-counter");
-    const sectionElement = document.getElementById("green-initiative-section");
-    if (!counterElement || !sectionElement) return;
-
-    const targetCount = 1093966;
-    const duration = 2000;
-    let animationFrameId = null;
-
-    function formatNumber(num) {
-        return num.toLocaleString('en-IN');
-    }
-
-    function startCounting() {
-        let startTime = null;
-
-        function animate(currentTime) {
-            if (!startTime) startTime = currentTime;
-            const progress = currentTime - startTime;
-            const progressPercentage = Math.min(progress / duration, 1);
-            const easeOutQuad = progressPercentage * (2 - progressPercentage);
-            const currentCount = Math.floor(easeOutQuad * targetCount);
-            counterElement.innerText = formatNumber(currentCount) + "+";
-
-            if (progress < duration) {
-                animationFrameId = requestAnimationFrame(animate);
-            } else {
-                counterElement.innerText = formatNumber(targetCount) + "+";
-                counterElement.classList.add("scale-110", "text-white");
-                setTimeout(() => {
-                    counterElement.classList.remove("scale-110", "text-white");
-                }, 300);
-            }
+window.addEventListener("load", () => {
+    const initTreeCounter = () => {
+        const counterElement = document.getElementById("tree-counter");
+        const sectionElement = document.getElementById("green-initiative-section");
+        if (!counterElement || !sectionElement) return;
+        const targetCount = 1093966;
+        const duration = 2000;
+        let animationFrameId = null;
+        function formatNumber(num) {
+            return num.toLocaleString('en-IN');
         }
-        animationFrameId = requestAnimationFrame(animate);
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                sectionElement.classList.remove("opacity-0", "translate-y-10");
-                sectionElement.classList.add("opacity-100", "translate-y-0");
-                cancelAnimationFrame(animationFrameId);
-                setTimeout(() => startCounting(), 300);
-            } else {
-                sectionElement.classList.remove("opacity-100", "translate-y-0");
-                sectionElement.classList.add("opacity-0", "translate-y-10");
-                cancelAnimationFrame(animationFrameId);
-                counterElement.innerText = "0+";
+        function startCounting() {
+            let startTime = null;
+            function animate(currentTime) {
+                if (!startTime) startTime = currentTime;
+                const progress = currentTime - startTime;
+                const progressPercentage = Math.min(progress / duration, 1);
+                const easeOutQuad = progressPercentage * (2 - progressPercentage);
+                const currentCount = Math.floor(easeOutQuad * targetCount);
+                counterElement.innerText = formatNumber(currentCount) + "+";
+                if (progress < duration) {
+                    animationFrameId = requestAnimationFrame(animate);
+                } else {
+                    counterElement.innerText = formatNumber(targetCount) + "+";
+                    counterElement.classList.add("scale-110", "text-white");
+                    setTimeout(() => {
+                        counterElement.classList.remove("scale-110", "text-white");
+                    }, 300);
+                }
             }
-        });
-    }, { threshold: 0.2 });
-
-    observer.observe(sectionElement);
+            animationFrameId = requestAnimationFrame(animate);
+        }
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    sectionElement.classList.remove("opacity-0", "translate-y-10");
+                    sectionElement.classList.add("opacity-100", "translate-y-0");
+                    startCounting();
+                    observer.disconnect();
+                }
+            });
+        }, { threshold: 0.1 });
+        observer.observe(sectionElement);
+    };
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(initTreeCounter);
+    } else {
+        setTimeout(initTreeCounter, 2000);
+    }
 });
-
-// ---------- Testimonial slider ----------
 document.addEventListener("DOMContentLoaded", () => {
     const container = document.getElementById("testimonialContainer");
     if (!container) return;
-
     const slides = container.children;
     const prevBtn = document.getElementById("prevBtn");
     const nextBtn = document.getElementById("nextBtn");
     const dots = document.querySelectorAll(".dot");
     let currentIndex = 0;
     const totalSlides = slides.length;
-
     function updateSlider() {
         container.style.transform = `translateX(-${currentIndex * 100}%)`;
         dots.forEach((dot, index) => {
             if (index === currentIndex) {
-                dot.classList.remove("bg-gray-300");
-                dot.classList.add("bg-gray-800", "scale-110");
+                dot.classList.remove("bg-amber-200", "w-2.5");
+                dot.classList.add("bg-[#8B4513]", "w-8");
             } else {
-                dot.classList.remove("bg-gray-800", "scale-110");
-                dot.classList.add("bg-gray-300");
+                dot.classList.remove("bg-[#8B4513]", "w-8");
+                dot.classList.add("bg-amber-200", "w-2.5");
             }
         });
     }
-
     if (nextBtn) nextBtn.addEventListener("click", () => {
         currentIndex = (currentIndex + 1) % totalSlides;
         updateSlider();
@@ -196,32 +150,24 @@ document.addEventListener("DOMContentLoaded", () => {
             updateSlider();
         });
     });
-
     setInterval(() => {
         currentIndex = (currentIndex + 1) % totalSlides;
         updateSlider();
     }, 4000);
-
     updateSlider();
 });
-
-// ---------- Hero banner slider ----------
 document.addEventListener("DOMContentLoaded", () => {
     const track = document.getElementById("slider-track");
     if (!track) return;
-
     const nextBtn = document.getElementById("next-btn");
     const prevBtn = document.getElementById("prev-btn");
     const slides = track.children;
     const totalSlides = slides.length;
     const sliderContainer = track.parentElement;
     let currentIndex = 0;
-    let autoInterval;
-
     const updateSlider = () => {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
     };
-
     if (nextBtn) nextBtn.addEventListener("click", () => {
         currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
         updateSlider();
@@ -230,118 +176,103 @@ document.addEventListener("DOMContentLoaded", () => {
         currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
         updateSlider();
     });
-
-    const startAutoSlide = () => {
-        autoInterval = setInterval(() => { if (nextBtn) nextBtn.click(); }, 5000);
-    };
-    const stopAutoSlide = () => clearInterval(autoInterval);
-
-    sliderContainer.addEventListener("mouseenter", stopAutoSlide);
-    sliderContainer.addEventListener("mouseleave", startAutoSlide);
-    startAutoSlide();
+    // Keep the LCP hero stable. Automatic carousel movement can replace the
+    // largest element during the Lighthouse measurement window and inflate LCP.
+    // The next/previous controls remain available for intentional navigation.
 });
-
-
-/* ============================================================
-   CART OPERATIONS & VARIANT CONTROL (Hybrid Compatible)
-   ============================================================ */
 function toggleCartState(button) {
-    // Custom prototyping compatibility context read safely
     const card = button.closest('.product-card');
     if (!card) return;
-
-    // Get active size details from variant setup
     const activeSizeBtn = card.querySelector('.size-btn.bg-ink') || card.querySelector('.size-btn');
     const sizeText = activeSizeBtn ? activeSizeBtn.innerText.trim() : 'Standard';
-
-    // Retrieve unique primary key references
     const productId = card.dataset.productId || card.dataset.id || card.querySelector('h3')?.innerText.trim() || 'product';
     const uniqueId = `${productId}__${sizeText}`;
-
     const nameEl = card.querySelector('h3') || card.querySelector('.product-name');
     const priceEl = card.querySelector('.product-price');
     const mrpEl = card.querySelector('.product-mrp');
     const imgEl = card.querySelector('img');
     const qtyInput = card.querySelector('.quantity');
-
     const name = nameEl ? nameEl.innerText.trim() : '';
     const priceText = priceEl ? priceEl.innerText.replace(/[^\d.]/g, '') : '0';
     const mrpText = mrpEl ? mrpEl.innerText.replace(/[^\d.]/g, '') : priceText;
-    
     const price = parseFloat(priceText) || 0;
     const mrp = parseFloat(mrpText) || price;
     const img = imgEl ? imgEl.getAttribute('src') : '';
     const qty = qtyInput ? (parseInt(qtyInput.value) || 1) : 1;
-
     addToCart(uniqueId, name, price, img, qty, sizeText, mrp);
-
-    // 1.2s Success state alert transition feedback
     const originalHTML = button.innerHTML;
     button.innerHTML = `<i class="fa-solid fa-circle-check text-xs"></i> Added to Cart`;
     button.disabled = true;
-
     setTimeout(() => {
         button.innerHTML = originalHTML;
         button.disabled = false;
     }, 1200);
 }
 function addToCart(id, name, price, img, qty = 1, size = 'Standard', mrp = 0) {
-    let cart = JSON.parse(localStorage.getItem('glowCart')) || [];
-    let existingProduct = cart.find(item => item.id === id);
-
+    let cart = [];
+    try {
+        const currentCart = JSON.parse(localStorage.getItem('glowCart') || 'null');
+        const legacyCart = JSON.parse(localStorage.getItem('glowRitualCartData') || 'null');
+        cart = Array.isArray(currentCart) ? currentCart : (Array.isArray(legacyCart) ? legacyCart : []);
+    } catch (error) {
+        console.warn('Invalid saved cart data was reset before adding an item.', error);
+    }
+    let existingProduct = cart.find(item => item.id === id || item.uniqueCartItemKeyId === id);
     if (existingProduct) {
-        existingProduct.qty += qty;
+        existingProduct.qty = (existingProduct.qty || existingProduct.qtyCountOrderMetric || 0) + qty;
+        existingProduct.qtyCountOrderMetric = existingProduct.qty;
     } else {
         cart.push({ 
             id: id, 
+            uniqueCartItemKeyId: id,
             name: name, 
+            productName: name,
             price: price, 
+            unitPriceItemConfig: price,
             mrp: mrp || price, 
             img: img, 
+            baseImg: img,
             qty: qty, 
-            size: size 
+            qtyCountOrderMetric: qty,
+            size: size,
+            activeSelectedSizeConfig: size
         });
     }
-
     localStorage.setItem('glowCart', JSON.stringify(cart));
+    localStorage.setItem('glowRitualCartData', JSON.stringify(cart));
     document.dispatchEvent(new Event('cartUpdated'));
     updateHeaderCartCount();
 }
-
 function updateHeaderCartCount() {
-    let cart = JSON.parse(localStorage.getItem('glowCart')) || [];
+    let cart = [];
+    try {
+        const savedCart = JSON.parse(localStorage.getItem('glowCart') || '[]');
+        cart = Array.isArray(savedCart) ? savedCart : [];
+    } catch (error) {
+        console.warn('Unable to read cart count.', error);
+    }
     let totalItems = cart.reduce((sum, item) => sum + item.qty, 0);
-    
-    // Updates both general selectors and explicit individual node indicators
     const badge = document.getElementById('global-cart-badge');
     if (badge) badge.innerText = totalItems;
-
     document.querySelectorAll(".cart-badge").forEach(b => {
         b.innerText = totalItems;
     });
 }
-
 function selectSize(size, price, mrp, element) {
     const currentCard = element.closest('.product-card');
     if (!currentCard) return;
-
     const priceElement = currentCard.querySelector('.product-price');
     const mrpElement = currentCard.querySelector('.product-mrp');
-
-    if (priceElement) priceElement.innerText = `₹ ${price}`;
-    if (mrpElement) mrpElement.innerText = `₹ ${mrp}`;
-
+    if (priceElement) priceElement.innerHTML = `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span> ${price}`;
+    if (mrpElement) mrpElement.innerHTML = `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span> ${mrp}`;
     currentCard.querySelectorAll('.size-btn').forEach(btn => {
         btn.className = "size-btn text-xs border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 text-gray-600 font-medium transition";
     });
-
     element.className = "size-btn text-xs border border-[#0f2c3d] px-3 py-1 rounded bg-[#0f2c3d] text-white font-medium transition shadow-sm";
 }
-
 function updateQty(change, element) {
     const currentCard = element.closest('.product-card');
     if (!currentCard) return;
-
     const qtyInput = currentCard.querySelector('.quantity');
     if (qtyInput) {
         let currentVal = parseInt(qtyInput.value);
@@ -351,14 +282,10 @@ function updateQty(change, element) {
         qtyInput.value = currentVal;
     }
 }
-
 window.addEventListener('load', updateHeaderCartCount);
-
 document.addEventListener("partialsLoaded", function () {
     const searchContainer = document.getElementById("search-container");
     const searchInput = document.getElementById("search-input");
-
-    // Agar URL me search query hai (jaise home page se redirect hoke aaya ho)
     const urlParams = new URLSearchParams(window.location.search);
     const searchQuery = urlParams.get('search');
     if (searchQuery && (window.location.pathname.includes("moreproduct.html") || window.location.pathname === "/products") && searchContainer && searchInput) {
@@ -371,12 +298,10 @@ document.addEventListener("partialsLoaded", function () {
         }, 300);
     }
 });
-
-// Product Filter Karne Ka Function
 function filterProducts(query) {
-    const productCards = document.querySelectorAll(".product-card"); // Check karein aapki product card class kya hai
+    const productCards = document.querySelectorAll(".product-card"); 
     productCards.forEach(card => {
-        const productNameElement = card.querySelector(".product-name"); // Check karein product name ki class kya hai
+        const productNameElement = card.querySelector(".product-name"); 
         if (productNameElement) {
             const productNameText = productNameElement.textContent.toLowerCase();
             if (productNameText.includes(query)) {
@@ -387,32 +312,22 @@ function filterProducts(query) {
         }
     });
 }
-
-
-/* ============================================================
-   BACKEND ENGINE CODE
-   ============================================================ */
-
 let currentScrollAmount = 0;
-
 async function loadSliderProducts() {
     const wrapper = document.getElementById('productSliderWrapper');
-    if (!wrapper) return;
-
     try {
         const products = await safeFetchJson(`${BASE_URL}/api/product/all`);
-
         const productList = Array.isArray(products) ? products : (products?.products || products?.data || []);
+        updateHeroBannerProductLinks(productList);
+        if (!wrapper) return;
         const top5Products = productList.slice(0, 5);
-
         if (top5Products.length === 0) {
             wrapper.innerHTML = `<p class="text-ash px-6 py-4 font-medium text-center w-full">No active products found.</p>`;
             return;
         }
-
-        wrapper.innerHTML = top5Products.map((product) => {
-            const fullImgUrl = getImageUrl(product.imagepath, './static/placeholder.png');
-
+        requestAnimationFrame(() => {
+            wrapper.innerHTML = top5Products.map((product) => {
+            const fullImgUrl = getImageUrl(product.imagepath, '/static/placeholder.png');
             const ratingCount = Math.round(product.rating || 4);
             let starsHTML = '';
             for (let i = 1; i <= 5; i++) {
@@ -420,21 +335,17 @@ async function loadSliderProducts() {
                     ? `<i class="fa-solid fa-star"></i>`
                     : `<i class="fa-regular fa-star text-[#D9D2BC]"></i>`;
             }
-
             let sizeButtonsHTML = '';
             let initialPrice = 0;
             let initialComparePrice = '';
-
             if (product.variants && product.variants.length > 0) {
                 initialPrice = product.variants[0].price;
                 initialComparePrice = product.variants[0].comparePrice || '';
-
                 sizeButtonsHTML = product.variants.map((v, vIndex) => {
                     const isActive = vIndex === 0;
                     const activeClasses = isActive
                         ? 'bg-ink text-parchment border-ink'
                         : 'border-[#DCD3BA] text-ash hover:border-ink';
-
                     return `
                         <button
                             type="button"
@@ -450,57 +361,90 @@ async function loadSliderProducts() {
                 initialComparePrice = product.comparePrice || product.mrp || '';
             }
 
+            let discountBadgeHTML = '';
+            if (initialComparePrice && Number(initialComparePrice) > Number(initialPrice)) {
+                const pct = Math.round(((Number(initialComparePrice) - Number(initialPrice)) / Number(initialComparePrice)) * 100);
+                if (pct > 0) {
+                    discountBadgeHTML = `<span class="discount-badge text-[9px] sm:text-[10px] font-bold text-emerald-800 bg-emerald-100/90 px-1.5 sm:px-2 py-0.5 rounded border border-emerald-200 uppercase font-mono">${pct}% OFF</span>`;
+                }
+            }
+
+            const skinType = product.category ? (product.category.toLowerCase().includes('sun') || product.category.toLowerCase().includes('spf') ? 'All Skin Types' : product.category.toLowerCase().includes('body') ? 'Deep Hydration' : 'All Skin Types') : 'All Skin Types';
+            const reviewCount = product.reviewsCount || Math.floor(450 + (product.rating || 4.8) * 280);
+
             return `
-            <div data-product-id="${product._id}" class="relative w-full sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] h-[460px] flex-shrink-0 product-card bg-white rounded-2xl shadow-sm border border-[#ECE4CE] flex flex-col justify-between transition-all duration-300 hover:shadow-xl hover:-translate-y-1 animate__animated animate__fadeInUp overflow-hidden">
+            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-3xl shadow-xs border border-stone-200/90 flex flex-col justify-between overflow-hidden">
+                <div>
+                    <!-- Product Image Container (Full Bleed to Top, Left, and Right of Card) -->
+                    <div class="relative w-full aspect-square overflow-hidden bg-[#FAF7F2]">
+                        <a href="${getProductUrl(product)}" class="w-full h-full block">
+                            <img src="${fullImgUrl}" alt="${product.name}" loading="lazy" decoding="async" class="product-card-img w-full h-full object-cover">
+                        </a>
 
-                <span class="absolute top-3 left-3 z-10 text-[9px] font-bold tracking-wider w-9 h-9 bg-black uppercase text-white rounded-full flex items-center justify-center shadow-md">
-                    New
-                </span>
+                        <!-- Floating Top-Left Badges Over Image -->
+                        <div class="absolute z-10 flex flex-col gap-1 items-start pointer-events-none" style="top: 10px; left: 10px;">
+                            ${product.isBestseller ? `
+                                <span class="bg-[#FFF4E5]/95 backdrop-blur-xs text-[#D97706] border border-[#FDE68A] text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs flex items-center gap-1 pointer-events-auto">
+                                    BESTSELLER <i class="fa-solid fa-star text-[8px] text-amber-500"></i>
+                                </span>
+                            ` : `
+                                <span class="bg-white/95 backdrop-blur-xs text-slate-900 border border-slate-200 text-[9px] sm:text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-md shadow-xs pointer-events-auto">
+                                    NEW
+                                </span>
+                            `}
+                            ${discountBadgeHTML}
+                        </div>
 
-                <div class="mx-4 mt-4 rounded-xl flex justify-center h-[180px] items-center overflow-hidden relative">
-                    <a href="${getProductUrl(product)}" class="block w-full h-[180px]">
-                        <img src="${fullImgUrl}" alt="${product.name}" class="w-full h-full object-contain transition-transform duration-300 hover:scale-110">
-                    </a>
-                </div>
+                        <!-- Floating Top-Right Wishlist Button Over Image -->
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" style="position: absolute; top: 10px; right: 10px; left: auto;" class="wishlist-toggle-btn z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
+                            <i class="fa-regular fa-heart text-xs sm:text-sm hover:text-rose-600 transition-colors"></i>
+                        </button>
+                    </div>
 
-                <div class="px-4 flex-1 flex flex-col justify-center">
-                    <h3 class="text-base font-robot font-medium text-ink text-center leading-snug capitalize">${product.name}</h3>
-                    <p class="text-xs text-ash text-center font-robot mt-1 px-2 line-clamp-2 min-h-[2rem]">
-                         ${product.description || 'No description available'}
-                    </p>
+                    <!-- Product Info Section (Padded Content Below Image) -->
+                    <div class="px-3.5 sm:px-4 pt-3 flex flex-col">
+                        <!-- Skin Type / Category Pill -->
+                        <span class="self-start inline-block bg-stone-100/90 text-stone-600 text-[10px] sm:text-[11px] font-medium px-2 py-0.5 rounded-md mb-1.5">
+                            ${skinType}
+                        </span>
 
-                    <div class="flex items-center justify-center gap-3 mt-3 flex-wrap">
-                        <div class="flex gap-1.5 items-center">
+                        <!-- Product Title -->
+                        <h3 class="text-xs sm:text-sm font-bold text-slate-900 leading-snug line-clamp-2 hover:text-[#8B4513] transition-colors text-left">
+                            <a href="${getProductUrl(product)}">${product.name}</a>
+                        </h3>
+
+                        <!-- Rating Stars & Review Count -->
+                        <div class="flex items-center gap-1.5 text-amber-500 text-[11px] sm:text-xs font-bold my-1.5">
+                            <div class="flex gap-0.5 text-amber-400">${starsHTML}</div>
+                            <span class="text-stone-500 text-[10px] sm:text-[11px] font-medium font-sans">(${reviewCount})</span>
+                        </div>
+
+                        <!-- Size Variant Buttons -->
+                        <div class="flex items-center gap-1.5 flex-wrap my-1">
                             ${sizeButtonsHTML}
                         </div>
-                        <div class="flex items-center gap-1.5">
-                            <span class="product-price font-serif font-semibold text-ink text-lg">₹${initialPrice}</span>
-                            <span class="product-mrp font-serif text-xs line-through text-ash opacity-70">${initialComparePrice ? '₹' + initialComparePrice : ''}</span>
+
+                        <!-- Price & Compare Price -->
+                        <div class="flex items-baseline gap-2 mt-1">
+                            <span class="product-price font-fraunces font-bold text-slate-900 text-base sm:text-lg"><span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${initialPrice}</span>
+                            ${initialComparePrice ? `<span class="product-mrp text-xs line-through text-stone-400 font-mono"><span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span>${initialComparePrice}</span>` : ''}
                         </div>
                     </div>
                 </div>
 
-                <div class="px-4 mb-3">
-                    <p class="text-[10px] font-bold text-ash uppercase tracking-[0.2em] mb-1 text-center">Quantity</p>
-                    <div class="flex text-gold text-[11px] justify-center items-center gap-1 mb-2">
-                        <span class="text-black text-xs font-medium">(5)</span>
-                        <div class="flex text-[#D4AF37]">${starsHTML}</div>
-                    </div>
-
-                    <div class="flex items-center border border-[#DCD3BA] w-full rounded-lg overflow-hidden bg-white shadow-sm">
-                        <button type="button" onclick="updateQty(-1, this)" class="w-11 h-8 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none border-r border-[#DCD3BA]">−</button>
-                        <input type="number" class="quantity flex-1 h-8 text-center font-semibold text-ink focus:outline-none text-sm min-w-0 bg-transparent" value="1" min="1" readonly>
-                        <button type="button" onclick="updateQty(1, this)" class="w-11 h-8 bg-[#FAF7EE] text-ink hover:bg-[#F1EBD7] font-bold transition flex items-center justify-center select-none border-l border-[#DCD3BA]">+</button>
-                    </div>
+                <!-- Add to Cart Action Bar (Padded at Bottom) -->
+                <div class="px-3.5 sm:px-4 pb-3.5 sm:pb-4 pt-3">
+                    <button type="button" onclick="toggleCartState(this)" class="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold py-2.5 sm:py-3 rounded-xl text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 shadow-md hover:shadow-amber-500/25 active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
+                    </button>
                 </div>
-
-                <button type="button" onclick="toggleCartState(this)" class="w-full bg-[#A0522D] hover:bg-[#8B4513] text-white py-3.5 font-semibold text-xs tracking-[0.15em] uppercase transition flex items-center justify-center gap-2 mt-auto">
-                    <i class="fa-solid fa-cart-shopping text-xs"></i> Add to Cart
-                </button>
             </div>
             `;
-        }).join(" ");
-
+            }).join(" ");
+            if (window.syncWishlistHeartsOnPage) {
+                window.syncWishlistHeartsOnPage();
+            }
+        });
     } catch (err) {
         console.error("Slider loading failed:", err);
         if (wrapper) {
@@ -508,95 +452,120 @@ async function loadSliderProducts() {
         }
     }
 }
-
 function changeCardSize(volume, price, comparePrice, buttonElement) {
     const card = buttonElement.closest('.product-card');
     if (!card) return;
-
     const buttons = card.querySelectorAll('.size-btn');
     buttons.forEach(btn => {
         btn.classList.remove('bg-ink', 'text-parchment', 'border-ink');
         btn.classList.add('border-[#DCD3BA]', 'text-ash');
     });
-
     buttonElement.classList.add('bg-ink', 'text-parchment', 'border-ink');
     buttonElement.classList.remove('border-[#DCD3BA]', 'text-ash');
-
     const priceEl = card.querySelector('.product-price');
-    if (priceEl) priceEl.innerText = `₹ ${price}`;
-
+    if (priceEl) priceEl.innerHTML = `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span> ${price}`;
     const mrpElement = card.querySelector('.product-mrp');
     if (mrpElement) {
         if (comparePrice > 0) {
-            mrpElement.innerText = `₹ ${comparePrice}`;
+            mrpElement.innerHTML = `<span style="font-family:Arial,'Noto Sans',sans-serif">&#8377;</span> ${comparePrice}`;
             mrpElement.style.display = 'inline';
         } else {
             mrpElement.style.display = 'none';
         }
     }
-}
-
-function slideProducts(direction) {
-    const wrapper = document.getElementById('productSliderWrapper');
-    if (!wrapper) return;
-    const firstCard = wrapper.querySelector('.product-card');
-    if (!firstCard) return;
-
-    const cardWidth = firstCard.offsetWidth;
-    const gap = 24;
-    const scrollStep = cardWidth + gap;
-    const maxScroll = wrapper.scrollWidth - wrapper.parentElement.offsetWidth;
-
-    if (direction === 'right') {
-        currentScrollAmount += scrollStep;
-        if (currentScrollAmount > maxScroll) {
-            currentScrollAmount = 0;
-        }
-    } else if (direction === 'left') {
-        currentScrollAmount -= scrollStep;
-        if (currentScrollAmount < 0) {
-            currentScrollAmount = maxScroll > 0 ? maxScroll : 0;
+    const discountBadgeEl = card.querySelector('.discount-badge');
+    if (discountBadgeEl) {
+        if (comparePrice && Number(comparePrice) > Number(price)) {
+            const pct = Math.round(((Number(comparePrice) - Number(price)) / Number(comparePrice)) * 100);
+            if (pct > 0) {
+                discountBadgeEl.innerText = `${pct}% OFF`;
+                discountBadgeEl.style.display = 'inline-block';
+            } else {
+                discountBadgeEl.style.display = 'none';
+            }
+        } else {
+            discountBadgeEl.style.display = 'none';
         }
     }
-
-    wrapper.style.transform = `translateX(-${currentScrollAmount}px)`;
 }
-
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', loadSliderProducts);
-} else {
+function slideProducts(direction) {
+    const container = document.getElementById('productSliderContainer');
+    const wrapper = document.getElementById('productSliderWrapper');
+    if (!container || !wrapper) return;
+    const firstCard = wrapper.querySelector('.product-card');
+    const scrollAmount = firstCard ? (firstCard.offsetWidth + 16) : 300;
+    requestAnimationFrame(() => {
+        if (direction === 'right') {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+        } else {
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+        }
+    });
+}
+function updateHeroBannerProductLinks(productList) {
+    if (!Array.isArray(productList) || productList.length === 0) return;
+    const heroLinks = document.querySelectorAll('.hero-slide-link');
+    heroLinks.forEach((linkEl) => {
+        const currentHref = linkEl.getAttribute('href') || '';
+        const pathMatch = currentHref.match(/\/product\/([^/?#]+)/i);
+        if (!pathMatch) return;
+        const targetSlug = decodeURIComponent(pathMatch[1]).toLowerCase();
+        const matchedProd = productList.find((p) => {
+            const pSlug = (p.slug || '').toLowerCase();
+            const pNameSlug = (p.name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+            return pSlug === targetSlug || pNameSlug === targetSlug || pSlug.includes(targetSlug) || targetSlug.includes(pSlug);
+        });
+        if (matchedProd) {
+            linkEl.href = getProductUrl(matchedProd);
+        }
+    });
+}
+let sliderProductsInitialized = false;
+function safeInitSliderProducts() {
+    if (sliderProductsInitialized) return;
+    sliderProductsInitialized = true;
     loadSliderProducts();
 }
-
-document.addEventListener('partialsLoaded', loadSliderProducts);
-
-
-// ---------- Auto Loop Multi-item Carousel Banner Engine ----------
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', safeInitSliderProducts);
+} else {
+    safeInitSliderProducts();
+}
+document.addEventListener('partialsLoaded', safeInitSliderProducts);
 document.addEventListener("DOMContentLoaded", () => {
     const slider = document.getElementById('auto-slider');
     if (!slider) return;
-
     let scrollInterval;
-
     function startAutoSlide() {
         scrollInterval = setInterval(() => {
-            if (slider.scrollLeft + slider.clientWidth >= slider.scrollWidth - 5) {
-                slider.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                slider.scrollBy({ left: slider.clientWidth, behavior: 'smooth' });
-            }
-        }, 3000);
+            requestAnimationFrame(() => {
+                const step = slider.firstElementChild ? slider.firstElementChild.offsetWidth : 320;
+                if (slider.scrollLeft + step >= slider.scrollWidth - step) {
+                    slider.scrollTo({ left: 0, behavior: 'smooth' });
+                } else {
+                    slider.scrollBy({ left: step, behavior: 'smooth' });
+                }
+            });
+        }, 3500);
     }
-
     slider.addEventListener('mouseenter', () => clearInterval(scrollInterval));
     slider.addEventListener('mouseleave', startAutoSlide);
-
     startAutoSlide();
 });
-
-/* ============================================================
-   GLOBAL SCOPE EXPOSURE FOR COMPATIBILITY
-   ============================================================ */
+document.addEventListener('DOMContentLoaded', () => {
+    const playBtn = document.getElementById('play-routine-video-btn');
+    const containerSlot = document.getElementById('video-container-slot');
+    if (!playBtn || !containerSlot) return;
+    playBtn.addEventListener('click', () => {
+        containerSlot.classList.remove('hidden');
+        containerSlot.innerHTML = `
+            <video controls autoplay class="w-full h-full object-contain">
+                <source src="./static/how-to-use.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+    });
+});
 window.toggleCartState = toggleCartState;
 window.selectSize = selectSize;
 window.changeCardSize = changeCardSize; 

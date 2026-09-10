@@ -1,5 +1,4 @@
 import crypto from "crypto";
-import nodemailer from "nodemailer";
 import getRazorpay from "../config/razorpay.js";
 import Order from "../models/order.models.js";
 import PaymentAttempt from "../models/paymentAttempt.models.js";
@@ -7,26 +6,30 @@ import SimpleProduct from "../models/product.models.js";
 import User from "../models/userAuth.models.js";
 import WebhookEvent from "../models/webhookEvent.models.js";
 import { createAffiliateConversion, validateReferral } from "../services/affiliate.service.js";
+import { AffiliateReferral, AffiliateConversion } from "../models/affiliate.models.js";
+import { sendMail, escapeHtml } from "../services/email.service.js";
+import { inventoryTrackingEnabled } from "../config/inventory.js";
 
 // Checkout prices must be calculated here, never from browser-rendered totals.
 const FREE_SHIPPING_LIMIT = 499;
 const STANDARD_DELIVERY_CHARGE = 40;
 const FOUNDER_DELIVERY_CHARGE = 5000;
-const MAX_STACKED_COUPONS = 3;
+const MAX_STACKED_COUPONS = 4;
 const MAX_COUPON_DISCOUNT_PERCENT = 50;
 
 const roundCurrency = (amount) => Number(Number(amount).toFixed(2));
 
-const calculateCheckoutTotals = ({ subtotal, discountPercent, founderHandDelivery }) => {
-    const affiliateDiscount = roundCurrency(subtotal * discountPercent / 100);
+export const calculateCheckoutTotals = ({ subtotal, discountPercent, flatDiscount = 0, founderHandDelivery }) => {
+    const percentDiscount = roundCurrency(subtotal * discountPercent / 100);
+    const totalDiscount = Math.min(subtotal, roundCurrency(percentDiscount + flatDiscount));
     const deliveryCharge = subtotal >= FREE_SHIPPING_LIMIT ? 0 : STANDARD_DELIVERY_CHARGE;
     const founderDeliveryCharge = founderHandDelivery ? FOUNDER_DELIVERY_CHARGE : 0;
-    const totalAmount = roundCurrency(Math.max(0, subtotal - affiliateDiscount + deliveryCharge + founderDeliveryCharge));
+    const totalAmount = roundCurrency(Math.max(0, subtotal - totalDiscount + deliveryCharge + founderDeliveryCharge));
 
-    return { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
+    return { affiliateDiscount: totalDiscount, deliveryCharge, founderDeliveryCharge, totalAmount };
 };
 
-const getRequestedCouponCodes = (body) => {
+export const getRequestedCouponCodes = (body) => {
     const rawCodes = [
         ...(Array.isArray(body.couponCodes) ? body.couponCodes : []),
         body.couponCode,
@@ -45,7 +48,7 @@ const getRequestedCouponCodes = (body) => {
     return codes;
 };
 
-const normalizeCheckoutItems = (cart) => {
+export const normalizeCheckoutItems = (cart) => {
     if (!Array.isArray(cart)) return [];
 
     return cart.map((item) => {
@@ -76,7 +79,8 @@ const resolveCatalogItems = async (cart) => {
         const product = productById.get(requested.productId);
         const variant = product?.variants?.find((entry) => entry.volume === requested.variant);
 
-        if (!product || !product.isAvailable || !variant || variant.stock < requested.quantity) {
+        const enforceInventory = inventoryTrackingEnabled();
+        if (!product || !variant || (enforceInventory && (!product.isAvailable || variant.stock < requested.quantity))) {
             throw new Error(`${product?.name || "A product"} or its selected variant is unavailable or out of stock.`);
         }
 
@@ -96,6 +100,7 @@ const resolveCatalogItems = async (cart) => {
 // Reduces every selected variant only when enough stock remains. If any item fails,
 // already-reduced variants are restored so a partial checkout never corrupts stock.
 const reservePaidOrderStock = async (items) => {
+    if (!inventoryTrackingEnabled()) return;
     const reducedItems = [];
 
     try {
@@ -106,20 +111,21 @@ const reservePaidOrderStock = async (items) => {
                     isAvailable: true,
                     variants: { $elemMatch: { volume: item.variant, stock: { $gte: item.quantity } } }
                 },
-                { $inc: { "variants.$.stock": -item.quantity } }
+                {
+                    $inc: { "variants.$.stock": -item.quantity }
+                }
             );
 
-            if (result.modifiedCount !== 1) {
-                throw new Error(`${item.name} (${item.variant}) is no longer in stock.`);
+            if (result.modifiedCount === 0) {
+                throw new Error(`Insufficient stock for item variant: ${item.variant}`);
             }
 
             reducedItems.push(item);
         }
     } catch (error) {
-        await Promise.all(reducedItems.map((item) => SimpleProduct.updateOne(
-            { _id: item.productId, "variants.volume": item.variant },
-            { $inc: { "variants.$.stock": item.quantity } }
-        )));
+        if (reducedItems.length > 0) {
+            await restoreStock(reducedItems);
+        }
         throw error;
     }
 };
@@ -155,78 +161,37 @@ const isValidCustomer = (customer) => (
     && /^\d{10}$/.test(customer.phone)
 );
 
-const escapeHtml = (value) => String(value ?? "")
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/\"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-
 const sendOrderEmails = async ({ orderData, savedOrder, itemsList }) => {
-    const senderEmail = process.env.EMAIL_USER;
-    const senderPassword = process.env.EMAIL_PASS;
-    const adminEmail = process.env.ADMIN_EMAIL;
-    if (!senderEmail || !senderPassword) {
-        console.warn("Order email skipped: EMAIL_USER or EMAIL_PASS is not configured.");
-        return;
-    }
+    const adminEmail = String(process.env.ADMIN_EMAIL || "").trim();
+    const { customer } = savedOrder;
+    const safeItems = orderData.cart.map((item) => (
+        `<li>${escapeHtml(item.name)} (${escapeHtml(item.size)}) &times; ${item.qty} — INR ${item.price * item.qty}</li>`
+    )).join("");
 
-    try {
-        const transporter = nodemailer.createTransport({
-            service: "gmail",
-            auth: { user: senderEmail, pass: senderPassword }
-        });
-        const { customer } = savedOrder;
-        const safeItems = orderData.cart.map((item) => (
-            `<li>${escapeHtml(item.name)} (${escapeHtml(item.size)}) &times; ${item.qty} — INR ${item.price * item.qty}</li>`
-        )).join("");
-        const customerMail = {
-            from: `"ALORA PRODUCTS" <${senderEmail}>`,
-            to: customer.email,
-            subject: `Order confirmed — ${orderData.order_id}`,
-            text: `Hi ${customer.name},\n\nYour ALORA PRODUCTS order is confirmed.\n\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nDelivery address: ${customer.address}`,
-            html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>Order confirmed</h2><p>Hi ${escapeHtml(customer.name)},</p><p>Thank you for shopping with ALORA PRODUCTS. Your order has been confirmed.</p><p><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total paid:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Delivery address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p></div>`
-        };
-        const adminMail = adminEmail ? {
-            from: `"ALORA PRODUCTS" <${senderEmail}>`,
+    const emailJobs = [sendMail({
+        to: customer.email,
+        subject: `Order confirmed — ${orderData.order_id}`,
+        text: `Hi ${customer.name},\n\nYour ALORA PRODUCTS order is confirmed.\n\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nDelivery address: ${customer.address}`,
+        html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>Order confirmed</h2><p>Hi ${escapeHtml(customer.name)},</p><p>Thank you for shopping with ALORA PRODUCTS. Your order has been confirmed.</p><p><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total paid:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Delivery address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p></div>`
+    })];
+
+    if (adminEmail) {
+        emailJobs.push(sendMail({
             to: adminEmail,
             subject: `New order received — ${orderData.order_id}`,
             text: `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nEmail: ${customer.email}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}`,
             html: `<div style="font-family:Arial,sans-serif;color:#2a2a24;line-height:1.5"><h2>New order received</h2><p><strong>Customer:</strong> ${escapeHtml(customer.name)}<br><strong>Email:</strong> ${escapeHtml(customer.email)}<br><strong>Phone:</strong> ${escapeHtml(customer.phone)}<br><strong>Address:</strong><br>${escapeHtml(customer.address).replace(/\n/g, "<br>")}</p><h3>Items</h3><ul>${safeItems}</ul><p><strong>Total:</strong> INR ${escapeHtml(savedOrder.totalAmount)}<br><strong>Order ID:</strong> ${escapeHtml(orderData.order_id)}<br><strong>Payment ID:</strong> ${escapeHtml(orderData.payment_id)}</p></div>`
-        } : null;
-
-        await Promise.all([transporter.sendMail(customerMail), ...(adminMail ? [transporter.sendMail(adminMail)] : [])]);
-    } catch (error) {
-        // Email failure must never undo a successfully captured payment or saved order.
-        console.error("Order email notification failed:", error.message);
+        }));
+    } else {
+        console.error("Order email skipped for admin: ADMIN_EMAIL is not configured.");
     }
-};
 
-const sendMetaWhatsAppMessage = async (toPhone, messageText) => {
-    try {
-        const token = process.env.META_WHATSAPP_TOKEN;
-        const phoneId = process.env.META_PHONE_NUMBER_ID;
-        if (!token || !phoneId) return;
-
-        let formattedPhone = String(toPhone).replace(/[^0-9]/g, "");
-        if (formattedPhone.length === 10) formattedPhone = `91${formattedPhone}`;
-
-        const response = await fetch(`https://graph.facebook.com/v20.0/${phoneId}/messages`, {
-            method: "POST",
-            headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
-            body: JSON.stringify({
-                messaging_product: "whatsapp",
-                recipient_type: "individual",
-                to: formattedPhone,
-                type: "text",
-                text: { preview_url: false, body: messageText }
-            })
-        });
-
-        if (!response.ok) console.error("Meta WhatsApp API request failed.");
-    } catch (error) {
-        console.error("Meta WhatsApp notification failed:", error.message);
-    }
+    const results = await Promise.all(emailJobs);
+    console.log("Order confirmation email summary:", {
+        orderId: orderData.order_id,
+        customerEmailSent: results[0]?.sent === true,
+        adminEmailSent: adminEmail ? results[1]?.sent === true : false
+    });
 };
 
 const sendOrderSideEffects = async (savedOrder) => {
@@ -249,15 +214,35 @@ const sendOrderSideEffects = async (savedOrder) => {
         }).catch((error) => console.error("Google Sheet sync failed:", error.message));
     }
 
-    const { customer } = savedOrder;
-    const customerMessage = `Order confirmed - ALORA PRODUCTS\n\nHi ${customer.name},\nOrder ID: ${orderData.order_id}\nPayment ID: ${orderData.payment_id}\n\nItems:\n${itemsList}\n\nTotal Paid: INR ${savedOrder.totalAmount}\nAddress: ${customer.address}`;
-    const adminMessage = `NEW ORDER RECEIVED\n\nCustomer: ${customer.name}\nPhone: ${customer.phone}\nAddress: ${customer.address}\n\nItems:\n${itemsList}\n\nTotal: INR ${savedOrder.totalAmount}\nOrder ID: ${orderData.order_id}`;
-    sendMetaWhatsAppMessage(customer.phone, customerMessage);
-    if (process.env.ADMIN_PHONE) sendMetaWhatsAppMessage(process.env.ADMIN_PHONE, adminMessage);
     await sendOrderEmails({ orderData, savedOrder, itemsList });
 
     if (savedOrder.referral?.code) {
         try {
+            const refCode = String(savedOrder.referral.code).trim().toUpperCase();
+            const referralDoc = await AffiliateReferral.findOne({ code: refCode });
+            if (referralDoc) {
+                const commissionRate = Number(referralDoc.commissionPercent || 10);
+                const commissionAmount = Number((savedOrder.totalAmount * commissionRate / 100).toFixed(2));
+                
+                await AffiliateConversion.create({
+                    referralId: referralDoc._id,
+                    affiliateId: referralDoc.affiliateId,
+                    orderId: String(savedOrder._id),
+                    customerEmail: savedOrder.customer.email,
+                    clickId: savedOrder.referral.clickId || null,
+                    orderAmount: savedOrder.totalAmount,
+                    grossAmount: savedOrder.subtotal,
+                    discountAmount: savedOrder.affiliateDiscount || 0,
+                    commissionAmount,
+                    status: "approved"
+                }).catch(err => console.warn("Local affiliate conversion notice:", err.message));
+
+                await AffiliateReferral.updateOne(
+                    { _id: referralDoc._id },
+                    { $inc: { totalConversions: 1, totalCommission: commissionAmount } }
+                );
+            }
+
             await createAffiliateConversion({
                 referralCode: savedOrder.referral.code,
                 clickId: savedOrder.referral.clickId,
@@ -268,7 +253,8 @@ const sendOrderSideEffects = async (savedOrder) => {
                 discountAmount: savedOrder.affiliateDiscount,
                 eligibleAmount: savedOrder.totalAmount,
                 currency: savedOrder.currency
-            });
+            }).catch(err => console.warn("External affiliate API notice:", err.message));
+
             await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.conversionRecordedAt": new Date(), "referral.externalSyncedAt": new Date(), "referral.lastSyncError": "" }, $inc: { "referral.syncAttempts": 1 } });
         } catch (error) {
             await Order.updateOne({ _id: savedOrder._id }, { $set: { "referral.lastSyncError": String(error.message || "Affiliate conversion sync failed.").slice(0, 1000) }, $inc: { "referral.syncAttempts": 1 } });
@@ -279,7 +265,10 @@ const sendOrderSideEffects = async (savedOrder) => {
 
 const restoreStock = (items) => Promise.all(items.map((item) => SimpleProduct.updateOne(
     { _id: item.productId, "variants.volume": item.variant },
-    { $inc: { "variants.$.stock": item.quantity } }
+    {
+        $inc: { "variants.$.stock": item.quantity },
+        $set: { isAvailable: true }
+    }
 )));
 
 // Used by both the signed browser callback and the signed Razorpay webhook.
@@ -317,12 +306,13 @@ const finalizeCapturedPayment = async ({ razorpayOrderId, razorpayPaymentId, cus
             appliedCoupons: paymentAttempt.appliedCoupons || [],
             referral: paymentAttempt.referral || {},
             totalAmount,
+            inventoryTracked: inventoryTrackingEnabled(),
             currency: razorpayOrder.currency || "INR",
             paymentStatus: "paid",
             orderStatus: "paid"
         });
     } catch (error) {
-        await restoreStock(paymentAttempt.items);
+        if (inventoryTrackingEnabled()) await restoreStock(paymentAttempt.items);
         if (error?.code === 11000) {
             const concurrentOrder = await Order.findOne({ razorpayPaymentId });
             if (concurrentOrder) return { order: concurrentOrder, created: false };
@@ -353,29 +343,52 @@ export const createOrder = async (req, res) => {
         }
 
         let discountPercent = 0;
+        let flatDiscount = 0;
         let referralCode = null;
         let clickId = referral?.clickId ? String(referral.clickId) : null;
         const appliedCoupons = [];
         const candidateCodes = getRequestedCouponCodes(req.body);
 
         for (const candidateCode of candidateCodes) {
+            // Strict Single-Use Per Account/Email Check
+            if (customerEmail) {
+                const usedOrder = await Order.findOne({
+                    $or: [
+                        { "customer.email": customerEmail },
+                        ...(req.user?.id && /^[0-9a-fA-F]{24}$/.test(req.user.id) ? [{ userId: req.user.id }] : [])
+                    ],
+                    $or: [
+                        { appliedCoupons: candidateCode },
+                        { "referral.code": candidateCode }
+                    ]
+                }).lean();
+
+                if (usedOrder) {
+                    throw new Error(`Coupon '${candidateCode}' has already been redeemed on your account and can only be used once.`);
+                }
+            }
+
+            if (candidateCode === "RAKHI30" || candidateCode === "RAKHI" || candidateCode === "FESTIVE30" || candidateCode === "RAKHI30OFF") {
+                discountPercent += 30;
+                appliedCoupons.push(candidateCode);
+                continue;
+            }
+
             if (candidateCode === "GLOW10") {
                 discountPercent += 10;
                 appliedCoupons.push(candidateCode);
                 continue;
             }
 
-            // An order can attribute commission to one affiliate only. GLOW10 can
-            // still be combined with that referral coupon.
             if (referralCode) continue;
 
             const referralStatus = await validateReferral({ referralCode: candidateCode, customerEmail });
             const referralMatchesCandidate = String(referral?.code || "").trim().toUpperCase() === candidateCode;
             if (referralStatus.valid === true && referralStatus.eligible === true && referralMatchesCandidate && clickId) {
-                    discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
-                    referralCode = candidateCode;
-                    appliedCoupons.push(candidateCode);
-                }
+                discountPercent += Math.max(0, Number(referralStatus.discountPercent) || 0);
+                referralCode = candidateCode;
+                appliedCoupons.push(candidateCode);
+            }
         }
 
         discountPercent = Math.min(MAX_COUPON_DISCOUNT_PERCENT, discountPercent);
@@ -384,6 +397,7 @@ export const createOrder = async (req, res) => {
         const { affiliateDiscount, deliveryCharge, founderDeliveryCharge, totalAmount } = calculateCheckoutTotals({
             subtotal,
             discountPercent,
+            flatDiscount,
             founderHandDelivery
         });
 

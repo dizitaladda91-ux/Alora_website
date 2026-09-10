@@ -1,86 +1,395 @@
-<footer class="bg-black text-gold/80 pt-16 pb-6 mt-10 border-t border-gold/20">
-    <div class="max-w-7xl mx-auto px-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 pb-10 border-b border-white/10">
-        <div>
-            <h3 class="text-parchment font-bold text-xs uppercase tracking-[0.2em] mb-4">Company Overview</h3>
-            <ul class="space-y-2.5 text-sm">
-                <li><a href="/about" class="hover:text-gold transition">About Our Brand</a></li>
-                <li><a href="/privacy-policy" class="hover:text-gold transition">Privacy Policy</a></li>
-                <li><a href="/terms-and-conditions" class="hover:text-gold transition">Terms &amp; Conditions</a></li>
-                <li><a href="/corporate-governance" class="hover:text-gold transition">Corporate Governance</a></li>
-            </ul>
-        </div>
+<style>
+  /* ========================================================
+     🎨 ALORA RADIANCE LUXURY DEEP WARM CREAM FOOTER
+     ======================================================== */
+  :root, footer, #footer-placeholder {
+    --footer-bg-cream: #EAE1CD;
+    --footer-bg-bottom: #DFD3BA;
+    --footer-card-bg: #FFFFFF;
+    --footer-heading-color: #B8460E;
+    --footer-subheading-color: #141E14;
+    --footer-accent-color: #B8460E;
+    --footer-hover-color: #D9541E;
+    --footer-gold-color: #B8860B;
+    --footer-text-primary: #141E14;
+    --footer-text-muted: #2E3B2C;
+    --footer-border-subtle: #D8CCA8;
+    --footer-border-card: #CEBE96;
+  }
 
-        <div>
-            <h3 class="text-parchment font-bold text-xs uppercase tracking-[0.2em] mb-4">Quick Links</h3>
-            <ul class="space-y-2.5 text-sm mb-6">
-                <li><a href="/faq" class="hover:text-gold transition">Knowledge Base FAQs</a></li>
-                <li><a href="/return-refund" class="hover:text-gold transition">Return &amp; Refund Policy</a></li>
-            </ul>
-            <h3 class="text-parchment font-bold text-xs uppercase tracking-[0.2em] mb-3">Follow Along</h3>
-            <div class="flex gap-4 text-lg">
-                <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-facebook-f text-sm"></i></a>
-                <a href="https://www.instagram.com/aloraradiance/" target="_blank" class="w-9 h-9 rounded-full border border-white/15 flex items-center justify-center hover:bg-gold hover:text-ink hover:border-gold transition"><i class="fa-brands fa-instagram"></i></a>
-            </div>
-            <p class="text-white text-base mt-6">Need help fast? <a href="tel:8920434560" class="hover:text-gold">8920434560</a></p>
-        </div>
+  footer.alora-cream-footer {
+    background-color: var(--footer-bg-cream) !important;
+    color: var(--footer-text-primary) !important;
+    border-top: 1px solid #E5DCB8 !important;
+    position: relative;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  }
 
-        <div>
-            <h3 class="text-parchment font-bold text-xs uppercase tracking-[0.2em] mb-4">Quality &amp; Certifications</h3>
-            <ul class="space-y-2.5 text-sm">
-                <li>
-                    <a href="/certificates#govt-license" class="hover:text-gold transition flex items-center gap-2">
-                        <i class="fa-solid fa-certificate text-gold text-xs"></i> Govt Cosmetic License
-                    </a>
-                </li>
-                <li>
-                    <a href="/certificates#patch-test" class="hover:text-gold transition flex items-center gap-2">
-                        <i class="fa-solid fa-vial-circle-check text-gold text-xs"></i> Patch Test Declaration
-                    </a>
-                </li>
-                <li>
-                    <a href="/certificates#facewash-cert" class="hover:text-gold transition flex items-center gap-2">
-                        <i class="fa-solid fa-flask-vial text-gold text-xs"></i> Face Wash Clinical Test
-                    </a>
-                </li>
-                <li>
-                    <a href="/certificates#serum-cert" class="hover:text-gold transition flex items-center gap-2">
-                        <i class="fa-solid fa-droplet text-gold text-xs"></i> Face Serum Clinical Test
-                    </a>
-                </li>
-                <li>
-                    <a href="/certificates#bodylotion-cert" class="hover:text-gold transition flex items-center gap-2">
-                        <i class="fa-solid fa-shield-heart text-gold text-xs"></i> Body Lotion Clinical Test
-                    </a>
-                </li>
-                <li class="pt-2">
-                    <a href="/certificates" class="inline-block bg-white/10 hover:bg-gold hover:text-ink text-parchment text-xs font-bold px-3 py-1.5 rounded-lg border border-white/20 transition">
-                        View All Certificates &rarr;
-                    </a>
-                </li>
-            </ul>
-        </div>
+  .footer-custom-heading {
+    color: #B8460E !important;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800 !important;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.4);
+  }
 
-        <div class="bg-ink-light p-6 rounded-xl border border-white/10">
-            <h3 class="text-parchment font-robot font-semibold text-lg mb-4">Get in Touch</h3>
-            <form id="contactForm" class="space-y-3">
-                <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Name</label>
-                    <input type="text" id="name" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
-                </div>
-                <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">Email</label>
-                    <input type="email" id="email" required class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10">
-                </div>
-                <div>
-                    <label class="block text-[11px] uppercase font-semibold tracking-wider text-parchment/50 mb-1">MESSAGE</label>
-                    <textarea id="message" required placeholder="Type your message here..." class="w-full bg-ink rounded-md p-2.5 text-sm text-parchment focus:outline-none focus:ring-1 focus:ring-gold border border-white/10"></textarea>
-                </div>
-                <button type="submit" class="w-full bg-clay hover:bg-clay-dark text-white font-semibold py-2.5 rounded-md text-xs transition tracking-[0.15em] uppercase mt-2">Submit</button>
-            </form>
+  .footer-custom-link {
+    color: #141E14 !important;
+    font-size: 0.88rem;
+    font-weight: 700 !important;
+    transition: all 0.22s ease;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .footer-custom-link:hover {
+    color: #B8460E !important;
+    transform: translateX(4px);
+  }
+
+  .footer-gold-icon {
+    color: #B8860B !important;
+    font-size: 0.9rem;
+  }
+
+  .footer-accent-icon {
+    color: #B8460E !important;
+    font-size: 0.9rem;
+  }
+
+  /* Social Icons (Solid Branded Colors) */
+  .footer-social-btn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    color: #FFFFFF !important;
+    font-size: 1rem !important;
+    transition: all 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.18) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.5) !important;
+  }
+
+  .social-btn-facebook {
+    background-color: #1877F2 !important;
+  }
+  .social-btn-instagram {
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%) !important;
+  }
+  .social-btn-youtube {
+    background-color: #FF0000 !important;
+  }
+
+  .footer-social-btn i {
+    color: #FFFFFF !important;
+    font-size: 1rem !important;
+  }
+
+  .footer-social-btn:hover {
+    transform: translateY(-3px) scale(1.12) !important;
+    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25) !important;
+    opacity: 0.95;
+  }
+
+  /* Pills & Buttons */
+  .footer-action-pill {
+    background-color: #FFFFFF;
+    border: 1.5px solid #C8B88E;
+    color: #141E14 !important;
+    font-size: 0.8rem;
+    font-weight: 800 !important;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  .footer-action-pill:hover {
+    background-color: #B8460E;
+    border-color: #B8460E;
+    color: #FFFFFF !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(184, 70, 14, 0.3);
+  }
+
+  .footer-action-pill:hover i {
+    color: #FFFFFF !important;
+  }
+
+  .footer-submit-btn {
+    background: linear-gradient(135deg, #B8460E 0%, #D9541E 100%) !important;
+    color: #FFFFFF !important;
+    font-weight: 800 !important;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 14px rgba(184, 70, 14, 0.38) !important;
+    transition: all 0.3s ease;
+  }
+
+  .footer-submit-btn:hover {
+    background: linear-gradient(135deg, #A33A07 0%, #C84714 100%) !important;
+    box-shadow: 0 6px 20px rgba(184, 70, 14, 0.55) !important;
+    transform: translateY(-1px);
+  }
+
+  /* Form inputs */
+  .footer-input-field {
+    background-color: #FFFFFF !important;
+    border: 1.5px solid #CEBE96 !important;
+    color: #141E14 !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease;
+  }
+
+  .footer-input-field:focus {
+    border-color: #B8460E !important;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(184, 70, 14, 0.2) !important;
+  }
+
+  #contactForm input:-webkit-autofill,
+  #contactForm input:-webkit-autofill:hover, 
+  #contactForm input:-webkit-autofill:focus,
+  #contactForm textarea:-webkit-autofill,
+  #contactForm textarea:-webkit-autofill:hover,
+  #contactForm textarea:-webkit-autofill:focus {
+    -webkit-text-fill-color: #141E14 !important;
+    -webkit-box-shadow: 0 0 0px 1000px #FFFFFF inset !important;
+  }
+</style>
+
+<footer class="alora-cream-footer pt-16 pb-0 mt-16 relative overflow-hidden">
+  <!-- Subtle Ambient Glow -->
+  <div class="absolute top-0 right-1/4 w-96 h-96 bg-amber-300/20 rounded-full blur-3xl pointer-events-none"></div>
+  <div class="absolute bottom-0 left-1/4 w-96 h-96 bg-[#B8460E]/10 rounded-full blur-3xl pointer-events-none"></div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8 pb-12">
+      
+      <!-- ====================================================
+           Column 1: COMPANY OVERVIEW
+           ==================================================== -->
+      <div class="space-y-4">
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-leaf text-xs text-[#B8460E]"></i>
+          <span>Company Overview</span>
+        </h3>
+        <ul class="space-y-3 pt-1">
+          <li>
+            <a href="/aboutus.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
+              <span>About Our Brand</span>
+            </a>
+          </li>
+          <li>
+            <a href="/PrivacyPolicy.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
+              <span>Privacy Policy</span>
+            </a>
+          </li>
+          <li>
+            <a href="/termCondition.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
+              <span>Terms &amp; Conditions</span>
+            </a>
+          </li>
+          <li>
+            <a href="/Corporate Governance.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-chevron-right text-[11px] text-[#B8460E] font-bold"></i>
+              <span>Corporate Governance</span>
+            </a>
+          </li>
+          <li>
+            <a href="/sitemap.html" class="footer-custom-link gap-2">
+              <i class="fa-solid fa-sitemap text-[11px] text-[#B8460E] font-bold"></i>
+              <span>Sitemap</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+
+      <!-- ====================================================
+           Column 2: QUICK LINKS
+           ==================================================== -->
+      <div class="space-y-4">
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-compass text-xs text-[#B8460E]"></i>
+          <span>Quick Links</span>
+        </h3>
+        <ul class="space-y-3 pt-1 mb-5">
+          <li>
+            <a href="/trackorder.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-truck-fast footer-accent-icon text-xs"></i>
+              <span>Track My Order</span>
+            </a>
+          </li>
+          <li>
+            <a href="/account.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-user footer-accent-icon text-xs"></i>
+              <span>My Account &amp; Orders</span>
+            </a>
+          </li>
+          <li>
+            <a href="/affiliate.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-handshake footer-accent-icon text-xs"></i>
+              <span>Become an Affiliate</span>
+            </a>
+          </li>
+          <li>
+            <a href="/KnowledegeFAQ.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-circle-question footer-accent-icon text-xs"></i>
+              <span>Knowledge Base FAQs</span>
+            </a>
+          </li>
+          <li>
+            <a href="/ReturnRefund.html" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-rotate-left footer-accent-icon text-xs"></i>
+              <span>Return &amp; Refund Policy</span>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Follow Along -->
+        <div class="pt-2 border-t border-[#D8CCA8]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#B8460E] mb-2 font-mono">Follow Along</span>
+          <div class="flex items-center gap-3 mb-3">
+            <a href="https://www.facebook.com/people/Alora-Radiance/61580820864005/?rdid=5gPp63jXbtCK81BG&share_url=https%3A%2F%2Fwww.facebook.com%2Fshare%2F1BaqA9vNTN%2F" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="footer-social-btn social-btn-facebook" style="background-color: #1877F2 !important; color: #FFFFFF !important;" title="Facebook">
+              <i class="fa-brands fa-facebook-f text-sm text-white"></i>
+            </a>
+            <a href="https://www.instagram.com/aloraradiance/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="footer-social-btn social-btn-instagram" style="background: radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285AEB 90%) !important; color: #FFFFFF !important;" title="Instagram">
+              <i class="fa-brands fa-instagram text-base text-white"></i>
+            </a>
+            <a href="https://www.youtube.com" target="_blank" rel="noopener noreferrer" aria-label="YouTube" class="footer-social-btn social-btn-youtube" style="background-color: #FF0000 !important; color: #FFFFFF !important;" title="YouTube">
+              <i class="fa-brands fa-youtube text-sm text-white"></i>
+            </a>
+          </div>
+
+          <div>
+            <a href="tel:8920434560" class="footer-action-pill inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full">
+              <i class="fa-solid fa-phone text-[#B8460E] text-xs"></i>
+              <span>Need Help Fast? <strong class="text-[#141E14]">8920434560</strong></span>
+            </a>
+          </div>
         </div>
+      </div>
+
+      <!-- ====================================================
+           Column 3: QUALITY & CERTIFICATIONS
+           ==================================================== -->
+      <div class="space-y-4">
+        <h3 class="footer-custom-heading flex items-center gap-2">
+          <i class="fa-solid fa-award text-xs text-[#B8460E]"></i>
+          <span>Quality &amp; Certifications</span>
+        </h3>
+        <ul class="space-y-2.5 pt-1">
+          <li>
+            <a href="/certificates.html#govt-license" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Govt Cosmetic License</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#patch-test" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Patch Test Declaration</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#facewash-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Face Wash Clinical Test</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#serum-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Face Serum Clinical Test</span>
+            </a>
+          </li>
+          <li>
+            <a href="/certificates.html#bodylotion-cert" class="footer-custom-link gap-2.5">
+              <i class="fa-solid fa-square-check footer-gold-icon"></i>
+              <span>Body Lotion Clinical Test</span>
+            </a>
+          </li>
+          <li class="pt-1">
+            <a href="/certificates.html" class="footer-action-pill inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl">
+              <span>View All Certificates</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+          </li>
+        </ul>
+
+        <!-- Also Available On -->
+        <div class="pt-3 border-t border-[#D8CCA8]">
+          <span class="block text-[11px] font-extrabold uppercase tracking-widest text-[#B8460E] mb-2 font-mono flex items-center gap-1.5">
+            <i class="fa-solid fa-bag-shopping text-xs"></i> Also Available On
+          </span>
+          <div class="flex items-center gap-2">
+            <a href="https://www.amazon.in/s?k=ALORA+RADIANCE&ref=nb_sb_noss" target="_blank" rel="noopener noreferrer" class="footer-action-pill px-3 py-1 rounded-lg inline-flex items-center gap-1.5">
+              <i class="fa-brands fa-amazon text-sm text-[#FF9900]"></i> Amazon
+            </a>
+            <a href="https://www.flipkart.com/search?q=alora%20radiance&otracker=search&otracker1=search&marketplace=FLIPKART&as-show=on&as=off" target="_blank" rel="noopener noreferrer" class="footer-action-pill px-3 py-1 rounded-lg inline-flex items-center gap-1.5">
+              <i class="fa-solid fa-cart-shopping text-xs text-[#2874F0]"></i> Flipkart
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================
+           Column 4: Get in Touch Form Card
+           ==================================================== -->
+      <div class="bg-white p-6 rounded-3xl border border-[#CEBE96] shadow-md">
+        <h3 class="font-fraunces font-bold text-lg text-[#141E14] mb-4 flex items-center gap-2">
+          <i class="fa-solid fa-envelope-open-text text-[#B8460E] text-base"></i>
+          <span>Get in Touch</span>
+        </h3>
+        
+        <form id="contactForm" class="space-y-3.5">
+          <div>
+            <label for="name" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Name</label>
+            <input type="text" id="name" name="name" aria-label="Name" required placeholder="Your full name" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs">
+          </div>
+          <div>
+            <label for="email" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Email</label>
+            <input type="email" id="email" name="email" aria-label="Email" required placeholder="Your email address" class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs">
+          </div>
+          <div>
+            <label for="message" class="block text-[10px] uppercase font-extrabold tracking-widest text-[#2E3B2C] mb-1">Message</label>
+            <textarea id="message" name="message" aria-label="Message" required rows="2" placeholder="Type your message here..." class="footer-input-field w-full rounded-xl px-3 py-2 text-xs placeholder-[#687766] shadow-2xs resize-none"></textarea>
+          </div>
+          <button type="submit" aria-label="Submit Contact Message" class="footer-submit-btn w-full font-bold py-3 rounded-xl cursor-pointer">
+            Submit Message
+          </button>
+        </form>
+      </div>
+
     </div>
+  </div>
 
-    <div class="text-center pt-6 text-xs text-parchment/40">
-        Copyright © 2026 Alora Radiance ❤️
+  <!-- ====================================================
+       Copyright Bottom Bar (Distinct Deeper Grounding Strip)
+       ==================================================== -->
+  <div class="w-full bg-[#DFD3BA] border-t-2 border-[#D0BF98] py-4 relative z-10 mt-2">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-[#2A3728] gap-4 font-bold">
+      <div class="flex flex-col sm:flex-row items-center gap-2 text-center sm:text-left">
+        <p>Copyright © 2026 <strong class="text-[#141E14] font-extrabold">Alora Radiance</strong>. All Rights Reserved.</p>
+        <span class="hidden sm:inline text-[#B8460E]">•</span>
+        <a href="/sitemap.html" class="hover:text-[#B8460E] transition font-bold">Sitemap</a>
+        <a href="/sitemap.xml" target="_blank" class="text-[#B8460E] font-extrabold">(XML)</a>
+        <span class="hidden sm:inline text-[#B8460E]">•</span>
+        <span class="text-[#B8460E] font-extrabold">Crafted for Pure Radiance ✨</span>
+      </div>
+
+      <!-- Floating Scroll to Top -->
+      <button type="button" onclick="window.scrollTo({top: 0, behavior: 'smooth'})" aria-label="Scroll to top" class="w-9 h-9 rounded-full bg-white border border-[#C8B88E] text-[#141E14] shadow-xs flex items-center justify-center cursor-pointer hover:bg-[#B8460E] hover:text-white hover:border-[#B8460E] transition-all" title="Scroll to top">
+        <i class="fa-solid fa-chevron-up text-xs"></i>
+      </button>
     </div>
+  </div>
 </footer>
+<div id="chatbot-placeholder"></div>

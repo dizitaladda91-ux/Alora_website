@@ -1,11 +1,88 @@
+window.togglePasswordVisibility = function(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const icon = btn ? btn.querySelector('i') : null;
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+};
+
+window.appendSchemaTemplate = function(type) {
+    const textarea = document.getElementById('schema');
+    if (!textarea) return;
+    const templates = {
+        article: {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "Blog Title Here",
+            "description": "Short summary of the blog post.",
+            "author": { "@type": "Organization", "name": "Alora Radiance" }
+        },
+        faq: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What are the benefits of this product?",
+                    "acceptedAnswer": { "@type": "Answer", "text": "Detailed answer explaining the benefits." }
+                }
+            ]
+        },
+        howto: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to apply product effectively",
+            "step": [
+                { "@type": "HowToStep", "text": "Cleanse face gently with lukewarm water." },
+                { "@type": "HowToStep", "text": "Apply 3 drops of serum and massage evenly." }
+            ]
+        }
+    };
+    const newObj = templates[type] || templates.article;
+    const currentVal = textarea.value.trim();
+    if (!currentVal) {
+        textarea.value = JSON.stringify([newObj], null, 2);
+    } else {
+        try {
+            let parsed = JSON.parse(currentVal);
+            if (Array.isArray(parsed)) {
+                parsed.push(newObj);
+            } else if (typeof parsed === 'object' && parsed !== null) {
+                parsed = [parsed, newObj];
+            } else {
+                parsed = [newObj];
+            }
+            textarea.value = JSON.stringify(parsed, null, 2);
+        } catch (e) {
+            textarea.value = JSON.stringify([newObj], null, 2);
+        }
+    }
+};
+
 async function loadPartial(selector, url) {
     const el = document.querySelector(selector);
-    if (!el) return; // us page par placeholder hi nahi hai to skip
-
+    if (!el) return; 
     try {
-        const res = await fetch(url);
+        const res = await fetch(url, { cache: "no-cache" });
         if (!res.ok) throw new Error(`${url} not found (status ${res.status})`);
-        el.innerHTML = await res.text();
+        const html = await res.text();
+        el.innerHTML = html;
+        if (location.protocol !== "file:") {
+            el.querySelectorAll('img[src^="./static/"]').forEach(img => {
+                img.src = img.getAttribute('src').replace(/^\.\/static\//, '/static/');
+            });
+        }
     } catch (err) {
         console.error("Partial load failed:", url, err);
     }
@@ -15,37 +92,53 @@ async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
     const footerUrl = isFile ? "./footer.html" : "/footer.html";
-    await Promise.all([
-        loadPartial("#navbar-placeholder", navUrl),
-        loadPartial("#footer-placeholder", footerUrl),
-    ]);
-    document.dispatchEvent(new Event("partialsLoaded"));
+    const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
+    const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
+
+    const navPlaceholder = document.getElementById('navbar-placeholder');
+    if (navPlaceholder) {
+        if (!navPlaceholder.parentElement || navPlaceholder.parentElement.tagName !== 'HEADER') {
+            navPlaceholder.classList.add('sticky', 'top-0', 'z-50', 'w-full', 'bg-white');
+        }
+        await loadPartial("#navbar-placeholder", navUrl);
+        if (typeof window.renderNavbarState === 'function') {
+            window.renderNavbarState();
+        }
+    }
+
+    const loadDeferredPartials = async () => {
+        await loadPartial("#footer-placeholder", footerUrl);
+        await loadPartial("#chatbot-placeholder", chatbotUrl);
+        if (!document.getElementById("alora-chatbot-js")) {
+            const script = document.createElement("script");
+            script.id = "alora-chatbot-js";
+            script.src = chatbotJsUrl;
+            document.body.appendChild(script);
+        }
+        document.dispatchEvent(new Event("partialsLoaded"));
+    };
+
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(loadDeferredPartials);
+    } else {
+        setTimeout(loadDeferredPartials, 1200);
+    }
 }
 
-/* =========================================================
-   GOOGLE TAG MANAGER (GTM) DYNAMIC INITIALIZER
-   ========================================================= */
 function loadGtmScript(gtmId) {
     if (!gtmId || !/^GTM-[A-Z0-9]+$/i.test(gtmId.trim())) return;
     const cleanId = gtmId.trim().toUpperCase();
-
     if (window._gtmInitialized === cleanId) return;
     window._gtmInitialized = cleanId;
-
-    // 1. Initialize dataLayer
     window.dataLayer = window.dataLayer || [];
     window.dataLayer.push({
         'gtm.start': new Date().getTime(),
         event: 'gtm.js'
     });
-
-    // 2. Inject GTM Head Script
     const headScript = document.createElement("script");
     headScript.async = true;
     headScript.src = `https://www.googletagmanager.com/gtm.js?id=${encodeURIComponent(cleanId)}`;
     document.head.appendChild(headScript);
-
-    // 3. Inject GTM Noscript iframe in Body
     const noscript = document.createElement("noscript");
     const iframe = document.createElement("iframe");
     iframe.src = `https://www.googletagmanager.com/ns.html?id=${encodeURIComponent(cleanId)}`;
@@ -53,7 +146,6 @@ function loadGtmScript(gtmId) {
     iframe.width = "0";
     iframe.style.cssText = "display:none;visibility:hidden";
     noscript.appendChild(iframe);
-
     if (document.body) {
         document.body.insertBefore(noscript, document.body.firstChild);
     } else {
@@ -68,12 +160,10 @@ function initGoogleTagManager() {
         loadGtmScript(window.GTM_ID);
         return;
     }
-
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
-    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null)
-        ? window.BASE_URL
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) 
+        ? window.BASE_URL 
         : (isLocal ? "http://localhost:5000" : "");
-
     fetch(`${baseUrl}/api/config/gtm`)
         .then((res) => res.ok ? res.json() : null)
         .then((data) => {
@@ -84,11 +174,8 @@ function initGoogleTagManager() {
         .catch(() => {});
 }
 
-/* =========================================================
-   AFFILIATE REFERRAL BANNER & TRACKING
-   ========================================================= */
 function showReferralBanner(code, discountPercent) {
-    if (!code) return;
+    if (!code || window.self !== window.top) return;
     let banner = document.getElementById("alora-referral-banner");
     if (!banner) {
         banner = document.createElement("div");
@@ -103,6 +190,7 @@ function showReferralBanner(code, discountPercent) {
 }
 
 function trackReferralFromUrl() {
+    if (window.self !== window.top) return;
     const params = new URLSearchParams(window.location.search);
     const pathMatch = window.location.pathname.match(/^\/ref\/([^/?#]+)\/?$/i);
     const rawCode = pathMatch?.[1] || params.get("ref") || params.get("aff") || params.get("referral") || params.get("code") || params.get("affiliate");
@@ -117,17 +205,15 @@ function trackReferralFromUrl() {
     }
     const normalizedCode = rawCode.toUpperCase();
     let existing = null;
-    try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch { /* replace unreadable storage */ }
+    try { existing = JSON.parse(sessionStorage.getItem("aloraReferral") || "null"); } catch {  }
     if (existing?.referralCode === normalizedCode && existing?.clickId) {
         showReferralBanner(normalizedCode, existing.discountPercent || 10);
         return;
     }
-
     const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
     const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) 
         ? window.BASE_URL 
         : (isLocal ? "http://localhost:5000" : "");
-
     fetch(`${baseUrl}/api/affiliates/track-click`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -160,6 +246,16 @@ function trackReferralFromUrl() {
 
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
-initGoogleTagManager();
-trackReferralFromUrl();
-document.addEventListener("DOMContentLoaded", loadAllPartials);
+
+const initNonCriticalServices = () => {
+    initGoogleTagManager();
+    trackReferralFromUrl();
+};
+
+loadAllPartials();
+
+if ('requestIdleCallback' in window) {
+    requestIdleCallback(initNonCriticalServices);
+} else {
+    window.addEventListener('load', initNonCriticalServices);
+}
