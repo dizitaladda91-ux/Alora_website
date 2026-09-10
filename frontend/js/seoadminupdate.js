@@ -244,6 +244,71 @@ function decodeEntities(str) {
     return decoded;
 }
 
+window.appendSchemaTemplate = function(type) {
+    const textarea = document.getElementById('schema');
+    if (!textarea) return;
+    const templates = {
+        article: {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "Blog Title Here",
+            "description": "Short summary of the blog post.",
+            "author": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            }
+        },
+        faq: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What are the benefits of this product?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Detailed answer explaining the benefits."
+                    }
+                }
+            ]
+        },
+        howto: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to apply product effectively",
+            "step": [
+                {
+                    "@type": "HowToStep",
+                    "text": "Cleanse face gently with lukewarm water."
+                },
+                {
+                    "@type": "HowToStep",
+                    "text": "Apply 3 drops of serum and massage evenly."
+                }
+            ]
+        }
+    };
+    const template = templates[type] || templates.article;
+    const currentVal = textarea.value.trim();
+    if (!currentVal) {
+        textarea.value = JSON.stringify([template], null, 2);
+        return;
+    }
+    try {
+        let existing = JSON.parse(currentVal);
+        if (Array.isArray(existing)) {
+            existing.push(template);
+        } else if (typeof existing === 'object' && existing !== null) {
+            existing = [existing, template];
+        } else {
+            existing = [template];
+        }
+        textarea.value = JSON.stringify(existing, null, 2);
+    } catch (e) {
+        textarea.value = JSON.stringify([template], null, 2);
+    }
+};
+
 document.addEventListener('DOMContentLoaded', async () => {
     if (!blogId) {
         alert("⚠️ Invalid Request: No Blog ID found!");
@@ -264,7 +329,30 @@ document.addEventListener('DOMContentLoaded', async () => {
         keywordsInput.value = decodeEntities(blog.keywords || '');
         categoryInput.value = decodeEntities(blog.category || '');
         metaDescInput.value = decodeEntities(blog.metaDesc || '');
-        schemaInput.value = typeof blog.schema === 'object' ? JSON.stringify(blog.schema) : (blog.schema || '');
+        
+        let schemaDisplayVal = '';
+        if (blog.schema) {
+            if (typeof blog.schema === 'object' && blog.schema !== null) {
+                schemaDisplayVal = JSON.stringify(blog.schema, null, 2);
+            } else if (typeof blog.schema === 'string' && blog.schema.trim()) {
+                const decoded = decodeEntities(blog.schema.trim());
+                try {
+                    const parsed = JSON.parse(decoded);
+                    schemaDisplayVal = JSON.stringify(parsed, null, 2);
+                } catch (e) {
+                    const parsedMulti = parseMultipleSchemas(decoded);
+                    if (parsedMulti && parsedMulti.length === 1) {
+                        schemaDisplayVal = JSON.stringify(parsedMulti[0], null, 2);
+                    } else if (parsedMulti && parsedMulti.length > 1) {
+                        schemaDisplayVal = JSON.stringify(parsedMulti, null, 2);
+                    } else {
+                        schemaDisplayVal = decoded;
+                    }
+                }
+            }
+        }
+        schemaInput.value = schemaDisplayVal;
+        
         publisherInput.value = decodeEntities(blog.publisher || '');
         if (blog.content) {
             quill.clipboard.dangerouslyPasteHTML(blog.content);

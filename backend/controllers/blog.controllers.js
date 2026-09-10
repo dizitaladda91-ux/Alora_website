@@ -17,6 +17,13 @@ function cleanBlogFieldsAndSave(blog) {
             }
         }
     }
+    if (doc.schema && typeof doc.schema === 'string') {
+        const cleanedSchema = decodeEntities(doc.schema);
+        if (cleanedSchema !== doc.schema) {
+            doc.schema = cleanedSchema;
+            needsUpdate = true;
+        }
+    }
     if (needsUpdate && doc._id) {
         Blog.updateOne({ _id: doc._id }, {
             $set: {
@@ -25,7 +32,8 @@ function cleanBlogFieldsAndSave(blog) {
                 category: doc.category,
                 publisher: doc.publisher,
                 metaDesc: doc.metaDesc,
-                keywords: doc.keywords
+                keywords: doc.keywords,
+                schema: doc.schema
             }
         }).catch(e => console.warn("Auto-clean DB update warning:", e));
     }

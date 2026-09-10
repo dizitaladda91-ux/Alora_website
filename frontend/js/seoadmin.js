@@ -247,6 +247,71 @@ coverUpload.addEventListener('change', function(event) {
         reader.readAsDataURL(input.files[0]);
     }
 });
+window.appendSchemaTemplate = function(type) {
+    const textarea = document.getElementById('schema');
+    if (!textarea) return;
+    const templates = {
+        article: {
+            "@context": "https://schema.org",
+            "@type": "BlogPosting",
+            "headline": "Blog Title Here",
+            "description": "Short summary of the blog post.",
+            "author": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            }
+        },
+        faq: {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": "What are the benefits of this product?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "Detailed answer explaining the benefits."
+                    }
+                }
+            ]
+        },
+        howto: {
+            "@context": "https://schema.org",
+            "@type": "HowTo",
+            "name": "How to apply product effectively",
+            "step": [
+                {
+                    "@type": "HowToStep",
+                    "text": "Cleanse face gently with lukewarm water."
+                },
+                {
+                    "@type": "HowToStep",
+                    "text": "Apply 3 drops of serum and massage evenly."
+                }
+            ]
+        }
+    };
+    const template = templates[type] || templates.article;
+    const currentVal = textarea.value.trim();
+    if (!currentVal) {
+        textarea.value = JSON.stringify([template], null, 2);
+        return;
+    }
+    try {
+        let existing = JSON.parse(currentVal);
+        if (Array.isArray(existing)) {
+            existing.push(template);
+        } else if (typeof existing === 'object' && existing !== null) {
+            existing = [existing, template];
+        } else {
+            existing = [template];
+        }
+        textarea.value = JSON.stringify(existing, null, 2);
+    } catch (e) {
+        textarea.value = JSON.stringify([template], null, 2);
+    }
+};
+
 const blogForm = document.getElementById('blog-form');
 const submitBtn = document.getElementById('submit-btn');
 blogForm.addEventListener('submit', async function(event) {
