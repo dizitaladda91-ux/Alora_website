@@ -46,7 +46,7 @@
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
 
     <!-- 🚀 PRELOAD EXACT CRITICAL LCP HERO IMAGE FOR MOBILE & DESKTOP -->
-    <link rel="preload" as="image" href="./static/hero_banner_1_desk.webp" media="(min-width: 768px)" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="./static/1.webp" media="(min-width: 768px)" type="image/webp" fetchpriority="high">
     <link rel="preload" as="image" href="./static/hero_banner_allproducts_mob.webp" media="(max-width: 767px)" type="image/webp" fetchpriority="high">
 
     <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES 480ms RENDER-BLOCKING DELAY) -->
@@ -70,6 +70,53 @@
         #navbar-placeholder {
             min-height: 64px;
             background-color: #FFFFFF;
+        }
+
+        /* 🚀 HERO SLIDER RESPONSIVE FULL-BLEED ZERO-CROP SYSTEM (ALL SCREENS & MACBOOKS) */
+        .hero-slider-container {
+            width: 100% !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background-color: #FAF5EE !important;
+            aspect-ratio: 4 / 5 !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+        }
+        @media (min-width: 640px) {
+            .hero-slider-container {
+                aspect-ratio: 16 / 9 !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .hero-slider-container {
+                aspect-ratio: 1902 / 600 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+            }
+        }
+        .hero-desk-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: fill !important;
+            object-position: center !important;
+            display: none !important;
+        }
+        .hero-mob-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            display: block !important;
+        }
+        @media (min-width: 768px) {
+            .hero-desk-img {
+                display: block !important;
+            }
+            .hero-mob-img {
+                display: none !important;
+            }
         }
 
         /* 🚀 WCAG Touch Target Compliance: Expands interactive touch target of .dot buttons to 28px x 28px */
@@ -422,7 +469,7 @@
 <main id="main-content">
 
 <!-- ============ HERO CAROUSEL BANNER (RESPONSIVE FULL-WIDTH - NO CROPPING) ============ -->
-<div class="flex w-full overflow-hidden relative group aspect-[4/5] sm:aspect-[16/9] md:aspect-[1902/600] max-h-[90vh] bg-[#FAF5EE] shadow-xs" style="image-rendering: -webkit-optimize-contrast;">
+<div class="hero-slider-container flex w-full relative group shadow-xs" style="image-rendering: -webkit-optimize-contrast;">
     
     <!-- Prev Button -->
     <button id="prev-btn" aria-label="Previous Slide" 
@@ -441,38 +488,38 @@
 
     <!-- 1st Slide: All Products -->
     <a href="/products" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/1.webp" alt="Alora Radiance Complete Skincare Collection Desktop" width="1920" height="600" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_allproducts_mob.webp" alt="Alora Radiance Complete Skincare Collection Mobile" width="819" height="1024" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/1.webp" alt="Alora Radiance Complete Skincare Collection Desktop" width="1920" height="600" fetchpriority="high" loading="eager" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_allproducts_mob.webp" alt="Alora Radiance Complete Skincare Collection Mobile" width="819" height="1024" fetchpriority="high" loading="eager" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 2nd Slide: Face Wash -->
     <a href="/product/purifying-glow-face-wash" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/2.webp" alt="Purifying Glow Face Wash Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_facewash_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/2.webp" alt="Purifying Glow Face Wash Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_facewash_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 3rd Slide: Body Lotion -->
     <a href="/product/soothing-body-lotion" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/3.webp" alt="Soothing Body Lotion Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_bodylotion_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/3.webp" alt="Soothing Body Lotion Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_bodylotion_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 4th Slide: Face Scrub -->
     <a href="/product/soothing-face-scrub" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/4.webp" alt="Soothing Face Scrub Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/4.webp" alt="Soothing Face Scrub Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 5th Slide: Face Serum -->
     <a href="/product/brightening-hydrating-face-serum" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/5.webp" alt="Brightening &amp; Hydrating Face Serum Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_3_mob.webp" alt="Brightening &amp; Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/5.webp" alt="Brightening &amp; Hydrating Face Serum Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_3_mob.webp" alt="Brightening &amp; Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 6th Slide: Face Cream -->
     <a href="/product/face-cream-sunscreen-spf-30" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/6.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_facecream_mob.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/6.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_facecream_mob.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
 </div>
