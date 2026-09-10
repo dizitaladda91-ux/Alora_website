@@ -92,6 +92,7 @@ async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
     const footerUrl = isFile ? "./footer.html" : "/footer.html";
+    const faqUrl = isFile ? "./faq-section.html" : "/faq-section.html";
     const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
@@ -107,6 +108,23 @@ async function loadAllPartials() {
     }
 
     const loadDeferredPartials = async () => {
+        // Auto-inject and load FAQ section across all public customer pages
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        const pathname = (window.location.pathname || "").toLowerCase();
+        const isAdminOrAuth = pathname.includes('admin') || pathname.includes('login') || pathname.includes('register') || pathname.includes('forgot') || pathname.includes('reset');
+        const hasProductFaq = !!document.getElementById('product-faq-section');
+        
+        let faqPlaceholder = document.getElementById('faq-placeholder');
+        if (!faqPlaceholder && footerPlaceholder && !isAdminOrAuth && !hasProductFaq) {
+            faqPlaceholder = document.createElement('div');
+            faqPlaceholder.id = 'faq-placeholder';
+            footerPlaceholder.parentNode.insertBefore(faqPlaceholder, footerPlaceholder);
+        }
+
+        if (faqPlaceholder) {
+            await loadPartial("#faq-placeholder", faqUrl);
+        }
+
         await loadPartial("#footer-placeholder", footerUrl);
         await loadPartial("#chatbot-placeholder", chatbotUrl);
         if (!document.getElementById("alora-chatbot-js")) {
