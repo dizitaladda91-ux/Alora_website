@@ -158,7 +158,7 @@ app.get('/products', async (req, res) => {
     const renderedHtml = renderProductListSsr(templateHtml, products);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=1800, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
     console.error("Products List SSR error:", err);
@@ -190,7 +190,7 @@ app.get('/product/:id', async (req, res) => {
     const renderedHtml = renderProductSsr(templateHtml, product);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
     console.error("Product SSR error:", err);
@@ -210,7 +210,7 @@ app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'],
     const renderedHtml = renderBlogListSsr(templateHtml, posts);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=1800, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
     console.error("Blog List SSR error:", err);
@@ -258,7 +258,7 @@ app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
     const renderedHtml = renderBlogArticleSsr(templateHtml, blog, relatedProducts);
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
-    res.setHeader('Cache-Control', 'public, max-age=0, s-maxage=3600, stale-while-revalidate=86400');
+    res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
     console.error("Blog SSR SEO error:", err);

@@ -393,19 +393,15 @@ export const renderProductSsr = (templateHtml, product, faqs = []) => {
         html = html.replace(/<div id="variants-container"[^>]*>[\s\S]*?<\/div>/i, `<div id="variants-container" class="flex flex-wrap gap-2.5">${variantsButtons}</div>`);
     }
 
-    // Additional Detail Sections
-    if (product.details) {
-        html = html.replace(/<p id="product-details"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-details" class="text-sm text-ash leading-relaxed">${escapeHtml(product.details)}</p>`);
-    }
-    if (product.benefits) {
-        html = html.replace(/<p id="product-benefits"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-benefits" class="text-sm text-ash leading-relaxed">${escapeHtml(product.benefits)}</p>`);
-    }
-    if (product.usageInstructions) {
-        html = html.replace(/<p id="product-usage"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-usage" class="text-sm text-ash leading-relaxed">${escapeHtml(product.usageInstructions)}</p>`);
-    }
-    if (product.ingredients) {
-        html = html.replace(/<p id="product-ingredients"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-ingredients" class="text-sm text-ash leading-relaxed">${escapeHtml(product.ingredients)}</p>`);
-    }
+    const detailsVal = product.details || product.description || 'Dermatologist-formulated luxury skincare essentials by Alora Radiance.';
+    const benefitsVal = product.benefits || 'Formulated with high-grade active botanicals for radiant, healthy skin nourishment.';
+    const usageVal = product.usageInstructions || 'Apply evenly on cleansed skin morning and night for optimal hydration.';
+    const ingredientsVal = product.ingredients || 'High-grade Saffron extract, Niacinamide, Botanical oils, Dermatologically safe active essentials.';
+
+    html = html.replace(/<p id="product-details"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-details" class="text-sm text-ash leading-relaxed">${escapeHtml(detailsVal)}</p>`);
+    html = html.replace(/<p id="product-benefits"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-benefits" class="text-sm text-ash leading-relaxed">${escapeHtml(benefitsVal)}</p>`);
+    html = html.replace(/<p id="product-usage"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-usage" class="text-sm text-ash leading-relaxed">${escapeHtml(usageVal)}</p>`);
+    html = html.replace(/<p id="product-ingredients"[^>]*>[\s\S]*?<\/p>/i, `<p id="product-ingredients" class="text-sm text-ash leading-relaxed">${escapeHtml(ingredientsVal)}</p>`);
 
     return html;
 };
