@@ -23,15 +23,15 @@ const DEFAULT_FAQS = [
         isActive: true
     },
     {
-        question: "Can I use the Body Lotion every day?",
-        answer: "Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness.",
+        question: "How do I choose the right product for my skin type?",
+        answer: "All Alora Radiance formulations are dermatologically tested and suitable for all skin types, including sensitive and acne-prone skin.",
         category: "Shop / Products",
         order: 1,
         isActive: true
     },
     {
-        question: "How often should I use the Face Scrub?",
-        answer: "Use the Face Scrub 2–3 times a week to gently exfoliate dead skin cells, unclog pores, and restore skin smoothness.",
+        question: "Can I use the Body Lotion every day?",
+        answer: "Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness.",
         category: "Shop / Products",
         order: 2,
         isActive: true
@@ -44,40 +44,43 @@ const DEFAULT_FAQS = [
         isActive: true
     },
     {
-        question: "How can I track my order?",
-        answer: "You can easily track your order in real-time by visiting our Track Order page and entering your Order ID and phone number.",
-        category: "Track Order / Support",
+        question: "How does Alora Radiance ensure ingredient transparency?",
+        answer: "We clearly disclose all active and botanical ingredients on every package and product page with zero harmful chemicals.",
+        category: "About Us",
+        order: 2,
+        isActive: true
+    },
+    {
+        question: "How often are skincare routines and blogs updated?",
+        answer: "Our certified skincare specialists publish science-backed beauty insights, ingredient deep-dives, and seasonal skincare routines weekly.",
+        category: "Blog Page",
         order: 1,
         isActive: true
     }
 ];
 
-// 🟢 1. GET ALL ACTIVE FAQS (Public Endpoint, Supports ?page= or ?category=)
+// 🟢 1. GET ALL ACTIVE FAQS (Public Endpoint, Supports ?page=)
 export const getAllFaqs = async (req, res) => {
     try {
         const { category, page } = req.query;
         let query = { isActive: true };
         
         const targetPage = (page || category || "").trim();
-        if (targetPage && targetPage.toLowerCase() !== "all" && targetPage.toLowerCase() !== "all pages") {
-            query.$or = [
-                { category: new RegExp(`^${targetPage}$`, "i") },
-                { category: "General" },
-                { category: "All Pages" }
-            ];
+        if (targetPage) {
+            query.category = new RegExp(`^${targetPage}$`, "i");
         }
 
         let faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
         
-        // Auto-seed if database has no FAQs yet
+        // Auto-seed or fallback
         if (!faqs || faqs.length === 0) {
             const count = await Faq.countDocuments();
             if (count === 0) {
                 await Faq.insertMany(DEFAULT_FAQS);
                 faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
             } else if (targetPage) {
-                // If no specific faqs found for this page, return general active faqs
-                faqs = await Faq.find({ isActive: true }).sort({ order: 1, createdAt: 1 }).lean();
+                // Fallback to Landing Page FAQs if this specific page has none yet
+                faqs = await Faq.find({ category: "Landing Page", isActive: true }).sort({ order: 1, createdAt: 1 }).lean();
             }
         }
 
@@ -99,6 +102,16 @@ export const getAllFaqs = async (req, res) => {
 // 🟢 2. GET ALL FAQS FOR ADMIN (Protected Endpoint)
 export const getAdminFaqs = async (req, res) => {
     try {
+        // Automatically migrate any legacy "General" or unassigned FAQs to "Landing Page"
+        await Faq.updateMany(
+            { category: { $in: ["General", "All Pages", "General / Global", null, ""] } },
+            { $set: { category: "Landing Page" } }
+        );
+        await Faq.updateMany(
+            { category: "Track Order / Support" },
+            { $set: { category: "Shop / Products" } }
+        );
+
         let faqs = await Faq.find().sort({ order: 1, createdAt: 1 }).lean();
         
         if (!faqs || faqs.length === 0) {

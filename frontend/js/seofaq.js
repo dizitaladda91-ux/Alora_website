@@ -1,7 +1,7 @@
 import BASE_URL, { getAuthHeaders } from "./config.js";
 
 let allFaqs = [];
-let activeFilter = "all";
+let activeFilter = "Landing Page";
 
 const faqTableBody = document.getElementById("faq-table-body");
 const faqCountEl = document.getElementById("faqCount");
@@ -46,7 +46,14 @@ async function fetchFaqs() {
         }
 
         const data = await res.json();
-        allFaqs = data.data || [];
+        allFaqs = (data.data || []).map(f => {
+            let cat = (f.category || "").trim();
+            if (!cat || cat.toLowerCase().includes("general") || cat.toLowerCase().includes("all") || cat.toLowerCase().includes("track")) {
+                cat = cat.toLowerCase().includes("track") ? "Shop / Products" : "Landing Page";
+            }
+            return { ...f, category: cat };
+        });
+
         updateFilterCounts();
         applyFiltersAndRender();
     } catch (error) {
@@ -67,23 +74,18 @@ async function fetchFaqs() {
 // 🟢 2. UPDATE CATEGORY FILTER COUNTS
 function updateFilterCounts() {
     const counts = {
-        all: allFaqs.length,
         landing: 0,
         about: 0,
         shop: 0,
-        blog: 0,
-        track: 0,
-        general: 0
+        blog: 0
     };
 
     allFaqs.forEach(f => {
-        const cat = (f.category || "General").toLowerCase();
-        if (cat.includes("landing") || cat.includes("home")) counts.landing++;
-        else if (cat.includes("about")) counts.about++;
+        const cat = (f.category || "Landing Page").toLowerCase();
+        if (cat.includes("about")) counts.about++;
         else if (cat.includes("shop") || cat.includes("product")) counts.shop++;
         else if (cat.includes("blog") || cat.includes("post")) counts.blog++;
-        else if (cat.includes("track") || cat.includes("support") || cat.includes("order")) counts.track++;
-        else counts.general++;
+        else counts.landing++;
     });
 
     const setBadge = (id, val) => {
@@ -91,36 +93,27 @@ function updateFilterCounts() {
         if (el) el.innerText = val;
     };
 
-    setBadge("count-all", counts.all);
     setBadge("count-landing", counts.landing);
     setBadge("count-about", counts.about);
     setBadge("count-shop", counts.shop);
     setBadge("count-blog", counts.blog);
-    setBadge("count-track", counts.track);
-    setBadge("count-general", counts.general);
 }
 
-// 🟢 3. GET CATEGORY BADGE HTML
+// 🟢 3. GET CATEGORY BADGE HTML (NO EMOJIS, CLEAN TYPOGRAPHY)
 function getCategoryBadge(category) {
-    const raw = (category || "General").trim();
+    const raw = (category || "Landing Page").trim();
     const cat = raw.toLowerCase();
 
-    if (cat.includes("landing") || cat.includes("home")) {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/90 text-amber-900 border border-amber-300 font-mono shadow-xs">🏠 Landing Page</span>`;
-    }
     if (cat.includes("about")) {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/90 text-sky-900 border border-sky-300 font-mono shadow-xs">ℹ️ About Us</span>`;
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-sky-100 text-sky-900 border border-sky-200">About Us</span>`;
     }
     if (cat.includes("shop") || cat.includes("product")) {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100/90 text-emerald-900 border border-emerald-300 font-mono shadow-xs">🛍️ Shop / Products</span>`;
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-emerald-100 text-emerald-900 border border-emerald-200">Shop / Products</span>`;
     }
     if (cat.includes("blog") || cat.includes("post")) {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100/90 text-purple-900 border border-purple-300 font-mono shadow-xs">📝 Blog Page</span>`;
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-purple-100 text-purple-900 border border-purple-200">Blog Page</span>`;
     }
-    if (cat.includes("track") || cat.includes("support") || cat.includes("order")) {
-        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100/90 text-indigo-900 border border-indigo-300 font-mono shadow-xs">📦 Track &amp; Support</span>`;
-    }
-    return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-800 border border-slate-300 font-mono shadow-xs">🌐 General / All Pages</span>`;
+    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-[11px] font-extrabold bg-amber-100 text-amber-900 border border-amber-200">Landing Page</span>`;
 }
 
 // 🟢 4. FILTER AND RENDER
@@ -128,17 +121,13 @@ function applyFiltersAndRender() {
     const searchVal = (faqSearchInput ? faqSearchInput.value : "").toLowerCase().trim();
 
     let filtered = allFaqs.filter(f => {
-        // Page filter
-        if (activeFilter !== "all") {
-            const cat = (f.category || "General").toLowerCase();
-            const target = activeFilter.toLowerCase();
-            if (target === "general" && !cat.includes("general") && !cat.includes("all")) return false;
-            if (target === "landing page" && !cat.includes("landing") && !cat.includes("home")) return false;
-            if (target === "about us" && !cat.includes("about")) return false;
-            if (target === "shop / products" && !cat.includes("shop") && !cat.includes("product")) return false;
-            if (target === "blog page" && !cat.includes("blog") && !cat.includes("post")) return false;
-            if (target === "track order / support" && !cat.includes("track") && !cat.includes("order") && !cat.includes("support")) return false;
-        }
+        const cat = (f.category || "Landing Page").toLowerCase();
+        const target = activeFilter.toLowerCase();
+
+        if (target.includes("landing") && !cat.includes("landing") && !cat.includes("home")) return false;
+        if (target.includes("about") && !cat.includes("about")) return false;
+        if (target.includes("shop") && !cat.includes("shop") && !cat.includes("product")) return false;
+        if (target.includes("blog") && !cat.includes("blog") && !cat.includes("post")) return false;
 
         // Search filter
         if (searchVal) {
@@ -165,7 +154,7 @@ function renderFaqs(faqsToRender) {
             <tr>
                 <td colspan="5" class="px-6 py-12 text-center text-slate-400">
                     <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-300"></i>
-                    <p class="text-xs font-bold text-slate-600">No FAQs found for this page.</p>
+                    <p class="text-xs font-bold text-slate-600">No FAQs found for ${escapeHtml(activeFilter)}.</p>
                     <p class="text-[11px] text-slate-400 mt-0.5">Click "Add New FAQ" to create a question for this page.</p>
                 </td>
             </tr>
@@ -231,19 +220,14 @@ function openModal(faq = null) {
         faqQuestionInput.value = faq.question || "";
         faqAnswerInput.value = faq.answer || "";
         faqOrderInput.value = faq.order || 1;
-        faqCategoryInput.value = faq.category || "General";
+        faqCategoryInput.value = faq.category || activeFilter || "Landing Page";
         faqIsActiveInput.checked = faq.isActive !== false;
     } else {
         modalTitle.innerHTML = `<i class="fa-solid fa-circle-question text-amber-400"></i> Add New FAQ`;
         faqForm.reset();
         faqIdInput.value = "";
         
-        // Pre-select category based on active filter if not 'all'
-        if (activeFilter && activeFilter !== "all") {
-            faqCategoryInput.value = activeFilter;
-        } else {
-            faqCategoryInput.value = "Landing Page";
-        }
+        faqCategoryInput.value = activeFilter || "Landing Page";
         
         // Compute order for this category
         const existingInCat = allFaqs.filter(f => (f.category || "").toLowerCase() === (faqCategoryInput.value || "").toLowerCase());
@@ -268,7 +252,7 @@ async function handleSaveFaq(e) {
         question: faqQuestionInput.value.trim(),
         answer: faqAnswerInput.value.trim(),
         order: Number(faqOrderInput.value) || 1,
-        category: faqCategoryInput.value.trim() || "General",
+        category: faqCategoryInput.value.trim() || "Landing Page",
         isActive: faqIsActiveInput.checked
     };
 
@@ -384,7 +368,7 @@ function initFilterTabs() {
                 countBadge.classList.remove("bg-slate-100", "text-slate-600");
             }
 
-            activeFilter = btn.dataset.filter || "all";
+            activeFilter = btn.dataset.filter || "Landing Page";
             applyFiltersAndRender();
         });
     });
