@@ -169,9 +169,9 @@ document.addEventListener("DOMContentLoaded", () => {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
         dots.forEach((dot, index) => {
             if (index === currentIndex) {
-                dot.className = "hero-dot w-6 sm:w-7 h-2 sm:h-2.5 rounded-full bg-[#B8460E] transition-all duration-300 shadow-xs cursor-pointer";
+                dot.classList.add("active");
             } else {
-                dot.className = "hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer";
+                dot.classList.remove("active");
             }
         });
     };
