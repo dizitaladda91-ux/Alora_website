@@ -174,7 +174,7 @@
     <priority>0.7</priority>
   </url>
 
-   <url>
+  <url>
     <loc>https://aloraradiance.com/blog/how-often-should-you-exfoliate-a-soothing-scrub-guide</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
@@ -187,17 +187,15 @@
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-</urlset>
 
- <url>
+  <url>
     <loc>https://aloraradiance.com/blog/why-you-need-to-wear-a-face-cream-sunscreen</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
   </url>
-</urlset>
 
- <url>
+  <url>
     <loc>https://aloraradiance.com/blog/what-makes-a-face-cream-sunscreen-actually-work</loc>
     <lastmod>2026-09-02</lastmod>
     <changefreq>weekly</changefreq>
