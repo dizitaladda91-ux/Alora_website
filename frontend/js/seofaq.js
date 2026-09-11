@@ -47,10 +47,11 @@ async function fetchFaqs() {
 
         const data = await res.json();
         allFaqs = (data.data || []).map(f => {
-            let cat = (f.category || "").trim();
-            if (!cat || cat.toLowerCase().includes("general") || cat.toLowerCase().includes("all") || cat.toLowerCase().includes("track")) {
-                cat = cat.toLowerCase().includes("track") ? "Shop / Products" : "Landing Page";
-            }
+            let cat = (f.category || "Landing Page").trim();
+            if (cat.toLowerCase().includes("about")) cat = "About Us";
+            else if (cat.toLowerCase().includes("shop") || cat.toLowerCase().includes("product")) cat = "Shop / Products";
+            else if (cat.toLowerCase().includes("blog") || cat.toLowerCase().includes("post")) cat = "Blog Page";
+            else cat = "Landing Page";
             return { ...f, category: cat };
         });
 

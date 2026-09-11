@@ -1,67 +1,78 @@
 import Faq from "../models/faq.models.js";
 
-const DEFAULT_FAQS = [
+const BASE_DEFAULT_FAQS = [
     {
         question: "Can I use the Alora Radiance Face Wash every day?",
         answer: "Yes! Our Face Wash is dermatologist-formulated to be gentle enough for daily use, morning and night, to remove impurities without stripping skin moisture.",
-        category: "Landing Page",
         order: 1,
         isActive: true
     },
     {
         question: "Can I use the Face Serum every day?",
         answer: "Yes. Apply 3-4 drops daily after cleansing and before your face cream. If you are new to active Retinol, start with alternate nights.",
-        category: "Landing Page",
         order: 2,
         isActive: true
     },
     {
         question: "When should I apply the Face Cream?",
         answer: "Apply the Face Cream right after your serum, morning and night, to lock in active ingredients and seal 24-hour hydration.",
-        category: "Landing Page",
         order: 3,
-        isActive: true
-    },
-    {
-        question: "How do I choose the right product for my skin type?",
-        answer: "All Alora Radiance formulations are dermatologically tested and suitable for all skin types, including sensitive and acne-prone skin.",
-        category: "Shop / Products",
-        order: 1,
         isActive: true
     },
     {
         question: "Can I use the Body Lotion every day?",
         answer: "Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness.",
-        category: "Shop / Products",
-        order: 2,
+        order: 4,
+        isActive: true
+    },
+    {
+        question: "How often should I use the Face Scrub?",
+        answer: "Use the Face Scrub 2–3 times a week to gently exfoliate dead skin cells, unclog pores, and restore skin smoothness.",
+        order: 5,
         isActive: true
     },
     {
         question: "Are Alora Radiance products safe and dermatologically tested?",
         answer: "Yes, all Alora Radiance formulations are 100% dermatologically tested, paraben-free, cruelty-free, and formulated with clean, high-grade ingredients safe for all skin types.",
-        category: "About Us",
-        order: 1,
+        order: 6,
         isActive: true
     },
     {
-        question: "How does Alora Radiance ensure ingredient transparency?",
-        answer: "We clearly disclose all active and botanical ingredients on every package and product page with zero harmful chemicals.",
-        category: "About Us",
-        order: 2,
-        isActive: true
-    },
-    {
-        question: "How often are skincare routines and blogs updated?",
-        answer: "Our certified skincare specialists publish science-backed beauty insights, ingredient deep-dives, and seasonal skincare routines weekly.",
-        category: "Blog Page",
-        order: 1,
+        question: "How can I track my order?",
+        answer: "You can easily track your order in real-time by visiting our Track Order page and entering your Order ID and phone number.",
+        order: 7,
         isActive: true
     }
 ];
 
+const PAGES = ["Landing Page", "About Us", "Shop / Products", "Blog Page"];
+
+const ensurePageFaqsSeeded = async () => {
+    // 1. Migrate legacy categories
+    await Faq.updateMany(
+        { category: { $in: ["General", "All Pages", "General / Global", "Track Order / Support", null, ""] } },
+        { $set: { category: "Landing Page" } }
+    );
+
+    // 2. For each of the 4 pages, ensure FAQs exist
+    for (const pageName of PAGES) {
+        const count = await Faq.countDocuments({ category: pageName });
+        if (count === 0) {
+            const seedItems = BASE_DEFAULT_FAQS.map((faq, idx) => ({
+                ...faq,
+                category: pageName,
+                order: idx + 1
+            }));
+            await Faq.insertMany(seedItems);
+        }
+    }
+};
+
 // 🟢 1. GET ALL ACTIVE FAQS (Public Endpoint, Supports ?page=)
 export const getAllFaqs = async (req, res) => {
     try {
+        await ensurePageFaqsSeeded();
+
         const { category, page } = req.query;
         let query = { isActive: true };
         
@@ -71,18 +82,6 @@ export const getAllFaqs = async (req, res) => {
         }
 
         let faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
-        
-        // Auto-seed or fallback
-        if (!faqs || faqs.length === 0) {
-            const count = await Faq.countDocuments();
-            if (count === 0) {
-                await Faq.insertMany(DEFAULT_FAQS);
-                faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
-            } else if (targetPage) {
-                // Fallback to Landing Page FAQs if this specific page has none yet
-                faqs = await Faq.find({ category: "Landing Page", isActive: true }).sort({ order: 1, createdAt: 1 }).lean();
-            }
-        }
 
         return res.status(200).json({
             success: true,
@@ -102,22 +101,9 @@ export const getAllFaqs = async (req, res) => {
 // 🟢 2. GET ALL FAQS FOR ADMIN (Protected Endpoint)
 export const getAdminFaqs = async (req, res) => {
     try {
-        // Automatically migrate any legacy "General" or unassigned FAQs to "Landing Page"
-        await Faq.updateMany(
-            { category: { $in: ["General", "All Pages", "General / Global", null, ""] } },
-            { $set: { category: "Landing Page" } }
-        );
-        await Faq.updateMany(
-            { category: "Track Order / Support" },
-            { $set: { category: "Shop / Products" } }
-        );
+        await ensurePageFaqsSeeded();
 
-        let faqs = await Faq.find().sort({ order: 1, createdAt: 1 }).lean();
-        
-        if (!faqs || faqs.length === 0) {
-            await Faq.insertMany(DEFAULT_FAQS);
-            faqs = await Faq.find().sort({ order: 1, createdAt: 1 }).lean();
-        }
+        let faqs = await Faq.find().sort({ category: 1, order: 1, createdAt: 1 }).lean();
 
         return res.status(200).json({
             success: true,
@@ -146,16 +132,18 @@ export const createFaq = async (req, res) => {
             return res.status(400).json({ success: false, message: "Answer is required." });
         }
 
+        const chosenCategory = category && category.trim() ? category.trim() : "Landing Page";
+
         let nextOrder = order;
         if (nextOrder === undefined || nextOrder === null) {
-            const lastFaq = await Faq.findOne().sort({ order: -1 }).lean();
+            const lastFaq = await Faq.findOne({ category: chosenCategory }).sort({ order: -1 }).lean();
             nextOrder = lastFaq ? (lastFaq.order || 0) + 1 : 1;
         }
 
         const newFaq = new Faq({
             question: question.trim(),
             answer: answer.trim(),
-            category: category ? category.trim() : "General",
+            category: chosenCategory,
             order: Number(nextOrder) || 0,
             isActive: isActive !== undefined ? Boolean(isActive) : true
         });
