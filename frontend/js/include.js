@@ -88,6 +88,57 @@ async function loadPartial(selector, url) {
     }
 }
 
+async function refreshPageFaqs() {
+    const container = document.getElementById('global-faq-list');
+    if (!container) return;
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
+
+    let pageCategory = "Landing Page";
+    const path = (window.location.pathname || "").toLowerCase();
+
+    if (path.includes("about") || path.includes("aboutus")) {
+        pageCategory = "About Us";
+    } else if (path.includes("product") || path.includes("moreproduct") || path.includes("cart") || path.includes("shop")) {
+        pageCategory = "Shop / Products";
+    } else if (path.includes("blog") || path.includes("post")) {
+        pageCategory = "Blog Page";
+    } else {
+        pageCategory = "Landing Page";
+    }
+
+    const customSlot = document.querySelector("[data-faq-page]");
+    if (customSlot && customSlot.getAttribute("data-faq-page")) {
+        pageCategory = customSlot.getAttribute("data-faq-page");
+    }
+
+    try {
+        const res = await fetch(`${baseUrl}/api/faqs?page=${encodeURIComponent(pageCategory)}`, { cache: "no-cache" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+            container.innerHTML = data.data.map((faq, idx) => {
+                const isOpen = idx === 0 ? "open" : "";
+                return `
+                    <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md" ${isOpen}>
+                        <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
+                            <span>${faq.question}</span>
+                            <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
+                        </summary>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
+                            ${faq.answer}
+                        </p>
+                    </details>
+                `;
+            }).join('');
+        }
+    } catch (err) {
+        // keep fallback HTML if fetch fails
+    }
+}
+window.refreshPageFaqs = refreshPageFaqs;
+
 async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
@@ -125,6 +176,7 @@ async function loadAllPartials() {
 
         if (faqPlaceholder && !isSingleBlogPage) {
             await loadPartial("#faq-placeholder", faqUrl);
+            await refreshPageFaqs();
         } else if (faqPlaceholder && isSingleBlogPage) {
             faqPlaceholder.remove();
         }
