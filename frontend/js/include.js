@@ -88,10 +88,62 @@ async function loadPartial(selector, url) {
     }
 }
 
+async function refreshPageFaqs() {
+    const container = document.getElementById('global-faq-list');
+    if (!container) return;
+
+    const isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1" || location.protocol === "file:";
+    const baseUrl = (window.BASE_URL !== undefined && window.BASE_URL !== null) ? window.BASE_URL : (isLocal ? "http://localhost:5000" : "");
+
+    let pageCategory = "Landing Page";
+    const path = (window.location.pathname || "").toLowerCase();
+
+    if (path.includes("about") || path.includes("aboutus")) {
+        pageCategory = "About Us";
+    } else if (path.includes("product") || path.includes("moreproduct") || path.includes("cart") || path.includes("shop")) {
+        pageCategory = "Shop / Products";
+    } else if (path.includes("blog") || path.includes("post")) {
+        pageCategory = "Blog Page";
+    } else {
+        pageCategory = "Landing Page";
+    }
+
+    const customSlot = document.querySelector("[data-faq-page]");
+    if (customSlot && customSlot.getAttribute("data-faq-page")) {
+        pageCategory = customSlot.getAttribute("data-faq-page");
+    }
+
+    try {
+        const res = await fetch(`${baseUrl}/api/faqs?page=${encodeURIComponent(pageCategory)}`, { cache: "no-cache" });
+        if (!res.ok) return;
+        const data = await res.json();
+        if (data && data.success && Array.isArray(data.data) && data.data.length > 0) {
+            container.innerHTML = data.data.map((faq, idx) => {
+                const isOpen = idx === 0 ? "open" : "";
+                return `
+                    <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md" ${isOpen}>
+                        <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
+                            <span>${faq.question}</span>
+                            <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
+                        </summary>
+                        <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
+                            ${faq.answer}
+                        </p>
+                    </details>
+                `;
+            }).join('');
+        }
+    } catch (err) {
+        // keep fallback HTML if fetch fails
+    }
+}
+window.refreshPageFaqs = refreshPageFaqs;
+
 async function loadAllPartials() {
     const isFile = location.protocol === "file:";
     const navUrl = isFile ? "./navbar.html" : "/navbar.html";
     const footerUrl = isFile ? "./footer.html" : "/footer.html";
+    const faqUrl = isFile ? "./faq-section.html" : "/faq-section.html";
     const chatbotUrl = isFile ? "./chatbot.html" : "/chatbot.html";
     const chatbotJsUrl = isFile ? "./js/chatbot.js" : "/js/chatbot.js";
 
@@ -107,6 +159,28 @@ async function loadAllPartials() {
     }
 
     const loadDeferredPartials = async () => {
+        // Auto-inject and load FAQ section across all public customer pages
+        // (Excluding single blog post pages, as requested)
+        const footerPlaceholder = document.getElementById('footer-placeholder');
+        const pathname = (window.location.pathname || "").toLowerCase();
+        const isAdminOrAuth = pathname.includes('admin') || pathname.includes('login') || pathname.includes('register') || pathname.includes('forgot') || pathname.includes('reset');
+        const hasProductFaq = !!document.getElementById('product-faq-section');
+        const isSingleBlogPage = !!document.getElementById('blog-content-area') || !!document.getElementById('post-loader') || pathname.includes('post.html') || (/^\/blogs?\/[^\/]+/i.test(pathname) && !pathname.endsWith('/blog') && !pathname.endsWith('/blogs') && !pathname.endsWith('/blog.html'));
+        
+        let faqPlaceholder = document.getElementById('faq-placeholder');
+        if (!faqPlaceholder && footerPlaceholder && !isAdminOrAuth && !hasProductFaq && !isSingleBlogPage) {
+            faqPlaceholder = document.createElement('div');
+            faqPlaceholder.id = 'faq-placeholder';
+            footerPlaceholder.parentNode.insertBefore(faqPlaceholder, footerPlaceholder);
+        }
+
+        if (faqPlaceholder && !isSingleBlogPage) {
+            await loadPartial("#faq-placeholder", faqUrl);
+            await refreshPageFaqs();
+        } else if (faqPlaceholder && isSingleBlogPage) {
+            faqPlaceholder.remove();
+        }
+
         await loadPartial("#footer-placeholder", footerUrl);
         await loadPartial("#chatbot-placeholder", chatbotUrl);
         if (!document.getElementById("alora-chatbot-js")) {

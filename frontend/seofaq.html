@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEO ALORA | FAQ Management Studio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700;800&family=Roboto+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./styles/tailwind.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        navy: '#0B132B',
+                        'navy-light': '#1C2541',
+                        gold: '#8B4513',
+                        'gold-light': '#D4AF37',
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                        fraunces: ['Fraunces', 'serif'],
+                        mono: ['"Roboto Mono"', 'monospace'],
+                    }
+                }
+            }
+        };
+    </script>
+    <style>
+        /* 🚀 SEO Studio Executive Theme Colors & High Contrast Fixes */
+        .bg-navy {
+            background-color: #0F172A !important;
+        }
+        .bg-navy-light {
+            background-color: #1E293B !important;
+        }
+        nav.bg-navy {
+            background-color: #0F172A !important;
+            border-bottom: 1px solid #1E293B !important;
+        }
+        aside.bg-navy {
+            background-color: #0F172A !important;
+            border-right: 1px solid #1E293B !important;
+        }
+        .sidebar-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-link-active {
+            background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+        }
+        .sidebar-link-active i {
+            color: #020617 !important;
+        }
+        .sidebar-link-inactive {
+            color: #F1F5F9 !important;
+            background-color: rgba(30, 41, 59, 0.6) !important;
+            border: 1px solid rgba(51, 65, 85, 0.6) !important;
+        }
+        .sidebar-link-inactive i {
+            color: #F59E0B !important;
+        }
+        .sidebar-link-inactive:hover {
+            background-color: #1E293B !important;
+            color: #FFFFFF !important;
+            border-color: #64748B !important;
+            transform: translateX(3px) !important;
+        }
+        .sidebar-logout {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            color: #FB7185 !important;
+            background-color: rgba(225, 29, 72, 0.12) !important;
+            border: 1px solid rgba(225, 29, 72, 0.25) !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-logout:hover {
+            background-color: rgba(225, 29, 72, 0.25) !important;
+            color: #FFFFFF !important;
+            border-color: rgba(225, 29, 72, 0.5) !important;
+        }
+    </style>
+</head>
+<body class="font-sans bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-800">
+
+    <!-- Top Executive Navigation Header -->
+    <nav class="h-16 bg-navy text-white flex items-center justify-between px-6 shrink-0 shadow-xl z-20 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 text-slate-950 flex items-center justify-center font-bold shadow-md shadow-amber-500/20">
+                <i class="fa-solid fa-circle-question text-sm"></i>
+            </div>
+            <div>
+                <h1 class="text-base font-extrabold tracking-wider uppercase font-fraunces text-white flex items-center gap-2">
+                    ALORA SEO STUDIO <span class="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-400/40">❓ FAQ MANAGER</span>
+                </h1>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <a href="/index.html" target="_blank" class="text-xs font-bold text-white hover:text-amber-300 transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-lg border border-slate-600 shadow-xs">
+                <i class="fa-solid fa-arrow-up-right-from-square text-amber-400"></i> View Live Site
+            </a>
+        </div>
+    </nav>
+
+    <!-- Main Workspace Container -->
+    <div class="flex flex-1 overflow-hidden">
+        
+        <!-- Sidebar Navigation -->
+        <aside class="bg-navy text-slate-200 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
+            <div class="space-y-6">
+                
+                <div class="px-2 pt-2">
+                    <p class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider font-mono mb-3">Content Navigation</p>
+                    <nav class="w-full">
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="./seoadmin.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-layer-group text-sm"></i> All Blog Posts
+                                </a>
+                            </li>
+                            <li>
+                                <a href="./seoallpost.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-circle-plus text-sm"></i> Create New Post
+                                </a>
+                            </li>
+                            <li>
+                                <a href="./seoproduct.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-box-archive text-sm"></i> Products SEO
+                                </a>
+                            </li>
+                            <li>
+                                <a href="./seofaq.html" class="sidebar-link sidebar-link-active">
+                                    <i class="fa-solid fa-circle-question text-sm"></i> Store FAQs
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+
+                <!-- Live Status Info Box -->
+                <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-700 text-xs space-y-2">
+                    <div class="flex items-center justify-between text-slate-300 font-mono text-[10px] uppercase font-bold">
+                        <span>FAQ Sync Status</span>
+                        <span class="text-emerald-400 font-extrabold">Live across all pages</span>
+                    </div>
+                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans font-medium">
+                        Any question updated here updates automatically across the entire storefront in real-time.
+                    </p>
+                </div>
+
+            </div>
+
+            <!-- LOGOUT BUTTON -->
+            <div class="border-t border-slate-800 pt-4">
+                <a href="#" id="adminLogoutBtn" class="sidebar-logout">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout Studio
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Workspace Area -->
+        <main class="flex-1 p-6 sm:p-8 overflow-y-auto bg-[#F8FAFC]">
+            <div class="animate__animated animate__fadeIn max-w-6xl mx-auto space-y-6">
+                
+                <!-- Welcome Stats Header -->
+                <div class="bg-gradient-to-r from-slate-900 via-navy to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl border border-slate-800 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 relative overflow-hidden">
+                    <div class="relative z-10">
+                        <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-300 text-[11px] font-bold tracking-widest uppercase font-mono border border-amber-400/30 mb-2">
+                            ✨ Global FAQs &amp; Good To Know
+                        </span>
+                        <h2 class="text-2xl sm:text-3xl font-fraunces font-bold text-white">Manage Storefront FAQs</h2>
+                        <p class="text-xs sm:text-sm text-slate-300 mt-1 max-w-lg leading-relaxed">
+                            Edit questions, answers, order sequence, and visibility for the global Good To Know accordion shown across all website pages.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-3 relative z-10">
+                        <button id="copySchemaBtn" type="button" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-xs py-3 px-4 rounded-xl border border-slate-700 transition flex items-center gap-2">
+                            <i class="fa-solid fa-code text-amber-400"></i> Copy JSON-LD Schema
+                        </button>
+                        <button id="addNewFaqBtn" type="button" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-extrabold text-xs sm:text-sm py-3 px-5 rounded-xl shadow-lg hover:shadow-amber-500/25 transition-all duration-300 flex items-center gap-2 tracking-wide shrink-0 transform hover:-translate-y-0.5 cursor-pointer">
+                            <i class="fa-solid fa-plus text-xs"></i> Add New FAQ
+                        </button>
+                    </div>
+                </div>
+
+                <!-- FAQs Table Container -->
+                <div class="bg-white rounded-3xl shadow-xl border border-slate-200/80 overflow-hidden">
+                    <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
+                        <div class="flex items-center gap-2">
+                            <i class="fa-solid fa-clipboard-question text-amber-600 text-base"></i>
+                            <h3 class="font-bold text-slate-900 text-base font-fraunces inline-flex items-center gap-2 whitespace-nowrap">
+                                <span>Questions Catalog</span>
+                                <span class="text-xs font-mono font-bold bg-amber-100 text-amber-900 px-2 py-0.5 rounded-full border border-amber-300" id="faqCount">0</span>
+                            </h3>
+                        </div>
+                        <div class="w-full sm:w-72">
+                            <input type="text" id="faqSearchInput" placeholder="Search questions &amp; answers..." class="w-full px-3.5 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-amber-500 bg-white">
+                        </div>
+                    </div>
+
+                    <!-- 🚀 Per-Page Category Filter Tabs -->
+                    <div class="p-3 border-b border-slate-100 flex items-center gap-2 overflow-x-auto bg-slate-50/70" id="faq-category-filters">
+                        <button type="button" data-filter="Landing Page" class="faq-filter-btn active px-4 py-2 rounded-xl text-xs font-extrabold transition flex items-center gap-2 bg-slate-900 text-white shadow-xs cursor-pointer whitespace-nowrap">
+                            <span>Landing Page</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono" id="count-landing">0</span>
+                        </button>
+                        <button type="button" data-filter="About Us" class="faq-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 cursor-pointer whitespace-nowrap">
+                            <span>About Us</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-about">0</span>
+                        </button>
+                        <button type="button" data-filter="Shop / Products" class="faq-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 cursor-pointer whitespace-nowrap">
+                            <span>Shop / Products</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-shop">0</span>
+                        </button>
+                        <button type="button" data-filter="Blog Page" class="faq-filter-btn px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 cursor-pointer whitespace-nowrap">
+                            <span>Blog Page</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-blog">0</span>
+                        </button>
+                    </div>
+
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-slate-900 text-slate-200 text-[11px] font-extrabold uppercase tracking-widest border-b border-slate-800">
+                                    <th class="px-6 py-4 w-16 text-center">#</th>
+                                    <th class="px-6 py-4">Question &amp; Page</th>
+                                    <th class="px-6 py-4">Answer Preview</th>
+                                    <th class="px-6 py-4 w-28 text-center">Status</th>
+                                    <th class="px-6 py-4 w-32 text-right">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="faq-table-body" class="divide-y divide-slate-100 text-sm text-slate-700">
+                                <tr>
+                                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
+                                        <p class="text-xs font-semibold">Loading FAQs from database...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ============ ADD / EDIT FAQ MODAL ============ -->
+    <div id="faqModal" class="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-xl w-full border border-slate-200 overflow-hidden animate__animated animate__zoomIn animate__faster">
+            <div class="p-6 bg-slate-900 text-white flex justify-between items-center border-b border-slate-800">
+                <h3 id="modalTitle" class="text-lg font-fraunces font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-circle-question text-amber-400"></i> Add New FAQ
+                </h3>
+                <button type="button" id="closeModalBtn" class="text-slate-400 hover:text-white text-lg focus:outline-none cursor-pointer">&times;</button>
+            </div>
+            
+            <form id="faqForm" class="p-6 space-y-4">
+                <input type="hidden" id="faqId">
+
+                <div>
+                    <label for="faqCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Target Page / Placement <span class="text-rose-500">*</span>
+                    </label>
+                    <select id="faqCategory" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-bold text-slate-800 bg-white cursor-pointer">
+                        <option value="Landing Page">Landing Page</option>
+                        <option value="About Us">About Us</option>
+                        <option value="Shop / Products">Shop / Products</option>
+                        <option value="Blog Page">Blog Page</option>
+                    </select>
+                    <p class="text-[11px] text-slate-400 mt-1">Select which page this FAQ will be assigned to.</p>
+                </div>
+
+                <div>
+                    <label for="faqQuestion" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Question <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="faqQuestion" required placeholder="e.g. Can I use the Face Serum every day?" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-semibold text-slate-900">
+                </div>
+
+                <div>
+                    <label for="faqAnswer" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Answer <span class="text-rose-500">*</span>
+                    </label>
+                    <textarea id="faqAnswer" required rows="4" placeholder="Write clear, dermatologist-backed answer here..." class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-sans leading-relaxed"></textarea>
+                    <p class="text-[11px] text-slate-400 mt-1">HTML links like &lt;a href="/trackorder.html"&gt;Track Order&lt;/a&gt; are supported.</p>
+                </div>
+
+                <div>
+                    <label for="faqOrder" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Display Order (Sequence on this Page)
+                    </label>
+                    <input type="number" id="faqOrder" min="1" max="99" value="1" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-amber-500 font-mono font-bold">
+                </div>
+
+                <div class="flex items-center gap-3 pt-2">
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="faqIsActive" checked class="sr-only peer">
+                        <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                        <span class="ml-3 text-xs font-bold text-slate-700">Display this FAQ on website (Active)</span>
+                    </label>
+                </div>
+
+                <div class="flex justify-end items-center gap-3 pt-4 border-t border-slate-100">
+                    <button type="button" id="cancelModalBtn" class="px-5 py-2.5 rounded-xl border border-slate-300 text-slate-700 text-xs font-bold hover:bg-slate-50 transition">
+                        Cancel
+                    </button>
+                    <button type="submit" id="saveFaqBtn" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-extrabold text-xs shadow-md transition flex items-center gap-2 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk text-xs"></i> Save FAQ
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script type="module" src="./js/seoAuth.min.js"></script>
+    <script type="module" src="./js/seofaq.min.js"></script>
+</body>
+</html>

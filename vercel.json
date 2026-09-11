@@ -46,7 +46,7 @@
     },
     {
       "src": "/products/?",
-      "dest": "/frontend/moreproduct"
+      "dest": "/api/index.js"
     },
     {
       "src": "/product/[^/]+/?",
@@ -125,11 +125,15 @@
     },
     {
       "src": "/blog/?",
-      "dest": "/frontend/Blog"
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/blogs/?",
+      "dest": "/api/index.js"
     },
     {
       "src": "/Blog/?",
-      "dest": "/frontend/Blog"
+      "dest": "/api/index.js"
     },
     {
       "src": "/blog/(.*)",

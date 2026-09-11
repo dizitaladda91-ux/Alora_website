@@ -46,8 +46,8 @@
     <link rel="dns-prefetch" href="https://res.cloudinary.com">
 
     <!-- 🚀 PRELOAD EXACT CRITICAL LCP HERO IMAGE FOR MOBILE & DESKTOP -->
-    <link rel="preload" as="image" href="./static/hero_banner_1_desk.webp" media="(min-width: 768px)" type="image/webp" fetchpriority="high">
-    <link rel="preload" as="image" href="./static/hero_banner_1_mob.webp" media="(max-width: 767px)" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="./static/1.webp" media="(min-width: 768px)" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="./static/hero_banner_allproducts_mob.webp" media="(max-width: 767px)" type="image/webp" fetchpriority="high">
 
     <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES 480ms RENDER-BLOCKING DELAY) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
@@ -70,6 +70,101 @@
         #navbar-placeholder {
             min-height: 64px;
             background-color: #FFFFFF;
+        }
+
+        /* 🚀 HERO SLIDER RESPONSIVE FULL-BLEED ZERO-CROP SYSTEM (ALL SCREENS & MACBOOKS) */
+        .hero-slider-container {
+            width: 100% !important;
+            position: relative !important;
+            overflow: hidden !important;
+            background-color: #FAF5EE !important;
+            aspect-ratio: 4 / 5 !important;
+            height: auto !important;
+            min-height: 0 !important;
+            max-height: none !important;
+        }
+        @media (min-width: 640px) {
+            .hero-slider-container {
+                aspect-ratio: 16 / 9 !important;
+            }
+        }
+        @media (min-width: 768px) {
+            .hero-slider-container {
+                aspect-ratio: 1902 / 600 !important;
+                height: auto !important;
+                min-height: 0 !important;
+                max-height: none !important;
+            }
+        }
+        .hero-desk-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: fill !important;
+            object-position: center !important;
+            display: none !important;
+        }
+        .hero-mob-img {
+            width: 100% !important;
+            height: 100% !important;
+            object-fit: cover !important;
+            object-position: center !important;
+            display: block !important;
+        }
+        @media (min-width: 768px) {
+            .hero-desk-img {
+                display: block !important;
+            }
+            .hero-mob-img {
+                display: none !important;
+            }
+        }
+
+        /* 🚀 Hero Banner Slider Dots Navigation (Explicit High-Contrast Bottom Placement) */
+        #hero-slider-dots {
+            position: absolute !important;
+            bottom: 18px !important;
+            left: 50% !important;
+            transform: translateX(-50%) !important;
+            z-index: 30 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            padding: 6px 14px !important;
+            border-radius: 9999px !important;
+            background-color: rgba(20, 30, 20, 0.45) !important;
+            backdrop-filter: blur(8px) !important;
+            -webkit-backdrop-filter: blur(8px) !important;
+            border: 1px solid rgba(255, 255, 255, 0.35) !important;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+        }
+        @media (max-width: 640px) {
+            #hero-slider-dots {
+                bottom: 10px !important;
+                padding: 4px 10px !important;
+                gap: 6px !important;
+            }
+        }
+        .hero-dot {
+            height: 8px !important;
+            width: 8px !important;
+            border-radius: 9999px !important;
+            background-color: rgba(255, 255, 255, 0.65) !important;
+            border: 1px solid rgba(0, 0, 0, 0.15) !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            cursor: pointer !important;
+            padding: 0 !important;
+            margin: 0 !important;
+            outline: none !important;
+        }
+        .hero-dot:hover {
+            background-color: #FFFFFF !important;
+            transform: scale(1.15) !important;
+        }
+        .hero-dot.active {
+            width: 26px !important;
+            background-color: #B8460E !important;
+            border-color: #FFFFFF !important;
+            box-shadow: 0 2px 8px rgba(184, 70, 14, 0.5) !important;
         }
 
         /* 🚀 WCAG Touch Target Compliance: Expands interactive touch target of .dot buttons to 28px x 28px */
@@ -422,66 +517,58 @@
 <main id="main-content">
 
 <!-- ============ HERO CAROUSEL BANNER (RESPONSIVE FULL-WIDTH - NO CROPPING) ============ -->
-<div class="flex w-full overflow-hidden relative group aspect-[16/9] md:aspect-[16/6] min-h-[200px] sm:min-h-[300px] md:min-h-[450px] max-h-[85vh] bg-[#FAF5EE] shadow-xs" style="image-rendering: -webkit-optimize-contrast;">
-    
-    <!-- Prev Button -->
-    <button id="prev-btn" aria-label="Previous Slide" 
-        class="absolute left-1 sm:left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
-        <i class="fa-solid fa-angle-left text-xs sm:text-sm md:text-base"></i>
-    </button>
-    
-    <!-- Next Button -->
-    <button id="next-btn" aria-label="Next Slide" 
-        class="absolute right-1 sm:right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
-        <i class="fa-solid fa-angle-right text-xs sm:text-sm md:text-base"></i>
-    </button>
+<div class="hero-slider-container flex w-full relative group shadow-xs overflow-hidden" style="image-rendering: -webkit-optimize-contrast;">
     
     <!-- Slider Track -->
-    <div id="slider-track" class="flex w-full h-full min-h-[200px] sm:min-h-[300px] md:min-h-[450px] transition-transform duration-700 ease-in-out">
+    <div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
 
-    <!-- Slide 1 (Travel Ready Kit / Sachets) -->
-    <a href="/product/alora-radiance-travel-essentials-kit" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_1_desk.webp" alt="Alora Travel Essentials Kit Banner Desktop" width="2400" height="900" fetchpriority="high" loading="eager" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_1_mob.webp" alt="Alora Travel Essentials Kit Banner Mobile" width="1200" height="675" fetchpriority="high" loading="eager" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+    <!-- 1st Slide: All Products -->
+    <a href="/products" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
+        <img src="./static/1.webp" alt="Alora Radiance Complete Skincare Collection Desktop" width="1920" height="600" fetchpriority="high" loading="eager" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_allproducts_mob.webp" alt="Alora Radiance Complete Skincare Collection Mobile" width="819" height="1024" fetchpriority="high" loading="eager" decoding="async" class="hero-mob-img">
     </a>
 
-    <!-- Slide 3 (Face Serum) -->
-    <a href="/product/brightening-hydrating-face-serum" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_3_desk.webp" alt="Brightening & Hydrating Face Serum Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_3_mob.webp" alt="Brightening & Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+    <!-- 2nd Slide: Face Wash -->
+    <a href="/product/purifying-glow-face-wash" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
+        <img src="./static/2.webp" alt="Purifying Glow Face Wash Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_facewash_mob.webp" alt="Purifying Glow Face Wash Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
-    <!-- Slide 4 (Body Lotion) -->
+    <!-- 3rd Slide: Body Lotion -->
     <a href="/product/soothing-body-lotion" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_4_desk.webp" alt="Soothing Body Lotion Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_4_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/3.webp" alt="Soothing Body Lotion Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_bodylotion_mob.webp" alt="Soothing Body Lotion Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
-    <!-- Slide 5 (Face Scrub) -->
+    <!-- 4th Slide: Face Scrub -->
     <a href="/product/soothing-face-scrub" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_5_desk.webp" alt="Soothing Face Scrub Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/4.webp" alt="Soothing Face Scrub Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_5_mob.webp" alt="Soothing Face Scrub Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
-    <!-- Slide 6 (Face Cream + Sunscreen) -->
+    <!-- 5th Slide: Face Serum -->
+    <a href="/product/brightening-hydrating-face-serum" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
+        <img src="./static/5.webp" alt="Brightening &amp; Hydrating Face Serum Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_3_mob.webp" alt="Brightening &amp; Hydrating Face Serum Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="hero-mob-img">
+    </a>
+
+    <!-- 6th Slide: Face Cream -->
     <a href="/product/face-cream-sunscreen-spf-30" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_6_desk.webp" alt="Face Cream & Sunscreen SPF 30 Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_6_mob.webp" alt="Face Cream & Sunscreen SPF 30 Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
-    </a>
-
-    <!-- Slide 7 (Combo / Rituals) -->
-    <a href="/product/radiance-ritual-trio" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_7_desk.webp" alt="Radiance Ritual Trio Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_7_mob.webp" alt="Radiance Ritual Trio Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
-    </a>
-
-    <!-- Slide 8 (Featured Collection) -->
-    <a href="/moreproduct.html" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
-        <img src="./static/hero_banner_8_desk.webp" alt="Featured Skincare Collection Banner Desktop" width="2400" height="900" loading="lazy" decoding="async" class="hidden md:block w-full h-full object-cover object-center">
-        <img src="./static/hero_banner_8_mob.webp" alt="Featured Skincare Collection Banner Mobile" width="1200" height="675" loading="lazy" decoding="async" class="block md:hidden w-full h-full object-cover object-center">
+        <img src="./static/6.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Desktop" width="1902" height="600" loading="lazy" decoding="async" class="hero-desk-img">
+        <img src="./static/hero_banner_facecream_mob.webp" alt="Mulberry Face Cream &amp; Sunscreen SPF 30++ Banner Mobile" width="819" height="1024" loading="lazy" decoding="async" class="hero-mob-img">
     </a>
 
 </div>
+
+    <!-- Hero Slider Dots Navigation -->
+    <div id="hero-slider-dots">
+        <button type="button" aria-label="Go to slide 1" class="hero-dot active"></button>
+        <button type="button" aria-label="Go to slide 2" class="hero-dot"></button>
+        <button type="button" aria-label="Go to slide 3" class="hero-dot"></button>
+        <button type="button" aria-label="Go to slide 4" class="hero-dot"></button>
+        <button type="button" aria-label="Go to slide 5" class="hero-dot"></button>
+        <button type="button" aria-label="Go to slide 6" class="hero-dot"></button>
+    </div>
 </div>
 
   <!-- ============ FEATURED PRODUCTS COLLECTION ============ -->
@@ -540,54 +627,54 @@
 
     <!-- ============ HERO BUNDLE HIGHLIGHT SECTION ============ -->
     <header class="max-w-7xl mx-auto px-3 sm:px-6 py-3 sm:py-6">
-        <div class="bg-gradient-to-br from-[#152219] via-[#1F3327] to-[#152219] rounded-3xl p-5 sm:p-10 md:p-14 text-white shadow-2xl border border-amber-500/20 relative overflow-hidden grid gap-8 md:grid-cols-2 md:gap-12 items-center">
+        <div style="background: linear-gradient(135deg, #F5EFE6 0%, #EAE1CD 50%, #DFD3BA 100%); border: 1px solid #CEBE96;" class="rounded-3xl p-5 sm:p-10 md:p-14 text-[#141E14] shadow-xl relative overflow-hidden grid gap-8 md:grid-cols-2 md:gap-12 items-center">
             
             <!-- Ambient Background Glow Effect -->
-            <div class="absolute -top-24 -left-24 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -bottom-24 -right-24 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div style="background-color: rgba(184, 70, 14, 0.08);" class="absolute -top-24 -left-24 w-96 h-96 rounded-full blur-3xl pointer-events-none"></div>
+            <div style="background-color: rgba(184, 134, 11, 0.08);" class="absolute -bottom-24 -right-24 w-96 h-96 rounded-full blur-3xl pointer-events-none"></div>
 
             <!-- Left Hero Copy -->
             <div class="relative z-10 flex flex-col items-center md:items-start text-center md:text-left hero-copy w-full">
                 
-                <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-500/15 text-amber-300 text-[10px] sm:text-[11px] font-bold uppercase tracking-widest border border-amber-400/30 mb-3 sm:mb-4">
+                <span style="background-color: rgba(184, 70, 14, 0.12); color: #B8460E; border: 1px solid rgba(184, 70, 14, 0.28);" class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-[10px] sm:text-[11px] font-bold uppercase tracking-widest mb-3 sm:mb-4">
                     Limited Edition Bundles
                 </span>
 
-                <h1 class="text-2xl sm:text-5xl md:text-6xl font-fraunces font-bold text-parchment leading-tight mb-4 sm:mb-6">
-                    Glow More.<br> <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-amber-400 to-amber-200">Save More.</span>
-                </h1>
+                <h2 class="text-2xl sm:text-5xl md:text-6xl font-fraunces font-bold text-[#141E14] leading-tight mb-4 sm:mb-6">
+                    Glow More.<br> <span style="background: linear-gradient(90deg, #B8460E, #D9541E, #B8460E); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Save More.</span>
+                </h2>
                 
-                <p class="text-parchment/80 text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-md leading-relaxed font-sans">
+                <p class="text-[#2E3B2C]/90 text-xs sm:text-sm md:text-base mb-6 sm:mb-8 max-w-md leading-relaxed font-sans">
                     Build a complete skincare ritual with our specially curated combo packs. Each set combines complementary products to cleanse, nourish, protect, and reveal healthy, radiant skin.
-                    <span class="font-semibold text-amber-300 block mt-1.5">Bundle Up &amp; Save Up to 25% Off.</span>
+                    <span style="color: #B8460E;" class="font-bold block mt-1.5">Bundle Up &amp; Save Up to 25% Off.</span>
                 </p>
 
                 <!-- CTA Buttons -->
                 <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-center md:justify-start gap-3 w-full sm:w-auto hero-actions">
-                    <a href="/products" class="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-500 hover:to-amber-600 text-slate-950 font-bold px-6 py-3 rounded-xl shadow-lg hover:shadow-amber-500/25 transition-all duration-300 text-xs sm:text-sm tracking-wide text-center active:scale-98">
-                        Explore Bundles <i class="fa-solid fa-arrow-right ml-1 text-xs"></i>
+                    <a href="/products" style="background: linear-gradient(135deg, #B8460E 0%, #D9541E 100%) !important; color: #FFFFFF !important; box-shadow: 0 6px 18px rgba(184, 70, 14, 0.38) !important;" class="font-bold px-7 py-3.5 rounded-xl transition-all duration-300 text-xs sm:text-sm tracking-wide text-center active:scale-98 hover:brightness-110 flex items-center justify-center gap-2">
+                        <span>Explore Bundles</span> <i class="fa-solid fa-arrow-right text-xs"></i>
                     </a>
-                    <a href="/products?filter=bestseller" class="bg-white/10 hover:bg-white/20 text-parchment font-semibold border border-white/20 px-6 py-3 rounded-xl transition-all duration-300 text-xs sm:text-sm text-center active:scale-98">
+                    <a href="/products?filter=bestseller" style="background-color: #FFFFFF; color: #141E14; border: 1.5px solid #CEBE96;" class="font-semibold px-6 py-3.5 rounded-xl transition-all duration-300 text-xs sm:text-sm text-center shadow-xs active:scale-98 hover:bg-amber-50/60">
                         Bestsellers
                     </a>
                 </div>
 
                 <!-- Hero Stats Row -->
-                <div class="grid grid-cols-3 gap-2 sm:gap-6 mt-8 pt-6 border-t border-white/15 hero-stats w-full items-center text-center sm:text-left">
+                <div style="border-color: #CEBE96;" class="grid grid-cols-3 gap-2 sm:gap-6 mt-8 pt-6 border-t hero-stats w-full items-center text-center sm:text-left">
                     
                     <div class="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2">
-                        <i class="fa-solid fa-shield-halved text-amber-400 text-sm sm:text-base shrink-0"></i>
-                        <p class="text-[9px] sm:text-xs font-medium text-parchment/90 uppercase tracking-wider leading-tight">Dermatologically<br class="hidden sm:inline"> Tested</p>
+                        <i style="color: #B8460E;" class="fa-solid fa-shield-halved text-sm sm:text-base shrink-0"></i>
+                        <p class="text-[9px] sm:text-xs font-medium text-[#2E3B2C] uppercase tracking-wider leading-tight">Dermatologically<br class="hidden sm:inline"> Tested</p>
                     </div>
                     
-                    <div class="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 border-x border-white/15 px-1 sm:px-4">
-                        <i class="fa-solid fa-leaf text-amber-400 text-sm sm:text-base shrink-0"></i>
-                        <p class="text-[9px] sm:text-xs font-medium text-parchment/90 uppercase tracking-wider leading-tight">Clean &amp; Safe<br class="hidden sm:inline"> Ingredients</p>
+                    <div style="border-color: #CEBE96;" class="flex flex-col sm:flex-row items-center gap-1.5 sm:gap-2 border-x px-1 sm:px-4">
+                        <i style="color: #B8460E;" class="fa-solid fa-leaf text-sm sm:text-base shrink-0"></i>
+                        <p class="text-[9px] sm:text-xs font-medium text-[#2E3B2C] uppercase tracking-wider leading-tight">Clean &amp; Safe<br class="hidden sm:inline"> Ingredients</p>
                     </div>
                     
                     <div class="flex flex-col justify-center items-center sm:items-start">
-                        <p class="text-lg sm:text-2xl font-fraunces text-amber-300 font-bold leading-none">4.9 ★</p>
-                        <p class="text-[9px] sm:text-[10px] uppercase tracking-wider text-parchment/70 mt-1 leading-none">Verified Buyers</p>
+                        <p style="color: #B8460E;" class="text-lg sm:text-2xl font-fraunces font-bold leading-none">4.9 ★</p>
+                        <p class="text-[9px] sm:text-[10px] uppercase tracking-wider text-[#2E3B2C]/80 mt-1 leading-none">Verified Buyers</p>
                     </div>
 
                 </div>
@@ -595,21 +682,21 @@
 
             <!-- Right Slider Container -->
             <div class="relative z-10 flex justify-center w-full min-w-0">
-                <div class="relative bg-white/10 backdrop-blur-md p-2 sm:p-4 rounded-3xl shadow-2xl border border-white/20 w-full max-w-md overflow-hidden">
+                <div style="background-color: rgba(255, 255, 255, 0.7); border: 1.5px solid #CEBE96;" class="relative backdrop-blur-md p-2 sm:p-4 rounded-3xl shadow-xl w-full max-w-md overflow-hidden">
                     
                     <!-- Dynamic Auto Slider Track -->
-                    <div id="auto-slider" class="bg-white/5 rounded-2xl p-2 sm:p-4 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 no-scrollbar">
+                    <div id="auto-slider" style="background-color: rgba(255, 255, 255, 0.85); border: 1px solid rgba(206, 190, 150, 0.6);" class="rounded-2xl p-2 sm:p-4 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 no-scrollbar">
                         
-                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
                             <img src="./static/combo1.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
                         </a>
-                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
                             <img src="./static/combo2.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
                         </a>
-                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                        <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
                             <img src="./static/combo3.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
                         </a>
-                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-white/10 group">
+                        <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
                             <img src="./static/combo4.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
                         </a>
                         
@@ -651,7 +738,7 @@
                 
                 <!-- Video Reel 1 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                    <div class="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/Db003y_vnCo/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" 
                          data-poster="./static/reel1-thumbnail.png"
                          data-video-title="Alora Skincare Reel 1">
@@ -662,29 +749,20 @@
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
-                            <p class="line-clamp-2">"Real skincare routines & glow results ✨"</p>
+                        <div class="absolute bottom-4 left-4 right-4 text-white text-xs font-medium leading-snug drop-shadow-md flex items-center justify-between gap-2">
+                            <p class="line-clamp-2">"Real skincare routines &amp; glow results ✨"</p>
+                            <span class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-brands fa-instagram text-xs"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
-                        <img src="./static/combo1.webp" alt="Product 1" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Alora Luxury Glow Ritual</h4>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">Natural</span>
-                                <span class="text-xs font-extrabold text-slate-900">₹499</span>
-                            </div>
-                        </div>
-                        <a href="https://www.instagram.com/reel/Db003y_vnCo/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
-                            <i class="fa-brands fa-instagram text-xs"></i>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Video Reel 2 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                    <div class="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/DcLflVtTzKL/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" 
+                         data-poster="./static/reel2-thumbnail.png"
                          data-video-title="Alora Skincare Reel 2">
                         <img src="./static/reel2-thumbnail.png" alt="Alora Video Reel 2" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
@@ -693,29 +771,20 @@
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                        <div class="absolute bottom-4 left-4 right-4 text-white text-xs font-medium leading-snug drop-shadow-md flex items-center justify-between gap-2">
                             <p class="line-clamp-2">"Hydrating nourishment with radiant skin texture 🌸"</p>
+                            <span class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-brands fa-instagram text-xs"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
-                        <img src="./static/combo2.webp" alt="Product 2" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Hydrating Skincare Essentials</h4>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">50g</span>
-                                <span class="text-xs font-extrabold text-slate-900">₹649</span>
-                            </div>
-                        </div>
-                        <a href="https://www.instagram.com/reel/DcLflVtTzKL/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
-                            <i class="fa-brands fa-instagram text-xs"></i>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Video Reel 3 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                    <div class="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/DcGaFCCoBWJ/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" 
+                         data-poster="./static/reel3-thumbnail.png"
                          data-video-title="Alora Skincare Reel 3">
                         <img src="./static/reel3-thumbnail.png" alt="Alora Video Reel 3" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
@@ -724,29 +793,20 @@
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
-                            <p class="line-clamp-2">"Pure botanical radiance & deep hydration ✨"</p>
+                        <div class="absolute bottom-4 left-4 right-4 text-white text-xs font-medium leading-snug drop-shadow-md flex items-center justify-between gap-2">
+                            <p class="line-clamp-2">"Pure botanical radiance &amp; deep hydration ✨"</p>
+                            <span class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-brands fa-instagram text-xs"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
-                        <img src="./static/products.png" alt="Product 3" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Brightening Glow Formulation</h4>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">30ml</span>
-                                <span class="text-xs font-extrabold text-slate-900">₹599</span>
-                            </div>
-                        </div>
-                        <a href="https://www.instagram.com/reel/DcGaFCCoBWJ/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
-                            <i class="fa-brands fa-instagram text-xs"></i>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Video Reel 4 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                    <div class="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
                          data-video-url="https://www.instagram.com/reel/DcTSaQhJrsJ/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" 
+                         data-poster="./static/reel4-thumbnail.png"
                          data-video-title="Alora Skincare Reel 4">
                         <img src="./static/reel4-thumbnail.png" alt="Alora Video Reel 4" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
@@ -755,30 +815,21 @@
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
+                        <div class="absolute bottom-4 left-4 right-4 text-white text-xs font-medium leading-snug drop-shadow-md flex items-center justify-between gap-2">
                             <p class="line-clamp-2">"Daily ritual routine for glowing skin ☀️"</p>
+                            <span class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-brands fa-instagram text-xs"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
-                        <img src="./static/combo3.webp" alt="Product 4" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Alora Daily Protection &amp; Care</h4>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">80g</span>
-                                <span class="text-xs font-extrabold text-slate-900">₹595</span>
-                            </div>
-                        </div>
-                        <a href="https://www.instagram.com/reel/DcTSaQhJrsJ/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
-                            <i class="fa-brands fa-instagram text-xs"></i>
-                        </a>
                     </div>
                 </div>
 
                 <!-- Video Reel 5 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
-                    <div class="relative w-full h-[320px] sm:h-[360px] rounded-t-3xl rounded-b-xl overflow-hidden shadow-md border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
-                         data-video-url="https://www.instagram.com/reel/Dc6AphzPuTq/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" 
-                         data-video-title="Alora Skincare Reel 5">
+                    <div class="relative w-full h-[360px] sm:h-[420px] rounded-3xl overflow-hidden shadow-lg border border-slate-200/80 bg-slate-900 cursor-pointer reel-video-trigger"
+                         data-video-url="https://www.instagram.com/reel/DcF7UytJq4c" 
+                         data-poster="./static/reel5-thumbnail.png"
+                         data-video-title="Alora Radiance Face Serum">
                         <img src="./static/reel5-thumbnail.png" alt="Alora Video Reel 5" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-90">
                         <div class="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/20"></div>
                         <div class="absolute inset-0 flex items-center justify-center">
@@ -786,22 +837,12 @@
                                 <i class="fa-solid fa-play text-sm ml-0.5"></i>
                             </div>
                         </div>
-                        <div class="absolute bottom-3 left-3 right-3 text-white text-[11px] font-medium leading-snug drop-shadow-md">
-                            <p class="line-clamp-2">"Lightweight soothing moisture formulation 💧"</p>
+                        <div class="absolute bottom-4 left-4 right-4 text-white text-xs font-medium leading-snug drop-shadow-md flex items-center justify-between gap-2">
+                            <p class="line-clamp-2">"Brightening &amp; hydrating face serum for radiant skin ✨"</p>
+                            <span class="w-7 h-7 rounded-full bg-white/20 backdrop-blur-md border border-white/40 text-white flex items-center justify-center shrink-0">
+                                <i class="fa-brands fa-instagram text-xs"></i>
+                            </span>
                         </div>
-                    </div>
-                    <div class="mt-2 bg-white rounded-b-3xl rounded-t-xl p-3 border border-slate-200/90 shadow-sm flex items-center justify-between gap-2">
-                        <img src="./static/combo4.webp" alt="Product 5" class="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0">
-                        <div class="flex-grow min-w-0">
-                            <h4 class="text-[11px] font-bold text-slate-900 truncate leading-tight">Alora Soothing Hydration Gel</h4>
-                            <div class="flex items-center gap-1.5 mt-1">
-                                <span class="px-1.5 py-0.5 rounded border border-slate-200 text-[9px] font-semibold text-slate-600 bg-slate-50">60ml</span>
-                                <span class="text-xs font-extrabold text-slate-900">₹495</span>
-                            </div>
-                        </div>
-                        <a href="https://www.instagram.com/reel/Dc6AphzPuTq/?utm_source=ig_web_copy_link&stkn=MzRlODBiNWFlZA==" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded-full bg-slate-100 hover:bg-amber-400 hover:text-slate-950 text-slate-700 font-bold flex items-center justify-center text-xs shadow-sm transition-all shrink-0">
-                            <i class="fa-brands fa-instagram text-xs"></i>
-                        </a>
                     </div>
                 </div>
 
@@ -1655,77 +1696,8 @@
         </div>
     </section>
 
-    <!-- ============ FAQ SECTION (LUXURY GLASS ACCORDION) ============ -->
-    <section class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
-        <div class="bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-6 sm:p-12 border border-amber-900/15 shadow-xl relative overflow-hidden">
-            
-            <div class="max-w-2xl mx-auto text-center mb-10">
-                <span class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-100/90 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-mono border border-amber-300 shadow-xs mb-3">
-                    Frequently Asked Questions
-                </span>
-                <h2 class="text-3xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">
-                    Good To Know
-                </h2>
-                <p class="text-xs sm:text-sm text-slate-600 mt-2 font-sans">
-                    Have questions about usage, ingredients, or daily routines? Find fast answers below.
-                </p>
-            </div>
-
-            <div class="max-w-3xl mx-auto space-y-4 text-left">
-                
-                <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md" open>
-                    <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                        <span>Can I use the Alora Radiance Face Wash every day?</span>
-                        <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
-                        Yes! Our Face Wash is dermatologist-formulated to be gentle enough for daily use, morning and night, to remove impurities without stripping skin moisture.
-                    </p>
-                </details>
-
-                <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md">
-                    <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                        <span>Can I use the Face Serum every day?</span>
-                        <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
-                        Yes. Apply 3-4 drops daily after cleansing and before your face cream. If you are new to active Retinol, start with alternate nights.
-                    </p>
-                </details>
-
-                <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md">
-                    <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                        <span>When should I apply the Face Cream?</span>
-                        <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
-                        Apply the Face Cream right after your serum, morning and night, to lock in active ingredients and seal 24-hour hydration.
-                    </p>
-                </details>
-
-                <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md">
-                    <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                        <span>Can I use the Body Lotion every day?</span>
-                        <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
-                        Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness.
-                    </p>
-                </details>
-
-                <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md">
-                    <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                        <span>How often should I use the Face Scrub?</span>
-                        <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
-                    </summary>
-                    <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
-                        Use the Face Scrub 2–3 times a week to gently exfoliate dead skin cells, unclog pores, and restore skin smoothness.
-                    </p>
-                </details>
-
-            </div>
-        </div>
-    </section>
+    <!-- ============ FAQ SECTION (LOADED MODULARLY VIA FAQ-SECTION.HTML) ============ -->
+    <div id="faq-placeholder"></div>
 
 </main>
 
