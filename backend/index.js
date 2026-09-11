@@ -130,9 +130,25 @@ app.use('/', authRoutes);
 // ==========================================
 // STATIC FILES HANDLER
 // ==========================================
-const frontendRoot = fs.existsSync(path.join(__dirname, '../public_html'))
-  ? path.join(__dirname, '../public_html')
-  : path.join(__dirname, '../frontend');
+// Keep the HTML templates available to the serverless function as well as local
+// development. `process.cwd()` is the project root on Vercel, whereas __dirname
+// is the backend directory locally.
+const frontendRootCandidates = [
+  path.join(__dirname, '../public_html'),
+  path.join(__dirname, '../frontend'),
+  path.join(process.cwd(), 'public_html'),
+  path.join(process.cwd(), 'frontend')
+];
+const frontendRoot = frontendRootCandidates.find(candidate => fs.existsSync(candidate))
+  || path.join(__dirname, '../frontend');
+
+const sendSsrUnavailable = (res, pageName, err) => {
+  console.error(`${pageName} SSR error:`, err);
+  // Do not serve a successful page containing client-side "Loading..." text.
+  // Search engines will retry a 503 and cannot index that placeholder page.
+  res.setHeader('Retry-After', '120');
+  return res.status(503).type('html').send('<!doctype html><title>Temporarily unavailable</title><meta name="robots" content="noindex">Please try again shortly.');
+};
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/js', express.static(path.join(frontendRoot, 'js')));
@@ -161,8 +177,7 @@ app.get('/products', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    console.error("Products List SSR error:", err);
-    return res.sendFile(moreProductHtmlPath);
+    return sendSsrUnavailable(res, 'Products list', err);
   }
 });
 
@@ -193,8 +208,7 @@ app.get('/product/:id', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    console.error("Product SSR error:", err);
-    return res.sendFile(productHtmlPath);
+    return sendSsrUnavailable(res, 'Product', err);
   }
 });
 
@@ -213,8 +227,7 @@ app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'],
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    console.error("Blog List SSR error:", err);
-    return res.sendFile(target);
+    return sendSsrUnavailable(res, 'Blog list', err);
   }
 });
 
@@ -261,8 +274,7 @@ app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    console.error("Blog SSR SEO error:", err);
-    return res.sendFile(postHtmlPath);
+    return sendSsrUnavailable(res, 'Blog article', err);
   }
 });
 

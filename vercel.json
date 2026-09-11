@@ -35,6 +35,11 @@
       "use": "@vercel/static"
     }
   ],
+  "functions": {
+    "api/index.js": {
+      "includeFiles": "frontend/*.html"
+    }
+  },
   "routes": [
     {
       "src": "/api/(.*)",
