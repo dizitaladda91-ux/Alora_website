@@ -109,20 +109,24 @@ async function loadAllPartials() {
 
     const loadDeferredPartials = async () => {
         // Auto-inject and load FAQ section across all public customer pages
+        // (Excluding single blog post pages, as requested)
         const footerPlaceholder = document.getElementById('footer-placeholder');
         const pathname = (window.location.pathname || "").toLowerCase();
         const isAdminOrAuth = pathname.includes('admin') || pathname.includes('login') || pathname.includes('register') || pathname.includes('forgot') || pathname.includes('reset');
         const hasProductFaq = !!document.getElementById('product-faq-section');
+        const isSingleBlogPage = !!document.getElementById('blog-content-area') || !!document.getElementById('post-loader') || pathname.includes('post.html') || (/^\/blogs?\/[^\/]+/i.test(pathname) && !pathname.endsWith('/blog') && !pathname.endsWith('/blogs') && !pathname.endsWith('/blog.html'));
         
         let faqPlaceholder = document.getElementById('faq-placeholder');
-        if (!faqPlaceholder && footerPlaceholder && !isAdminOrAuth && !hasProductFaq) {
+        if (!faqPlaceholder && footerPlaceholder && !isAdminOrAuth && !hasProductFaq && !isSingleBlogPage) {
             faqPlaceholder = document.createElement('div');
             faqPlaceholder.id = 'faq-placeholder';
             footerPlaceholder.parentNode.insertBefore(faqPlaceholder, footerPlaceholder);
         }
 
-        if (faqPlaceholder) {
+        if (faqPlaceholder && !isSingleBlogPage) {
             await loadPartial("#faq-placeholder", faqUrl);
+        } else if (faqPlaceholder && isSingleBlogPage) {
+            faqPlaceholder.remove();
         }
 
         await loadPartial("#footer-placeholder", footerUrl);
