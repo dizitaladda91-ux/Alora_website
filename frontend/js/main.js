@@ -159,26 +159,80 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener("DOMContentLoaded", () => {
     const track = document.getElementById("slider-track");
     if (!track) return;
-    const nextBtn = document.getElementById("next-btn");
-    const prevBtn = document.getElementById("prev-btn");
     const slides = track.children;
     const totalSlides = slides.length;
-    const sliderContainer = track.parentElement;
+    const dots = document.querySelectorAll(".hero-dot");
     let currentIndex = 0;
+    let autoSlideInterval = null;
+
     const updateSlider = () => {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
+        dots.forEach((dot, index) => {
+            if (index === currentIndex) {
+                dot.className = "hero-dot w-6 sm:w-7 h-2 sm:h-2.5 rounded-full bg-[#B8460E] transition-all duration-300 shadow-xs cursor-pointer";
+            } else {
+                dot.className = "hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer";
+            }
+        });
     };
-    if (nextBtn) nextBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex < totalSlides - 1) ? currentIndex + 1 : 0;
-        updateSlider();
+
+    const startAutoSlide = () => {
+        stopAutoSlide();
+        autoSlideInterval = setInterval(() => {
+            currentIndex = (currentIndex + 1) % totalSlides;
+            updateSlider();
+        }, 4000);
+    };
+
+    const stopAutoSlide = () => {
+        if (autoSlideInterval) {
+            clearInterval(autoSlideInterval);
+            autoSlideInterval = null;
+        }
+    };
+
+    dots.forEach((dot, index) => {
+        dot.addEventListener("click", (e) => {
+            e.preventDefault();
+            currentIndex = index;
+            updateSlider();
+            startAutoSlide();
+        });
     });
-    if (prevBtn) prevBtn.addEventListener("click", () => {
-        currentIndex = (currentIndex > 0) ? currentIndex - 1 : totalSlides - 1;
-        updateSlider();
-    });
-    // Keep the LCP hero stable. Automatic carousel movement can replace the
-    // largest element during the Lighthouse measurement window and inflate LCP.
-    // The next/previous controls remain available for intentional navigation.
+
+    const sliderContainer = track.closest(".hero-slider-container");
+    if (sliderContainer) {
+        sliderContainer.addEventListener("mouseenter", stopAutoSlide);
+        sliderContainer.addEventListener("mouseleave", startAutoSlide);
+
+        // Touch swipe support for mobile
+        let startX = 0;
+        let diffX = 0;
+        sliderContainer.addEventListener("touchstart", (e) => {
+            startX = e.touches[0].clientX;
+            diffX = 0;
+            stopAutoSlide();
+        }, { passive: true });
+
+        sliderContainer.addEventListener("touchmove", (e) => {
+            diffX = e.touches[0].clientX - startX;
+        }, { passive: true });
+
+        sliderContainer.addEventListener("touchend", () => {
+            if (Math.abs(diffX) > 40) {
+                if (diffX < 0) {
+                    currentIndex = (currentIndex + 1) % totalSlides;
+                } else {
+                    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                }
+                updateSlider();
+            }
+            startAutoSlide();
+        });
+    }
+
+    startAutoSlide();
+    updateSlider();
 });
 function toggleCartState(button) {
     const card = button.closest('.product-card');

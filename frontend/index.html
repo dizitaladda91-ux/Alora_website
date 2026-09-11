@@ -469,19 +469,7 @@
 <main id="main-content">
 
 <!-- ============ HERO CAROUSEL BANNER (RESPONSIVE FULL-WIDTH - NO CROPPING) ============ -->
-<div class="hero-slider-container flex w-full relative group shadow-xs" style="image-rendering: -webkit-optimize-contrast;">
-    
-    <!-- Prev Button -->
-    <button id="prev-btn" aria-label="Previous Slide" 
-        class="absolute left-1 sm:left-3 md:left-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
-        <i class="fa-solid fa-angle-left text-xs sm:text-sm md:text-base"></i>
-    </button>
-    
-    <!-- Next Button -->
-    <button id="next-btn" aria-label="Next Slide" 
-        class="absolute right-1 sm:right-3 md:right-5 top-1/2 -translate-y-1/2 z-20 bg-white/90 hover:bg-white text-gray-900 w-7 h-7 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full flex items-center justify-center shadow-lg border border-gray-200/80 transition-all opacity-80 group-hover:opacity-100 active:scale-95 hover:scale-105">
-        <i class="fa-solid fa-angle-right text-xs sm:text-sm md:text-base"></i>
-    </button>
+<div class="hero-slider-container flex w-full relative group shadow-xs overflow-hidden" style="image-rendering: -webkit-optimize-contrast;">
     
     <!-- Slider Track -->
     <div id="slider-track" class="flex w-full h-full transition-transform duration-700 ease-in-out">
@@ -523,6 +511,16 @@
     </a>
 
 </div>
+
+    <!-- Hero Slider Dots Navigation -->
+    <div id="hero-slider-dots" class="absolute bottom-2.5 sm:bottom-4 md:bottom-6 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-black/25 backdrop-blur-md border border-white/20 shadow-md">
+        <button type="button" aria-label="Go to slide 1" class="hero-dot w-6 sm:w-7 h-2 sm:h-2.5 rounded-full bg-[#B8460E] transition-all duration-300 shadow-xs cursor-pointer"></button>
+        <button type="button" aria-label="Go to slide 2" class="hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer"></button>
+        <button type="button" aria-label="Go to slide 3" class="hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer"></button>
+        <button type="button" aria-label="Go to slide 4" class="hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer"></button>
+        <button type="button" aria-label="Go to slide 5" class="hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer"></button>
+        <button type="button" aria-label="Go to slide 6" class="hero-dot w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-white/60 hover:bg-white transition-all duration-300 cursor-pointer"></button>
+    </div>
 </div>
 
   <!-- ============ FEATURED PRODUCTS COLLECTION ============ -->
