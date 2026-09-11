@@ -1,6 +1,7 @@
 import BASE_URL, { getAuthHeaders } from "./config.js";
 
 let allFaqs = [];
+let activeFilter = "all";
 
 const faqTableBody = document.getElementById("faq-table-body");
 const faqCountEl = document.getElementById("faqCount");
@@ -24,14 +25,16 @@ const faqIsActiveInput = document.getElementById("faqIsActive");
 // 🟢 1. FETCH ALL FAQS
 async function fetchFaqs() {
     try {
-        faqTableBody.innerHTML = `
-            <tr>
-                <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                    <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
-                    <p class="text-xs font-semibold">Loading FAQs from database...</p>
-                </td>
-            </tr>
-        `;
+        if (faqTableBody) {
+            faqTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-12 text-center text-slate-400">
+                        <i class="fa-solid fa-spinner fa-spin text-2xl mb-2 text-amber-600"></i>
+                        <p class="text-xs font-semibold">Loading FAQs from database...</p>
+                    </td>
+                </tr>
+            `;
+        }
 
         const res = await fetch(`${BASE_URL}/api/faqs/admin`, {
             headers: getAuthHeaders(),
@@ -44,30 +47,126 @@ async function fetchFaqs() {
 
         const data = await res.json();
         allFaqs = data.data || [];
-        renderFaqs(allFaqs);
+        updateFilterCounts();
+        applyFiltersAndRender();
     } catch (error) {
         console.error("Failed to load FAQs:", error);
-        faqTableBody.innerHTML = `
-            <tr>
-                <td colspan="5" class="px-6 py-10 text-center text-rose-500">
-                    <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i>
-                    <p class="text-xs font-bold">Failed to load FAQs. Please make sure you are logged in as SEO Admin.</p>
-                </td>
-            </tr>
-        `;
+        if (faqTableBody) {
+            faqTableBody.innerHTML = `
+                <tr>
+                    <td colspan="5" class="px-6 py-10 text-center text-rose-500">
+                        <i class="fa-solid fa-triangle-exclamation text-2xl mb-2"></i>
+                        <p class="text-xs font-bold">Failed to load FAQs. Please make sure you are logged in as SEO Admin.</p>
+                    </td>
+                </tr>
+            `;
+        }
     }
 }
 
-// 🟢 2. RENDER FAQS TABLE
+// 🟢 2. UPDATE CATEGORY FILTER COUNTS
+function updateFilterCounts() {
+    const counts = {
+        all: allFaqs.length,
+        landing: 0,
+        about: 0,
+        shop: 0,
+        blog: 0,
+        track: 0,
+        general: 0
+    };
+
+    allFaqs.forEach(f => {
+        const cat = (f.category || "General").toLowerCase();
+        if (cat.includes("landing") || cat.includes("home")) counts.landing++;
+        else if (cat.includes("about")) counts.about++;
+        else if (cat.includes("shop") || cat.includes("product")) counts.shop++;
+        else if (cat.includes("blog") || cat.includes("post")) counts.blog++;
+        else if (cat.includes("track") || cat.includes("support") || cat.includes("order")) counts.track++;
+        else counts.general++;
+    });
+
+    const setBadge = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+    };
+
+    setBadge("count-all", counts.all);
+    setBadge("count-landing", counts.landing);
+    setBadge("count-about", counts.about);
+    setBadge("count-shop", counts.shop);
+    setBadge("count-blog", counts.blog);
+    setBadge("count-track", counts.track);
+    setBadge("count-general", counts.general);
+}
+
+// 🟢 3. GET CATEGORY BADGE HTML
+function getCategoryBadge(category) {
+    const raw = (category || "General").trim();
+    const cat = raw.toLowerCase();
+
+    if (cat.includes("landing") || cat.includes("home")) {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100/90 text-amber-900 border border-amber-300 font-mono shadow-xs">🏠 Landing Page</span>`;
+    }
+    if (cat.includes("about")) {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-sky-100/90 text-sky-900 border border-sky-300 font-mono shadow-xs">ℹ️ About Us</span>`;
+    }
+    if (cat.includes("shop") || cat.includes("product")) {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100/90 text-emerald-900 border border-emerald-300 font-mono shadow-xs">🛍️ Shop / Products</span>`;
+    }
+    if (cat.includes("blog") || cat.includes("post")) {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-purple-100/90 text-purple-900 border border-purple-300 font-mono shadow-xs">📝 Blog Page</span>`;
+    }
+    if (cat.includes("track") || cat.includes("support") || cat.includes("order")) {
+        return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-indigo-100/90 text-indigo-900 border border-indigo-300 font-mono shadow-xs">📦 Track &amp; Support</span>`;
+    }
+    return `<span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-800 border border-slate-300 font-mono shadow-xs">🌐 General / All Pages</span>`;
+}
+
+// 🟢 4. FILTER AND RENDER
+function applyFiltersAndRender() {
+    const searchVal = (faqSearchInput ? faqSearchInput.value : "").toLowerCase().trim();
+
+    let filtered = allFaqs.filter(f => {
+        // Page filter
+        if (activeFilter !== "all") {
+            const cat = (f.category || "General").toLowerCase();
+            const target = activeFilter.toLowerCase();
+            if (target === "general" && !cat.includes("general") && !cat.includes("all")) return false;
+            if (target === "landing page" && !cat.includes("landing") && !cat.includes("home")) return false;
+            if (target === "about us" && !cat.includes("about")) return false;
+            if (target === "shop / products" && !cat.includes("shop") && !cat.includes("product")) return false;
+            if (target === "blog page" && !cat.includes("blog") && !cat.includes("post")) return false;
+            if (target === "track order / support" && !cat.includes("track") && !cat.includes("order") && !cat.includes("support")) return false;
+        }
+
+        // Search filter
+        if (searchVal) {
+            const q = (f.question || "").toLowerCase();
+            const a = (f.answer || "").toLowerCase();
+            const c = (f.category || "").toLowerCase();
+            return q.includes(searchVal) || a.includes(searchVal) || c.includes(searchVal);
+        }
+
+        return true;
+    });
+
+    renderFaqs(filtered);
+}
+
+// 🟢 5. RENDER FAQS TABLE
 function renderFaqs(faqsToRender) {
     if (faqCountEl) faqCountEl.innerText = faqsToRender.length;
+
+    if (!faqTableBody) return;
 
     if (!faqsToRender || faqsToRender.length === 0) {
         faqTableBody.innerHTML = `
             <tr>
                 <td colspan="5" class="px-6 py-12 text-center text-slate-400">
-                    <i class="fa-solid fa-folder-open text-2xl mb-2"></i>
-                    <p class="text-xs font-semibold">No FAQs found. Click "Add New FAQ" to create your first question.</p>
+                    <i class="fa-solid fa-folder-open text-2xl mb-2 text-slate-300"></i>
+                    <p class="text-xs font-bold text-slate-600">No FAQs found for this page.</p>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Click "Add New FAQ" to create a question for this page.</p>
                 </td>
             </tr>
         `;
@@ -80,7 +179,7 @@ function renderFaqs(faqsToRender) {
         const rawAns = faq.answer || "";
         const cleanAns = escapeHtml(rawAns.length > 120 ? rawAns.substring(0, 120) + "..." : rawAns);
         const order = faq.order || (index + 1);
-        const category = escapeHtml(faq.category || "General");
+        const categoryBadge = getCategoryBadge(faq.category);
         const isActive = faq.isActive !== false;
 
         return `
@@ -89,19 +188,19 @@ function renderFaqs(faqsToRender) {
                     ${order}
                 </td>
                 <td class="px-6 py-4">
-                    <span class="inline-block text-[10px] font-bold uppercase tracking-wider text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/60 mb-1">
-                        ${category}
-                    </span>
+                    <div class="mb-1.5">
+                        ${categoryBadge}
+                    </div>
                     <h4 class="font-bold text-slate-900 text-sm leading-snug">
                         ${q}
                     </h4>
                 </td>
-                <td class="px-6 py-4 text-slate-600 text-xs leading-relaxed max-w-xs truncate">
+                <td class="px-6 py-4 text-slate-600 text-xs leading-relaxed max-w-xs">
                     ${cleanAns}
                 </td>
                 <td class="px-6 py-4 text-center">
                     ${isActive 
-                        ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100/90 text-emerald-800 border border-emerald-300 uppercase font-mono">
+                        ? `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-emerald-100/90 text-emerald-800 border border-emerald-300 uppercase font-mono shadow-xs">
                             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Active
                         </span>`
                         : `<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-slate-100 text-slate-500 border border-slate-200 uppercase font-mono">
@@ -111,10 +210,10 @@ function renderFaqs(faqsToRender) {
                 </td>
                 <td class="px-6 py-4 text-right whitespace-nowrap">
                     <div class="flex items-center justify-end gap-2">
-                        <button type="button" onclick="window.editFaq('${id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-800 transition" title="Edit FAQ">
+                        <button type="button" onclick="window.editFaq('${id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-amber-100 text-slate-700 hover:text-amber-800 transition shadow-xs cursor-pointer" title="Edit FAQ">
                             <i class="fa-solid fa-pen-to-square text-xs"></i>
                         </button>
-                        <button type="button" onclick="window.deleteFaq('${id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-700 transition" title="Delete FAQ">
+                        <button type="button" onclick="window.deleteFaq('${id}')" class="p-2 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-700 hover:text-rose-700 transition shadow-xs cursor-pointer" title="Delete FAQ">
                             <i class="fa-solid fa-trash-can text-xs"></i>
                         </button>
                     </div>
@@ -124,7 +223,7 @@ function renderFaqs(faqsToRender) {
     }).join("");
 }
 
-// 🟢 3. OPEN MODAL (ADD / EDIT)
+// 🟢 6. OPEN MODAL (ADD / EDIT)
 function openModal(faq = null) {
     if (faq) {
         modalTitle.innerHTML = `<i class="fa-solid fa-pen-to-square text-amber-400"></i> Edit FAQ`;
@@ -138,8 +237,17 @@ function openModal(faq = null) {
         modalTitle.innerHTML = `<i class="fa-solid fa-circle-question text-amber-400"></i> Add New FAQ`;
         faqForm.reset();
         faqIdInput.value = "";
-        faqOrderInput.value = (allFaqs.length + 1);
-        faqCategoryInput.value = "General";
+        
+        // Pre-select category based on active filter if not 'all'
+        if (activeFilter && activeFilter !== "all") {
+            faqCategoryInput.value = activeFilter;
+        } else {
+            faqCategoryInput.value = "Landing Page";
+        }
+        
+        // Compute order for this category
+        const existingInCat = allFaqs.filter(f => (f.category || "").toLowerCase() === (faqCategoryInput.value || "").toLowerCase());
+        faqOrderInput.value = existingInCat.length + 1;
         faqIsActiveInput.checked = true;
     }
     faqModal.classList.remove("hidden");
@@ -150,7 +258,7 @@ function closeModal() {
     faqForm.reset();
 }
 
-// 🟢 4. SAVE FAQ (SUBMIT FORM)
+// 🟢 7. SAVE FAQ (SUBMIT FORM)
 async function handleSaveFaq(e) {
     e.preventDefault();
     const id = faqIdInput.value.trim();
@@ -199,7 +307,7 @@ async function handleSaveFaq(e) {
     }
 }
 
-// 🟢 5. GLOBAL ACTIONS (EDIT / DELETE)
+// 🟢 8. GLOBAL ACTIONS (EDIT / DELETE)
 window.editFaq = function(id) {
     const faq = allFaqs.find(f => f._id === id);
     if (faq) {
@@ -229,7 +337,7 @@ window.deleteFaq = async function(id) {
     }
 };
 
-// 🟢 6. COPY JSON-LD SCHEMA
+// 🟢 9. COPY JSON-LD SCHEMA
 function copySchema() {
     const activeFaqs = allFaqs.filter(f => f.isActive !== false);
     const schema = {
@@ -253,21 +361,38 @@ function copySchema() {
     });
 }
 
-// 🟢 7. SEARCH / FILTER
-if (faqSearchInput) {
-    faqSearchInput.addEventListener("input", (e) => {
-        const q = e.target.value.toLowerCase().trim();
-        if (!q) {
-            renderFaqs(allFaqs);
-            return;
-        }
-        const filtered = allFaqs.filter(f => 
-            (f.question && f.question.toLowerCase().includes(q)) ||
-            (f.answer && f.answer.toLowerCase().includes(q)) ||
-            (f.category && f.category.toLowerCase().includes(q))
-        );
-        renderFaqs(filtered);
+// 🟢 10. SETUP FILTER TABS
+function initFilterTabs() {
+    const filterBtns = document.querySelectorAll(".faq-filter-btn");
+    filterBtns.forEach(btn => {
+        btn.addEventListener("click", () => {
+            filterBtns.forEach(b => {
+                b.classList.remove("active", "bg-slate-900", "text-white", "font-extrabold");
+                b.classList.add("bg-white", "text-slate-700", "font-bold");
+                const countBadge = b.querySelector(".filter-count");
+                if (countBadge) {
+                    countBadge.classList.remove("bg-slate-800", "text-slate-300");
+                    countBadge.classList.add("bg-slate-100", "text-slate-600");
+                }
+            });
+
+            btn.classList.add("active", "bg-slate-900", "text-white", "font-extrabold");
+            btn.classList.remove("bg-white", "text-slate-700", "font-bold");
+            const countBadge = btn.querySelector(".filter-count");
+            if (countBadge) {
+                countBadge.classList.add("bg-slate-800", "text-slate-300");
+                countBadge.classList.remove("bg-slate-100", "text-slate-600");
+            }
+
+            activeFilter = btn.dataset.filter || "all";
+            applyFiltersAndRender();
+        });
     });
+}
+
+// 🟢 11. SEARCH
+if (faqSearchInput) {
+    faqSearchInput.addEventListener("input", applyFiltersAndRender);
 }
 
 function escapeHtml(str) {
@@ -286,4 +411,7 @@ if (cancelModalBtn) cancelModalBtn.addEventListener("click", closeModal);
 if (faqForm) faqForm.addEventListener("submit", handleSaveFaq);
 if (copySchemaBtn) copySchemaBtn.addEventListener("click", copySchema);
 
-document.addEventListener("DOMContentLoaded", fetchFaqs);
+document.addEventListener("DOMContentLoaded", () => {
+    initFilterTabs();
+    fetchFaqs();
+});

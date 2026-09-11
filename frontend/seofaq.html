@@ -27,8 +27,78 @@
                     }
                 }
             }
-        }
+        };
     </script>
+    <style>
+        /* 🚀 SEO Studio Executive Theme Colors & High Contrast Fixes */
+        .bg-navy {
+            background-color: #0F172A !important;
+        }
+        .bg-navy-light {
+            background-color: #1E293B !important;
+        }
+        nav.bg-navy {
+            background-color: #0F172A !important;
+            border-bottom: 1px solid #1E293B !important;
+        }
+        aside.bg-navy {
+            background-color: #0F172A !important;
+            border-right: 1px solid #1E293B !important;
+        }
+        .sidebar-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-link-active {
+            background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+        }
+        .sidebar-link-active i {
+            color: #020617 !important;
+        }
+        .sidebar-link-inactive {
+            color: #F1F5F9 !important;
+            background-color: rgba(30, 41, 59, 0.6) !important;
+            border: 1px solid rgba(51, 65, 85, 0.6) !important;
+        }
+        .sidebar-link-inactive i {
+            color: #F59E0B !important;
+        }
+        .sidebar-link-inactive:hover {
+            background-color: #1E293B !important;
+            color: #FFFFFF !important;
+            border-color: #64748B !important;
+            transform: translateX(3px) !important;
+        }
+        .sidebar-logout {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            color: #FB7185 !important;
+            background-color: rgba(225, 29, 72, 0.12) !important;
+            border: 1px solid rgba(225, 29, 72, 0.25) !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-logout:hover {
+            background-color: rgba(225, 29, 72, 0.25) !important;
+            color: #FFFFFF !important;
+            border-color: rgba(225, 29, 72, 0.5) !important;
+        }
+    </style>
 </head>
 <body class="font-sans bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-800">
 
@@ -40,13 +110,13 @@
             </div>
             <div>
                 <h1 class="text-base font-extrabold tracking-wider uppercase font-fraunces text-white flex items-center gap-2">
-                    ALORA SEO STUDIO <span class="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">❓ FAQ MANAGER</span>
+                    ALORA SEO STUDIO <span class="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-400/40">❓ FAQ MANAGER</span>
                 </h1>
             </div>
         </div>
 
         <div class="flex items-center gap-4">
-            <a href="/index.html" target="_blank" class="text-xs font-semibold text-slate-300 hover:text-amber-400 transition flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+            <a href="/index.html" target="_blank" class="text-xs font-bold text-white hover:text-amber-300 transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-lg border border-slate-600 shadow-xs">
                 <i class="fa-solid fa-arrow-up-right-from-square text-amber-400"></i> View Live Site
             </a>
         </div>
@@ -56,30 +126,30 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-        <aside class="bg-navy text-slate-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
+        <aside class="bg-navy text-slate-200 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
             <div class="space-y-6">
                 
                 <div class="px-2 pt-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">Content Navigation</p>
+                    <p class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider font-mono mb-3">Content Navigation</p>
                     <nav class="w-full">
-                        <ul class="space-y-1.5">
+                        <ul class="space-y-2">
                             <li>
-                                <a href="./seoadmin.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-layer-group text-slate-400"></i> All Blog Posts
+                                <a href="./seoadmin.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-layer-group text-sm"></i> All Blog Posts
                                 </a>
                             </li>
                             <li>
-                                <a href="./seoallpost.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-circle-plus text-slate-400"></i> Create New Post
+                                <a href="./seoallpost.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-circle-plus text-sm"></i> Create New Post
                                 </a>
                             </li>
                             <li>
-                                <a href="./seoproduct.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-box-archive text-slate-400"></i> Products SEO
+                                <a href="./seoproduct.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-box-archive text-sm"></i> Products SEO
                                 </a>
                             </li>
                             <li>
-                                <a href="./seofaq.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-extrabold shadow-lg shadow-amber-500/20 transition">
+                                <a href="./seofaq.html" class="sidebar-link sidebar-link-active">
                                     <i class="fa-solid fa-circle-question text-sm"></i> Store FAQs
                                 </a>
                             </li>
@@ -88,12 +158,12 @@
                 </div>
 
                 <!-- Live Status Info Box -->
-                <div class="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-800 text-xs space-y-2">
-                    <div class="flex items-center justify-between text-slate-400 font-mono text-[10px] uppercase">
+                <div class="p-3.5 rounded-2xl bg-slate-900 border border-slate-700 text-xs space-y-2">
+                    <div class="flex items-center justify-between text-slate-300 font-mono text-[10px] uppercase font-bold">
                         <span>FAQ Sync Status</span>
-                        <span class="text-emerald-400 font-bold">Live across all pages</span>
+                        <span class="text-emerald-400 font-extrabold">Live across all pages</span>
                     </div>
-                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans">
+                    <p class="text-[11px] text-slate-300 leading-relaxed font-sans font-medium">
                         Any question updated here updates automatically across the entire storefront in real-time.
                     </p>
                 </div>
@@ -102,7 +172,7 @@
 
             <!-- LOGOUT BUTTON -->
             <div class="border-t border-slate-800 pt-4">
-                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold transition">
+                <a href="#" id="adminLogoutBtn" class="sidebar-logout">
                     <i class="fa-solid fa-right-from-bracket"></i> Logout Studio
                 </a>
             </div>
@@ -139,7 +209,7 @@
                     <div class="p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-slate-50/50">
                         <div class="flex items-center gap-3">
                             <h3 class="font-bold text-slate-900 text-base font-fraunces flex items-center gap-2">
-                                <i class="fa-solid fa-clipboard-question text-amber-600 text-sm"></i> Active Questions (<span id="faqCount">0</span>)
+                                <i class="fa-solid fa-clipboard-question text-amber-600 text-sm"></i> Questions Catalog (<span id="faqCount">0</span>)
                             </h3>
                         </div>
                         <div class="w-full sm:w-72">
@@ -147,12 +217,44 @@
                         </div>
                     </div>
 
+                    <!-- 🚀 Per-Page Category Filter Tabs -->
+                    <div class="p-3 border-b border-slate-100 flex items-center gap-2 overflow-x-auto bg-slate-50/70" id="faq-category-filters">
+                        <button type="button" data-filter="all" class="faq-filter-btn active px-3.5 py-1.5 rounded-xl text-xs font-extrabold transition flex items-center gap-1.5 bg-slate-900 text-white shadow-xs cursor-pointer">
+                            <span>🌐 All Pages</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-mono" id="count-all">0</span>
+                        </button>
+                        <button type="button" data-filter="Landing Page" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-amber-50 text-slate-700 hover:text-amber-900 border border-slate-200 cursor-pointer">
+                            <span>🏠 Landing Page</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-landing">0</span>
+                        </button>
+                        <button type="button" data-filter="About Us" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-sky-50 text-slate-700 hover:text-sky-900 border border-slate-200 cursor-pointer">
+                            <span>ℹ️ About Us</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-about">0</span>
+                        </button>
+                        <button type="button" data-filter="Shop / Products" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-900 border border-slate-200 cursor-pointer">
+                            <span>🛍️ Shop / Products</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-shop">0</span>
+                        </button>
+                        <button type="button" data-filter="Blog Page" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-purple-50 text-slate-700 hover:text-purple-900 border border-slate-200 cursor-pointer">
+                            <span>📝 Blog Page</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-blog">0</span>
+                        </button>
+                        <button type="button" data-filter="Track Order / Support" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-indigo-50 text-slate-700 hover:text-indigo-900 border border-slate-200 cursor-pointer">
+                            <span>📦 Track &amp; Support</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-track">0</span>
+                        </button>
+                        <button type="button" data-filter="General" class="faq-filter-btn px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 bg-white hover:bg-slate-100 text-slate-700 hover:text-slate-900 border border-slate-200 cursor-pointer">
+                            <span>🌐 General / Global</span>
+                            <span class="filter-count text-[10px] px-1.5 py-0.5 rounded-full bg-slate-100 text-slate-600 font-mono" id="count-general">0</span>
+                        </button>
+                    </div>
+
                     <div class="overflow-x-auto">
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-slate-900 text-slate-200 text-[11px] font-extrabold uppercase tracking-widest border-b border-slate-800">
                                     <th class="px-6 py-4 w-16 text-center">#</th>
-                                    <th class="px-6 py-4">Question &amp; Category</th>
+                                    <th class="px-6 py-4">Question &amp; Page Placement</th>
                                     <th class="px-6 py-4">Answer Preview</th>
                                     <th class="px-6 py-4 w-28 text-center">Status</th>
                                     <th class="px-6 py-4 w-32 text-right">Actions</th>
@@ -182,40 +284,47 @@
                 <h3 id="modalTitle" class="text-lg font-fraunces font-bold flex items-center gap-2">
                     <i class="fa-solid fa-circle-question text-amber-400"></i> Add New FAQ
                 </h3>
-                <button type="button" id="closeModalBtn" class="text-slate-400 hover:text-white text-lg focus:outline-none">&times;</button>
+                <button type="button" id="closeModalBtn" class="text-slate-400 hover:text-white text-lg focus:outline-none cursor-pointer">&times;</button>
             </div>
             
             <form id="faqForm" class="p-6 space-y-4">
                 <input type="hidden" id="faqId">
 
                 <div>
+                    <label for="faqCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Target Page / Placement <span class="text-rose-500">*</span>
+                    </label>
+                    <select id="faqCategory" required class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-bold text-slate-800 bg-white cursor-pointer">
+                        <option value="Landing Page">🏠 Landing Page (Home)</option>
+                        <option value="About Us">ℹ️ About Us Page</option>
+                        <option value="Shop / Products">🛍️ Shop / All Products Page</option>
+                        <option value="Blog Page">📝 Blog Page</option>
+                        <option value="Track Order / Support">📦 Track Order &amp; Support Page</option>
+                        <option value="General">🌐 General (Visible across All Pages)</option>
+                    </select>
+                    <p class="text-[11px] text-slate-400 mt-1">Select which page this FAQ will be assigned to.</p>
+                </div>
+
+                <div>
                     <label for="faqQuestion" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         Question <span class="text-rose-500">*</span>
                     </label>
-                    <input type="text" id="faqQuestion" required placeholder="e.g. Can I use the Face Serum every day?" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-medium">
+                    <input type="text" id="faqQuestion" required placeholder="e.g. Can I use the Face Serum every day?" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-semibold text-slate-900">
                 </div>
 
                 <div>
                     <label for="faqAnswer" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
                         Answer <span class="text-rose-500">*</span>
                     </label>
-                    <textarea id="faqAnswer" required rows="4" placeholder="Write clear, dermatologist-backed answer here..." class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-sans"></textarea>
+                    <textarea id="faqAnswer" required rows="4" placeholder="Write clear, dermatologist-backed answer here..." class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-amber-500/20 focus:border-amber-500 font-sans leading-relaxed"></textarea>
                     <p class="text-[11px] text-slate-400 mt-1">HTML links like &lt;a href="/trackorder.html"&gt;Track Order&lt;/a&gt; are supported.</p>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label for="faqOrder" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                            Display Order (Sequence)
-                        </label>
-                        <input type="number" id="faqOrder" min="1" max="99" value="1" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-amber-500 font-mono">
-                    </div>
-                    <div>
-                        <label for="faqCategory" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                            Category
-                        </label>
-                        <input type="text" id="faqCategory" value="General" placeholder="e.g. Usage, Ingredients" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-amber-500">
-                    </div>
+                <div>
+                    <label for="faqOrder" class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
+                        Display Order (Sequence on this Page)
+                    </label>
+                    <input type="number" id="faqOrder" min="1" max="99" value="1" class="w-full px-4 py-2.5 text-sm rounded-xl border border-slate-300 focus:outline-none focus:border-amber-500 font-mono font-bold">
                 </div>
 
                 <div class="flex items-center gap-3 pt-2">

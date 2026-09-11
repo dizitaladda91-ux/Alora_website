@@ -4,57 +4,79 @@ const DEFAULT_FAQS = [
     {
         question: "Can I use the Alora Radiance Face Wash every day?",
         answer: "Yes! Our Face Wash is dermatologist-formulated to be gentle enough for daily use, morning and night, to remove impurities without stripping skin moisture.",
+        category: "Landing Page",
         order: 1,
         isActive: true
     },
     {
         question: "Can I use the Face Serum every day?",
         answer: "Yes. Apply 3-4 drops daily after cleansing and before your face cream. If you are new to active Retinol, start with alternate nights.",
+        category: "Landing Page",
         order: 2,
         isActive: true
     },
     {
         question: "When should I apply the Face Cream?",
         answer: "Apply the Face Cream right after your serum, morning and night, to lock in active ingredients and seal 24-hour hydration.",
+        category: "Landing Page",
         order: 3,
         isActive: true
     },
     {
         question: "Can I use the Body Lotion every day?",
         answer: "Yes! Apply daily right after a bath/shower when skin is damp for maximum absorption and long-lasting velvety softness.",
-        order: 4,
+        category: "Shop / Products",
+        order: 1,
         isActive: true
     },
     {
         question: "How often should I use the Face Scrub?",
         answer: "Use the Face Scrub 2–3 times a week to gently exfoliate dead skin cells, unclog pores, and restore skin smoothness.",
-        order: 5,
+        category: "Shop / Products",
+        order: 2,
         isActive: true
     },
     {
         question: "Are Alora Radiance products safe and dermatologically tested?",
         answer: "Yes, all Alora Radiance formulations are 100% dermatologically tested, paraben-free, cruelty-free, and formulated with clean, high-grade ingredients safe for all skin types.",
-        order: 6,
+        category: "About Us",
+        order: 1,
         isActive: true
     },
     {
         question: "How can I track my order?",
         answer: "You can easily track your order in real-time by visiting our Track Order page and entering your Order ID and phone number.",
-        order: 7,
+        category: "Track Order / Support",
+        order: 1,
         isActive: true
     }
 ];
 
-// 🟢 1. GET ALL ACTIVE FAQS (Public Endpoint)
+// 🟢 1. GET ALL ACTIVE FAQS (Public Endpoint, Supports ?page= or ?category=)
 export const getAllFaqs = async (req, res) => {
     try {
-        let faqs = await Faq.find({ isActive: true }).sort({ order: 1, createdAt: 1 }).lean();
+        const { category, page } = req.query;
+        let query = { isActive: true };
+        
+        const targetPage = (page || category || "").trim();
+        if (targetPage && targetPage.toLowerCase() !== "all" && targetPage.toLowerCase() !== "all pages") {
+            query.$or = [
+                { category: new RegExp(`^${targetPage}$`, "i") },
+                { category: "General" },
+                { category: "All Pages" }
+            ];
+        }
+
+        let faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
         
         // Auto-seed if database has no FAQs yet
         if (!faqs || faqs.length === 0) {
             const count = await Faq.countDocuments();
             if (count === 0) {
                 await Faq.insertMany(DEFAULT_FAQS);
+                faqs = await Faq.find(query).sort({ order: 1, createdAt: 1 }).lean();
+            } else if (targetPage) {
+                // If no specific faqs found for this page, return general active faqs
                 faqs = await Faq.find({ isActive: true }).sort({ order: 1, createdAt: 1 }).lean();
             }
         }

@@ -51,6 +51,75 @@
             font-family: 'Manrope', sans-serif;
             font-size: 0.95rem;
         }
+
+        /* 🚀 SEO Studio Executive Theme Colors & High Contrast Fixes */
+        .bg-navy {
+            background-color: #0F172A !important;
+        }
+        .bg-navy-light {
+            background-color: #1E293B !important;
+        }
+        nav.bg-navy {
+            background-color: #0F172A !important;
+            border-bottom: 1px solid #1E293B !important;
+        }
+        aside.bg-navy {
+            background-color: #0F172A !important;
+            border-right: 1px solid #1E293B !important;
+        }
+        .sidebar-link {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 700 !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-link-active {
+            background: linear-gradient(135deg, #F59E0B, #D97706) !important;
+            color: #020617 !important;
+            font-weight: 800 !important;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.3) !important;
+        }
+        .sidebar-link-active i {
+            color: #020617 !important;
+        }
+        .sidebar-link-inactive {
+            color: #F1F5F9 !important;
+            background-color: rgba(30, 41, 59, 0.6) !important;
+            border: 1px solid rgba(51, 65, 85, 0.6) !important;
+        }
+        .sidebar-link-inactive i {
+            color: #F59E0B !important;
+        }
+        .sidebar-link-inactive:hover {
+            background-color: #1E293B !important;
+            color: #FFFFFF !important;
+            border-color: #64748B !important;
+            transform: translateX(3px) !important;
+        }
+        .sidebar-logout {
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            padding: 10px 14px !important;
+            border-radius: 12px !important;
+            font-size: 13px !important;
+            font-weight: 800 !important;
+            color: #FB7185 !important;
+            background-color: rgba(225, 29, 72, 0.12) !important;
+            border: 1px solid rgba(225, 29, 72, 0.25) !important;
+            transition: all 0.2s ease !important;
+            text-decoration: none !important;
+        }
+        .sidebar-logout:hover {
+            background-color: rgba(225, 29, 72, 0.25) !important;
+            color: #FFFFFF !important;
+            border-color: rgba(225, 29, 72, 0.5) !important;
+        }
     </style>
 </head>
 <body class="font-sans bg-[#F8FAFC] flex flex-col h-screen overflow-hidden text-slate-800">
@@ -63,13 +132,13 @@
             </div>
             <div>
                 <h1 class="text-base font-extrabold tracking-wider uppercase font-fraunces text-white flex items-center gap-2">
-                    ALORA ARTICLE STUDIO <span class="text-[10px] font-mono bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full border border-amber-400/30">🛠️ EDIT MODE</span>
+                    ALORA ARTICLE STUDIO <span class="text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 px-2.5 py-1 rounded-full border border-amber-400/40">🛠️ EDIT MODE</span>
                 </h1>
             </div>
         </div>
 
         <div class="flex items-center gap-4">
-            <a href="./seoadmin.html" class="text-xs font-semibold text-slate-300 hover:text-amber-400 transition flex items-center gap-1.5 bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700">
+            <a href="./seoadmin.html" class="text-xs font-bold text-white hover:text-amber-300 transition flex items-center gap-1.5 bg-slate-800 hover:bg-slate-700 px-3.5 py-2 rounded-lg border border-slate-600 shadow-xs">
                 <i class="fa-solid fa-arrow-left text-amber-400"></i> Back to Directory
             </a>
         </div>
@@ -79,31 +148,31 @@
     <div class="flex flex-1 overflow-hidden">
         
         <!-- Sidebar Navigation -->
-        <aside class="bg-navy text-slate-300 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
+        <aside class="bg-navy text-slate-200 w-64 min-h-full p-4 flex flex-col justify-between shrink-0 border-r border-slate-800 shadow-lg">
             <div class="space-y-6">
                 
                 <div class="px-2 pt-2">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest font-mono mb-2">Content Navigation</p>
+                    <p class="text-[11px] font-extrabold text-slate-300 uppercase tracking-wider font-mono mb-3">Content Navigation</p>
                     <nav class="w-full">
-                        <ul class="space-y-1.5">
+                        <ul class="space-y-2">
                             <li>
-                                <a href="./seoadmin.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-layer-group text-slate-400"></i> All Blog Posts
+                                <a href="./seoadmin.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-layer-group text-sm"></i> All Blog Posts
                                 </a>
                             </li>
                             <li>
-                                <a href="./seoallpost.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-circle-plus text-slate-400"></i> Create New Post
+                                <a href="./seoallpost.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-circle-plus text-sm"></i> Create New Post
                                 </a>
                             </li>
                             <li>
-                                <a href="./seoproduct.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-box-archive text-slate-400"></i> Products SEO
+                                <a href="./seoproduct.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-box-archive text-sm"></i> Products SEO
                                 </a>
                             </li>
                             <li>
-                                <a href="./seofaq.html" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-800/80 text-slate-300 hover:text-white font-semibold transition">
-                                    <i class="fa-solid fa-circle-question text-slate-400"></i> Store FAQs
+                                <a href="./seofaq.html" class="sidebar-link sidebar-link-inactive">
+                                    <i class="fa-solid fa-circle-question text-sm"></i> Store FAQs
                                 </a>
                             </li>
                         </ul>
@@ -114,7 +183,7 @@
 
             <!-- LOGOUT BUTTON -->
             <div class="border-t border-slate-800 pt-4">
-                <a href="#" id="adminLogoutBtn" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-rose-400 hover:bg-rose-950/40 hover:text-rose-300 font-bold transition">
+                <a href="#" id="adminLogoutBtn" class="sidebar-logout">
                     <i class="fa-solid fa-right-from-bracket"></i> Logout Studio
                 </a>
             </div>
