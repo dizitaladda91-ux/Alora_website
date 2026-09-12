@@ -15,7 +15,6 @@ Disallow: /admin
 Disallow: /seoadmin
 Disallow: /seoproduct
 Disallow: /seoproductupdate
-Disallow: /account
 Disallow: /myorders
 Disallow: /checkout
 Disallow: /api/

@@ -308,6 +308,10 @@ app.get('/certificates', (req, res) => {
 });
 
 app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, res) => {
+  // Account URLs are utility pages, not public landing pages. Keep them
+  // crawlable long enough for Google to receive this directive, but never
+  // allow them into the search index.
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.sendFile(path.join(frontendRoot, 'account.html'));
 });
 

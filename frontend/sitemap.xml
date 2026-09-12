@@ -67,13 +67,6 @@
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
-  <url>
-    <loc>https://aloraradiance.com/sitemap</loc>
-    <lastmod>2026-09-02</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.5</priority>
-  </url>
-
   <!-- Product Pages -->
   <url>
     <loc>https://aloraradiance.com/product/purifying-glow-face-wash</loc>
