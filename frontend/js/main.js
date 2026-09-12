@@ -694,6 +694,35 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const sliderContainer = document.getElementById("productSliderContainer");
+    if (!sliderContainer) return;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    sliderContainer.addEventListener("mousedown", (e) => {
+        isDown = true;
+        sliderContainer.classList.add("cursor-grabbing");
+        startX = e.pageX - sliderContainer.offsetLeft;
+        scrollLeft = sliderContainer.scrollLeft;
+    });
+    sliderContainer.addEventListener("mouseleave", () => {
+        isDown = false;
+        sliderContainer.classList.remove("cursor-grabbing");
+    });
+    sliderContainer.addEventListener("mouseup", () => {
+        isDown = false;
+        sliderContainer.classList.remove("cursor-grabbing");
+    });
+    sliderContainer.addEventListener("mousemove", (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - sliderContainer.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        sliderContainer.scrollLeft = scrollLeft - walk;
+    });
+});
 window.toggleCartState = toggleCartState;
 window.selectSize = selectSize;
 window.changeCardSize = changeCardSize; 
