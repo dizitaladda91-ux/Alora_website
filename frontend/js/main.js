@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", () => {
         autoSlideInterval = setInterval(() => {
             currentIndex = (currentIndex + 1) % totalSlides;
             updateSlider();
-        }, 4000);
+        }, 6000);
     };
 
     const stopAutoSlide = () => {
