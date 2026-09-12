@@ -720,7 +720,7 @@
     <section id="watch-it-love-it-section" class="max-w-7xl mx-auto px-4 py-6 sm:py-10">
         <div class="bg-gradient-to-b from-slate-50 via-white to-amber-50/20 rounded-3xl p-5 sm:p-8 border border-amber-900/10 shadow-lg relative overflow-hidden">
             
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4 mb-6 text-center sm:text-left">
+            <div class="flex flex-col sm:flex-row justify-between items-center sm:items-start gap-4 mb-6 text-center sm:text-left">
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 text-pink-700 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase font-roboto border border-pink-200 mb-2">
                         <i class="fa-solid fa-circle-play text-pink-500"></i> Video Spotlight
@@ -728,18 +728,16 @@
                     <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">Watch It. Love It.</h2>
                     <p class="text-xs sm:text-sm text-slate-600 mt-1">Real skincare routines &amp; results in action. Click any card to watch.</p>
                 </div>
-
-                <div class="flex items-center gap-2 shrink-0">
-                    <button type="button" aria-label="Scroll Left" onclick="scrollWatchItCarousel('left')" class="w-10 h-10 rounded-full bg-white text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-md transition-all active:scale-95">
-                        <i class="fa-solid fa-chevron-left text-xs"></i>
-                    </button>
-                    <button type="button" aria-label="Scroll Right" onclick="scrollWatchItCarousel('right')" class="w-10 h-10 rounded-full bg-white text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-md transition-all active:scale-95">
-                        <i class="fa-solid fa-chevron-right text-xs"></i>
-                    </button>
-                </div>
             </div>
 
-            <div id="watchItCarousel" class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-3 px-1 no-scrollbar snap-x snap-mandatory items-stretch">
+            <!-- Watch It Carousel Wrapper with Side Navigation Arrows -->
+            <div class="relative group/watchit-slider">
+                <!-- Floating Left Arrow (Visible on Mobile & Desktop) -->
+                <button type="button" aria-label="Scroll Left" onclick="scrollWatchItCarousel('left')" class="absolute -left-2 sm:-left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-xl transition-all duration-300 active:scale-95 hover:scale-110 backdrop-blur-md cursor-pointer">
+                    <i class="fa-solid fa-chevron-left text-xs sm:text-sm"></i>
+                </button>
+
+                <div id="watchItCarousel" class="flex gap-4 sm:gap-6 overflow-x-auto scroll-smooth py-3 px-1 no-scrollbar snap-x snap-mandatory items-stretch">
                 
                 <!-- Video Reel 1 -->
                 <div class="reel-card-item w-56 sm:w-64 shrink-0 snap-center group transition-all duration-300 hover:-translate-y-1">
@@ -851,6 +849,10 @@
                     </div>
                 </div>
 
+                <!-- Floating Right Arrow (Visible on Mobile & Desktop) -->
+                <button type="button" aria-label="Scroll Right" onclick="scrollWatchItCarousel('right')" class="absolute -right-2 sm:-right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 text-slate-800 hover:bg-amber-400 hover:text-slate-950 border border-slate-200 flex items-center justify-center shadow-xl transition-all duration-300 active:scale-95 hover:scale-110 backdrop-blur-md cursor-pointer">
+                    <i class="fa-solid fa-chevron-right text-xs sm:text-sm"></i>
+                </button>
             </div>
 
         </div>
