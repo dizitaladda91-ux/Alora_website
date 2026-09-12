@@ -119,28 +119,27 @@
             }
         }
 
-        /* 🚀 Hero Banner Slider Dots Navigation (Explicit High-Contrast Bottom Placement) */
+        /* 🚀 Hero Banner Slider Dots Navigation (Placed cleanly below banner image) */
         #hero-slider-dots {
-            position: absolute !important;
-            bottom: 18px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            z-index: 30 !important;
+            position: relative !important;
             display: flex !important;
+            justify-content: center !important;
             align-items: center !important;
             gap: 8px !important;
-            padding: 6px 14px !important;
+            padding: 8px 16px !important;
+            margin: 12px auto 6px auto !important;
+            width: fit-content !important;
             border-radius: 9999px !important;
-            background-color: rgba(20, 30, 20, 0.45) !important;
+            background-color: rgba(230, 222, 205, 0.7) !important;
             backdrop-filter: blur(8px) !important;
             -webkit-backdrop-filter: blur(8px) !important;
-            border: 1px solid rgba(255, 255, 255, 0.35) !important;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25) !important;
+            border: 1px solid rgba(139, 69, 19, 0.15) !important;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
         }
         @media (max-width: 640px) {
             #hero-slider-dots {
-                bottom: 10px !important;
-                padding: 4px 10px !important;
+                margin: 8px auto 4px auto !important;
+                padding: 6px 12px !important;
                 gap: 6px !important;
             }
         }
@@ -148,8 +147,8 @@
             height: 8px !important;
             width: 8px !important;
             border-radius: 9999px !important;
-            background-color: rgba(255, 255, 255, 0.65) !important;
-            border: 1px solid rgba(0, 0, 0, 0.15) !important;
+            background-color: rgba(139, 69, 19, 0.35) !important;
+            border: 1px solid rgba(139, 69, 19, 0.15) !important;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
             cursor: pointer !important;
             padding: 0 !important;
@@ -157,14 +156,14 @@
             outline: none !important;
         }
         .hero-dot:hover {
-            background-color: #FFFFFF !important;
+            background-color: #8B4513 !important;
             transform: scale(1.15) !important;
         }
         .hero-dot.active {
             width: 26px !important;
             background-color: #B8460E !important;
-            border-color: #FFFFFF !important;
-            box-shadow: 0 2px 8px rgba(184, 70, 14, 0.5) !important;
+            border-color: #B8460E !important;
+            box-shadow: 0 2px 8px rgba(184, 70, 14, 0.4) !important;
         }
 
         /* 🚀 WCAG Touch Target Compliance: Expands interactive touch target of .dot buttons to 28px x 28px */
@@ -547,8 +546,10 @@
     </a>
 
 </div>
+</div>
 
-    <!-- Hero Slider Dots Navigation -->
+<!-- Hero Slider Dots Navigation (Placed cleanly below the banner image) -->
+<div class="w-full flex justify-center py-1">
     <div id="hero-slider-dots">
         <button type="button" aria-label="Go to slide 1" class="hero-dot active"></button>
         <button type="button" aria-label="Go to slide 2" class="hero-dot"></button>
