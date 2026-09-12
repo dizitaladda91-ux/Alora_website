@@ -36,12 +36,9 @@ async function loadProductsFromBackend() {
         PRODUCTS_DATABASE = normalizeAndAssignBestsellers(data);
         updateQuickFilterUI();
         filterProducts();
-        const filterSkeleton = document.getElementById('filter-skeleton');
         const filterContent = document.getElementById('filter-content');
-        if (filterSkeleton && filterContent) {
-            filterSkeleton.classList.add('hidden');
+        if (filterContent) {
             filterContent.classList.remove('hidden');
-            filterContent.classList.add('animate-fade-in');
         }
     } catch (err) {
         console.error("Product fetch failed:", err);
