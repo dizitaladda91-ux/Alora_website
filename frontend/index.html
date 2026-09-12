@@ -575,52 +575,57 @@
     <section id="featured" class="max-w-7xl mx-auto px-4 py-4 sm:py-6 sm:px-6 lg:px-8">
         <div class="bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-6 sm:p-10 border border-amber-900/10 shadow-sm relative overflow-hidden">
             <!-- Top Header Bar -->
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 mb-6 sm:mb-8">
                 <div>
                     <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
                         Signature Formulations
                     </span>
                     <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">Featured Collection</h2>
                 </div>
-                <div class="flex items-center gap-3">
-                    <button type="button" aria-label="Previous Product" onclick="slideProducts('left')" class="w-11 h-11 rounded-full bg-white text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/15 flex items-center justify-center shadow-md transition-all duration-300 active:scale-95">
-                        <i class="fa-solid fa-chevron-left text-sm"></i>
-                    </button>
-                    <button type="button" aria-label="Next Product" onclick="slideProducts('right')" class="w-11 h-11 rounded-full bg-white text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/15 flex items-center justify-center shadow-md transition-all duration-300 active:scale-95">
-                        <i class="fa-solid fa-chevron-right text-sm"></i>
-                    </button>
-                </div>
             </div>
 
-            <!-- Product Slider Container -->
-            <div id="productSliderContainer" class="overflow-x-auto w-full py-3 sm:py-4 scroll-smooth snap-x snap-mandatory no-scrollbar">
-                <div id="productSliderWrapper" class="flex items-stretch gap-4 sm:gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
-                    <!-- Skeleton Product Card Placeholders (Exact width & height match eliminates CLS layout shift) -->
-                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
-                        <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
-                        <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
-                        <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
-                        <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
-                    </div>
-                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
-                        <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
-                        <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
-                        <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
-                        <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
-                    </div>
-                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
-                        <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
-                        <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
-                        <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
-                        <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
-                    </div>
-                    <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between hidden md:flex">
-                        <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
-                        <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
-                        <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
-                        <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+            <!-- Product Slider Container Wrapper with Side Navigation Arrows -->
+            <div class="relative group/featured-slider">
+                <!-- Floating Left Arrow (Visible on Mobile & Desktop) -->
+                <button type="button" aria-label="Previous Product" onclick="slideProducts('left')" class="absolute -left-2 sm:-left-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/20 flex items-center justify-center shadow-xl transition-all duration-300 active:scale-95 hover:scale-110 backdrop-blur-md cursor-pointer">
+                    <i class="fa-solid fa-chevron-left text-xs sm:text-sm"></i>
+                </button>
+
+                <!-- Product Slider Container -->
+                <div id="productSliderContainer" class="overflow-x-auto w-full py-3 sm:py-4 scroll-smooth snap-x snap-mandatory no-scrollbar">
+                    <div id="productSliderWrapper" class="flex items-stretch gap-4 sm:gap-6 transition-transform duration-500 ease-out" style="transform: translateX(0px);">
+                        <!-- Skeleton Product Card Placeholders (Exact width & height match eliminates CLS layout shift) -->
+                        <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
+                            <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
+                            <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
+                            <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+                        </div>
+                        <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
+                            <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
+                            <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
+                            <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+                        </div>
+                        <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between">
+                            <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
+                            <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
+                            <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+                        </div>
+                        <div class="w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center rounded-2xl sm:rounded-3xl bg-white/60 border border-slate-200/80 p-4 min-h-[480px] sm:min-h-[520px] animate-pulse flex flex-col justify-between hidden md:flex">
+                            <div class="w-full h-44 bg-slate-200/70 rounded-xl mb-3"></div>
+                            <div class="h-4 bg-slate-200/70 rounded w-3/4 mb-2"></div>
+                            <div class="h-3 bg-slate-200/70 rounded w-1/2 mb-4"></div>
+                            <div class="h-8 bg-slate-200/70 rounded-xl w-full"></div>
+                        </div>
                     </div>
                 </div>
+
+                <!-- Floating Right Arrow (Visible on Mobile & Desktop) -->
+                <button type="button" aria-label="Next Product" onclick="slideProducts('right')" class="absolute -right-2 sm:-right-5 top-1/2 -translate-y-1/2 z-30 w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/95 text-[#8B4513] hover:bg-[#8B4513] hover:text-white border border-amber-900/20 flex items-center justify-center shadow-xl transition-all duration-300 active:scale-95 hover:scale-110 backdrop-blur-md cursor-pointer">
+                    <i class="fa-solid fa-chevron-right text-xs sm:text-sm"></i>
+                </button>
             </div>
         </div>
     </section>
