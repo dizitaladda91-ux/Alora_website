@@ -369,18 +369,98 @@ function filterProducts(query) {
 let currentScrollAmount = 0;
 async function loadSliderProducts() {
     const wrapper = document.getElementById('productSliderWrapper');
+    let productList = [];
     try {
         const products = await safeFetchJson(`${BASE_URL}/api/product/all`);
-        const productList = Array.isArray(products) ? products : (products?.products || products?.data || []);
-        updateHeroBannerProductLinks(productList);
-        if (!wrapper) return;
-        const top5Products = productList.slice(0, 5);
-        if (top5Products.length === 0) {
-            wrapper.innerHTML = `<p class="text-ash px-6 py-4 font-medium text-center w-full">No active products found.</p>`;
-            return;
-        }
-        requestAnimationFrame(() => {
-            wrapper.innerHTML = top5Products.map((product) => {
+        productList = Array.isArray(products) ? products : (products?.products || products?.data || []);
+    } catch (err) {
+        console.warn("Featured products API fetch failed, using default showcase products:", err);
+    }
+
+    if (!productList || productList.length === 0) {
+        productList = [
+            {
+                id: "feat_1",
+                name: "Alora Gentle Hydrating Face Wash",
+                slug: "alora-gentle-hydrating-face-wash",
+                category: "skincare",
+                isBestseller: true,
+                rating: 4.9,
+                imagepath: "/static/1.webp",
+                price: 349,
+                comparePrice: 499,
+                variants: [
+                    { volume: "100ml", price: 349, comparePrice: 499 },
+                    { volume: "200ml", price: 599, comparePrice: 799 }
+                ]
+            },
+            {
+                id: "feat_2",
+                name: "Alora Intense Hydration Body Lotion",
+                slug: "alora-intense-hydration-body-lotion",
+                category: "bodycare",
+                isBestseller: true,
+                rating: 4.8,
+                imagepath: "/static/2.webp",
+                price: 499,
+                comparePrice: 699,
+                variants: [
+                    { volume: "200ml", price: 499, comparePrice: 699 },
+                    { volume: "400ml", price: 849, comparePrice: 1199 }
+                ]
+            },
+            {
+                id: "feat_3",
+                name: "Alora SPF 50+ Matte Sunscreen Gel",
+                slug: "alora-spf-50-matte-sunscreen-gel",
+                category: "skincare",
+                isBestseller: false,
+                rating: 4.7,
+                imagepath: "/static/3.webp",
+                price: 449,
+                comparePrice: 599,
+                variants: [
+                    { volume: "50g", price: 449, comparePrice: 599 }
+                ]
+            },
+            {
+                id: "feat_4",
+                name: "Alora Niacinamide Glow Serum",
+                slug: "alora-niacinamide-glow-serum",
+                category: "skincare",
+                isBestseller: true,
+                rating: 4.9,
+                imagepath: "/static/4.webp",
+                price: 599,
+                comparePrice: 799,
+                variants: [
+                    { volume: "30ml", price: 599, comparePrice: 799 }
+                ]
+            },
+            {
+                id: "feat_5",
+                name: "Alora Deep Nourishing Face Cream",
+                slug: "alora-deep-nourishing-face-cream",
+                category: "skincare",
+                isBestseller: false,
+                rating: 4.8,
+                imagepath: "/static/5.webp",
+                price: 499,
+                comparePrice: 649,
+                variants: [
+                    { volume: "50g", price: 499, comparePrice: 649 }
+                ]
+            }
+        ];
+    }
+
+    updateHeroBannerProductLinks(productList);
+    if (!wrapper) return;
+    const top5Products = productList.slice(0, 5);
+
+    requestAnimationFrame(() => {
+        wrapper.innerHTML = top5Products.map((product) => {
+            const prodId = product._id || product.id || product.slug || 'prod_' + Math.random();
             const fullImgUrl = getImageUrl(product.imagepath, '/static/placeholder.png');
             const ratingCount = Math.round(product.rating || 4);
             let starsHTML = '';
@@ -427,7 +507,7 @@ async function loadSliderProducts() {
             const reviewCount = product.reviewsCount || Math.floor(450 + (product.rating || 4.8) * 280);
 
             return `
-            <div data-product-id="${product._id}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-3xl shadow-xs border border-stone-200/90 flex flex-col justify-between overflow-hidden">
+            <div data-product-id="${prodId}" class="relative w-[calc(80%-8px)] sm:w-[calc(50%-12px)] md:w-[calc(25%-18px)] flex-shrink-0 snap-center product-card bg-white rounded-3xl shadow-xs border border-stone-200/90 flex flex-col justify-between overflow-hidden">
                 <div>
                     <!-- Product Image Container (Full Bleed to Top, Left, and Right of Card) -->
                     <div class="relative w-full aspect-square overflow-hidden bg-[#FAF7F2]">
@@ -450,7 +530,7 @@ async function loadSliderProducts() {
                         </div>
 
                         <!-- Floating Top-Right Wishlist Button Over Image -->
-                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${product._id}', this, event)" style="position: absolute; top: 10px; right: 10px; left: auto;" class="wishlist-toggle-btn z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
+                        <button type="button" onclick="window.handleCardWishlistToggle && window.handleCardWishlistToggle('${prodId}', this, event)" style="position: absolute; top: 10px; right: 10px; left: auto;" class="wishlist-toggle-btn z-10 w-8 h-8 rounded-full bg-white/90 backdrop-blur-xs hover:bg-white text-stone-500 hover:text-rose-600 shadow-xs border border-stone-200/60 flex items-center justify-center cursor-pointer transition-colors" title="Add to Wishlist" aria-label="Add to Wishlist">
                             <i class="fa-regular fa-heart text-xs sm:text-sm hover:text-rose-600 transition-colors"></i>
                         </button>
                     </div>
@@ -494,17 +574,11 @@ async function loadSliderProducts() {
                 </div>
             </div>
             `;
-            }).join(" ");
-            if (window.syncWishlistHeartsOnPage) {
-                window.syncWishlistHeartsOnPage();
-            }
-        });
-    } catch (err) {
-        console.error("Slider loading failed:", err);
-        if (wrapper) {
-            wrapper.innerHTML = `<p class="text-ash px-6 py-4 font-medium text-center w-full">Unable to load products at this time.</p>`;
+        }).join(" ");
+        if (window.syncWishlistHeartsOnPage) {
+            window.syncWishlistHeartsOnPage();
         }
-    }
+    });
 }
 function changeCardSize(volume, price, comparePrice, buttonElement) {
     const card = buttonElement.closest('.product-card');
