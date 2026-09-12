@@ -85,42 +85,8 @@
         <div class="flex flex-col lg:flex-row gap-8">
             <!-- Sidebar Filters (Slide-up drawer on mobile, sticky sidebar on desktop) -->
             <aside id="filter-sidebar" class="fixed inset-x-0 bottom-0 z-50 rounded-t-3xl max-h-[85vh] overflow-y-auto bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 shadow-2xl border-t border-amber-900/20 translate-y-full transition-transform duration-300 ease-out hidden lg:block lg:static lg:z-auto lg:rounded-3xl lg:max-h-none lg:overflow-visible lg:border lg:translate-y-0 lg:w-64 lg:flex-shrink-0 lg:shadow-xl lg:h-fit lg:p-6 relative">
-                <!-- YouTube Shimmer Skeleton for Filters -->
-                <div id="filter-skeleton" class="space-y-6">
-                    <div class="flex justify-between items-center pb-4 border-b border-dashed border-[#E3D9BC]">
-                        <div class="skeleton-shimmer h-5 w-24 rounded"></div>
-                        <div class="skeleton-shimmer h-4 w-12 rounded"></div>
-                    </div>
-                    <div>
-                        <div class="skeleton-shimmer h-3 w-16 rounded mb-2.5"></div>
-                        <div class="skeleton-shimmer h-9 w-full rounded-lg"></div>
-                    </div>
-                    <div>
-                        <div class="skeleton-shimmer h-3 w-20 rounded mb-2.5"></div>
-                        <div class="space-y-2.5">
-                            <div class="skeleton-shimmer h-4 w-28 rounded"></div>
-                            <div class="skeleton-shimmer h-4 w-28 rounded"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="skeleton-shimmer h-3 w-20 rounded mb-2.5"></div>
-                        <div class="skeleton-shimmer h-2 w-full rounded mb-2"></div>
-                        <div class="flex justify-between">
-                            <div class="skeleton-shimmer h-3 w-8 rounded"></div>
-                            <div class="skeleton-shimmer h-3 w-12 rounded"></div>
-                        </div>
-                    </div>
-                    <div>
-                        <div class="skeleton-shimmer h-3 w-28 rounded mb-2.5"></div>
-                        <div class="space-y-2">
-                            <div class="skeleton-shimmer h-4 w-36 rounded"></div>
-                            <div class="skeleton-shimmer h-4 w-36 rounded"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Actual Filter Content (Fades in smoothly when ready) -->
-                <div id="filter-content" class="hidden space-y-6">
+                <!-- Filter Content -->
+                <div id="filter-content" class="space-y-6">
                     
                     <div class="flex items-center justify-between border-b border-amber-900/10 pb-3.5">
                         <h2 class="font-fraunces font-bold text-slate-900 tracking-wide text-base flex items-center gap-2">
@@ -204,44 +170,7 @@
                     </div>
                 </div>
 
-                <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6">
-                    <!-- YouTube-Style Shimmer Skeleton Loader 1 -->
-                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden">
-                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
-                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
-                        <div class="flex justify-between items-center px-2 mb-3">
-                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
-                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
-                        </div>
-                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
-                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
-                    </div>
-                    <!-- YouTube-Style Shimmer Skeleton Loader 2 -->
-                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden hidden sm:flex">
-                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
-                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
-                        <div class="flex justify-between items-center px-2 mb-3">
-                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
-                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
-                        </div>
-                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
-                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
-                    </div>
-                    <!-- YouTube-Style Shimmer Skeleton Loader 3 -->
-                    <div class="bg-white rounded-2xl p-4 border border-[#ECE4CE] h-[470px] flex flex-col justify-between shadow-sm overflow-hidden hidden md:flex">
-                        <div class="skeleton-shimmer h-[170px] rounded-xl mb-4 w-full"></div>
-                        <div class="skeleton-shimmer h-4 rounded w-3/4 mx-auto mb-2"></div>
-                        <div class="skeleton-shimmer h-3 rounded w-5/6 mx-auto mb-4"></div>
-                        <div class="flex justify-between items-center px-2 mb-3">
-                            <div class="skeleton-shimmer h-6 w-16 rounded-full"></div>
-                            <div class="skeleton-shimmer h-6 w-16 rounded-md"></div>
-                        </div>
-                        <div class="skeleton-shimmer h-8 rounded-lg w-full mb-3"></div>
-                        <div class="skeleton-shimmer h-10 rounded-xl w-full mt-auto"></div>
-                    </div>
-                </div>
+                <div id="product-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-6"></div>
 
                 <div id="no-products" class="hidden text-center py-20 bg-white border border-[#ECE4CE] rounded-2xl mt-4">
                     <i class="fa-solid fa-magnifying-glass text-4xl text-[#D9D2BC] mb-3"></i>

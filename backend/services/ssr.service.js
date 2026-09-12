@@ -420,10 +420,6 @@ export const renderProductListSsr = (templateHtml, products = []) => {
     html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${desc}">`);
     html = html.replace(/<link rel="canonical" href="[^"]*" \/>/i, `<link rel="canonical" href="${canonical}" />`);
 
-    // Filter Skeleton to Filter Content Toggle
-    html = html.replace(/<div id="filter-skeleton" class="space-y-6">/i, `<div id="filter-skeleton" class="space-y-6 hidden">`);
-    html = html.replace(/<div id="filter-content" class="hidden\s+/i, `<div id="filter-content" class="`);
-
     if (Array.isArray(products) && products.length > 0) {
         const cardsHtml = products.map(product => {
             const pUrl = getProductSlugUrl(product);
