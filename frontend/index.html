@@ -276,6 +276,20 @@
             animation-play-state: paused;
         }
 
+        @keyframes badgesMarquee {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+        .animate-badges-ticker {
+            display: flex;
+            width: max-content;
+            animation: badgesMarquee 25s linear infinite;
+            will-change: transform;
+        }
+        .animate-badges-ticker:hover {
+            animation-play-state: paused;
+        }
+
         .animate-marquee {
           display: inline-block;
           padding-left: 100%;
@@ -1041,13 +1055,13 @@
    
 
 
-    <!-- ============ TOXIN-FREE PROMISE (COMPACT & ATTRACTIVE) ============ -->
-    <section class="max-w-6xl mx-auto px-4 py-8 sm:py-10">
-        <div class="bg-gradient-to-b from-[#FDFBF7] via-white to-[#FDFBF7] rounded-3xl p-6 sm:p-10 border border-amber-900/15 shadow-xl relative overflow-hidden">
+    <!-- ============ TOXIN-FREE PROMISE (CONTINUOUS SLIDING TICKER) ============ -->
+    <section class="max-w-6xl mx-auto px-2 sm:px-4 py-6 sm:py-10">
+        <div class="bg-transparent sm:bg-gradient-to-b sm:from-[#FDFBF7] sm:via-white sm:to-[#FDFBF7] rounded-none sm:rounded-3xl p-2 sm:p-10 border-0 sm:border sm:border-amber-900/15 shadow-none sm:shadow-xl relative overflow-hidden">
             
             <!-- Top Header -->
-            <div class="text-center mb-8">
-                <span class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase border border-amber-300/50 mb-3">
+            <div class="text-center mb-6 sm:mb-8">
+                <span class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-100/80 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase border border-amber-300/50 mb-2 sm:mb-3">
                     100% Clean &amp; Safe Formulations
                 </span>
                 <h2 class="text-2xl sm:text-4xl font-fraunces font-bold text-slate-900 leading-tight">
@@ -1058,65 +1072,187 @@
                 </p>
             </div>
 
-            <!-- Compact Grid of Badges -->
-            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
-                
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-ban text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">Parabens</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Zero Added</span>
-                </div>
+            <!-- Continuous Auto-Sliding Marquee Ticker -->
+            <div class="relative w-full overflow-hidden py-2 mb-6 sm:mb-8">
+                <div class="animate-badges-ticker flex items-center gap-3 sm:gap-4 whitespace-nowrap">
+                    
+                    <!-- Loop Item Group 1 -->
+                    <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Parabens</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-ban text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">SLS &amp; Sulfates</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Zero Added</span>
-                </div>
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">SLS &amp; Sulfates</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-ban text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">Mineral Oils</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Zero Added</span>
-                </div>
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Mineral Oils</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-ban text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">Silicones</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Zero Added</span>
-                </div>
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Silicones</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-leaf text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">100% Vegan</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Plant Derived</span>
-                </div>
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-leaf text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">100% Vegan</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Plant Derived</span>
+                            </div>
+                        </div>
 
-                <div class="bg-white p-3.5 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col items-center text-center hover:shadow-md hover:-translate-y-0.5 transition-all">
-                    <div class="w-10 h-10 rounded-xl bg-rose-100/70 text-rose-800 flex items-center justify-center mb-2 shadow-inner">
-                        <i class="fa-solid fa-paw text-sm"></i>
-                    </div>
-                    <span class="text-xs font-bold text-slate-900">Cruelty-Free</span>
-                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md mt-1 border border-emerald-200">Never Tested</span>
-                </div>
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-rose-100/70 text-rose-800 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-paw text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Cruelty-Free</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Never Tested</span>
+                            </div>
+                        </div>
 
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-user-doctor text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Dermat Approved</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">100% Safe</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-flask-vial text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Clean Science</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Pure Extracts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Loop Item Group 2 (Duplicate for Seamless Infinite Scroll) -->
+                    <div class="flex items-center gap-3 sm:gap-4 shrink-0">
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Parabens</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">SLS &amp; Sulfates</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Mineral Oils</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-ban text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Silicones</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Zero Added</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex flex-col justify-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center shrink-0">
+                                    <i class="fa-solid fa-leaf text-xs"></i>
+                                </div>
+                                <div class="text-left">
+                                    <p class="text-xs font-bold text-slate-900 leading-tight">100% Vegan</p>
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Plant Derived</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-rose-100/70 text-rose-800 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-paw text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Cruelty-Free</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Never Tested</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-amber-100/70 text-[#8B4513] flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-user-doctor text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Dermat Approved</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">100% Safe</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-white px-4 py-3 rounded-2xl border border-amber-900/10 shadow-sm flex items-center gap-3 shrink-0 min-w-[165px]">
+                            <div class="w-9 h-9 rounded-xl bg-emerald-100/70 text-emerald-800 flex items-center justify-center shrink-0">
+                                <i class="fa-solid fa-flask-vial text-xs"></i>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-xs font-bold text-slate-900 leading-tight">Clean Science</p>
+                                <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200">Pure Extracts</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
             </div>
 
             <!-- Compact Product / Dermat Feature Bar -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 bg-gradient-to-r from-amber-500/10 via-amber-400/10 to-amber-500/10 p-4 sm:p-5 rounded-2xl border border-amber-300/40 items-center">
                 
                 <div class="flex items-center gap-3.5">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-100/90 text-amber-800 flex items-center justify-center shadow-md border border-amber-300 shrink-0">
-                        <i class="fa-solid fa-user-doctor text-2xl sm:text-3xl text-amber-800"></i>
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-100/90 text-amber-800 flex items-center justify-center shadow-md border border-amber-300 shrink-0">
+                        <i class="fa-solid fa-user-doctor text-xl sm:text-3xl text-amber-800"></i>
                     </div>
                     <div>
                         <p class="text-xs sm:text-sm font-bold font-fraunces text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
@@ -1127,8 +1263,8 @@
                 </div>
 
                 <div class="flex items-center gap-3.5 border-t sm:border-t-0 sm:border-l border-amber-300/40 pt-3 sm:pt-0 sm:pl-5">
-                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-amber-100/90 text-amber-800 flex items-center justify-center shadow-md border border-amber-300 shrink-0">
-                        <i class="fa-solid fa-flask-vial text-2xl sm:text-3xl text-amber-800"></i>
+                    <div class="w-12 h-12 sm:w-16 sm:h-16 rounded-2xl bg-amber-100/90 text-amber-800 flex items-center justify-center shadow-md border border-amber-300 shrink-0">
+                        <i class="fa-solid fa-flask-vial text-xl sm:text-3xl text-amber-800"></i>
                     </div>
                     <div>
                         <p class="text-xs sm:text-sm font-bold font-fraunces text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
@@ -1145,11 +1281,11 @@
 
 
     <!-- ============ WHY ALORA RADIANCE (OUR STANDARD) ============ -->
-    <section class="max-w-7xl mx-auto px-4 py-8 sm:py-12">
-        <div class="bg-gradient-to-b from-[#FBF8F3] via-white to-[#FBF8F3] rounded-3xl p-6 sm:p-12 border border-amber-900/15 shadow-xl text-center relative overflow-hidden">
+    <section class="max-w-7xl mx-auto px-2 sm:px-4 py-6 sm:py-12">
+        <div class="bg-transparent sm:bg-gradient-to-b sm:from-[#FBF8F3] sm:via-white sm:to-[#FBF8F3] rounded-none sm:rounded-3xl p-2 sm:p-12 border-0 sm:border sm:border-amber-900/15 shadow-none sm:shadow-xl text-center relative overflow-hidden">
             
             <!-- Header -->
-            <div class="max-w-2xl mx-auto mb-10">
+            <div class="max-w-2xl mx-auto mb-8 sm:mb-10">
                 <span class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-amber-100/90 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-mono border border-amber-300/60 shadow-xs mb-3">
                     Our Uncompromising Standard
                 </span>
@@ -1161,70 +1297,139 @@
                 </p>
             </div>
 
-            <!-- 4 Feature Cards Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <!-- Continuous Auto-Sliding Marquee Ticker of Feature Cards -->
+            <div class="relative w-full overflow-hidden py-3">
+                <div class="animate-badges-ticker flex items-stretch gap-4 sm:gap-6 whitespace-normal">
+                    
+                    <!-- Loop Item Group 1 -->
+                    <div class="flex items-stretch gap-4 sm:gap-6 shrink-0">
+                        <!-- 1. Transparency -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-eye text-[#8B4513]"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Full disclosure of ingredients and their exact, scientifically tested concentration ratios.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                                Full Disclosure
+                            </span>
+                        </div>
 
-                <!-- 1. Transparency -->
-                <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center">
-                    <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-5 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                        <i class="fa-solid fa-eye text-[#8B4513]"></i>
+                        <!-- 2. Efficacy -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-flask-vial text-emerald-800"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Formulations rigorously developed and tested in certified dermatological laboratories.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                                Lab Tested
+                            </span>
+                        </div>
+
+                        <!-- 3. Affordable Luxury -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-crown text-[#8B4513]"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                High-end dermatological skincare formulations made accessible to every Indian home.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                                Premium Value
+                            </span>
+                        </div>
+
+                        <!-- 4. Global Pure Actives -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-earth-americas text-emerald-800"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                100% pure, potent raw botanical extracts ethically sourced from certified global farms.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                                Ethically Sourced
+                            </span>
+                        </div>
                     </div>
-                    <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Full disclosure of ingredients and their exact, scientifically tested concentration ratios.
-                    </p>
-                    <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
-                        Full Disclosure
-                    </span>
-                </div>
 
-                <!-- 2. Efficacy -->
-                <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center">
-                    <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-5 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                        <i class="fa-solid fa-flask-vial text-emerald-800"></i>
+                    <!-- Loop Item Group 2 (Duplicate for Seamless Infinite Scroll) -->
+                    <div class="flex items-stretch gap-4 sm:gap-6 shrink-0">
+                        <!-- 1. Transparency -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-eye text-[#8B4513]"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Full disclosure of ingredients and their exact, scientifically tested concentration ratios.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                                Full Disclosure
+                            </span>
+                        </div>
+
+                        <!-- 2. Efficacy -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-flask-vial text-emerald-800"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                Formulations rigorously developed and tested in certified dermatological laboratories.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                                Lab Tested
+                            </span>
+                        </div>
+
+                        <!-- 3. Affordable Luxury -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-crown text-[#8B4513]"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                High-end dermatological skincare formulations made accessible to every Indian home.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                                Premium Value
+                            </span>
+                        </div>
+
+                        <!-- 4. Global Pure Actives -->
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
+                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                                <i class="fa-solid fa-earth-americas text-emerald-800"></i>
+                            </div>
+                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
+                            <p class="text-xs text-slate-600 leading-relaxed">
+                                100% pure, potent raw botanical extracts ethically sourced from certified global farms.
+                            </p>
+                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                                Ethically Sourced
+                            </span>
+                        </div>
                     </div>
-                    <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Formulations rigorously developed and tested in certified dermatological laboratories.
-                    </p>
-                    <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
-                        Lab Tested
-                    </span>
-                </div>
 
-                <!-- 3. Affordable Luxury -->
-                <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center">
-                    <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-5 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
-                        <i class="fa-solid fa-crown text-[#8B4513]"></i>
-                    </div>
-                    <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        High-end dermatological skincare formulations made accessible to every Indian home.
-                    </p>
-                    <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
-                        Premium Value
-                    </span>
                 </div>
-
-                <!-- 4. Global Pure Actives -->
-                <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center">
-                    <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                    <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-5 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
-                        <i class="fa-solid fa-earth-americas text-emerald-800"></i>
-                    </div>
-                    <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        100% pure, potent raw botanical extracts ethically sourced from certified global farms.
-                    </p>
-                    <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
-                        Ethically Sourced
-                    </span>
-                </div>
-
             </div>
+
         </div>
     </section>
 
