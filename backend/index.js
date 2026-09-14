@@ -25,7 +25,7 @@ import { fileURLToPath } from "url";
 import User from "./models/userAuth.models.js"; 
 import Product from "./models/product.models.js";
 import Post from "./models/blog.models.js"; 
-import { generateSitemapXml } from "./services/sitemap.service.js"; 
+import { generateSitemapXml, syncStaticSitemapFile } from "./services/sitemap.service.js"; 
 import { parseAndNormalizeSchemas } from "./services/contentSanitizer.service.js"; 
 import { renderBlogArticleSsr, renderBlogListSsr, renderProductSsr, renderProductListSsr } from "./services/ssr.service.js";
 import { setSecurityHeaders, sanitizeNoSql, createRateLimiter } from "./middlewares/security.middleware.js"; 
@@ -325,10 +325,11 @@ app.get('/track-order', (req, res) => {
 
 app.get('/sitemap.xml', async (req, res) => {
   try {
-    res.setHeader('Content-Type', 'application/xml');
+    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
     await db();
     const xml = await generateSitemapXml();
-    res.send(xml);
+    syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e.message));
+    res.status(200).send(xml);
   } catch (err) {
     console.error("Sitemap generation error:", err);
     res.sendFile(path.join(frontendRoot, 'sitemap.xml'));
@@ -343,7 +344,6 @@ app.get('/robots.txt', (req, res) => {
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   res.sendFile(path.join(frontendRoot, 'robots.txt'));
 });
-
 app.get(['/llms.txt', '/llms-full.txt'], (req, res) => {
   res.setHeader('Content-Type', 'text/plain; charset=utf-8');
   const filename = req.path.includes('full') ? 'llms-full.txt' : 'llms.txt';
@@ -353,6 +353,7 @@ app.get(['/llms.txt', '/llms-full.txt'], (req, res) => {
   }
   return res.sendFile(path.join(frontendRoot, 'llms.txt'));
 });
+
 
 app.get(['/affiliate', '/affiliate-register'], (req, res) => {
   res.redirect(301, 'https://affiliation.aloraradiance.com/register');
@@ -436,6 +437,7 @@ if (!process.env.VERCEL) {
     .then(() => {
       app.listen(Port, () => {
         console.log(`Server is running on Port ${Port}`);
+        syncStaticSitemapFile().catch(e => console.warn("Startup sitemap sync warning:", e.message));
       });
     })
     .catch(() => {

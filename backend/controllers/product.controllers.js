@@ -2,6 +2,7 @@ import SimpleProduct from "../models/product.models.js";
 import fs from "fs";
 import db from "../config/db.js";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
+import { syncStaticSitemapFile } from "../services/sitemap.service.js";
 
 const toProductSlug = (value = "") => String(value)
     .toLowerCase()
@@ -60,6 +61,7 @@ export const addnewproduct = async (req, res) => {
 
         const newProduct = new SimpleProduct(addproduct);
         const savedProduct = await newProduct.save();
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
         
         res.status(201).json(savedProduct);
 
@@ -236,6 +238,7 @@ export const updateProductForSeo = async (req, res) => {
         }
 
         await product.save();
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
         res.status(200).json(product);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -257,6 +260,7 @@ export const deleteproduct = async (req, res) => {
         }
         await Promise.all((deleteProduct.galleryImages || []).map(deleteFromCloudinary));
 
+        syncStaticSitemapFile().catch(e => console.warn("Sitemap sync warning:", e));
         res.status(200).json({ message: "Product successfully deleted!" });
     } catch (err) {
         res.status(500).json({ error: err.message });
