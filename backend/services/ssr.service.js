@@ -241,12 +241,14 @@ export const renderBlogListSsr = (templateHtml, posts = []) => {
 
     const title = "Alora Radiance | Skincare Blog & Beauty Guides";
     const desc = "Explore stories, expert skincare routines, ingredient guides, and beauty insights from Alora Radiance.";
+    const keywords = "skin care, face skin care, healthy skin care, skin care products, face care products, skin products, facial skin care products, good skin care products, skin care products for all skin types, skin care items, good skin products, skin care products in India, best skin care, best skin products, affordable skin care products, best face care products, natural skin care, organic skincare, skincare products for normal skin, glow skin care products, face products, natural skincare, vegan skincare products, Alora Radiance, Alora Radiance skincare, Alora Radiance skincare products, Alora Radiance products, Alora Radiance skin care, Alora Radiance skincare brand, Alora Radiance official, Alora Radiance official website, Alora Radiance India, Alora Radiance skincare India, Alora Radiance products India";
     const canonical = `${DOMAIN}/blog`;
 
     html = html.replace(/<title id="dynamic-title">.*?<\/title>/i, `<title id="dynamic-title">${title}</title>`);
     html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
     html = html.replace(/<meta id="dynamic-meta-desc" name="description" content="[^"]*">/i, `<meta id="dynamic-meta-desc" name="description" content="${desc}">`);
     html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${desc}">`);
+    html = html.replace(/<meta id="dynamic-keywords" name="keywords" content="[^"]*">/i, `<meta id="dynamic-keywords" name="keywords" content="${keywords}">`);
     html = html.replace(/<link rel="canonical" href="[^"]*" \/>/i, `<link rel="canonical" href="${canonical}" />`);
 
     if (Array.isArray(posts) && posts.length > 0) {
