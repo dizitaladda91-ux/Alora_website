@@ -20,8 +20,7 @@ export async function generateSitemapXml() {
         '/privacy-policy',
         '/terms-and-conditions',
         '/return-refund',
-        '/corporate-governance',
-        '/sitemap'
+        '/corporate-governance'
     ];
 
     const today = new Date().toISOString().split('T')[0];
