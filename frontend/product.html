@@ -72,6 +72,44 @@
             image-rendering: -webkit-optimize-contrast;
             image-rendering: high-quality;
         }
+
+        /* Keep the review form and review list usable even if a responsive
+           utility stylesheet is stale or a browser is zoomed. */
+        .product-reviews .reviews-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+            gap: 2rem;
+            align-items: start;
+            width: 100%;
+        }
+
+        .product-reviews .review-form-card,
+        .product-reviews .reviews-list-column,
+        .product-reviews #review-form,
+        .product-reviews #reviews-list-container,
+        .product-reviews #review-form input,
+        .product-reviews #review-form textarea,
+        .product-reviews #review-form button {
+            box-sizing: border-box;
+            min-width: 0;
+            max-width: 100%;
+        }
+
+        .product-reviews .review-form-card,
+        .product-reviews .reviews-list-column,
+        .product-reviews #review-form,
+        .product-reviews #reviews-list-container,
+        .product-reviews #review-form input,
+        .product-reviews #review-form textarea,
+        .product-reviews #review-form button {
+            width: 100%;
+        }
+
+        @media (max-width: 1023px) {
+            .product-reviews .reviews-layout {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
     </style>
 </head>
 <body class="bg-parchment font-sans text-ink flex flex-col min-h-screen">
@@ -223,7 +261,7 @@
         </section>
 
         <!-- REVIEWS & RATINGS SECTION -->
-        <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 sm:my-16 md:my-20">
+        <section class="product-reviews max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 my-12 sm:my-16 md:my-20">
             <div class="relative py-4 sm:py-6">
                 <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 sm:mb-8 border-b border-[#ECE4CE] pb-4">
                     <div>
@@ -232,9 +270,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-col lg:flex-row gap-8 items-start w-full">
+                <div class="reviews-layout flex flex-col lg:flex-row gap-8 items-start w-full">
                     <!-- Left Side: Review Form -->
-                    <div class="w-full lg:w-5/12 bg-white p-5 sm:p-7 rounded-2xl border border-[#ECE4CE] shadow-xs shrink-0">
+                    <div class="review-form-card w-full lg:w-5/12 bg-white p-5 sm:p-7 rounded-2xl border border-[#ECE4CE] shadow-xs shrink-0">
                         <h3 class="text-base font-serif font-bold text-ink mb-4 flex items-center gap-2">
                             <i class="fa-solid fa-pen-to-square text-clay text-sm"></i> Write a Review
                         </h3>
@@ -265,7 +303,7 @@
                     </div>
 
                     <!-- Right Side: Display Submitted Reviews -->
-                    <div class="w-full lg:w-7/12 space-y-4 flex-1">
+                    <div class="reviews-list-column w-full lg:w-7/12 space-y-4 flex-1">
                         <h3 class="text-base font-serif font-bold text-ink mb-2">Recent Reviews</h3>
                         <div id="reviews-list-container" class="space-y-4 w-full">
                             <div class="text-sm text-ash italic bg-white p-5 rounded-2xl border border-[#ECE4CE] w-full" id="no-reviews-msg">No reviews yet for this product. Be the first to share your thoughts!</div>
