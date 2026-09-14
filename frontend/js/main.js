@@ -124,17 +124,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const dots = document.querySelectorAll(".dot");
     let currentIndex = 0;
     const totalSlides = slides.length;
+    if (totalSlides === 0) return;
+
     function updateSlider() {
         container.style.transform = `translateX(-${currentIndex * 100}%)`;
-        dots.forEach((dot, index) => {
-            if (index === currentIndex) {
-                dot.classList.remove("bg-amber-200");
-                dot.classList.add("bg-[#8B4513]", "w-2.5", "scale-110");
-            } else {
-                dot.classList.remove("bg-[#8B4513]", "scale-110");
-                dot.classList.add("bg-amber-200", "w-2.5");
-            }
-        });
+        if (dots && dots.length > 0) {
+            dots.forEach((dot, index) => {
+                if (index === currentIndex) {
+                    dot.classList.remove("bg-amber-200");
+                    dot.classList.add("bg-[#8B4513]", "w-2.5", "scale-110");
+                } else {
+                    dot.classList.remove("bg-[#8B4513]", "scale-110");
+                    dot.classList.add("bg-amber-200", "w-2.5");
+                }
+            });
+        }
     }
     if (nextBtn) nextBtn.addEventListener("click", () => {
         currentIndex = (currentIndex + 1) % totalSlides;
@@ -144,12 +148,36 @@ document.addEventListener("DOMContentLoaded", () => {
         currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
         updateSlider();
     });
-    dots.forEach((dot, index) => {
-        dot.addEventListener("click", () => {
-            currentIndex = index;
-            updateSlider();
+    if (dots && dots.length > 0) {
+        dots.forEach((dot, index) => {
+            dot.addEventListener("click", () => {
+                currentIndex = index;
+                updateSlider();
+            });
         });
-    });
+    }
+
+    let touchStartX = 0;
+    container.addEventListener('touchstart', (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            touchStartX = e.changedTouches[0].screenX;
+        }
+    }, { passive: true });
+    container.addEventListener('touchend', (e) => {
+        if (e.changedTouches && e.changedTouches.length > 0) {
+            const touchEndX = e.changedTouches[0].screenX;
+            const diff = touchEndX - touchStartX;
+            if (Math.abs(diff) > 40) {
+                if (diff < 0) {
+                    currentIndex = (currentIndex + 1) % totalSlides;
+                } else {
+                    currentIndex = (currentIndex - 1 + totalSlides) % totalSlides;
+                }
+                updateSlider();
+            }
+        }
+    }, { passive: true });
+
     setInterval(() => {
         currentIndex = (currentIndex + 1) % totalSlides;
         updateSlider();

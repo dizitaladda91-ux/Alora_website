@@ -461,7 +461,7 @@ async function fetchAndRenderReviews(productId) {
             if (noReviewsMsg) noReviewsMsg.style.display = 'none';
             result.data.forEach(review => {
                 const reviewElement = document.createElement('div');
-                reviewElement.className = 'border-b border-[#FAF7EE] pb-4 mb-4 last:border-0';
+                reviewElement.className = 'bg-white p-4 sm:p-5 rounded-2xl border border-[#ECE4CE] shadow-xs flex flex-col gap-2 transition hover:border-[#DCD3BA]';
                 const reviewDate = new Date(review.createdAt).toLocaleDateString('en-IN', {
                     day: 'numeric',
                     month: 'long',
@@ -471,17 +471,17 @@ async function fetchAndRenderReviews(productId) {
                 for (let i = 1; i <= 5; i++) {
                     starsHTML += i <= review.rating 
                         ? '<i class="fa-solid fa-star mr-0.5"></i>' 
-                        : '<i class="fa-regular fa-star mr-0.5"></i>';
+                        : '<i class="fa-regular fa-star text-stone-300 mr-0.5"></i>';
                 }
                 reviewElement.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <span class="font-medium text-ink text-sm">${escapeHTML(review.username)}</span>
+                    <div class="flex items-center justify-between flex-wrap gap-1">
+                        <span class="font-semibold text-ink text-sm sm:text-base">${escapeHTML(review.username)}</span>
                         <span class="text-xs text-ash">${reviewDate}</span>
                     </div>
-                    <div class="flex text-gold text-xs mb-2">
+                    <div class="flex text-gold text-xs sm:text-sm my-0.5">
                         ${starsHTML}
                     </div>
-                    <p class="text-xs text-[#5C594E] leading-relaxed">${escapeHTML(review.comment)}</p>
+                    <p class="text-xs sm:text-sm text-[#4A473E] leading-relaxed">${escapeHTML(review.comment)}</p>
                 `;
                 reviewsListContainer.appendChild(reviewElement);
             });
