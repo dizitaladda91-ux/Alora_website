@@ -144,12 +144,12 @@
             }
         }
         .hero-dot {
-            height: 6px !important;
-            width: 6px !important;
-            border-radius: 9999px !important;
-            background-color: rgba(184, 70, 14, 0.22) !important;
+            height: 7px !important;
+            width: 7px !important;
+            border-radius: 50% !important;
+            background-color: rgba(184, 70, 14, 0.25) !important;
             border: none !important;
-            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            transition: all 0.3s ease !important;
             cursor: pointer !important;
             padding: 0 !important;
             margin: 0 !important;
@@ -160,10 +160,10 @@
             transform: scale(1.2) !important;
         }
         .hero-dot.active {
-            width: 18px !important;
-            height: 6px !important;
+            width: 9px !important;
+            height: 9px !important;
             background-color: #B8460E !important;
-            border-radius: 9999px !important;
+            border-radius: 50% !important;
             box-shadow: 0 1px 6px rgba(184, 70, 14, 0.35) !important;
         }
 
@@ -1017,42 +1017,7 @@
 
 
 
-    <!-- ============ SHOP BY CATEGORY / RITUAL ============ -->
-    <section class="max-w-7xl mx-auto px-4 py-4 sm:py-6">
-        <div class="text-center mb-10">
-            <span class="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-amber-100/70 text-[#8B4513] text-[11px] font-bold tracking-widest uppercase font-roboto border border-amber-300/40 mb-2">
-                Tailored Skincare
-            </span>
-            <h2 class="text-3xl sm:text-4xl font-fraunces font-bold text-slate-900">Find Your Ritual</h2>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            
-            <a href="/products" class="group bg-gradient-to-br from-white to-[#FDFBF7] rounded-3xl border border-amber-900/10 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 relative overflow-hidden">
-                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/60 text-[#8B4513] flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-amber-300/50">
-                    <i class="fa-solid fa-spa text-2xl"></i>
-                </div>
-                <h3 class="font-fraunces font-bold text-slate-900 text-xl mb-1.5 group-hover:text-[#8B4513] transition-colors">Facial Skincare</h3>
-                <p class="text-xs text-slate-600 mb-4 max-w-xs">Nourishing serums, gentle cleansers &amp; hydrating face creams.</p>
-                <span class="text-xs font-bold uppercase tracking-widest text-[#8B4513] inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-                    Explore Skincare <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </span>
-            </a>
 
-            <a href="/products?category=body" class="group bg-gradient-to-br from-white to-[#FDFBF7] rounded-3xl border border-amber-900/10 p-8 flex flex-col items-center text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1.5 relative overflow-hidden">
-                <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/60 text-emerald-800 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300 shadow-sm border border-emerald-300/50">
-                    <i class="fa-solid fa-droplet text-2xl"></i>
-                </div>
-                <h3 class="font-fraunces font-bold text-slate-900 text-xl mb-1.5 group-hover:text-emerald-800 transition-colors">Bodycare Rituals</h3>
-                <p class="text-xs text-slate-600 mb-4 max-w-xs">Rich body lotions, refreshing washes &amp; exfoliating scrubs.</p>
-                <span class="text-xs font-bold uppercase tracking-widest text-emerald-800 inline-flex items-center gap-1.5 group-hover:gap-2.5 transition-all">
-                    Explore Bodycare <i class="fa-solid fa-arrow-right text-[10px]"></i>
-                </span>
-            </a>
-
-        </div>
-    </section>
-
-   
 
 
     <!-- ============ TOXIN-FREE PROMISE (CONTINUOUS SLIDING TICKER) ============ -->
@@ -1298,130 +1263,130 @@
             </div>
 
             <!-- Continuous Auto-Sliding Marquee Ticker of Feature Cards -->
-            <div class="relative w-full overflow-hidden py-3">
-                <div class="animate-badges-ticker flex items-stretch gap-4 sm:gap-6 whitespace-normal">
+            <div class="relative w-full overflow-hidden py-2">
+                <div class="animate-badges-ticker flex items-stretch gap-3 sm:gap-5 whitespace-normal">
                     
                     <!-- Loop Item Group 1 -->
-                    <div class="flex items-stretch gap-4 sm:gap-6 shrink-0">
+                    <div class="flex items-stretch gap-3 sm:gap-5 shrink-0">
                         <!-- 1. Transparency -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-eye text-[#8B4513]"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Full disclosure of ingredients and their exact, scientifically tested concentration ratios.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Full disclosure of ingredients and exact concentration ratios.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Full Disclosure
                             </span>
                         </div>
 
                         <!-- 2. Efficacy -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-flask-vial text-emerald-800"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Formulations rigorously developed and tested in certified dermatological laboratories.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Formulations developed &amp; tested in certified dermatological labs.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200 font-mono">
                                 Lab Tested
                             </span>
                         </div>
 
                         <!-- 3. Affordable Luxury -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-crown text-[#8B4513]"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                High-end dermatological skincare formulations made accessible to every Indian home.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Premium dermatological skincare made accessible for everyone.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Premium Value
                             </span>
                         </div>
 
                         <!-- 4. Global Pure Actives -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-earth-americas text-emerald-800"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                100% pure, potent raw botanical extracts ethically sourced from certified global farms.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Pure botanical extracts ethically sourced from certified global farms.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Ethically Sourced
                             </span>
                         </div>
                     </div>
 
                     <!-- Loop Item Group 2 (Duplicate for Seamless Infinite Scroll) -->
-                    <div class="flex items-stretch gap-4 sm:gap-6 shrink-0">
+                    <div class="flex items-stretch gap-3 sm:gap-5 shrink-0">
                         <!-- 1. Transparency -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-eye text-[#8B4513]"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Full disclosure of ingredients and their exact, scientifically tested concentration ratios.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">100% Transparency</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Full disclosure of ingredients and exact concentration ratios.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Full Disclosure
                             </span>
                         </div>
 
                         <!-- 2. Efficacy -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-flask-vial text-emerald-800"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Formulations rigorously developed and tested in certified dermatological laboratories.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">Clinical Efficacy</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Formulations developed &amp; tested in certified dermatological labs.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200 font-mono">
                                 Lab Tested
                             </span>
                         </div>
 
                         <!-- 3. Affordable Luxury -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-2xl mb-4 shadow-sm border border-amber-300/60 group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-crown text-[#8B4513]"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                High-end dermatological skincare formulations made accessible to every Indian home.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Accessible Luxury</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Premium dermatological skincare made accessible for everyone.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Premium Value
                             </span>
                         </div>
 
                         <!-- 4. Global Pure Actives -->
-                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-6 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[250px] sm:w-[280px] shrink-0 justify-between">
-                            <div class="absolute -top-12 -right-12 w-28 h-28 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                            <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-2xl mb-4 shadow-sm border border-emerald-300/60 group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-300">
+                        <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group relative overflow-hidden flex flex-col items-center text-center w-[190px] sm:w-[230px] shrink-0 justify-between">
+                            <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform duration-300">
                                 <i class="fa-solid fa-earth-americas text-emerald-800"></i>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                100% pure, potent raw botanical extracts ethically sourced from certified global farms.
+                            <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">Global Pure Actives</h3>
+                            <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                Pure botanical extracts ethically sourced from certified global farms.
                             </p>
-                            <span class="mt-4 text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
+                            <span class="mt-3 text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
                                 Ethically Sourced
                             </span>
                         </div>
@@ -1434,14 +1399,14 @@
     </section>
 
     <!-- ============ GREEN INITIATIVE + SAFETY ============ -->
-    <section class="bg-white py-2 md:20 sm:p-2 border-b border-[#E7DFC7]">
+    <section class="bg-transparent py-4 sm:py-8">
         <div class="max-w-7xl mx-auto px-1 md:px-4">
 
             <!-- ============ SUPER SAFE STANDARDS ============ -->
-            <div class="max-w-6xl mx-auto py-8 sm:py-12 px-4 text-center">
+            <div class="max-w-6xl mx-auto py-6 sm:py-12 px-2 sm:px-4 text-center">
                 
                 <!-- Section Header -->
-                <div class="max-w-2xl mx-auto mb-10">
+                <div class="max-w-2xl mx-auto mb-6 sm:mb-10">
                     <span class="inline-flex items-center gap-1.5 px-4 py-1 rounded-full bg-emerald-100/90 text-emerald-900 text-[11px] font-bold tracking-widest uppercase font-mono border border-emerald-300 shadow-xs mb-3">
                         100% Certified Safety
                     </span>
@@ -1453,75 +1418,153 @@
                     </p>
                 </div>
 
-                <!-- 3 Interactive 3D Glassmorphic Cards Grid -->
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                    <!-- Card 1: Dermatologically Tested -->
-                    <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between">
-                        <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                <!-- Continuous Auto-Sliding Marquee Ticker of Super Safe Cards -->
+                <div class="relative w-full overflow-hidden py-2">
+                    <div class="animate-badges-ticker flex items-stretch gap-3 sm:gap-5 whitespace-normal">
                         
-                        <div>
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-xl mb-5 shadow-sm border border-amber-300/60 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-user-shield text-[#8B4513]"></i>
+                        <!-- Loop Item Group 1 -->
+                        <div class="flex items-stretch gap-3 sm:gap-5 shrink-0">
+                            
+                            <!-- Card 1: Dermatologically Tested -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-user-shield text-[#8B4513]"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Dermatologically Tested</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Clinically tested on sensitive human skin to guarantee gentle safety.
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
+                                        100% Pass
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-amber-600 text-xs"></i>
+                                </div>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Dermatologically Tested</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Clinically tested on sensitive human skin to guarantee non-irritating, gentle safety for all Indian skin types.
-                            </p>
-                        </div>
 
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
-                                100% Pass
-                            </span>
-                            <i class="fa-solid fa-circle-check text-amber-600 text-sm"></i>
-                        </div>
-                    </div>
+                            <!-- Card 2: FDA Approved Standards -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-square-check text-emerald-800"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">FDA Approved Standards</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Formulated in WHO-GMP &amp; FDA approved facilities conforming to global protocols.
+                                    </p>
+                                </div>
 
-                    <!-- Card 2: FDA Approved Standards -->
-                    <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between">
-                        <div class="absolute -top-10 -right-10 w-24 h-24 bg-emerald-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
-                        
-                        <div>
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-xl mb-5 shadow-sm border border-emerald-300/60 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-square-check text-emerald-800"></i>
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200 font-mono">
+                                        Certified Facility
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+                                </div>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-emerald-800 transition-colors">FDA Approved Standards</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Formulated in WHO-GMP &amp; FDA approved facilities conforming perfectly to global manufacturing protocols.
-                            </p>
-                        </div>
 
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2.5 py-1 rounded-md border border-emerald-200 font-mono">
-                                Certified Facility
-                            </span>
-                            <i class="fa-solid fa-circle-check text-emerald-600 text-sm"></i>
-                        </div>
-                    </div>
+                            <!-- Card 3: Made Safe Certified -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-shield-heart text-[#8B4513]"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Made Safe Certified</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Guarantees zero endocrine disruptors, neurotoxins, or harsh chemical additives.
+                                    </p>
+                                </div>
 
-                    <!-- Card 3: Made Safe Certified -->
-                    <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-7 rounded-3xl border border-amber-900/15 shadow-md hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between">
-                        <div class="absolute -top-10 -right-10 w-24 h-24 bg-amber-400/15 rounded-full blur-xl pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
-                        
-                        <div>
-                            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-xl mb-5 shadow-sm border border-amber-300/60 group-hover:scale-110 transition-transform">
-                                <i class="fa-solid fa-shield-heart text-[#8B4513]"></i>
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
+                                        100% Toxin-Free
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-amber-600 text-xs"></i>
+                                </div>
                             </div>
-                            <h3 class="font-fraunces font-bold text-slate-900 text-lg mb-2 group-hover:text-[#8B4513] transition-colors">Made Safe Certified</h3>
-                            <p class="text-xs text-slate-600 leading-relaxed">
-                                Clean seal guarantees zero endocrine disruptors, neurotoxins, synthetic filters, or harsh chemical additives.
-                            </p>
+
                         </div>
 
-                        <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2.5 py-1 rounded-md border border-amber-200 font-mono">
-                                100% Toxin-Free
-                            </span>
-                            <i class="fa-solid fa-circle-check text-amber-600 text-sm"></i>
+                        <!-- Loop Item Group 2 (Duplicate for Seamless Infinite Scroll) -->
+                        <div class="flex items-stretch gap-3 sm:gap-5 shrink-0">
+                            
+                            <!-- Card 1: Dermatologically Tested -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-user-shield text-[#8B4513]"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Dermatologically Tested</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Clinically tested on sensitive human skin to guarantee gentle safety.
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
+                                        100% Pass
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-amber-600 text-xs"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 2: FDA Approved Standards -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-emerald-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-emerald-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-100 to-emerald-200/80 text-emerald-800 flex items-center justify-center text-lg mb-3 shadow-xs border border-emerald-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-square-check text-emerald-800"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-emerald-800 transition-colors">FDA Approved Standards</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Formulated in WHO-GMP &amp; FDA approved facilities conforming to global protocols.
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100/70 px-2 py-0.5 rounded-md border border-emerald-200 font-mono">
+                                        Certified Facility
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-emerald-600 text-xs"></i>
+                                </div>
+                            </div>
+
+                            <!-- Card 3: Made Safe Certified -->
+                            <div class="bg-gradient-to-b from-[#FFFDF9] via-white to-[#FFFDF9] p-4 sm:p-5 rounded-2xl border border-amber-900/15 shadow-sm hover:shadow-md transition-all duration-300 group text-left relative overflow-hidden flex flex-col justify-between w-[190px] sm:w-[230px] shrink-0">
+                                <div class="absolute -top-10 -right-10 w-20 h-20 bg-amber-400/15 rounded-full blur-lg pointer-events-none group-hover:bg-amber-400/30 transition-all"></div>
+                                
+                                <div>
+                                    <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-100 to-amber-200/80 text-[#8B4513] flex items-center justify-center text-lg mb-3 shadow-xs border border-amber-300/60 group-hover:scale-105 transition-transform">
+                                        <i class="fa-solid fa-shield-heart text-[#8B4513]"></i>
+                                    </div>
+                                    <h3 class="font-fraunces font-bold text-slate-900 text-base mb-1.5 group-hover:text-[#8B4513] transition-colors">Made Safe Certified</h3>
+                                    <p class="text-[11px] sm:text-xs text-slate-600 leading-normal">
+                                        Guarantees zero endocrine disruptors, neurotoxins, or harsh chemical additives.
+                                    </p>
+                                </div>
+
+                                <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                                    <span class="text-[9px] font-bold uppercase tracking-wider text-amber-800 bg-amber-100/70 px-2 py-0.5 rounded-md border border-amber-200 font-mono">
+                                        100% Toxin-Free
+                                    </span>
+                                    <i class="fa-solid fa-circle-check text-amber-600 text-xs"></i>
+                                </div>
+                            </div>
+
                         </div>
+
                     </div>
-
                 </div>
             </div>
         </div>
@@ -1867,7 +1910,7 @@
 
             <!-- Custom Slide Dots -->
             <div class="flex justify-center items-center gap-2 mt-8">
-                <button class="dot h-2.5 rounded-full bg-[#8B4513] w-8 transition-all duration-300" aria-label="Slide 1"></button>
+                <button class="dot h-2.5 w-2.5 rounded-full bg-[#8B4513] transition-all duration-300" aria-label="Slide 1"></button>
                 <button class="dot h-2.5 rounded-full bg-amber-200 w-2.5 hover:bg-amber-400 transition-all duration-300" aria-label="Slide 2"></button>
                 <button class="dot h-2.5 rounded-full bg-amber-200 w-2.5 hover:bg-amber-400 transition-all duration-300" aria-label="Slide 3"></button>
             </div>
