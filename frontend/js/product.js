@@ -529,12 +529,12 @@ function renderGoodToKnowFaqs(product) {
             }
         ];
     faqList.innerHTML = faqsToRender.map((faq, index) => `
-        <details class="group bg-white p-5 rounded-2xl border border-amber-900/15 shadow-xs transition-all duration-300 open:shadow-md" ${index === 0 ? 'open' : ''}>
-            <summary class="flex justify-between items-center font-fraunces font-bold text-slate-900 text-sm sm:text-base cursor-pointer list-none select-none">
-                <span>${escapeHTML(faq.question)}</span>
-                <span class="w-8 h-8 rounded-full bg-amber-100 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform"><i class="fa-solid fa-plus"></i></span>
+        <details class="group bg-[#FBF9F4] hover:bg-white p-4.5 sm:p-5 rounded-2xl border border-[#ECE4CE] shadow-2xs transition-all duration-300 open:shadow-md open:bg-white" ${index === 0 ? 'open' : ''}>
+            <summary class="flex justify-between items-center font-sans font-semibold text-slate-800 text-sm sm:text-base cursor-pointer list-none select-none gap-3">
+                <span class="leading-snug">${escapeHTML(faq.question)}</span>
+                <span class="w-7 h-7 rounded-full bg-amber-100/80 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform shrink-0"><i class="fa-solid fa-plus"></i></span>
             </summary>
-            <p class="text-xs sm:text-sm text-slate-600 mt-3 pl-3 border-l-2 border-[#8B4513] leading-relaxed font-sans">
+            <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-[#ECE4CE]/80 leading-relaxed font-sans font-normal">
                 ${escapeHTML(faq.answer)}
             </p>
         </details>
