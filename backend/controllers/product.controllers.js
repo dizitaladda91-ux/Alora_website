@@ -3,6 +3,7 @@ import fs from "fs";
 import db from "../config/db.js";
 import { deleteFromCloudinary } from "../middlewares/cloudinaryUpload.js";
 import { syncStaticSitemapFile } from "../services/sitemap.service.js";
+import { formatSchemaForStorage, parseAndNormalizeSchemas } from "../services/contentSanitizer.service.js";
 
 const toProductSlug = (value = "") => String(value)
     .toLowerCase()
@@ -169,6 +170,18 @@ export const updateProductForSeo = async (req, res) => {
         if (req.body.metaTitle !== undefined) product.metaTitle = String(req.body.metaTitle || '').trim();
         if (req.body.metaDescription !== undefined) product.metaDescription = String(req.body.metaDescription || '').trim();
         if (req.body.keywords !== undefined) product.keywords = String(req.body.keywords || '').trim();
+        if (req.body.schema !== undefined) {
+            const rawSchema = String(req.body.schema || '').trim();
+            if (!rawSchema) {
+                product.schema = '';
+            } else {
+                const schemas = parseAndNormalizeSchemas(rawSchema);
+                if (schemas.length === 0) {
+                    return res.status(400).json({ error: 'Invalid JSON-LD Schema format provided.' });
+                }
+                product.schema = formatSchemaForStorage(schemas);
+            }
+        }
 
         if (req.body.volumes) {
             const volumes = JSON.parse(req.body.volumes);

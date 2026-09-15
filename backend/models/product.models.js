@@ -51,6 +51,9 @@ const SimpleProductSchema = new mongoose.Schema({
     metaTitle: { type: String, trim: true, default: '' },
     metaDescription: { type: String, trim: true, default: '' },
     keywords: { type: String, trim: true, default: '' },
+    // Optional page-specific JSON-LD (for example FAQPage or HowTo).
+    // The standard Product schema is still generated from the live product data.
+    schema: { type: String, default: '' },
     videoUrl: { type: String, trim: true, default: '' },
     category: {
         type: String,

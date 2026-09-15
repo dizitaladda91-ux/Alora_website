@@ -351,10 +351,16 @@ export const renderProductSsr = (templateHtml, product, faqs = []) => {
         }
     };
 
-    html = html.replace(
-        /<\/head>/i,
-        `<script type="application/ld+json">\n${JSON.stringify(productSchema, null, 2)}\n</script>\n</head>`
-    );
+    // Keep schema data safe inside a script tag even when product text contains '<'.
+    const serializeJsonLd = (value) => JSON.stringify(value, null, 2)
+        .replace(/</g, "\\u003c")
+        .replace(/>/g, "\\u003e")
+        .replace(/&/g, "\\u0026");
+    const customSchemas = parseAndNormalizeSchemas(product.schema);
+    const jsonLdTags = [productSchema, ...customSchemas]
+        .map(schema => `<script type="application/ld+json">\n${serializeJsonLd(schema)}\n</script>`)
+        .join('\n');
+    html = html.replace(/<\/head>/i, `${jsonLdTags}\n</head>`);
 
     // Body Image & Badges
     html = html.replace(/<img id="main-product-image"[^>]*>/i, `<img id="main-product-image" src="${mainImg}" alt="${escapeHtml(product.name)}" class="w-full h-full object-cover" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='/static/placeholder.png'">`);

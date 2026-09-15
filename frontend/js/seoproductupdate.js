@@ -38,6 +38,46 @@ const videoFilename = document.getElementById('video-filename');
 const videoSubtext = document.getElementById('video-subtext');
 const removeVideoBtn = document.getElementById('remove-video-btn');
 const videoBadge = document.getElementById('video-status-badge');
+const productSchemaInput = document.getElementById('product-schema');
+
+const schemaTemplates = {
+    faq: {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [{
+            "@type": "Question",
+            "name": "What are the benefits of this product?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Add the product-specific answer here." }
+        }]
+    },
+    howto: {
+        "@context": "https://schema.org",
+        "@type": "HowTo",
+        "name": "How to use this product",
+        "step": [{ "@type": "HowToStep", "text": "Add the first usage step here." }]
+    }
+};
+
+document.querySelectorAll('.schema-template-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        if (!productSchemaInput) return;
+        const nextSchema = JSON.stringify(schemaTemplates[button.dataset.schemaTemplate], null, 2);
+        if (!productSchemaInput.value.trim()) {
+            productSchemaInput.value = nextSchema;
+            return;
+        }
+        try {
+            const current = JSON.parse(productSchemaInput.value);
+            productSchemaInput.value = JSON.stringify(
+                Array.isArray(current) ? [...current, schemaTemplates[button.dataset.schemaTemplate]] : [current, schemaTemplates[button.dataset.schemaTemplate]],
+                null,
+                2
+            );
+        } catch (_) {
+            alert('Please correct the existing JSON-LD before adding another template.');
+        }
+    });
+});
 
 // --- Render Main Image UI ---
 function renderMainImageUI() {
@@ -280,6 +320,7 @@ async function loadProduct() {
         if (form.metaTitle) form.metaTitle.value = product.metaTitle || '';
         if (form.metaDescription) form.metaDescription.value = product.metaDescription || '';
         if (form.keywords) form.keywords.value = product.keywords || '';
+        if (productSchemaInput) productSchemaInput.value = product.schema || '';
 
         // Main Image
         originalMainImage = product.imagepath || '';
@@ -326,6 +367,7 @@ form.addEventListener('submit', async event => {
     data.append('metaTitle', form.metaTitle ? form.metaTitle.value.trim() : '');
     data.append('metaDescription', form.metaDescription ? form.metaDescription.value.trim() : '');
     data.append('keywords', form.keywords ? form.keywords.value.trim() : '');
+    data.append('schema', productSchemaInput ? productSchemaInput.value.trim() : '');
     data.append('volumes', JSON.stringify([...document.querySelectorAll('.seo-volume')].map(input => input.value.trim())));
     data.append('faqs', JSON.stringify(getCollectedProductFaqs()));
 

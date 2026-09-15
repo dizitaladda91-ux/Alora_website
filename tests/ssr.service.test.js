@@ -29,6 +29,22 @@ test("product SSR replaces every crawlable loading placeholder", () => {
   assert.doesNotMatch(html, /Loading product formulation details|Loading details|Loading benefits|Loading usage|Loading ingredients/);
 });
 
+test("product SSR includes that product's saved custom JSON-LD", () => {
+  const template = fs.readFileSync(path.join(projectRoot, "frontend", "product.html"), "utf8");
+  const html = renderProductSsr(template, {
+    _id: "507f1f77bcf86cd799439011",
+    slug: "purifying-glow-face-wash",
+    name: "Purifying Glow Face Wash",
+    description: "A gentle daily cleanser.",
+    imagepath: "/static/face-wash.png",
+    variants: [{ volume: "200ml", price: 499, stock: 10 }],
+    schema: JSON.stringify({ "@context": "https://schema.org", "@type": "FAQPage", "name": "Face wash FAQs" })
+  });
+
+  assert.match(html, /"@type": "FAQPage"/);
+  assert.match(html, /Face wash FAQs/);
+});
+
 test("blog SSR includes article copy in the response HTML", () => {
   const template = fs.readFileSync(path.join(projectRoot, "frontend", "post.html"), "utf8");
   const html = renderBlogArticleSsr(template, {
