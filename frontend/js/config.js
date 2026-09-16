@@ -10,7 +10,7 @@ function computeBaseUrl() {
     return "";
 }
 const BASE_URL = computeBaseUrl();
-export function getImageUrl(imagePath, fallback = "/static/placeholder.png") {
+export function getImageUrl(imagePath, fallback = "/static/placeholder.png", options = {}) {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
     const trimmed = imagePath.trim();
     if (!trimmed) return fallback;
@@ -18,9 +18,17 @@ export function getImageUrl(imagePath, fallback = "/static/placeholder.png") {
     // Handle Cloudinary and absolute URLs safely without deleting path segments
     if (/^https?:\/\//i.test(trimmed) || trimmed.startsWith('data:')) {
         // Remove any obsolete restrictive transformation strings if previously stored
-        return trimmed
+        const normalizedUrl = trimmed
             .replace('/upload/f_auto,q_auto,w_400,c_limit/', '/upload/')
             .replace('/upload/f_auto,q_auto:best,w_1400,c_limit,dpr_auto/', '/upload/');
+
+        // Product cards never need the original multi-megapixel upload. Let
+        // Cloudinary negotiate WebP/AVIF and cap only this card rendition.
+        const width = Number(options?.width);
+        if (Number.isFinite(width) && width > 0 && /res\.cloudinary\.com\//i.test(normalizedUrl)) {
+            return normalizedUrl.replace('/upload/', `/upload/f_auto,q_auto:good,w_${Math.round(width)},c_limit/`);
+        }
+        return normalizedUrl;
     }
 
     const base = String(BASE_URL).replace(/\/+$/, '');

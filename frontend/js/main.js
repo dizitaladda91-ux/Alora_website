@@ -312,6 +312,9 @@ function updateHeaderCartCount() {
         b.innerText = totalItems;
     });
 }
+// The homepage bundle can load after shared navbar injection; refresh once on
+// import as well as on the partialsLoaded event above.
+updateHeaderCartCount();
 function selectSize(size, price, mrp, element) {
     const currentCard = element.closest('.product-card');
     if (!currentCard) return;
@@ -461,7 +464,7 @@ async function loadSliderProducts() {
     requestAnimationFrame(() => {
         wrapper.innerHTML = top5Products.map((product) => {
             const prodId = product._id || product.id || product.slug || 'prod_' + Math.random();
-            const fullImgUrl = getImageUrl(product.imagepath, '/static/placeholder.png');
+            const fullImgUrl = getImageUrl(product.imagepath, '/static/placeholder.png', { width: 640 });
             const ratingCount = Math.round(product.rating || 4);
             let starsHTML = '';
             for (let i = 1; i <= 5; i++) {
