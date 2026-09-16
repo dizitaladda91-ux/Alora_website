@@ -347,12 +347,16 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap"></noscript>
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" media="print" onload="this.media='all'">
-    <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"></noscript>
+    <!-- Local CSS keeps the CDN icon-font URLs, but all faces use font-display: swap. -->
+    <link rel="stylesheet" href="./styles/fontawesome-6.4.0.min.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="./styles/fontawesome-6.4.0.min.css"></noscript>
 
 
 
-    <link rel="stylesheet" href="./styles/tailwind.min.css">
+    <!-- Load the full utility sheet without holding up the first paint. The rules below
+         cover the header and hero until this stylesheet applies. -->
+    <link rel="preload" href="./styles/tailwind.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="./styles/tailwind.min.css"></noscript>
     <style>
         /* 🚀 0ms Instant Critical Paint (Eliminates Initial White Screen / Flash) */
         html, body {
@@ -492,21 +496,6 @@
         @font-face { font-family: 'PT Sans'; src: local('Arial'); font-display: swap; }
         @font-face { font-family: 'Manrope'; src: local('Helvetica'); font-display: swap; }
         @font-face { font-family: 'Roboto Mono'; src: local('Courier New'); font-display: swap; }
-        @font-face {
-            font-family: 'Font Awesome 6 Free';
-            font-style: normal;
-            font-weight: 900;
-            font-display: swap !important;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-solid-900.woff2') format('woff2');
-        }
-        @font-face {
-            font-family: 'Font Awesome 6 Brands';
-            font-style: normal;
-            font-weight: 400;
-            font-display: swap !important;
-            src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/webfonts/fa-brands-400.woff2') format('woff2');
-        }
-
         @font-face {
             font-family: 'Fraunces-Fallback';
             src: local('Georgia'), local('Times New Roman');
