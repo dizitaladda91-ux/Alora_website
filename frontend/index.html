@@ -341,7 +341,7 @@
 
     <!-- 🚀 PRELOAD EXACT CRITICAL LCP HERO IMAGE FOR MOBILE & DESKTOP -->
     <link rel="preload" as="image" href="./static/1.webp" media="(min-width: 768px)" type="image/webp" fetchpriority="high">
-    <link rel="preload" as="image" href="./static/hero_banner_allproducts_mob.webp" media="(max-width: 767px)" type="image/webp" fetchpriority="high">
+    <link rel="preload" as="image" href="./static/hero_banner_allproducts_mob-768.webp" media="(max-width: 767px)" type="image/webp" fetchpriority="high">
 
     <!-- 🚀 NON-BLOCKING ASYNCHRONOUS STYLESHEETS & FONTS (ELIMINATES 480ms RENDER-BLOCKING DELAY) -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,500&family=Manrope:wght@400;500;600;700&family=PT+Sans:ital,wght@0,400;0,700;1,400&family=Roboto+Mono:wght@400;500&display=swap" media="print" onload="this.media='all'">
@@ -808,7 +808,7 @@
             <div class="flex justify-center items-center p-2">
                 <span class="h-[40px] md:h-[50px] flex items-center">
                     <a href="/">
-                        <img src="./static/logo2.png" alt="logo" class="w-[140px] md:w-[170px] h-fit object-contain">
+                        <img src="./static/logo2-200.webp" srcset="./static/logo2-200.webp 200w, ./static/logo2.png 400w" sizes="(min-width: 768px) 170px, 140px" alt="logo" width="200" height="200" class="w-[140px] md:w-[170px] h-fit object-contain">
                     </a>
                 </span>
             </div>
@@ -838,7 +838,7 @@
     <!-- 1st Slide: All Products -->
     <a href="/products" class="hero-slide-link w-full shrink-0 block h-full bg-[#FAF5EE]">
         <img src="./static/1.webp" alt="Alora Radiance Complete Skincare Collection Desktop" width="1920" height="600" fetchpriority="high" loading="eager" decoding="async" class="hero-desk-img">
-        <img src="./static/hero_banner_allproducts_mob.webp" alt="Alora Radiance Complete Skincare Collection Mobile" width="819" height="1024" fetchpriority="high" loading="eager" decoding="async" class="hero-mob-img">
+        <img src="./static/hero_banner_allproducts_mob-768.webp" srcset="./static/hero_banner_allproducts_mob-768.webp 768w, ./static/hero_banner_allproducts_mob.webp 819w" sizes="100vw" alt="Alora Radiance Complete Skincare Collection Mobile" width="819" height="1024" fetchpriority="high" loading="eager" decoding="async" class="hero-mob-img">
     </a>
 
     <!-- 2nd Slide: Face Wash -->
@@ -1004,16 +1004,16 @@
                     <div id="auto-slider" style="background-color: rgba(255, 255, 255, 0.85); border: 1px solid rgba(206, 190, 150, 0.6);" class="rounded-2xl p-2 sm:p-4 flex overflow-x-auto scroll-smooth snap-x snap-mandatory gap-4 no-scrollbar">
                         
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
-                            <img src="./static/combo1.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
+                            <img src="./static/combo1-540.webp" srcset="./static/combo1-540.webp 540w, ./static/combo1.webp 600w" sizes="(min-width: 768px) 540px, calc(100vw - 2rem)" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
                         </a>
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
-                            <img src="./static/combo2.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
+                            <img src="./static/combo2-540.webp" srcset="./static/combo2-540.webp 540w, ./static/combo2.webp 600w" sizes="(min-width: 768px) 540px, calc(100vw - 2rem)" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto object-cover">
                         </a>
                         <a href="/products" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
-                            <img src="./static/combo3.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
+                            <img src="./static/combo3-540.webp" srcset="./static/combo3-540.webp 540w, ./static/combo3.webp 600w" sizes="(min-width: 768px) 540px, calc(100vw - 2rem)" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
                         </a>
                         <a href="/products" target="_blank" class="w-full flex-shrink-0 snap-center block rounded-xl overflow-hidden shadow-lg border border-[#CEBE96]/40 group">
-                            <img src="./static/combo4.webp" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
+                            <img src="./static/combo4-540.webp" srcset="./static/combo4-540.webp 540w, ./static/combo4.webp 600w" sizes="(min-width: 768px) 540px, calc(100vw - 2rem)" alt="Alora Combo" width="400" height="400" loading="lazy" decoding="async" class="w-full h-auto rounded-lg shadow-md">
                         </a>
                         
                     </div>
