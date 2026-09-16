@@ -319,9 +319,6 @@ function trackReferralFromUrl() {
     });
 }
 
-window.showReferralBanner = showReferralBanner;
-window.loadGtmScript = loadGtmScript;
-
 function deduplicateSchemas(schemas) {
     if (!Array.isArray(schemas)) return [];
     const seen = new Set();
@@ -335,6 +332,36 @@ function deduplicateSchemas(schemas) {
         }
     }
     return result;
+}
+
+function repairSchemaString(rawInput) {
+    if (!rawInput) return "";
+    let s = String(rawInput).trim();
+    if (!s) return "";
+
+    s = s.replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&quot;/g, '"').replace(/&#039;|&#39;|&apos;/gi, "'");
+    s = s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"').replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'");
+
+    s = s.replace(/\[\s*([^\[\]\r\n]+?)\s*\]\(\s*([^()\s]+?)\s*\)/g, (match, text, href) => {
+        let clean = href.trim();
+        if (clean.endsWith(',')) clean = clean.slice(0, -1).trim();
+        if (clean.startsWith('http://') || clean.startsWith('https://')) {
+            return '"' + clean + '"';
+        }
+        return '"' + text.trim() + '"';
+    });
+
+    s = s.replace(/("([^"\\]|\\.)*"|'([^'\\]|\\.)*')|(\/\*[\s\S]*?\*\/|\/\/[^\r\n]*)/g, (match, strVal) => {
+        if (strVal) return strVal;
+        return "";
+    });
+
+    s = s.replace(/(^|[{,\[])(\s*)([@a-zA-Z_$][a-zA-Z0-9_$-]*)\s*:/g, '$1$2"$3":');
+    s = s.replace(/:\s*'([^'\\]*(?:\\.[^'\\]*)*)'/g, (match, p1) => ': "' + p1.replace(/"/g, '\\"') + '"');
+    s = s.replace(/("|\}|\]|\d|true|false|null)\s*[\r\n]+\s*("|\{|\[)/g, '$1,\n$2');
+    s = s.replace(/,(\s*[}\]])/g, '$1');
+
+    return s.trim();
 }
 
 function parseMultipleSchemas(rawInput) {
@@ -367,6 +394,10 @@ function parseMultipleSchemas(rawInput) {
             cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
         }
     }
+
+    cleaned = repairSchemaString(cleaned);
+    if (!cleaned) return [];
+
     try {
         const parsed = JSON.parse(cleaned);
         if (Array.isArray(parsed)) {
@@ -407,8 +438,9 @@ function parseMultipleSchemas(rawInput) {
                 depth--;
                 if (depth === 0 && startIndex !== -1) {
                     const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
+                    const repairedChunk = repairSchemaString(jsonChunk);
                     try {
-                        const parsedObj = JSON.parse(jsonChunk);
+                        const parsedObj = JSON.parse(repairedChunk);
                         if (Array.isArray(parsedObj)) {
                             schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
                         } else if (parsedObj && typeof parsedObj === 'object') {
@@ -461,6 +493,8 @@ function injectMultipleSchemasToDOM(rawSchemaInput) {
 
 window.parseMultipleSchemas = parseMultipleSchemas;
 window.injectMultipleSchemasToDOM = injectMultipleSchemasToDOM;
+window.showReferralBanner = showReferralBanner;
+window.loadGtmScript = loadGtmScript;
 
 const initNonCriticalServices = () => {
     initGoogleTagManager();

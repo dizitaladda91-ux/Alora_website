@@ -86,21 +86,34 @@ export const repairSchemaString = (rawInput) => {
   s = s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
        .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'");
 
-  // 3. Strip JS comments safely without touching URLs like "https://" inside strings
-  s = s.replace(/("([^"\\]|\\.)*"|'([^'\\]|\\.)*')|(\/\*[\s\S]*?\*\/|\/\/[^\r\n]*)/g, (match, strVal, _1, _2, commentVal) => {
+  // 3. Strip markdown link syntax like [https://url](https://url) or [text](https://url)
+  s = s.replace(/\[\s*([^\[\]\r\n]+?)\s*\]\(\s*([^()\s]+?)\s*\)/g, (match, text, href) => {
+    let clean = href.trim();
+    if (clean.endsWith(',')) clean = clean.slice(0, -1).trim();
+    if (clean.startsWith('http://') || clean.startsWith('https://')) {
+      return '"' + clean + '"';
+    }
+    return '"' + text.trim() + '"';
+  });
+
+  // 4. Strip JS comments safely without touching URLs like "https://" inside strings
+  s = s.replace(/("([^"\\]|\\.)*"|'([^'\\]|\\.)*')|(\/\*[\s\S]*?\*\/|\/\/[^\r\n]*)/g, (match, strVal) => {
     if (strVal) return strVal;
     return "";
   });
 
-  // 4. Convert single-quoted string values/keys to double-quoted strings
-  s = s.replace(/'([^'\\]*(\\.[^'\\]*)*)'/g, (match, p1) => {
-    return '"' + p1.replace(/"/g, '\\"') + '"';
+  // 5. Quote unquoted object keys (e.g., @context: "...", @type: "...", name: "...")
+  s = s.replace(/(^|[{,\[])(\s*)([@a-zA-Z_$][a-zA-Z0-9_$-]*)\s*:/g, '$1$2"$3":');
+
+  // 6. Convert single-quoted values AFTER colon to double-quoted strings (e.g. : 'value' -> : "value")
+  s = s.replace(/:\s*'([^'\\]*(?:\\.[^'\\]*)*)'/g, (match, p1) => {
+    return ': "' + p1.replace(/"/g, '\\"') + '"';
   });
 
-  // 5. Quote unquoted object keys (e.g., @context: "...", @type: "...", name: "...")
-  s = s.replace(/(^|[{,])(\s*)([@a-zA-Z_$][a-zA-Z0-9_$-]*)\s*:/g, '$1$2"$3":');
+  // 7. Fix missing commas between array elements or adjacent values on separate lines
+  s = s.replace(/("|\}|\]|\d|true|false|null)\s*[\r\n]+\s*("|\{|\[)/g, '$1,\n$2');
 
-  // 6. Remove trailing commas before closing braces/brackets (e.g. ,} -> }, ,] -> ])
+  // 8. Remove trailing commas before closing braces/brackets (e.g. ,} -> }, ,] -> ])
   s = s.replace(/,(\s*[}\]])/g, '$1');
 
   return s.trim();
