@@ -321,6 +321,146 @@ function trackReferralFromUrl() {
 window.showReferralBanner = showReferralBanner;
 window.loadGtmScript = loadGtmScript;
 
+function deduplicateSchemas(schemas) {
+    if (!Array.isArray(schemas)) return [];
+    const seen = new Set();
+    const result = [];
+    for (const s of schemas) {
+        if (!s || typeof s !== 'object') continue;
+        const key = JSON.stringify(s);
+        if (!seen.has(key)) {
+            seen.add(key);
+            result.push(s);
+        }
+    }
+    return result;
+}
+
+function parseMultipleSchemas(rawInput) {
+    if (!rawInput) return [];
+    if (Array.isArray(rawInput)) {
+        return deduplicateSchemas(rawInput.filter(item => item && typeof item === 'object'));
+    }
+    if (typeof rawInput === 'object' && rawInput !== null) {
+        if (Array.isArray(rawInput['@graph'])) {
+            return deduplicateSchemas(rawInput['@graph'].filter(item => item && typeof item === 'object'));
+        }
+        return [rawInput];
+    }
+    let cleaned = String(rawInput).trim();
+    if (!cleaned) return [];
+
+    if (cleaned.includes('<script')) {
+        const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+        if (scriptMatches && scriptMatches.length > 0) {
+            const extracted = [];
+            for (const match of scriptMatches) {
+                const content = match.replace(/<script[^>]*>/i, '').replace(/<\/script>/i, '').trim();
+                if (content) {
+                    const subSchemas = parseMultipleSchemas(content);
+                    extracted.push(...subSchemas);
+                }
+            }
+            if (extracted.length > 0) return deduplicateSchemas(extracted);
+        } else {
+            cleaned = cleaned.replace(/<[^>]*>/g, '').trim();
+        }
+    }
+    try {
+        const parsed = JSON.parse(cleaned);
+        if (Array.isArray(parsed)) {
+            return deduplicateSchemas(parsed.filter(item => item && typeof item === 'object'));
+        }
+        if (parsed && typeof parsed === 'object') {
+            if (Array.isArray(parsed['@graph'])) {
+                return deduplicateSchemas(parsed['@graph'].filter(item => item && typeof item === 'object'));
+            }
+            return [parsed];
+        }
+    } catch (e) {}
+
+    const schemas = [];
+    let depth = 0;
+    let startIndex = -1;
+    let inString = false;
+    let isEscaped = false;
+    for (let i = 0; i < cleaned.length; i++) {
+        const char = cleaned[i];
+        if (isEscaped) {
+            isEscaped = false;
+            continue;
+        }
+        if (char === '\\') {
+            isEscaped = true;
+            continue;
+        }
+        if (char === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (!inString) {
+            if (char === '{' || char === '[') {
+                if (depth === 0) startIndex = i;
+                depth++;
+            } else if (char === '}' || char === ']') {
+                depth--;
+                if (depth === 0 && startIndex !== -1) {
+                    const jsonChunk = cleaned.substring(startIndex, i + 1).trim();
+                    try {
+                        const parsedObj = JSON.parse(jsonChunk);
+                        if (Array.isArray(parsedObj)) {
+                            schemas.push(...parsedObj.filter(item => item && typeof item === 'object'));
+                        } else if (parsedObj && typeof parsedObj === 'object') {
+                            if (Array.isArray(parsedObj['@graph'])) {
+                                schemas.push(...parsedObj['@graph'].filter(item => item && typeof item === 'object'));
+                            } else {
+                                schemas.push(parsedObj);
+                            }
+                        }
+                    } catch (err) {
+                        console.warn("Failed parsing schema chunk:", err);
+                    }
+                    startIndex = -1;
+                }
+            }
+        }
+    }
+    return deduplicateSchemas(schemas);
+}
+
+function injectMultipleSchemasToDOM(rawSchemaInput) {
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"][data-dynamic="true"]').forEach(el => el.remove());
+    if (!rawSchemaInput) return;
+    let schemasToInject = parseMultipleSchemas(rawSchemaInput);
+    if (!schemasToInject || schemasToInject.length === 0) return;
+
+    const script = document.createElement('script');
+    script.id = 'dynamic-json-ld';
+    script.type = 'application/ld+json';
+    script.className = 'dynamic-schema-injected';
+    script.setAttribute('data-dynamic', 'true');
+
+    if (schemasToInject.length === 1) {
+        const single = { ...schemasToInject[0] };
+        if (!single["@context"]) single["@context"] = "https://schema.org";
+        script.textContent = JSON.stringify(single, null, 2);
+    } else {
+        const combinedSchema = {
+            "@context": "https://schema.org",
+            "@graph": schemasToInject.map(s => {
+                const copy = { ...s };
+                if (copy["@context"]) delete copy["@context"];
+                return copy;
+            })
+        };
+        script.textContent = JSON.stringify(combinedSchema, null, 2);
+    }
+    document.head.appendChild(script);
+}
+
+window.parseMultipleSchemas = parseMultipleSchemas;
+window.injectMultipleSchemasToDOM = injectMultipleSchemasToDOM;
+
 const initNonCriticalServices = () => {
     initGoogleTagManager();
     trackReferralFromUrl();

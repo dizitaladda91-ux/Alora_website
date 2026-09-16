@@ -320,7 +320,13 @@ async function loadProduct() {
         if (form.metaTitle) form.metaTitle.value = product.metaTitle || '';
         if (form.metaDescription) form.metaDescription.value = product.metaDescription || '';
         if (form.keywords) form.keywords.value = product.keywords || '';
-        if (productSchemaInput) productSchemaInput.value = product.schema || '';
+        if (productSchemaInput) {
+            if (typeof product.schema === 'object' && product.schema !== null) {
+                productSchemaInput.value = JSON.stringify(product.schema, null, 2);
+            } else {
+                productSchemaInput.value = product.schema || '';
+            }
+        }
 
         // Main Image
         originalMainImage = product.imagepath || '';

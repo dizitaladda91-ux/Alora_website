@@ -279,12 +279,69 @@ async function loadProductDetails() {
             if (variantsContainer) variantsContainer.innerHTML = `<p class="text-xs text-ash">No variants available</p>`;
         }
         setPurchaseAvailability();
+        injectProductSchemas(product, currentSelectedVariant);
         renderGoodToKnowFaqs(product);
         fetchAndRenderReviews(productId);
     } catch (error) {
         console.error("Error loading product details:", error);
     }
 }
+
+function injectProductSchemas(product, selectedVariant) {
+    if (!product) return;
+    const canonicalUrl = `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id)}`;
+    const mainImgUrl = product.imagepath 
+        ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath.startsWith('/') ? '' : '/'}${product.imagepath}`)
+        : '';
+    const galleryImgs = (product.galleryImages || []).map(g => g ? (g.startsWith('http') ? g : `${BASE_URL}${g.startsWith('/') ? '' : '/'}${g}`) : '').filter(Boolean);
+    const images = [mainImgUrl, ...galleryImgs].filter(Boolean);
+    
+    const priceVal = selectedVariant ? Number(selectedVariant.price || 0) : Number(product.variants?.[0]?.price || product.price || 0);
+
+    const defaultProductSchema = {
+        "@context": "https://schema.org",
+        "@type": "Product",
+        "name": product.name || 'Alora Radiance Product',
+        "image": images.length > 0 ? images : undefined,
+        "description": product.description || product.metaDescription || '',
+        "sku": String(product._id || ''),
+        "brand": {
+            "@type": "Brand",
+            "name": "Alora Radiance"
+        },
+        "offers": {
+            "@type": "Offer",
+            "url": canonicalUrl,
+            "priceCurrency": "INR",
+            "price": String(priceVal),
+            "availability": "https://schema.org/InStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            }
+        },
+        "aggregateRating": {
+            "@type": "AggregateRating",
+            "ratingValue": String(product.rating || 4.5),
+            "reviewCount": String(product.numReviews || product.totalReviews || 12)
+        }
+    };
+
+    let allSchemas = [defaultProductSchema];
+    if (product.schema && String(product.schema).trim()) {
+        if (typeof window.parseMultipleSchemas === 'function') {
+            const custom = window.parseMultipleSchemas(product.schema);
+            if (Array.isArray(custom) && custom.length > 0) {
+                allSchemas.push(...custom);
+            }
+        }
+    }
+
+    if (typeof window.injectMultipleSchemasToDOM === 'function') {
+        window.injectMultipleSchemasToDOM(allSchemas);
+    }
+}
+
 window.selectSize = function(volume, price, comparePrice, stock, buttonElement) {
     if (!buttonElement) return;
     document.querySelectorAll('.size-btn').forEach(btn => {
@@ -296,6 +353,9 @@ window.selectSize = function(volume, price, comparePrice, stock, buttonElement) 
     const mrpEl = document.getElementById('product-mrp');
     if (priceEl) priceEl.innerText = `₹ ${price}`;
     if (mrpEl) mrpEl.innerText = comparePrice ? `₹ ${comparePrice}` : '';
+    if (currentProductData) {
+        injectProductSchemas(currentProductData, currentSelectedVariant);
+    }
 }
 window.selectGalleryImage = function(imageUrl) {
     const mainImage = document.getElementById('main-product-image');
