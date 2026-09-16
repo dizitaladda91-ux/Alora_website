@@ -9,7 +9,8 @@
     "test": "node --test tests/**/*.test.js",
     "build:css": "node scripts/build-css.js",
     "build:js": "node scripts/minify-js.mjs",
-    "build:fontawesome": "node scripts/build-fontawesome-home-css.mjs"
+    "build:fontawesome": "node scripts/build-fontawesome-home-css.mjs",
+    "build:critical-css": "node scripts/extract-home-critical-tailwind.mjs && tailwindcss --config tailwind.config.js --content scratch/tailwind-home-critical.html --input frontend/styles/tailwind.css --output frontend/styles/tailwind-home-critical.min.css --minify && node scripts/inline-home-critical-css.mjs"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",
