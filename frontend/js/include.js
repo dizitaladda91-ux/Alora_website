@@ -121,10 +121,10 @@ async function refreshPageFaqs() {
             container.innerHTML = data.data.map((faq, idx) => {
                 const isOpen = idx === 0 ? "open" : "";
                 return `
-                    <details class="group bg-[#FBF9F4] hover:bg-white p-4.5 sm:p-5 rounded-2xl border border-[#ECE4CE] shadow-2xs transition-all duration-300 open:shadow-md open:bg-white" ${isOpen}>
-                        <summary class="flex justify-between items-center font-sans font-semibold text-slate-800 text-sm sm:text-base cursor-pointer list-none select-none gap-3">
-                            <span class="leading-snug">${faq.question}</span>
-                            <span class="w-7 h-7 rounded-full bg-amber-100/80 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform shrink-0"><i class="fa-solid fa-plus"></i></span>
+                    <details class="group bg-white hover:bg-[#FAF7F0] p-4 sm:p-5 rounded-xl sm:rounded-2xl border border-[#ECE4CE] shadow-2xs transition-all duration-300 open:shadow-md open:bg-white" ${isOpen}>
+                        <summary class="flex justify-between items-center font-sans font-semibold text-slate-900 text-xs sm:text-sm md:text-base cursor-pointer list-none select-none gap-3">
+                            <span class="leading-snug flex-1">${faq.question}</span>
+                            <span class="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-100/90 text-[#8B4513] flex items-center justify-center text-xs group-open:rotate-45 transition-transform shrink-0"><i class="fa-solid fa-plus"></i></span>
                         </summary>
                         <p class="text-xs sm:text-sm text-slate-600 mt-3 pt-3 border-t border-[#ECE4CE]/80 leading-relaxed font-sans font-normal">
                             ${faq.answer}

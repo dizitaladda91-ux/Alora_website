@@ -74,6 +74,38 @@ export const sanitizeHttpUrl = (value) => {
   }
 };
 
+export const repairSchemaString = (rawInput) => {
+  if (!rawInput) return "";
+  let s = String(rawInput).trim();
+  if (!s) return "";
+
+  // 1. Decode HTML entities (e.g. &quot;, &#39;, &lt;, &gt;, &amp;)
+  s = decodeEntities(s);
+
+  // 2. Normalize smart / curly quotes to straight quotes
+  s = s.replace(/[\u201C\u201D\u201E\u201F\u2033\u2036]/g, '"')
+       .replace(/[\u2018\u2019\u201A\u201B\u2032\u2035]/g, "'");
+
+  // 3. Strip JS comments safely without touching URLs like "https://" inside strings
+  s = s.replace(/("([^"\\]|\\.)*"|'([^'\\]|\\.)*')|(\/\*[\s\S]*?\*\/|\/\/[^\r\n]*)/g, (match, strVal, _1, _2, commentVal) => {
+    if (strVal) return strVal;
+    return "";
+  });
+
+  // 4. Convert single-quoted string values/keys to double-quoted strings
+  s = s.replace(/'([^'\\]*(\\.[^'\\]*)*)'/g, (match, p1) => {
+    return '"' + p1.replace(/"/g, '\\"') + '"';
+  });
+
+  // 5. Quote unquoted object keys (e.g., @context: "...", @type: "...", name: "...")
+  s = s.replace(/(^|[{,])(\s*)([@a-zA-Z_$][a-zA-Z0-9_$-]*)\s*:/g, '$1$2"$3":');
+
+  // 6. Remove trailing commas before closing braces/brackets (e.g. ,} -> }, ,] -> ])
+  s = s.replace(/,(\s*[}\]])/g, '$1');
+
+  return s.trim();
+};
+
 export const deduplicateSchemas = (schemas) => {
   if (!Array.isArray(schemas)) return [];
   const seen = new Set();
@@ -100,11 +132,12 @@ export const parseAndNormalizeSchemas = (rawInput) => {
     }
     return [rawInput];
   }
-  let cleaned = String(rawInput).trim();
-  if (!cleaned) return [];
+  let rawStr = String(rawInput).trim();
+  if (!rawStr) return [];
 
-  if (cleaned.includes("<script")) {
-    const scriptMatches = cleaned.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
+  // Extract <script> blocks if embedded in HTML tags
+  if (rawStr.includes("<script")) {
+    const scriptMatches = rawStr.match(/<script[^>]*>([\s\S]*?)<\/script>/gi);
     if (scriptMatches && scriptMatches.length > 0) {
       const extracted = [];
       for (const match of scriptMatches) {
@@ -115,11 +148,14 @@ export const parseAndNormalizeSchemas = (rawInput) => {
         }
       }
       if (extracted.length > 0) return deduplicateSchemas(extracted);
-    } else {
-      cleaned = cleaned.replace(/<[^>]*>/g, "").trim();
     }
   }
 
+  // Pre-repair formatting errors (unquoted keys, single quotes, smart quotes, trailing commas, comments)
+  const cleaned = repairSchemaString(rawStr);
+  if (!cleaned) return [];
+
+  // 1. Try direct JSON.parse on the repaired string
   try {
     const parsed = JSON.parse(cleaned);
     if (Array.isArray(parsed)) {
@@ -133,6 +169,7 @@ export const parseAndNormalizeSchemas = (rawInput) => {
     }
   } catch (_) {}
 
+  // 2. Fallback bracket matching to extract multiple adjacent objects/arrays
   const schemas = [];
   let depth = 0;
   let startIndex = -1;
@@ -161,8 +198,9 @@ export const parseAndNormalizeSchemas = (rawInput) => {
         depth--;
         if (depth === 0 && startIndex !== -1) {
           const chunk = cleaned.substring(startIndex, i + 1).trim();
+          const repairedChunk = repairSchemaString(chunk);
           try {
-            const parsedObj = JSON.parse(chunk);
+            const parsedObj = JSON.parse(repairedChunk);
             if (Array.isArray(parsedObj)) {
               schemas.push(...parsedObj.filter(item => item && typeof item === "object"));
             } else if (parsedObj && typeof parsedObj === "object") {

@@ -52,6 +52,13 @@ export const addnewproduct = async (req, res) => {
             variants 
         };
 
+        if (req.body.schema && String(req.body.schema).trim()) {
+            const parsedSchema = parseAndNormalizeSchemas(req.body.schema);
+            if (parsedSchema.length > 0) {
+                addproduct.schema = formatSchemaForStorage(parsedSchema);
+            }
+        }
+
         const mainImage = req.files?.imagepath?.[0];
         if (mainImage) addproduct.imagepath = mainImage.path;
         addproduct.galleryImages = (req.files?.galleryImages || []).map((file) => file.path);
@@ -100,6 +107,18 @@ export const updateproduct = async (req, res) => {
                 updateProductData.variants = JSON.parse(req.body.variants);
             } catch (e) {
                 // Input validation fallback
+            }
+        }
+
+        if (req.body.schema !== undefined) {
+            const rawSchema = String(req.body.schema || '').trim();
+            if (!rawSchema) {
+                updateProductData.schema = '';
+            } else {
+                const parsed = parseAndNormalizeSchemas(rawSchema);
+                if (parsed.length > 0) {
+                    updateProductData.schema = formatSchemaForStorage(parsed);
+                }
             }
         }
 
