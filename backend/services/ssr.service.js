@@ -1,3 +1,4 @@
+
 import sanitizeHtml from "sanitize-html";
 import { sanitizeBlogHtml, decodeEntities, parseAndNormalizeSchemas } from "./contentSanitizer.service.js";
 
@@ -12,6 +13,11 @@ const escapeHtml = (str) => {
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
 };
+
+const serializeJsonLd = (value) => JSON.stringify(value, null, 2)
+    .replace(/</g, "\\u003c")
+    .replace(/>/g, "\\u003e")
+    .replace(/&/g, "\\u0026");
 
 export const formatImageUrl = (imagePath, fallback = `${DOMAIN}/static/placeholder.png`) => {
     if (!imagePath || typeof imagePath !== 'string') return fallback;
@@ -356,10 +362,6 @@ export const renderProductSsr = (templateHtml, product, faqs = []) => {
     };
 
     // Keep schema data safe inside a script tag even when product text contains '<'.
-    const serializeJsonLd = (value) => JSON.stringify(value, null, 2)
-        .replace(/</g, "\\u003c")
-        .replace(/>/g, "\\u003e")
-        .replace(/&/g, "\\u0026");
     const customSchemas = parseAndNormalizeSchemas(product.schema);
     const jsonLdTags = [productSchema, ...customSchemas]
         .map(schema => `<script type="application/ld+json">\n${serializeJsonLd(schema)}\n</script>`)
