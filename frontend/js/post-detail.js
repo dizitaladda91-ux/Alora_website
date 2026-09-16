@@ -472,7 +472,55 @@ function injectSEO(blog) {
         const fullImgUrl = blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage}`;
         document.getElementById('og-image')?.setAttribute('content', fullImgUrl);
     }
-    injectMultipleSchemasToDOM(blog.schema);
+    injectBlogSchemas(blog, currentUrl);
+}
+
+function injectBlogSchemas(blog, currentUrl) {
+    if (!blog) return;
+    const coverUrl = blog.coverImage 
+        ? (blog.coverImage.startsWith('http') ? blog.coverImage : `${BASE_URL}${blog.coverImage.startsWith('/') ? '' : '/'}${blog.coverImage}`)
+        : `${BASE_URL}/static/logo2.png`;
+
+    const defaultBlogSchema = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": blog.title || '',
+        "description": blog.metaDesc || blog.title || '',
+        "image": coverUrl,
+        "datePublished": blog.createdAt || new Date().toISOString(),
+        "dateModified": blog.updatedAt || blog.createdAt || new Date().toISOString(),
+        "author": {
+            "@type": "Organization",
+            "name": blog.publisher || "Alora Radiance",
+            "url": "https://aloraradiance.com"
+        },
+        "publisher": {
+            "@type": "Organization",
+            "name": "Alora Radiance",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://aloraradiance.com/static/logo2.png"
+            }
+        },
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": currentUrl
+        }
+    };
+
+    let allSchemas = [defaultBlogSchema];
+    if (blog.schema && String(blog.schema).trim()) {
+        if (typeof window.parseMultipleSchemas === 'function') {
+            const custom = window.parseMultipleSchemas(blog.schema);
+            if (Array.isArray(custom) && custom.length > 0) {
+                allSchemas.push(...custom);
+            }
+        }
+    }
+
+    if (typeof window.injectMultipleSchemasToDOM === 'function') {
+        window.injectMultipleSchemasToDOM(allSchemas);
+    }
 }
 function deduplicateSchemas(schemas) {
     if (!Array.isArray(schemas)) return [];

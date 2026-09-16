@@ -156,7 +156,11 @@ export const renderBlogArticleSsr = (templateHtml, blog, relatedProducts = []) =
             "@id": canonicalUrl
         }
     };
-    html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, `<script id="dynamic-json-ld" type="application/ld+json">\n${JSON.stringify(schemaObj, null, 2)}\n</script>`);
+    const customSchemas = parseAndNormalizeSchemas(blog.schema);
+    const jsonLdTags = [schemaObj, ...customSchemas]
+        .map(schema => `<script type="application/ld+json">\n${serializeJsonLd(schema)}\n</script>`)
+        .join('\n');
+    html = html.replace(/<script id="dynamic-json-ld" type="application\/ld\+json">[\s\S]*?<\/script>/i, jsonLdTags);
 
     // Process Body HTML Content & TOC
     const rawBody = blog.content || '';
