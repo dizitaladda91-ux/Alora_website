@@ -178,10 +178,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }, { passive: true });
 
-    setInterval(() => {
-        currentIndex = (currentIndex + 1) % totalSlides;
-        updateSlider();
-    }, 4000);
     updateSlider();
 });
 document.addEventListener("DOMContentLoaded", () => {
@@ -191,8 +187,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const totalSlides = slides.length;
     const dots = document.querySelectorAll(".hero-dot");
     let currentIndex = 0;
-    let autoSlideInterval = null;
-
     const updateSlider = () => {
         track.style.transform = `translateX(-${currentIndex * 100}%)`;
         dots.forEach((dot, index) => {
@@ -204,42 +198,22 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     };
 
-    const startAutoSlide = () => {
-        stopAutoSlide();
-        autoSlideInterval = setInterval(() => {
-            currentIndex = (currentIndex + 1) % totalSlides;
-            updateSlider();
-        }, 6000);
-    };
-
-    const stopAutoSlide = () => {
-        if (autoSlideInterval) {
-            clearInterval(autoSlideInterval);
-            autoSlideInterval = null;
-        }
-    };
-
     dots.forEach((dot, index) => {
         dot.addEventListener("click", (e) => {
             e.preventDefault();
             currentIndex = index;
             updateSlider();
-            startAutoSlide();
         });
     });
 
     const sliderContainer = track.closest(".hero-slider-container");
     if (sliderContainer) {
-        sliderContainer.addEventListener("mouseenter", stopAutoSlide);
-        sliderContainer.addEventListener("mouseleave", startAutoSlide);
-
         // Touch swipe support for mobile
         let startX = 0;
         let diffX = 0;
         sliderContainer.addEventListener("touchstart", (e) => {
             startX = e.touches[0].clientX;
             diffX = 0;
-            stopAutoSlide();
         }, { passive: true });
 
         sliderContainer.addEventListener("touchmove", (e) => {
@@ -255,11 +229,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
                 updateSlider();
             }
-            startAutoSlide();
         });
     }
 
-    startAutoSlide();
     updateSlider();
 });
 function toggleCartState(button) {

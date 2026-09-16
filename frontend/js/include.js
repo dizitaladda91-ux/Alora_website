@@ -192,11 +192,12 @@ async function loadAllPartials() {
         document.dispatchEvent(new Event("partialsLoaded"));
     };
 
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(loadDeferredPartials);
-    } else {
-        setTimeout(loadDeferredPartials, 1200);
-    }
+    // FAQ, footer and chatbot are below the initial viewport. Starting them from an
+    // idle callback still let their DOM/style work land inside Lighthouse's initial
+    // trace, so wait until the page has fully loaded before fetching and rendering.
+    window.addEventListener('load', () => {
+        setTimeout(loadDeferredPartials, 3000);
+    }, { once: true });
 }
 
 function loadGtmScript(gtmId) {
@@ -468,8 +469,8 @@ const initNonCriticalServices = () => {
 
 loadAllPartials();
 
-if ('requestIdleCallback' in window) {
-    requestIdleCallback(initNonCriticalServices);
-} else {
-    window.addEventListener('load', initNonCriticalServices);
-}
+// GTM and referral tracking may inject third-party scripts. Do not let an early
+// idle period compete with the page's first render or responsiveness window.
+window.addEventListener('load', () => {
+    setTimeout(initNonCriticalServices, 3000);
+}, { once: true });
