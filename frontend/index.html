@@ -2107,35 +2107,9 @@
             window.addEventListener('touchstart', loadGSAP, { passive: true, once: true });
         })();
     </script>
-    <script src="./js/include.min.js" async defer></script>
+    <script src="./js/include.min.js"></script>
     <script type="module" src="./js/navbar-interactions.min.js"></script>
-    <script>
-        // `main` owns below-the-fold cards, carousels, counters and the offer modal.
-        // Keep it out of the startup task; load it as soon as the visitor signals
-        // intent, with a fallback for visitors who remain on the page.
-        (function () {
-            let started = false;
-            let fallbackTimer;
-            const startHomepageInteractions = () => {
-                if (started) return;
-                started = true;
-                clearTimeout(fallbackTimer);
-                window.removeEventListener('scroll', startHomepageInteractions);
-                window.removeEventListener('pointerdown', startHomepageInteractions);
-                window.removeEventListener('keydown', startHomepageInteractions);
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = './js/main.min.js';
-                document.body.appendChild(script);
-            };
-            window.addEventListener('scroll', startHomepageInteractions, { passive: true, once: true });
-            window.addEventListener('pointerdown', startHomepageInteractions, { passive: true, once: true });
-            window.addEventListener('keydown', startHomepageInteractions, { once: true });
-            window.addEventListener('load', () => {
-                fallbackTimer = window.setTimeout(startHomepageInteractions, 4000);
-            }, { once: true });
-        })();
-    </script>
+    <script type="module" src="./js/main.min.js"></script>
     <script>
         // Defer secondary interaction scripts (cart.js, auth.js, app.js, lead.js) to idle time to eliminate unused JS on initial render
         window.addEventListener('load', () => {

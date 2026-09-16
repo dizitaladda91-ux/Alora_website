@@ -192,12 +192,12 @@ async function loadAllPartials() {
         document.dispatchEvent(new Event("partialsLoaded"));
     };
 
-    // FAQ, footer and chatbot are below the initial viewport. Starting them from an
-    // idle callback still let their DOM/style work land inside Lighthouse's initial
-    // trace, so wait until the page has fully loaded before fetching and rendering.
-    window.addEventListener('load', () => {
-        setTimeout(loadDeferredPartials, 3000);
-    }, { once: true });
+    if (document.readyState === 'complete' || document.readyState === 'interactive') {
+        loadDeferredPartials();
+    } else {
+        document.addEventListener('DOMContentLoaded', loadDeferredPartials, { once: true });
+        window.addEventListener('load', loadDeferredPartials, { once: true });
+    }
 }
 
 function loadGtmScript(gtmId) {
