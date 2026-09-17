@@ -222,10 +222,6 @@ app.get(['/index.html', '/index'], (req, res) => {
   return res.redirect(301, '/');
 });
 
-app.get(['/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
-  return res.redirect(301, '/blog');
-});
-
 app.get(['/blogs/:slug', '/Blog/:slug', '/post/:slug'], (req, res) => {
   const rawSlug = String(req.params.slug || '').trim();
   if (!rawSlug) return res.redirect(301, '/blog');
@@ -310,9 +306,9 @@ app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, 
 
 // 3. Blog Catalog Listing Page SSR (Canonical route: /blog)
 app.get('/blog', async (req, res) => {
-  const target = fs.existsSync(path.join(frontendRoot, 'Blog.html'))
-    ? path.join(frontendRoot, 'Blog.html')
-    : path.join(frontendRoot, 'blog.html');
+  const target = fs.existsSync(path.join(frontendRoot, 'blog.html'))
+    ? path.join(frontendRoot, 'blog.html')
+    : path.join(frontendRoot, 'Blog.html');
   try {
     await db();
     const posts = await Post.find({ status: { $ne: 'draft' } }).sort({ publishedAt: -1, createdAt: -1 }).lean();
