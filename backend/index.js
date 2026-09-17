@@ -213,7 +213,7 @@ app.get('/product/:id', async (req, res) => {
 });
 
 // 301 Permanent Redirects for legacy and duplicate URL variations
-app.get(['/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
+app.get(['/blogs', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
   return res.redirect(301, '/blog');
 });
 
@@ -222,7 +222,7 @@ app.get(['/index.html', '/index'], (req, res) => {
   return res.redirect(301, '/');
 });
 
-app.get(['/blogs/:slug', '/Blog/:slug', '/post/:slug'], (req, res) => {
+app.get(['/blogs/:slug', '/post/:slug'], (req, res) => {
   const rawSlug = String(req.params.slug || '').trim();
   if (!rawSlug) return res.redirect(301, '/blog');
   return res.redirect(301, `/blog/${encodeURIComponent(rawSlug)}`);
@@ -319,7 +319,8 @@ app.get('/blog', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    return sendSsrUnavailable(res, 'Blog list', err);
+    console.error('Blog list SSR fallback:', err.message);
+    return res.sendFile(target);
   }
 });
 
@@ -366,11 +367,9 @@ app.get('/blog/:slug', async (req, res) => {
     res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
     return res.status(200).send(renderedHtml);
   } catch (err) {
-    return sendSsrUnavailable(res, 'Blog article', err);
+    console.error('Blog article SSR fallback:', err.message);
+    return res.sendFile(postHtmlPath);
   }
-  // allow them into the search index.
-  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
-  res.sendFile(path.join(frontendRoot, 'account.html'));
 });
 
 app.get(['/verify-email', '/verify-email.html'], (req, res) => {
