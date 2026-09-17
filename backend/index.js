@@ -212,8 +212,104 @@ app.get('/product/:id', async (req, res) => {
   }
 });
 
-// 3. Blog Catalog Listing Page SSR
-app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'], async (req, res) => {
+// 301 Permanent Redirects for legacy and duplicate URL variations
+app.get(['/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
+  return res.redirect(301, '/blog');
+});
+
+// 301 Permanent Redirects for legacy and duplicate URL variations to clean canonical routes
+app.get(['/index.html', '/index'], (req, res) => {
+  return res.redirect(301, '/');
+});
+
+app.get(['/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
+  return res.redirect(301, '/blog');
+});
+
+app.get(['/blogs/:slug', '/Blog/:slug', '/post/:slug'], (req, res) => {
+  const rawSlug = String(req.params.slug || '').trim();
+  if (!rawSlug) return res.redirect(301, '/blog');
+  return res.redirect(301, `/blog/${encodeURIComponent(rawSlug)}`);
+});
+
+app.get(['/moreproduct', '/moreproduct.html', '/product.html', '/products.html'], (req, res) => {
+  return res.redirect(301, '/products');
+});
+
+app.get(['/aboutus', '/aboutus.html', '/about.html'], (req, res) => {
+  return res.redirect(301, '/about');
+});
+
+app.get(['/PrivacyPolicy', '/PrivacyPolicy.html', '/privacy-policy.html', '/privacypolicy'], (req, res) => {
+  return res.redirect(301, '/privacy-policy');
+});
+
+app.get(['/termCondition', '/termCondition.html', '/term-condition', '/terms-and-conditions.html', '/termcondition'], (req, res) => {
+  return res.redirect(301, '/terms-and-conditions');
+});
+
+app.get(['/ReturnRefund', '/ReturnRefund.html', '/return-refund.html', '/returnrefund'], (req, res) => {
+  return res.redirect(301, '/return-refund');
+});
+
+app.get(['/KnowledegeFAQ', '/KnowledegeFAQ.html', '/faq.html', '/faqs'], (req, res) => {
+  return res.redirect(301, '/faq');
+});
+
+app.get(['/certificates.html'], (req, res) => {
+  return res.redirect(301, '/certificates');
+});
+
+app.get(['/Corporate Governance.html', '/corporate-governance.html'], (req, res) => {
+  return res.redirect(301, '/corporate-governance');
+});
+
+app.get(['/trackorder', '/trackorder.html', '/track-order.html'], (req, res) => {
+  return res.redirect(301, '/track-order');
+});
+
+app.get(['/account.html', '/myorders.html'], (req, res) => {
+  return res.redirect(301, '/account');
+});
+
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'aboutus.html'));
+});
+
+app.get('/privacy-policy', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'PrivacyPolicy.html'));
+});
+
+app.get('/terms-and-conditions', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'termCondition.html'));
+});
+
+app.get('/corporate-governance', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'Corporate Governance.html'));
+});
+
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'KnowledegeFAQ.html'));
+});
+
+app.get('/return-refund', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'ReturnRefund.html'));
+});
+
+app.get('/certificates', (req, res) => {
+  res.sendFile(path.join(frontendRoot, 'certificates.html'));
+});
+
+app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, res) => {
+  // Account URLs are utility pages, not public landing pages. Keep them
+  // crawlable long enough for Google to receive this directive, but never
+  // allow them into the search index.
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  res.sendFile(path.join(frontendRoot, 'account.html'));
+});
+
+// 3. Blog Catalog Listing Page SSR (Canonical route: /blog)
+app.get('/blog', async (req, res) => {
   const target = fs.existsSync(path.join(frontendRoot, 'Blog.html'))
     ? path.join(frontendRoot, 'Blog.html')
     : path.join(frontendRoot, 'blog.html');
@@ -231,8 +327,8 @@ app.get(['/blog', '/blogs', '/Blog', '/Blog.html', '/blog.html', '/blogs.html'],
   }
 });
 
-// 4. Individual Blog Article Page SSR
-app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
+// 4. Individual Blog Article Page SSR (Canonical route: /blog/:slug)
+app.get('/blog/:slug', async (req, res) => {
   const rawSlug = String(req.params.slug || '').trim();
   const postHtmlPath = path.join(frontendRoot, 'post.html');
   if (!rawSlug) {
@@ -276,40 +372,6 @@ app.get(['/blog/:slug', '/blogs/:slug'], async (req, res) => {
   } catch (err) {
     return sendSsrUnavailable(res, 'Blog article', err);
   }
-});
-
-// Other static content routes
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'aboutus.html'));
-});
-
-app.get('/privacy-policy', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'PrivacyPolicy.html'));
-});
-
-app.get('/terms-and-conditions', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'termCondition.html'));
-});
-
-app.get('/corporate-governance', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'Corporate Governance.html'));
-});
-
-app.get('/faq', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'KnowledegeFAQ.html'));
-});
-
-app.get('/return-refund', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'ReturnRefund.html'));
-});
-
-app.get('/certificates', (req, res) => {
-  res.sendFile(path.join(frontendRoot, 'certificates.html'));
-});
-
-app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, res) => {
-  // Account URLs are utility pages, not public landing pages. Keep them
-  // crawlable long enough for Google to receive this directive, but never
   // allow them into the search index.
   res.setHeader('X-Robots-Tag', 'noindex, nofollow');
   res.sendFile(path.join(frontendRoot, 'account.html'));
