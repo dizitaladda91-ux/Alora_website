@@ -321,17 +321,52 @@ function trackReferralFromUrl() {
 
 function deduplicateSchemas(schemas) {
     if (!Array.isArray(schemas)) return [];
-    const seen = new Set();
-    const result = [];
+    const seenExact = new Set();
+    const singletonMap = new Map();
+    const others = [];
+    const SINGLETON_TYPES = ['Product', 'BlogPosting', 'Article', 'NewsArticle', 'BreadcrumbList', 'FAQPage', 'WebSite', 'Organization', 'ItemPage', 'WebPage'];
+
     for (const s of schemas) {
         if (!s || typeof s !== 'object') continue;
         const key = JSON.stringify(s);
-        if (!seen.has(key)) {
-            seen.add(key);
-            result.push(s);
+        if (seenExact.has(key)) continue;
+        seenExact.add(key);
+
+        const type = s['@type'];
+        const isSingleton = typeof type === 'string' && SINGLETON_TYPES.includes(type);
+
+        if (isSingleton) {
+            if (!singletonMap.has(type)) {
+                singletonMap.set(type, s);
+            } else {
+                const existing = singletonMap.get(type);
+                const merged = { ...existing, ...s };
+                if (existing.offers && s.offers && typeof existing.offers === 'object' && typeof s.offers === 'object') {
+                    merged.offers = { ...existing.offers, ...s.offers };
+                }
+                if (existing.aggregateRating && s.aggregateRating && typeof existing.aggregateRating === 'object' && typeof s.aggregateRating === 'object') {
+                    merged.aggregateRating = { ...existing.aggregateRating, ...s.aggregateRating };
+                }
+                if (type === 'FAQPage' && existing.mainEntity && s.mainEntity) {
+                    const combined = [
+                        ...(Array.isArray(existing.mainEntity) ? existing.mainEntity : [existing.mainEntity]),
+                        ...(Array.isArray(s.mainEntity) ? s.mainEntity : [s.mainEntity])
+                    ];
+                    const qSeen = new Set();
+                    merged.mainEntity = combined.filter(q => {
+                        const qKey = q?.name || q?.question || JSON.stringify(q);
+                        if (qSeen.has(qKey)) return false;
+                        qSeen.add(qKey);
+                        return true;
+                    });
+                }
+                singletonMap.set(type, merged);
+            }
+        } else {
+            others.push(s);
         }
     }
-    return result;
+    return [...singletonMap.values(), ...others];
 }
 
 function repairSchemaString(rawInput) {
@@ -462,7 +497,7 @@ function parseMultipleSchemas(rawInput) {
 }
 
 function injectMultipleSchemasToDOM(rawSchemaInput) {
-    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"][data-dynamic="true"]').forEach(el => el.remove());
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"]').forEach(el => el.remove());
     if (!rawSchemaInput) return;
     let schemasToInject = parseMultipleSchemas(rawSchemaInput);
     if (!schemasToInject || schemasToInject.length === 0) return;

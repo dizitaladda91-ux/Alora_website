@@ -289,57 +289,227 @@ async function loadProductDetails() {
 
 function injectProductSchemas(product, selectedVariant) {
     if (!product) return;
-    const canonicalUrl = `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id)}`;
-    const mainImgUrl = product.imagepath 
-        ? (product.imagepath.startsWith('http') ? product.imagepath : `${BASE_URL}${product.imagepath.startsWith('/') ? '' : '/'}${product.imagepath}`)
-        : '';
-    const galleryImgs = (product.galleryImages || []).map(g => g ? (g.startsWith('http') ? g : `${BASE_URL}${g.startsWith('/') ? '' : '/'}${g}`) : '').filter(Boolean);
-    const images = [mainImgUrl, ...galleryImgs].filter(Boolean);
-    
-    const priceVal = selectedVariant ? Number(selectedVariant.price || 0) : Number(product.variants?.[0]?.price || product.price || 0);
+    const formatImgUrl = (img) => {
+        if (!img || typeof img !== 'string') return '';
+        const trimmed = img.trim();
+        if (!trimmed) return '';
+        if (/^https?:\/\//i.test(trimmed)) return trimmed;
+        const base = (typeof BASE_URL !== 'undefined' && BASE_URL) ? BASE_URL : 'https://aloraradiance.com';
+        return `${base}${trimmed.startsWith('/') ? '' : '/'}${trimmed}`;
+    };
 
-    const defaultProductSchema = {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": product.name || 'Alora Radiance Product',
-        "image": images.length > 0 ? images : undefined,
-        "description": product.description || product.metaDescription || '',
-        "sku": String(product._id || ''),
-        "brand": {
-            "@type": "Brand",
-            "name": "Alora Radiance"
-        },
-        "offers": {
+    const canonicalUrl = `https://aloraradiance.com/product/${encodeURIComponent(product.slug || product._id)}`;
+    const mainImg = formatImgUrl(product.imagepath) || 'https://aloraradiance.com/static/placeholder.png';
+    const galleryImgs = (product.galleryImages || []).map(formatImgUrl).filter(Boolean);
+    const allImages = [mainImg, ...galleryImgs].filter(Boolean);
+
+    const variants = Array.isArray(product.variants) && product.variants.length > 0 ? product.variants : [];
+    const prices = variants.map(v => Number(v.price)).filter(p => !isNaN(p) && p > 0);
+    const defaultPrice = prices.length > 0 ? Math.min(...prices) : Number(product.price || 0);
+    const minPrice = prices.length > 0 ? Math.min(...prices) : defaultPrice;
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : defaultPrice;
+    const currentPrice = selectedVariant && selectedVariant.price ? Number(selectedVariant.price) : defaultPrice;
+
+    // 1. Parse custom schemas from product.schema
+    let customSchemas = [];
+    if (product.schema && String(product.schema).trim()) {
+        if (typeof window.parseMultipleSchemas === 'function') {
+            customSchemas = window.parseMultipleSchemas(product.schema) || [];
+        }
+    }
+
+    // 2. Separate schemas by type
+    let customProductSchema = customSchemas.find(s => s && s["@type"] === "Product");
+    const customBreadcrumb = customSchemas.find(s => s && s["@type"] === "BreadcrumbList");
+    const customFaq = customSchemas.find(s => s && s["@type"] === "FAQPage");
+    const otherSchemas = customSchemas.filter(s => s && !["Product", "BreadcrumbList", "FAQPage"].includes(s["@type"]));
+
+    // 3. Resolve SINGLE Product Schema
+    let finalProductSchema;
+    if (customProductSchema) {
+        finalProductSchema = JSON.parse(JSON.stringify(customProductSchema));
+        finalProductSchema["@context"] = "https://schema.org";
+        finalProductSchema["@type"] = "Product";
+        if (!finalProductSchema.name) finalProductSchema.name = product.name || 'Alora Radiance Product';
+        if (!finalProductSchema.image || (Array.isArray(finalProductSchema.image) && finalProductSchema.image.length === 0)) {
+            finalProductSchema.image = allImages.length > 0 ? allImages : [mainImg];
+        }
+        if (!finalProductSchema.description) {
+            finalProductSchema.description = product.description || product.metaDescription || "Luxury dermatologist-tested skincare formulation.";
+        }
+        if (!finalProductSchema.sku || finalProductSchema.sku === "" || finalProductSchema.sku === "undefined") {
+            finalProductSchema.sku = product.sku || (product._id ? String(product._id) : (product.slug || "alora-product"));
+        }
+        if (!finalProductSchema.brand) {
+            finalProductSchema.brand = { "@type": "Brand", "name": "Alora Radiance" };
+        }
+        if (!finalProductSchema.category && product.category) {
+            finalProductSchema.category = product.category;
+        }
+
+        if (!finalProductSchema.offers || typeof finalProductSchema.offers !== 'object') {
+            finalProductSchema.offers = {};
+        }
+        finalProductSchema.offers.priceCurrency = "INR";
+        finalProductSchema.offers.url = canonicalUrl;
+        finalProductSchema.offers.availability = (selectedVariant && selectedVariant.stock === 0) ? "https://schema.org/OutOfStock" : (product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock");
+        finalProductSchema.offers.seller = { "@type": "Organization", "name": "Alora Radiance" };
+        if (!finalProductSchema.offers.itemCondition) {
+            finalProductSchema.offers.itemCondition = "https://schema.org/NewCondition";
+        }
+        if (!finalProductSchema.offers.priceValidUntil) {
+            finalProductSchema.offers.priceValidUntil = "2027-12-31";
+        }
+
+        if (selectedVariant) {
+            finalProductSchema.offers["@type"] = "Offer";
+            finalProductSchema.offers.price = String(currentPrice);
+            delete finalProductSchema.offers.lowPrice;
+            delete finalProductSchema.offers.highPrice;
+            delete finalProductSchema.offers.offerCount;
+        } else if (variants.length > 1) {
+            finalProductSchema.offers["@type"] = "AggregateOffer";
+            finalProductSchema.offers.lowPrice = String(minPrice);
+            finalProductSchema.offers.highPrice = String(maxPrice);
+            finalProductSchema.offers.price = String(minPrice);
+            finalProductSchema.offers.offerCount = String(variants.length);
+        } else {
+            finalProductSchema.offers["@type"] = "Offer";
+            finalProductSchema.offers.price = String(defaultPrice);
+            delete finalProductSchema.offers.lowPrice;
+            delete finalProductSchema.offers.highPrice;
+            delete finalProductSchema.offers.offerCount;
+        }
+
+        const ratingVal = Number(product.rating || finalProductSchema.aggregateRating?.ratingValue || 4.5);
+        const reviewCnt = Number(product.totalReviews || product.numReviews || finalProductSchema.aggregateRating?.reviewCount || (Array.isArray(finalProductSchema.review) ? finalProductSchema.review.length : 5));
+        finalProductSchema.aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": String(ratingVal),
+            "bestRating": "5",
+            "worstRating": "1",
+            "ratingCount": String(reviewCnt > 0 ? reviewCnt : 5),
+            "reviewCount": String(reviewCnt > 0 ? reviewCnt : 5)
+        };
+    } else {
+        const offersObj = (selectedVariant || variants.length <= 1) ? {
             "@type": "Offer",
             "url": canonicalUrl,
             "priceCurrency": "INR",
-            "price": String(priceVal),
-            "availability": "https://schema.org/InStock",
+            "price": String(currentPrice),
+            "availability": (selectedVariant && selectedVariant.stock === 0) ? "https://schema.org/OutOfStock" : (product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock"),
             "seller": {
                 "@type": "Organization",
                 "name": "Alora Radiance"
-            }
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": String(product.rating || 4.5),
-            "reviewCount": String(product.numReviews || product.totalReviews || 12)
-        }
-    };
+            },
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": "2027-12-31"
+        } : {
+            "@type": "AggregateOffer",
+            "url": canonicalUrl,
+            "priceCurrency": "INR",
+            "lowPrice": String(minPrice),
+            "highPrice": String(maxPrice),
+            "price": String(minPrice),
+            "offerCount": String(variants.length),
+            "availability": product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            },
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": "2027-12-31"
+        };
 
-    let allSchemas = [defaultProductSchema];
-    if (product.schema && String(product.schema).trim()) {
-        if (typeof window.parseMultipleSchemas === 'function') {
-            const custom = window.parseMultipleSchemas(product.schema);
-            if (Array.isArray(custom) && custom.length > 0) {
-                allSchemas.push(...custom);
+        const ratingVal = Number(product.rating || 4.5);
+        const reviewCnt = Number(product.totalReviews || product.numReviews || 5);
+
+        finalProductSchema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name || 'Alora Radiance Product',
+            "image": allImages.length > 0 ? allImages : [mainImg],
+            "description": product.description || product.metaDescription || "Luxury dermatologist-tested skincare formulation.",
+            "sku": product.sku || (product._id ? String(product._id) : (product.slug || "alora-product")),
+            "category": product.category || "Skincare",
+            "brand": {
+                "@type": "Brand",
+                "name": "Alora Radiance"
+            },
+            "offers": offersObj,
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": String(ratingVal),
+                "bestRating": "5",
+                "worstRating": "1",
+                "ratingCount": String(reviewCnt > 0 ? reviewCnt : 5),
+                "reviewCount": String(reviewCnt > 0 ? reviewCnt : 5)
             }
-        }
+        };
     }
 
-    if (typeof window.injectMultipleSchemasToDOM === 'function') {
-        window.injectMultipleSchemasToDOM(allSchemas);
+    // 4. Resolve SINGLE BreadcrumbList Schema
+    let finalBreadcrumb = customBreadcrumb;
+    if (!finalBreadcrumb) {
+        finalBreadcrumb = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": "https://aloraradiance.com/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Shop",
+                    "item": "https://aloraradiance.com/products"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": product.name,
+                    "item": canonicalUrl
+                }
+            ]
+        };
     }
+
+    // 5. Resolve SINGLE FAQPage Schema
+    let finalFaq = customFaq;
+    if (!finalFaq && Array.isArray(product.faqs) && product.faqs.length > 0) {
+        finalFaq = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": product.faqs.filter(f => f && f.question && f.answer).map(f => ({
+                "@type": "Question",
+                "name": f.question,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": f.answer
+                }
+            }))
+        };
+    }
+
+    const allSchemas = [finalProductSchema, finalBreadcrumb, finalFaq, ...otherSchemas].filter(Boolean);
+
+    // Purge any prior schemas to guarantee zero duplicates
+    document.querySelectorAll('.dynamic-schema-injected, #dynamic-json-ld, script[type="application/ld+json"]').forEach(el => el.remove());
+
+    // Inject clean unified schema tags into DOM
+    allSchemas.forEach((schema, idx) => {
+        const sTag = document.createElement('script');
+        sTag.type = 'application/ld+json';
+        sTag.className = 'dynamic-schema-injected';
+        sTag.setAttribute('data-dynamic', 'true');
+        if (idx === 0) sTag.id = 'dynamic-json-ld';
+        if (!schema['@context']) schema['@context'] = 'https://schema.org';
+        sTag.textContent = JSON.stringify(schema, null, 2);
+        document.head.appendChild(sTag);
+    });
 }
 
 window.selectSize = function(volume, price, comparePrice, stock, buttonElement) {

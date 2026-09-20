@@ -256,6 +256,9 @@ export const renderBlogListSsr = (templateHtml, posts = []) => {
 
     html = html.replace(/<title id="dynamic-title">.*?<\/title>/i, `<title id="dynamic-title">${title}</title>`);
     html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
+
+    html = html.replace(/<title id="dynamic-title">.*?<\/title>/i, `<title id="dynamic-title">${title}</title>`);
+    html = html.replace(/<title>.*?<\/title>/i, `<title>${title}</title>`);
     html = html.replace(/<meta id="dynamic-meta-desc" name="description" content="[^"]*">/i, `<meta id="dynamic-meta-desc" name="description" content="${desc}">`);
     html = html.replace(/<meta name="description" content="[^"]*">/i, `<meta name="description" content="${desc}">`);
     html = html.replace(/<meta id="dynamic-keywords" name="keywords" content="[^"]*">/i, `<meta id="dynamic-keywords" name="keywords" content="${keywords}">`);
@@ -301,6 +304,198 @@ export const renderBlogListSsr = (templateHtml, posts = []) => {
     return html;
 };
 
+export const buildProductJsonLdSchemas = (product) => {
+    if (!product) return [];
+
+    const canonicalUrl = getProductSlugUrl(product);
+    const mainImg = formatImageUrl(product.imagepath);
+    const galleryImgs = (product.galleryImages || []).map(g => formatImageUrl(g)).filter(Boolean);
+    const allImages = [mainImg, ...galleryImgs].filter(Boolean);
+
+    const variants = Array.isArray(product.variants) && product.variants.length > 0 ? product.variants : [];
+    const prices = variants.map(v => Number(v.price)).filter(p => !isNaN(p) && p > 0);
+    const defaultPrice = prices.length > 0 ? Math.min(...prices) : Number(product.price || 0);
+    const minPrice = prices.length > 0 ? Math.min(...prices) : defaultPrice;
+    const maxPrice = prices.length > 0 ? Math.max(...prices) : defaultPrice;
+
+    // 1. Parse custom schemas from product.schema field
+    const customSchemas = parseAndNormalizeSchemas(product.schema);
+
+    // 2. Separate schemas by type
+    let customProductSchema = customSchemas.find(s => s && s["@type"] === "Product");
+    const customBreadcrumb = customSchemas.find(s => s && s["@type"] === "BreadcrumbList");
+    const customFaq = customSchemas.find(s => s && s["@type"] === "FAQPage");
+    const otherSchemas = customSchemas.filter(s => s && !["Product", "BreadcrumbList", "FAQPage"].includes(s["@type"]));
+
+    // 3. Resolve SINGLE Product Schema (no duplicates!)
+    let finalProductSchema;
+    if (customProductSchema) {
+        finalProductSchema = JSON.parse(JSON.stringify(customProductSchema));
+        finalProductSchema["@context"] = "https://schema.org";
+        finalProductSchema["@type"] = "Product";
+        if (!finalProductSchema.name) finalProductSchema.name = product.name;
+        if (!finalProductSchema.image || (Array.isArray(finalProductSchema.image) && finalProductSchema.image.length === 0)) {
+            finalProductSchema.image = allImages.length > 0 ? allImages : [mainImg];
+        }
+        if (!finalProductSchema.description) {
+            finalProductSchema.description = product.description || product.metaDescription || "Luxury dermatologist-tested skincare formulation.";
+        }
+        if (!finalProductSchema.sku || finalProductSchema.sku === "" || finalProductSchema.sku === "undefined") {
+            finalProductSchema.sku = product.sku || (product._id ? String(product._id) : (product.slug || "alora-product"));
+        }
+        if (!finalProductSchema.brand) {
+            finalProductSchema.brand = { "@type": "Brand", "name": "Alora Radiance" };
+        }
+        if (!finalProductSchema.category && product.category) {
+            finalProductSchema.category = product.category;
+        }
+
+        // Heal & ensure valid offers
+        if (!finalProductSchema.offers || typeof finalProductSchema.offers !== 'object') {
+            finalProductSchema.offers = {};
+        }
+        finalProductSchema.offers.priceCurrency = "INR";
+        finalProductSchema.offers.url = canonicalUrl;
+        finalProductSchema.offers.availability = product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+        finalProductSchema.offers.seller = { "@type": "Organization", "name": "Alora Radiance" };
+        if (!finalProductSchema.offers.itemCondition) {
+            finalProductSchema.offers.itemCondition = "https://schema.org/NewCondition";
+        }
+        if (!finalProductSchema.offers.priceValidUntil) {
+            finalProductSchema.offers.priceValidUntil = "2027-12-31";
+        }
+
+        if (variants.length > 1) {
+            finalProductSchema.offers["@type"] = "AggregateOffer";
+            finalProductSchema.offers.lowPrice = String(minPrice);
+            finalProductSchema.offers.highPrice = String(maxPrice);
+            finalProductSchema.offers.price = String(minPrice);
+            finalProductSchema.offers.offerCount = String(variants.length);
+        } else {
+            finalProductSchema.offers["@type"] = "Offer";
+            finalProductSchema.offers.price = String(defaultPrice);
+            delete finalProductSchema.offers.lowPrice;
+            delete finalProductSchema.offers.highPrice;
+            delete finalProductSchema.offers.offerCount;
+        }
+
+        // Heal & ensure valid aggregateRating
+        const ratingVal = Number(product.rating || finalProductSchema.aggregateRating?.ratingValue || 4.5);
+        const reviewCnt = Number(product.totalReviews || product.numReviews || finalProductSchema.aggregateRating?.reviewCount || (Array.isArray(finalProductSchema.review) ? finalProductSchema.review.length : 5));
+        finalProductSchema.aggregateRating = {
+            "@type": "AggregateRating",
+            "ratingValue": String(ratingVal),
+            "bestRating": "5",
+            "worstRating": "1",
+            "ratingCount": String(reviewCnt > 0 ? reviewCnt : 5),
+            "reviewCount": String(reviewCnt > 0 ? reviewCnt : 5)
+        };
+    } else {
+        const offersObj = variants.length > 1 ? {
+            "@type": "AggregateOffer",
+            "url": canonicalUrl,
+            "priceCurrency": "INR",
+            "lowPrice": String(minPrice),
+            "highPrice": String(maxPrice),
+            "price": String(minPrice),
+            "offerCount": String(variants.length),
+            "availability": product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            },
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": "2027-12-31"
+        } : {
+            "@type": "Offer",
+            "url": canonicalUrl,
+            "priceCurrency": "INR",
+            "price": String(defaultPrice),
+            "availability": product.isAvailable !== false ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+            "seller": {
+                "@type": "Organization",
+                "name": "Alora Radiance"
+            },
+            "itemCondition": "https://schema.org/NewCondition",
+            "priceValidUntil": "2027-12-31"
+        };
+
+        const ratingVal = Number(product.rating || 4.5);
+        const reviewCnt = Number(product.totalReviews || product.numReviews || 5);
+
+        finalProductSchema = {
+            "@context": "https://schema.org",
+            "@type": "Product",
+            "name": product.name,
+            "image": allImages.length > 0 ? allImages : [mainImg],
+            "description": product.description || product.metaDescription || "Luxury dermatologist-tested skincare formulation.",
+            "sku": product.sku || (product._id ? String(product._id) : (product.slug || "alora-product")),
+            "category": product.category || "Skincare",
+            "brand": {
+                "@type": "Brand",
+                "name": "Alora Radiance"
+            },
+            "offers": offersObj,
+            "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": String(ratingVal),
+                "bestRating": "5",
+                "worstRating": "1",
+                "ratingCount": String(reviewCnt > 0 ? reviewCnt : 5),
+                "reviewCount": String(reviewCnt > 0 ? reviewCnt : 5)
+            }
+        };
+    }
+
+    // 4. Resolve SINGLE BreadcrumbList Schema (Every product gets breadcrumbs!)
+    let finalBreadcrumb = customBreadcrumb;
+    if (!finalBreadcrumb) {
+        finalBreadcrumb = {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": DOMAIN + "/"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "Shop",
+                    "item": DOMAIN + "/products"
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": product.name,
+                    "item": canonicalUrl
+                }
+            ]
+        };
+    }
+
+    // 5. Resolve SINGLE FAQPage Schema
+    let finalFaq = customFaq;
+    if (!finalFaq && Array.isArray(product.faqs) && product.faqs.length > 0) {
+        finalFaq = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": product.faqs.filter(f => f && f.question && f.answer).map(f => ({
+                "@type": "Question",
+                "name": f.question,
+                "acceptedAnswer": {
+                    "@type": "Answer",
+                    "text": f.answer
+                }
+            }))
+        };
+    }
+
+    return [finalProductSchema, finalBreadcrumb, finalFaq, ...otherSchemas].filter(Boolean);
+};
+
 // ==========================================
 // 3. INDIVIDUAL PRODUCT DETAIL SSR PRE-RENDERER
 // ==========================================
@@ -331,40 +526,13 @@ export const renderProductSsr = (templateHtml, product, faqs = []) => {
     html = html.replace(/<meta id="og-image" property="og:image" content="[^"]*">/i, `<meta id="og-image" property="og:image" content="${mainImg}">`);
     html = html.replace(/<meta id="og-url" property="og:url" content="[^"]*">/i, `<meta id="og-url" property="og:url" content="${canonicalUrl}">`);
 
-    // Schema.org Product JSON-LD
-    const productSchema = {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": product.name,
-        "image": [mainImg, ...(product.galleryImages || []).map(g => formatImageUrl(g))],
-        "description": product.description || product.metaDescription,
-        "sku": String(product._id),
-        "brand": {
-            "@type": "Brand",
-            "name": "Alora Radiance"
-        },
-        "offers": {
-            "@type": "Offer",
-            "url": canonicalUrl,
-            "priceCurrency": "INR",
-            "price": String(price),
-            "availability": "https://schema.org/InStock",
-            "seller": {
-                "@type": "Organization",
-                "name": "Alora Radiance"
-            }
-        },
-        "aggregateRating": {
-            "@type": "AggregateRating",
-            "ratingValue": String(product.rating || 4.5),
-            "reviewCount": String(product.numReviews || 12)
-        }
-    };
+    // Clean any prior script tags from the template HTML to prevent duplicates
+    html = html.replace(/<script\b[^>]*type=["']application\/ld\+json["'][^>]*>[\s\S]*?<\/script>/gi, '');
 
-    // Keep schema data safe inside a script tag even when product text contains '<'.
-    const customSchemas = parseAndNormalizeSchemas(product.schema);
-    const jsonLdTags = [productSchema, ...customSchemas]
-        .map(schema => `<script type="application/ld+json">\n${serializeJsonLd(schema)}\n</script>`)
+    // Schema.org Verified, Deduplicated JSON-LD
+    const allSchemas = buildProductJsonLdSchemas(product);
+    const jsonLdTags = allSchemas
+        .map(schema => `<script type="application/ld+json" class="dynamic-schema-injected">\n${serializeJsonLd(schema)}\n</script>`)
         .join('\n');
     html = html.replace(/<\/head>/i, `${jsonLdTags}\n</head>`);
 
