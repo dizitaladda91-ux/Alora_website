@@ -44,6 +44,26 @@ const __dirname = path.dirname(__filename);
 const app = express();
 app.set("trust proxy", 1);
 
+// Canonical Host & HTTPS Enforcer: Redirect www and http to https://aloraradiance.com
+app.use((req, res, next) => {
+  const host = (req.headers.host || "").toLowerCase().trim();
+  const proto = (req.headers["x-forwarded-proto"] || (req.secure ? "https" : "http")).toLowerCase();
+
+  // Bypass for local development and direct vercel previews
+  if (host.includes("localhost") || host.includes("127.0.0.1") || host.endsWith(".vercel.app")) {
+    return next();
+  }
+
+  // Redirect if accessed via www. or non-https
+  if (host.startsWith("www.") || (host.includes("aloraradiance.com") && proto !== "https")) {
+    const cleanHost = host.replace(/^www\./i, "");
+    const targetUrl = `https://${cleanHost}${req.originalUrl || req.url || ""}`;
+    return res.redirect(301, targetUrl);
+  }
+
+  next();
+});
+
 // Security Rate Limiters
 const globalLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 2000, message: "Too many API requests. Please slow down." });
 const authLimiter = createRateLimiter({ windowMs: 15 * 60 * 1000, max: 20, message: "Too many login/auth attempts. Please try again after 15 minutes." });

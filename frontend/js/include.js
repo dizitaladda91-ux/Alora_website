@@ -1,3 +1,21 @@
+// Canonical Host & HTTPS Enforcer
+(function() {
+    if (typeof window !== 'undefined' && window.location) {
+        const host = window.location.hostname.toLowerCase();
+        const proto = window.location.protocol;
+        const isLocal = host === 'localhost' || host === '127.0.0.1' || host.endsWith('.local');
+        if (!isLocal) {
+            const isWww = host.startsWith('www.');
+            const isHttp = proto === 'http:';
+            if (isWww || (isHttp && host.includes('aloraradiance.com'))) {
+                const cleanHost = host.replace(/^www\./i, '');
+                const targetUrl = 'https://' + cleanHost + window.location.pathname + window.location.search + window.location.hash;
+                window.location.replace(targetUrl);
+            }
+        }
+    }
+})();
+
 window.togglePasswordVisibility = function(inputId, btn) {
     const input = document.getElementById(inputId);
     if (!input) return;
