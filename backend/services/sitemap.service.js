@@ -16,7 +16,6 @@ export async function generateSitemapXml() {
         '/blog',
         '/certificates',
         '/faq',
-        '/track-order',
         '/privacy-policy',
         '/terms-and-conditions',
         '/return-refund',

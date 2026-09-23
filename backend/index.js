@@ -221,6 +221,10 @@ app.get('/product/:id', async (req, res) => {
       return res.status(404).sendFile(productHtmlPath);
     }
 
+    if (product.slug && rawId !== product.slug) {
+      return res.redirect(301, `/product/${encodeURIComponent(product.slug)}`);
+    }
+
     const templateHtml = await fs.promises.readFile(productHtmlPath, 'utf8');
     const renderedHtml = renderProductSsr(templateHtml, product);
 
@@ -233,7 +237,7 @@ app.get('/product/:id', async (req, res) => {
 });
 
 // 301 Permanent Redirects for legacy and duplicate URL variations
-app.get(['/blogs', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
+app.get(['/blogs', '/blog.html', '/blogs.html', '/post', '/post.html', '/Blog'], (req, res) => {
   return res.redirect(301, '/blog');
 });
 
@@ -248,7 +252,27 @@ app.get(['/blogs/:slug', '/post/:slug'], (req, res) => {
   return res.redirect(301, `/blog/${encodeURIComponent(rawSlug)}`);
 });
 
-app.get(['/moreproduct', '/moreproduct.html', '/product.html', '/products.html'], (req, res) => {
+app.get(['/product', '/product.html'], async (req, res) => {
+  const queryId = String(req.query.id || req.query._id || '').trim();
+  if (queryId) {
+    try {
+      await db();
+      const product = await Product.findOne({
+        $or: [
+          { slug: queryId },
+          { slug: decodeURIComponent(queryId) },
+          { _id: queryId.match(/^[0-9a-fA-F]{24}$/) ? queryId : null }
+        ].filter(Boolean)
+      }).select('slug').lean();
+      if (product && product.slug) {
+        return res.redirect(301, `/product/${encodeURIComponent(product.slug)}`);
+      }
+    } catch (_) {}
+  }
+  return res.redirect(301, '/products');
+});
+
+app.get(['/moreproduct', '/moreproduct.html', '/products.html'], (req, res) => {
   return res.redirect(301, '/products');
 });
 
@@ -282,6 +306,11 @@ app.get(['/Corporate Governance.html', '/corporate-governance.html'], (req, res)
 
 app.get(['/trackorder', '/trackorder.html', '/track-order.html'], (req, res) => {
   return res.redirect(301, '/track-order');
+});
+
+app.get('/track-order', (req, res) => {
+  res.setHeader('X-Robots-Tag', 'noindex, follow');
+  res.sendFile(path.join(frontendRoot, 'trackorder.html'));
 });
 
 app.get(['/account.html', '/myorders.html'], (req, res) => {

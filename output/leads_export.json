@@ -1,0 +1,311 @@
+[
+  {
+    "_id": "6a9d0a2901b015a60c182e3e",
+    "email": "pandatj340@gmail.com",
+    "__v": 0,
+    "address": "",
+    "createdAt": "2026-09-06T06:37:29.837Z",
+    "name": "PRIYA SING",
+    "phone": "8010086332",
+    "source": "registration"
+  },
+  {
+    "_id": "6a9bb12501b015a60c17e902",
+    "email": "info@dizitaladda.com",
+    "__v": 0,
+    "address": "",
+    "createdAt": "2026-09-05T06:05:25.338Z",
+    "name": "GOVIND",
+    "phone": "8010606010",
+    "source": "registration"
+  },
+  {
+    "_id": "6a97add020897852539fe859",
+    "email": "sanchigoyal729@gmail.com",
+    "__v": 0,
+    "address": "",
+    "createdAt": "2026-09-02T05:02:08.322Z",
+    "name": "SANCHI GOYAL",
+    "phone": "9911331891",
+    "source": "registration"
+  },
+  {
+    "_id": "6a8ff948e885894ec9ef9fd9",
+    "email": "reemasingh010847@gmail.com",
+    "__v": 0,
+    "address": "",
+    "createdAt": "2026-08-27T08:46:00.482Z",
+    "name": "PRATHAM LOHIA",
+    "phone": "7223936303",
+    "source": "registration"
+  },
+  {
+    "_id": "6a8ff883e885894ec9ef9fb5",
+    "email": "prtmlohia27@gmail.com",
+    "__v": 0,
+    "address": "664,top floor, sector 21 C, faridabad haryana",
+    "createdAt": "2026-08-27T08:42:43.845Z",
+    "name": "SEEMA NAGAR",
+    "phone": "9650665466",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a8aac8ed7db56e214753513",
+    "email": "managementiem629@gmail.com",
+    "__v": 0,
+    "address": "Surya vihar part 3rd near Om Shanti Mandir sector\nSector 91",
+    "createdAt": "2026-08-23T08:17:18.589Z",
+    "name": "DIVYANSHU MISHRA",
+    "phone": "8178881354",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a899ad1d7db56e21474fab0",
+    "email": "test123@gmail.com",
+    "__v": 0,
+    "address": "qwertyuiozxcvbnm,zxcvbnmasxdvbn",
+    "createdAt": "2026-08-22T12:49:21.046Z",
+    "name": "DMONIC",
+    "phone": "7565554512",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a893b3dd7db56e21474e5f9",
+    "email": "officalmarkestra@gmail.com",
+    "__v": 0,
+    "address": "",
+    "createdAt": "2026-08-22T06:01:33.689Z",
+    "name": "ABHINAV SHARMA",
+    "phone": "7428532940",
+    "source": "registration"
+  },
+  {
+    "_id": "6a840c98d7db56e21473a025",
+    "email": "griteealora@gmail.com",
+    "__v": 0,
+    "address": "366 Sant Nagar, East Of Kailash, New Delhi- 110065",
+    "createdAt": "2026-08-18T07:41:12.213Z",
+    "name": "GRITEE",
+    "phone": "7531832668",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a807bffd7db56e21472c0d4",
+    "email": "jane.smith@example.com",
+    "__v": 0,
+    "address": "Surya vihar part 3rd near Om Shanti Mandir sector\nSector 91",
+    "createdAt": "2026-08-15T14:47:27.339Z",
+    "name": "DIVYANSHU MISHRA",
+    "phone": "8282796454",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a801fc09160b11c6296a225",
+    "name": "Satyam Mishra",
+    "email": "satyammishra07july@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-15T08:13:52.183Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a801a72a2054459a7dd6fcc",
+    "name": "w,asl",
+    "email": "67renumishra@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-15T07:51:14.642Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a800dc639cee24a06787a08",
+    "name": "satyam",
+    "email": "kumarmishrasuman@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-15T06:57:10.546Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7fee85ab2a088c7cb9dd90",
+    "name": "divuanshu",
+    "email": "devop1291@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-15T04:43:49.226Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7feae35d1192f238309951",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-15T04:28:19.303Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7fc24170796f5e889defc8",
+    "name": "Satyam Mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-15T01:34:57.361Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7f4d0a738ae9c45da885b1",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-14T17:14:50.688Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7f4b075eb960ac815e4b60",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "phone": "",
+    "address": "",
+    "source": "website",
+    "createdAt": "2026-08-14T17:06:15.981Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7f479689214d14a82e3d4b",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-14T16:51:34.693Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7ef593c80ae31e072800a9",
+    "name": "Gritee Kushwaha",
+    "email": "griteek@gmail.com",
+    "createdAt": "2026-08-14T11:01:39.424Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7ed92a3ca5c372977a168b",
+    "name": "neeraj",
+    "email": "neerajtanvarr@gamil.co",
+    "createdAt": "2026-08-14T09:00:26.422Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7ed8243ca5c372977a1619",
+    "name": "yuvraj",
+    "email": "yuvrajtripathi@mail.co",
+    "createdAt": "2026-08-14T08:56:04.081Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7ed7a73ca5c372977a15ef",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-14T08:53:59.430Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7ed146b680f4fecd7921b6",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-14T08:26:46.003Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7eac5cb8dcb2b2e283f41b",
+    "name": "DIVYANSHU MISHRA",
+    "email": "satyam07july@gmail.com",
+    "createdAt": "2026-08-14T05:49:16.176Z",
+    "__v": 0,
+    "address": "Surya vihar part 3rd near Om Shanti Mandir sector\nSector 91",
+    "phone": "9315507412",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a7cbf8ae79c02ff82e17bfb",
+    "name": "Kakal",
+    "email": "shia@hakm.com",
+    "createdAt": "2026-08-12T18:46:34.930Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7c5085dae10623fdbd6820",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-12T10:52:53.250Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7bffc9c591bad9cb38ce7a",
+    "name": "divyanshu",
+    "email": "satyammihsra@mail.com",
+    "createdAt": "2026-08-12T05:08:25.519Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7bd7fbce58d4ae4ae6a0d3",
+    "name": "Gwt2",
+    "email": "mmishra07july@gmail.com",
+    "createdAt": "2026-08-12T02:18:35.129Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a7b17a66eff2807d80aff01",
+    "name": "hgjh",
+    "email": "vggjhj@gmail.co",
+    "createdAt": "2026-08-11T12:37:58.032Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a76f397cf29badb9a6c61d5",
+    "name": "DIVYANSHU MISHRA",
+    "email": "satyammishra@gmail.com",
+    "createdAt": "2026-08-08T09:15:03.532Z",
+    "__v": 0,
+    "address": "Surya vihar part 3rd near Om Shanti Mandir sector\nSector 91",
+    "phone": "9315589644",
+    "source": "checkout"
+  },
+  {
+    "_id": "6a76d3ac151b65c30b5e18a6",
+    "name": "divyanshu mishra",
+    "email": "dizitaladda91@gmail.com",
+    "createdAt": "2026-08-08T06:58:52.357Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a76c54d36b14dbb7178b143",
+    "name": "divyanshu mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-08T05:57:33.529Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a76c382ffe6411cbe75382e",
+    "name": "Satyam Mishra",
+    "email": "satyammishra07july@gmail.com",
+    "createdAt": "2026-08-08T05:49:54.240Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a70da0617141cb4fe32dc67",
+    "name": "Manish",
+    "email": "manishedit78@gmail.com",
+    "createdAt": "2026-08-03T18:12:22.546Z",
+    "__v": 0
+  },
+  {
+    "_id": "6a6f485085a3f7d05826479d",
+    "name": "Anushka",
+    "email": "anushkadubey1508@gmail.com",
+    "createdAt": "2026-08-02T13:38:24.137Z",
+    "__v": 0
+  }
+]

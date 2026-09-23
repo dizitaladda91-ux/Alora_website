@@ -23,6 +23,16 @@
       "source": "/moreproduct.html",
       "destination": "/products",
       "permanent": true
+    },
+    {
+      "source": "/moreproduct",
+      "destination": "/products",
+      "permanent": true
+    },
+    {
+      "source": "/Blog",
+      "destination": "/blog",
+      "permanent": true
     }
   ],
   "builds": [
@@ -53,6 +63,10 @@
     },
     {
       "src": "/product/[^/]+/?",
+      "dest": "/api/index.js"
+    },
+    {
+      "src": "/product/?",
       "dest": "/api/index.js"
     },
     {
@@ -106,7 +120,9 @@
     {
       "src": "/(affiliate|affiliate-register)(/.*)?",
       "status": 301,
-      "headers": { "Location": "https://affiliation.aloraradiance.com/register" }
+      "headers": {
+        "Location": "https://affiliation.aloraradiance.com/register"
+      }
     },
     {
       "src": "/(admin|addnewproduct|adminleadshow|adminproduct|adminupdateproduct|adminUserquery|seoadmin|seoadminupdate|seoallpost|seoproduct|seoproductupdate|affiliate)(\\.html)?",
@@ -119,12 +135,16 @@
     {
       "src": "/post/(.*)",
       "status": 301,
-      "headers": { "Location": "/blog/$1" }
+      "headers": {
+        "Location": "/blog/$1"
+      }
     },
     {
       "src": "/post/?",
       "status": 301,
-      "headers": { "Location": "/blog" }
+      "headers": {
+        "Location": "/blog"
+      }
     },
     {
       "src": "/blog/?",
@@ -136,7 +156,10 @@
     },
     {
       "src": "/Blog/?",
-      "dest": "/api/index.js"
+      "status": 301,
+      "headers": {
+        "Location": "/blog"
+      }
     },
     {
       "src": "/blog/(.*)",
