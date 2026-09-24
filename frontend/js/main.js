@@ -624,12 +624,22 @@ function slideProducts(direction) {
     const wrapper = document.getElementById('productSliderWrapper');
     if (!container || !wrapper) return;
     const firstCard = wrapper.querySelector('.product-card');
-    const scrollAmount = firstCard ? (firstCard.offsetWidth + 16) : 300;
+    const gap = window.innerWidth >= 640 ? 24 : 16;
+    const scrollAmount = firstCard ? (firstCard.offsetWidth + gap) : 320;
     requestAnimationFrame(() => {
         if (direction === 'right') {
-            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            const maxScroll = container.scrollWidth - container.clientWidth;
+            if (container.scrollLeft + scrollAmount >= maxScroll - 10) {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+            }
         } else {
-            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            if (container.scrollLeft <= 10) {
+                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+            }
         }
     });
 }

@@ -419,6 +419,66 @@
         }
 
         /* 🚀 Hero Banner Slider Dots Navigation (Classic, Minimalist & Sleek) */
+        
+        /* 🚀 FEATURED COLLECTION SLIDER ARROWS (LAPTOP/DESKTOP HOVER REVEAL) */
+        .featured-slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 25;
+            width: 44px;
+            height: 44px;
+            border-radius: 9999px;
+            background-color: rgba(255, 255, 255, 0.95);
+            color: #152219;
+            border: 1.5px solid #E5DEC9;
+            box-shadow: 0 4px 16px rgba(21, 34, 25, 0.12), 0 1px 3px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.35s ease, transform 0.25s ease, background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.25s ease;
+        }
+
+        /* Show arrows when cursor enters featured collection area on laptop */
+        .featured-slider-wrapper:hover .featured-slider-arrow,
+        #featured:hover .featured-slider-arrow {
+            opacity: 0.7;
+            pointer-events: auto;
+        }
+
+        /* Full highlight when hovering directly on the button */
+        .featured-slider-arrow:hover {
+            opacity: 1 !important;
+            transform: translateY(-50%) scale(1.12) !important;
+            background-color: #FFFFFF !important;
+            color: #8B4513 !important;
+            border-color: #C5A059 !important;
+            box-shadow: 0 8px 24px rgba(139, 69, 19, 0.22) !important;
+        }
+
+        .featured-slider-arrow:active {
+            transform: translateY(-50%) scale(0.95) !important;
+        }
+
+        .featured-slider-prev {
+            left: -12px;
+        }
+        @media (min-width: 1024px) {
+            .featured-slider-prev {
+                left: -20px;
+            }
+        }
+
+        .featured-slider-next {
+            right: -12px;
+        }
+        @media (min-width: 1024px) {
+            .featured-slider-next {
+                right: -20px;
+            }
+        }
+
         #hero-slider-dots {
             position: relative !important;
             display: flex !important;
@@ -929,7 +989,18 @@
             </div>
 
             <!-- Product Slider Container Wrapper (Touch Swipe & Mouse Drag Enabled) -->
-            <div class="relative group/featured-slider">
+            <div class="relative group/featured-slider featured-slider-wrapper">
+                <!-- Left Navigation Arrow (Laptop/Desktop Hover Visible) -->
+                <button 
+                    type="button" 
+                    id="featuredSliderPrev"
+                    onclick="slideProducts('left')" 
+                    aria-label="Previous Featured Products" 
+                    class="featured-slider-arrow featured-slider-prev hidden md:flex items-center justify-center cursor-pointer"
+                >
+                    <i class="fa-solid fa-chevron-left text-sm lg:text-base pointer-events-none"></i>
+                </button>
+
                 <!-- Product Slider Container -->
                 <div id="productSliderContainer" class="overflow-x-auto w-full py-3 sm:py-4 scroll-smooth snap-x snap-mandatory no-scrollbar cursor-grab active:cursor-grabbing select-none">
                     <div id="productSliderWrapper" class="flex items-stretch gap-4 sm:gap-6">
@@ -960,6 +1031,17 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Right Navigation Arrow (Laptop/Desktop Hover Visible) -->
+                <button 
+                    type="button" 
+                    id="featuredSliderNext"
+                    onclick="slideProducts('right')" 
+                    aria-label="Next Featured Products" 
+                    class="featured-slider-arrow featured-slider-next hidden md:flex items-center justify-center cursor-pointer"
+                >
+                    <i class="fa-solid fa-chevron-right text-sm lg:text-base pointer-events-none"></i>
+                </button>
             </div>
         </div>
     </section>
