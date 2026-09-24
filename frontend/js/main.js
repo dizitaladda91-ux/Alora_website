@@ -627,19 +627,11 @@ function slideProducts(direction) {
     const gap = window.innerWidth >= 640 ? 24 : 16;
     const scrollAmount = firstCard ? (firstCard.offsetWidth + gap) : 320;
     requestAnimationFrame(() => {
-        if (direction === 'right') {
-            const maxScroll = container.scrollWidth - container.clientWidth;
-            if (container.scrollLeft + scrollAmount >= maxScroll - 10) {
-                container.scrollTo({ left: 0, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-            }
+        // User requested: Left click scrolls right, Right click scrolls left
+        if (direction === 'left') {
+            container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
         } else {
-            if (container.scrollLeft <= 10) {
-                container.scrollTo({ left: container.scrollWidth, behavior: 'smooth' });
-            } else {
-                container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
-            }
+            container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
         }
     });
 }

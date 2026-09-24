@@ -113,6 +113,29 @@
                 grid-template-columns: minmax(0, 1fr);
             }
         }
+    
+        /* 🚀 PRODUCT IMAGE HOVER ZOOM & LIGHTBOX */
+        #main-media-container {
+            cursor: zoom-in;
+            position: relative;
+            overflow: hidden;
+        }
+        #main-media-container iframe,
+        #main-media-container video {
+            cursor: default;
+        }
+        #main-media-container #main-product-image {
+            will-change: transform, transform-origin;
+            transform-origin: center center;
+        }
+        #image-zoom-modal {
+            touch-action: none;
+        }
+        #zoom-modal-img {
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
     </style>
 </head>
 <body class="bg-parchment font-sans text-ink flex flex-col min-h-screen">
@@ -129,11 +152,17 @@
                 <!-- LEFT SIDE: IMAGES & GALLERY -->
                 <div class="product-media-gallery space-y-4 relative z-0">
                     <div class="relative group">
-                        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] aspect-square flex items-center justify-center p-0 shadow-sm relative overflow-hidden">
+                        <div id="main-media-container" class="imagesection bg-white rounded-2xl md:rounded-3xl border border-[#E7DFC7] aspect-square flex items-center justify-center p-0 shadow-sm relative overflow-hidden cursor-zoom-in group/zoom">
                             <!-- IMPORTANT: source image must be uploaded as 1:1 (square),
                                  e.g. 800x800 or 1200x1200 — object-cover will crop anything
                                  that isn't already square. -->
-                            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                            <img id="main-product-image" src="/static/placeholder.png" alt="Product Image" class="w-full h-full object-cover transition-transform duration-200 ease-out select-none" decoding="async" fetchpriority="high" onerror="this.onerror=null; this.src='/static/placeholder.png'">
+                            
+                            <!-- Floating Zoom Badge -->
+                            <div id="zoom-hint-badge" class="absolute bottom-3 right-3 z-10 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md border border-stone-200/80 text-[11px] font-medium text-slate-700 shadow-xs flex items-center gap-1.5 pointer-events-none transition-opacity duration-200">
+                                <i class="fa-solid fa-magnifying-glass-plus text-amber-700 text-xs"></i>
+                                <span class="hidden sm:inline">Roll over or click to zoom</span>
+                            </div>
                         </div>
 
                         <!-- Left & Right Media Navigation Arrows -->
@@ -340,6 +369,56 @@
     </main>
 
     <!-- FOOTER PLACEHOLDER -->
+    
+    <!-- ============ PRODUCT IMAGE ZOOM LIGHTBOX MODAL ============ -->
+    <div id="image-zoom-modal" class="fixed inset-0 z-50 hidden bg-slate-950/95 backdrop-blur-md flex flex-col items-center justify-between p-4 sm:p-6 opacity-0 transition-opacity duration-300 select-none" role="dialog" aria-modal="true" aria-label="Product Image Zoom">
+        <!-- Top Action Bar -->
+        <div class="w-full max-w-7xl flex items-center justify-between z-20">
+            <div class="flex items-center gap-3">
+                <span id="zoom-modal-counter" class="text-xs font-mono text-white/80 bg-white/10 px-3 py-1 rounded-full border border-white/15">
+                    1 / 1
+                </span>
+                <span id="zoom-modal-product-name" class="text-xs sm:text-sm font-semibold text-white/90 truncate max-w-[200px] sm:max-w-md hidden sm:inline">
+                    Product Image
+                </span>
+            </div>
+            
+            <!-- Controls: Zoom In / Zoom Out / Reset / Close -->
+            <div class="flex items-center gap-2">
+                <button type="button" id="zoom-in-btn" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer border border-white/15" title="Zoom In" aria-label="Zoom In">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                </button>
+                <button type="button" id="zoom-out-btn" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition cursor-pointer border border-white/15" title="Zoom Out" aria-label="Zoom Out">
+                    <i class="fa-solid fa-minus text-xs"></i>
+                </button>
+                <button type="button" id="zoom-reset-btn" class="px-2.5 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white text-xs font-mono flex items-center justify-center transition cursor-pointer border border-white/15" title="Reset Zoom" aria-label="Reset Zoom">
+                    100%
+                </button>
+                <button type="button" id="close-zoom-modal-btn" class="w-9 h-9 rounded-full bg-white/15 hover:bg-rose-600 text-white flex items-center justify-center transition cursor-pointer border border-white/20 ml-2" title="Close (Esc)" aria-label="Close modal">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Center Stage: Pan-and-Zoom Image Container -->
+        <div id="zoom-stage" class="relative flex-1 w-full flex items-center justify-center overflow-hidden my-2 cursor-grab active:cursor-grabbing">
+            <img id="zoom-modal-img" src="" alt="Zoomed Product" class="max-w-[90vw] max-h-[75vh] object-contain transition-transform duration-150 ease-out select-none shadow-2xl rounded-xl">
+            
+            <!-- Modal Left & Right Navigation Arrows -->
+            <button type="button" id="zoom-modal-prev-btn" aria-label="Previous Image" class="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white shadow-xl flex items-center justify-center transition backdrop-blur-sm cursor-pointer border border-white/20 hover:scale-110">
+                <i class="fa-solid fa-chevron-left text-base"></i>
+            </button>
+            <button type="button" id="zoom-modal-next-btn" aria-label="Next Image" class="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white shadow-xl flex items-center justify-center transition backdrop-blur-sm cursor-pointer border border-white/20 hover:scale-110">
+                <i class="fa-solid fa-chevron-right text-base"></i>
+            </button>
+        </div>
+
+        <!-- Bottom Thumbnail Strip -->
+        <div id="zoom-modal-thumbnails" class="w-full max-w-xl flex items-center justify-center gap-2 overflow-x-auto py-2 scrollbar-none z-20">
+            <!-- Thumbnails populated dynamically -->
+        </div>
+    </div>
+
     <div id="footer-placeholder"></div>
 
     <!-- SCRIPTS -->
