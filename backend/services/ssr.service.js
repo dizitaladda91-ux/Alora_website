@@ -180,7 +180,7 @@ export const renderBlogArticleSsr = (templateHtml, blog, relatedProducts = []) =
     // Inject Article Top Meta (Category, Date, Title, Cover Image)
     html = html.replace(/<span id="post-category"[^>]*>.*?<\/span>/i, `<span id="post-category" class="bg-amber-100/70 text-[#8B4513] px-3 py-1 rounded-full text-[11px] font-bold uppercase font-roboto border border-amber-300/40">${escapeHtml(blog.category || 'Skincare')}</span>`);
     html = html.replace(/<span id="post-date"[^>]*>.*?<\/span>/i, `<span id="post-date" class="text-slate-500 font-medium">${pubDate}</span>`);
-    html = html.replace(/<h1 id="post-title"[^>]*>.*?<\/h1>/i, `<h1 id="post-title" class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-fraunces font-bold text-ink leading-snug text-slate-900 break-words overflow-wrap-anywhere">${escapeHtml(blog.title)}</h1>`);
+    html = html.replace(/<h1 id="post-title"[^>]*>.*?<\/h1>/i, `<h1 id="post-title" class="text-xl sm:text-2xl md:text-3xl lg:text-[31px] font-fraunces font-bold text-ink leading-tight text-slate-900 break-words overflow-wrap-anywhere">${escapeHtml(blog.title)}</h1>`);
 
     if (coverUrl) {
         html = html.replace(

@@ -83,6 +83,27 @@
             padding: 0;
         }
 
+        
+        /* 📰 Refined, Luxury Editorial Blog Title Sizing */
+        #post-title {
+            font-size: 1.35rem !important; /* ~21.6px mobile */
+            line-height: 1.25 !important;
+            letter-spacing: -0.015em !important;
+            font-weight: 700 !important;
+            color: #0F172A !important;
+        }
+        @media (min-width: 640px) {
+            #post-title {
+                font-size: 1.65rem !important; /* ~26.4px tablet */
+            }
+        }
+        @media (min-width: 1024px) {
+            #post-title {
+                font-size: 1.95rem !important; /* ~31.2px desktop */
+                line-height: 1.25 !important;
+            }
+        }
+
         /* 📱 Professional Mobile-First Blog Typography & Clean Tight Spacing */
         .post-body-content {
             font-size: 0.95rem; /* 15.2px comfortable mobile reading size */
@@ -427,7 +448,7 @@
                             <span class="text-slate-300">•</span>
                             <span id="post-date" class="text-slate-500 font-medium"></span>
                         </div>
-                        <h1 id="post-title" class="text-xl sm:text-3xl md:text-4xl lg:text-5xl font-fraunces font-bold text-ink leading-snug text-slate-900 break-words overflow-wrap-anywhere"></h1>
+                        <h1 id="post-title" class="text-xl sm:text-2xl md:text-3xl lg:text-[31px] font-fraunces font-bold text-ink leading-tight text-slate-900 break-words overflow-wrap-anywhere"></h1>
                     </div>
 
                     <!-- Cover Image Container -->
