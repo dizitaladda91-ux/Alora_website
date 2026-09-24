@@ -237,7 +237,7 @@ app.get('/product/:id', async (req, res) => {
 });
 
 // 301 Permanent Redirects for legacy and duplicate URL variations
-app.get(['/blogs', '/blog.html', '/blogs.html', '/post', '/post.html', '/Blog'], (req, res) => {
+app.get(['/blogs', '/blog.html', '/blogs.html', '/post', '/post.html'], (req, res) => {
   return res.redirect(301, '/blog');
 });
 
@@ -355,6 +355,10 @@ app.get(['/account', '/myorders', '/my-orders', '/profile', '/wishlist'], (req, 
 
 // 3. Blog Catalog Listing Page SSR (Canonical route: /blog)
 app.get('/blog', async (req, res) => {
+  // If requested specifically with uppercase /Blog, redirect to lowercase /blog
+  if (req.originalUrl && (req.originalUrl === '/Blog' || req.originalUrl.startsWith('/Blog?'))) {
+    return res.redirect(301, '/blog' + (req.originalUrl.slice(5) || ''));
+  }
   const target = fs.existsSync(path.join(frontendRoot, 'blog.html'))
     ? path.join(frontendRoot, 'blog.html')
     : path.join(frontendRoot, 'Blog.html');

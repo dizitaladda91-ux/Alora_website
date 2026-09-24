@@ -28,11 +28,6 @@
       "source": "/moreproduct",
       "destination": "/products",
       "permanent": true
-    },
-    {
-      "source": "/Blog",
-      "destination": "/blog",
-      "permanent": true
     }
   ],
   "builds": [
@@ -153,13 +148,6 @@
     {
       "src": "/blogs/?",
       "dest": "/api/index.js"
-    },
-    {
-      "src": "/Blog/?",
-      "status": 301,
-      "headers": {
-        "Location": "/blog"
-      }
     },
     {
       "src": "/blog/(.*)",
