@@ -316,6 +316,9 @@ async function loadProduct() {
         
         document.getElementById('product-name').textContent = product.name || 'Product Details';
         form.description.value = product.description || '';
+        if (form.benefits) form.benefits.value = product.benefits || '';
+        if (form.usageInstructions) form.usageInstructions.value = product.usageInstructions || '';
+        if (form.ingredients) form.ingredients.value = product.ingredients || '';
         form.rating.value = product.rating ?? 4.5;
         if (form.metaTitle) form.metaTitle.value = product.metaTitle || '';
         if (form.metaDescription) form.metaDescription.value = product.metaDescription || '';
@@ -369,6 +372,9 @@ form.addEventListener('submit', async event => {
 
     const data = new FormData();
     data.append('description', form.description.value.trim());
+    data.append('benefits', form.benefits ? form.benefits.value.trim() : '');
+    data.append('usageInstructions', form.usageInstructions ? form.usageInstructions.value.trim() : '');
+    data.append('ingredients', form.ingredients ? form.ingredients.value.trim() : '');
     data.append('rating', String(form.rating.value));
     data.append('metaTitle', form.metaTitle ? form.metaTitle.value.trim() : '');
     data.append('metaDescription', form.metaDescription ? form.metaDescription.value.trim() : '');

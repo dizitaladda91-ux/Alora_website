@@ -185,6 +185,9 @@ export const updateProductForSeo = async (req, res) => {
         }
 
         if (req.body.description !== undefined) product.description = req.body.description;
+        if (req.body.benefits !== undefined) product.benefits = String(req.body.benefits || '').trim();
+        if (req.body.usageInstructions !== undefined) product.usageInstructions = String(req.body.usageInstructions || '').trim();
+        if (req.body.ingredients !== undefined) product.ingredients = String(req.body.ingredients || '').trim();
         if (req.body.rating !== undefined) product.rating = Number(req.body.rating);
         if (req.body.metaTitle !== undefined) product.metaTitle = String(req.body.metaTitle || '').trim();
         if (req.body.metaDescription !== undefined) product.metaDescription = String(req.body.metaDescription || '').trim();

@@ -202,9 +202,53 @@
 }' class="w-full rounded-xl border border-slate-300 p-3 text-xs font-mono leading-relaxed focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition bg-white"></textarea>
             </div>
 
-            <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5">Product Story &amp; Description</label>
-                <textarea name="description" required rows="5" class="w-full rounded-xl border border-slate-300 p-3.5 text-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition"></textarea>
+            <!-- 5. STOREFRONT ACCORDION TABS (Product Overview, Benefits, How to Use, Ingredients) -->
+            <div class="p-5 bg-gradient-to-br from-amber-500/5 via-slate-50 to-amber-500/10 rounded-2xl border border-amber-200/80 shadow-xs space-y-5">
+                <div class="flex items-center justify-between border-b border-amber-200/60 pb-3">
+                    <div class="flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-amber-700 text-sm"></i>
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-amber-950 font-fraunces">
+                            Storefront Product Accordion Details
+                        </h3>
+                    </div>
+                    <span class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">Live Tabs</span>
+                </div>
+                <p class="text-[11px] text-slate-500 font-mono -mt-2">These details appear directly in the 4 interactive dropdown tabs on the product detail page.</p>
+
+                <!-- Tab 1: Product Overview & Story -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-book-open text-amber-600"></i> Tab 1: Product Overview &amp; Story
+                    </label>
+                    <textarea name="description" required rows="4" placeholder="e.g. Purifying glow face wash - quantity- 200ml - with Saffron Extract, Salicylic Acid, and Niacinamide" class="w-full rounded-xl border border-slate-300 p-3.5 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition bg-white leading-relaxed"></textarea>
+                </div>
+
+                <!-- Tab 2: Key Benefits -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-star text-amber-600"></i> Tab 2: Key Benefits
+                    </label>
+                    <textarea name="benefits" rows="4" placeholder="e.g. • Gently cleanses and purifies pores&#10;• Removes dead skin cells and excess sebum&#10;• Restores natural radiance without drying" class="w-full rounded-xl border border-slate-300 p-3.5 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition bg-white leading-relaxed"></textarea>
+                    <p class="mt-1 text-[11px] text-slate-500 font-mono">Use bullet points or concise lines to describe skin benefits.</p>
+                </div>
+
+                <!-- Tab 3: How to Use -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-hands-bubbles text-amber-600"></i> Tab 3: How to Use (Usage Instructions)
+                    </label>
+                    <textarea name="usageInstructions" rows="3" placeholder="e.g. Squeeze a coin-sized amount onto wet palms. Gently lather and massage in circular motions across face and neck for 45-60 seconds. Rinse thoroughly with lukewarm water." class="w-full rounded-xl border border-slate-300 p-3.5 text-xs sm:text-sm focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition bg-white leading-relaxed"></textarea>
+                    <p class="mt-1 text-[11px] text-slate-500 font-mono">Provide step-by-step guidance for customers on application routines.</p>
+                </div>
+
+                <!-- Tab 4: Full Ingredients List -->
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1.5 flex items-center gap-1.5">
+                        <i class="fa-solid fa-flask text-amber-600"></i> Tab 4: Full Ingredients List
+                    </label>
+                    <textarea name="ingredients" rows="4" placeholder="e.g. Aqua (Water), Saffron (Crocus Sativus) Extract, Salicylic Acid (2%), Niacinamide, Glycerin, Aloe Barbadensis Leaf Juice, Allantoin, Sodium Lauroyl Sarcosinate, Cocamidopropyl Betaine..." class="w-full rounded-xl border border-slate-300 p-3.5 text-xs sm:text-sm font-mono focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500 outline-none transition bg-white leading-relaxed"></textarea>
+                    <p class="mt-1 text-[11px] text-slate-500 font-mono">List active and botanical formulation ingredients transparently.</p>
+                </div>
             </div>
 
             <div>
